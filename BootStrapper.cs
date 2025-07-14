@@ -12,7 +12,6 @@ using DBF.DataModel;
 using DBF.ViewModels;
 using DBF.Views;
 using Microsoft.DotNet.DesignTools.ViewModels;
-using Wpf_TaskBar_Icon;
 
 namespace DBF
 {

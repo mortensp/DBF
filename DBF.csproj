@@ -152,17 +152,12 @@
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
 
-		<!--<Content Include="..\..\SyncfusionLicense.txt" Link="SyncfusionLicense.txt">
+		<Content Include="..\..\SyncfusionLicense.txt" Link="SyncfusionLicense.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 
 		<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>-->
+		</None>
 	</ItemGroup>
-
-
-
-	
-
 </Project>
