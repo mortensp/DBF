@@ -1,0 +1,328 @@
+﻿<Window x:Name="root"
+    x:Class="DBF.Views.TimerSettingView"
+    Title="Indstil uret"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cal="http://www.caliburnproject.org"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dbf="clr-namespace:DBF"
+    xmlns:local="clr-namespace:DBF.ViewModels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:DBF.DataModel"
+    xmlns:sf="http://schemas.syncfusion.com/wpf"
+    Width="500"
+    Height="600"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderThickness" Value="2" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderThickness" Value="2" />
+
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Padding="12"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            CornerRadius="6">
+
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,12"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Text="Indstil uret" />
+                <Grid Margin="0,0,0,0" DataContext="{Binding NewSetting}">
+                    <Grid.RowDefinitions>
+                        <!--  Add a row for each field  -->
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Række(r):  -->
+                    <TextBlock Grid.Column="0" Grid.Row="0"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Række(r):" />
+
+                    <TextBox x:Name="Group" Grid.Column="1" Grid.Row="0"
+                        Width="200"
+                        Margin="0,5"
+                        HorizontalAlignment="Left"
+                        Text="{Binding Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!--  Background:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="1"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Baggrund:" />
+
+                    <sf:ColorPickerPalette Name="cbColor" Grid.Column="1" Grid.Row="1"
+                        Width="200"
+                        Height="35"
+                        Margin="0,5"
+                        HorizontalAlignment="Left"
+                        AutomaticColorVisibility="Collapsed"
+                        CustomColorsCollection="{Binding NewColorCollection}"
+                        CustomHeaderText="Udvalgte Farver"
+                        CustomHeaderVisibility="Visible"
+                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                        SetCustomColors="True"
+                        StandardPanelVisibility="Collapsed"
+                        ThemePanelVisibility="Collapsed"
+                        Color="{Binding NewSetting.Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!--  Lyd:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="2"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Lyd:" />
+
+                    <WrapPanel Grid.Column="1" Grid.Row="2">
+                        <ComboBox
+                            Width="120"
+                            Margin="0,5"
+                            cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]"
+                            ItemsSource="{x:Static dbf:AudioPlayer.Sounds}"
+                            SelectedItem="{Binding Sound}" />
+
+                        <Slider x:Name="volume"
+                            Width="200"
+                            Margin="0,5"
+                            HorizontalAlignment="Left"
+                            cal:Message.Attach="[Event ValueChanged] = [Action VolumeChanged($eventArgs)]"
+                            Maximum="100"
+                            Minimum="0"
+                            Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </WrapPanel>
+
+                    <!--  Brug indstilling:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="3"
+                        Margin="0,5,0,5"
+                        VerticalAlignment="Center"
+                        Text="Brug indstilling:" />
+
+                    <StackPanel Grid.Column="1" Grid.Row="3"
+                        VerticalAlignment="Center"
+                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                        Orientation="Horizontal">
+                        <ComboBox x:Name="cbPresets"
+                            Width="120"
+                            Margin="0,5"
+                            DisplayMemberPath="Name"
+                            IsEditable="False"
+                            ItemsSource="{Binding Configuration.Presets}"
+                            SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <Button
+                            Width="28"
+                            Margin="4,5,0,5"
+                            cal:Message.Attach="[Event Click] = [Action AddPreset]"
+                            Content="+"
+                            ToolTip="Opret ny forudstilling" />
+
+                        <Button
+                            Width="28"
+                            Margin="4,5,0,5"
+                            cal:Message.Attach="[Event Click] = [Action SavePreset]"
+                            Content="💾"
+                            IsEnabled="{Binding CustomPreset}"
+                            ToolTip="Gem forudstilling" />
+
+                        <Button
+                            Width="28"
+                            Margin="4,5,0,5"
+                            cal:Message.Attach="[Event Click] = [Action DeletePreset]"
+                            Content="🗑"
+                            IsEnabled="{Binding CustomPreset}"
+                            ToolTip="Slet forudindstilling" />
+                    </StackPanel>
+
+                    <!--  Holdkamp:  -->
+                    <TextBlock x:Name="chkTeams" Grid.Column="0" Grid.Row="4"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Holdkamp:" />
+
+                    <CheckBox Grid.Column="1" Grid.Row="4"
+                        Margin="0,5"
+                        IsChecked="{Binding TeamMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!--  Runder:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="5"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Runder:" />
+
+                    <StackPanel Grid.Column="1" Grid.Row="5"
+                        Margin="0,5"
+                        Orientation="Horizontal">
+                        <TextBox
+                            Width="50"
+                            Margin="0,0,4,0"
+                            Text="{Binding Rounds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="0,0,4,0"
+                            VerticalAlignment="Center"
+                            Text="af:" />
+                        <TextBox
+                            Width="50"
+                            Margin="0,0,4,0"
+                            Text="{Binding BoardsPerRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock VerticalAlignment="Center" Text="spil." />
+                    </StackPanel>
+
+                    <!--  Pause efter runde  -->
+                    <TextBlock Grid.Column="0" Grid.Row="6"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Pause efter runde:" />
+
+                    <TextBox Grid.Column="1" Grid.Row="6"
+                        Width="50"
+                        Margin="0,5"
+                        HorizontalAlignment="Left"
+                        Text="{Binding BreakAfterRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <!--  Tid pr runde:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="7"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Tid pr runde:" />
+
+                    <StackPanel Grid.Column="1" Grid.Row="7"
+                        Margin="0,5"
+                        Orientation="Horizontal">
+                        <TextBox
+                            Width="40"
+                            Margin="0,0,2,0"
+                            Text="{Binding Hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock VerticalAlignment="Center" Text=":" />
+                        <TextBox
+                            Width="40"
+                            Margin="2,0,2,0"
+                            Text="{Binding Minutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock VerticalAlignment="Center" Text=":" />
+                        <TextBox
+                            Width="40"
+                            Margin="2,0,2,0"
+                            Text="{Binding Seconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="(tt:mm:ss)" />
+                    </StackPanel>
+
+                    <!--  Advarsel om ikke at starte på nye spil  -->
+                    <TextBlock Grid.Column="0" Grid.Row="8"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Advarsel - start ike nye spil:" />
+
+                    <StackPanel Grid.Column="1" Grid.Row="8"
+                        Margin="0,5"
+                        Orientation="Horizontal">
+                        <TextBox Width="50" Text="{Binding WarningMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="4,0,0,0"
+                            VerticalAlignment="top"
+                            Text="(minutter)" />
+                    </StackPanel>
+
+
+                    <!--  Tid til rundeskifte:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="9"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Tid til rundeskifte:" />
+
+
+                    <StackPanel Grid.Column="1" Grid.Row="9"
+                        Margin="0,5"
+                        Orientation="Horizontal">
+                        <TextBox Width="50" Text="{Binding TransitionMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="4,0,0,0"
+                            VerticalAlignment="top"
+                            Text="(minutter)" />
+                    </StackPanel>
+
+                    <!--  Pausens længde:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="10"
+                        Margin="0,5"
+                        VerticalAlignment="Center"
+                        Text="Pausens længde:" />
+
+                    <StackPanel Grid.Column="1" Grid.Row="10"
+                        Orientation="Horizontal">
+
+                        <TextBox
+                            Width="50"
+                            Margin="0,5"
+                            Text="{Binding BreakMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock
+                            Margin="4,0,0,0"
+                            VerticalAlignment="top"
+                            Text="(minutter)" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1"
+            Margin="0,12,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Width="80"
+                Margin="0,0,8,0"
+                cal:Message.Attach="[Event Click] = [Action Cancel]"
+                Content="Annuller"
+                IsCancel="True" />
+            <Button
+                Width="80"
+                cal:Message.Attach="[Event Click] = [Action AcceptSetting]"
+                Content="Anvend"
+                IsDefault="True" />
+        </StackPanel>
+    </Grid>
+
+</Window>
+

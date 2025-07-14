@@ -1,0 +1,37 @@
+<Project>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+    <!-- ================
+         Common constants
+         ================ -->
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants);CBridgeOff;Cache;Count;MaintainCount,MaintainSignatureOff;DDSMoves;DDSCompare;DDSQuickTricks;NewSwap;MyDictionaryOff</DefineConstants>
+		<DefineConstants>$(DefineConstants);PoolOff</DefineConstants>
+    </PropertyGroup>
+
+    <!-- ================================  
+         Configuration specific constants
+         ================================ -->
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DefineConstants>$(DefineConstants);CheckOff;ValidateOff;RereadOff</DefineConstants>
+		<DefineConstants>$(DefineConstants);Logging;LogMTZ;LogDDS</DefineConstants>
+		<DefineConstants>$(DefineConstants);DoCombinationsOff;SaveDictOff</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Profile'">
+        <DefineConstants>$(DefineConstants)</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='ProdTest'">
+        <DefineConstants>$(DefineConstants);</DefineConstants>
+    </PropertyGroup>
+
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<PreprocessorDefinitions>CBridgeOff;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+		</ClCompile>
+	</ItemDefinitionGroup>
+</Project>
+
+
+

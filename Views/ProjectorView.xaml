@@ -1,0 +1,20 @@
+﻿<Window
+    x:Class="DBF.Views.ProjectorView"
+    Title="DBF Projektor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Notification="clr-namespace:Syncfusion.Windows.Controls.Notification;assembly=Syncfusion.SfBusyIndicator.WPF"
+    xmlns:cal="http://www.caliburnproject.org"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:DBF.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    WindowStartupLocation="Manual"
+    mc:Ignorable="d">
+    <Viewbox Focusable="False">
+        <ContentControl Grid.Row="1"
+            Content="{Binding CurrentView}"
+            IsTabStop="False" />
+    </Viewbox>
+</Window>

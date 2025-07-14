@@ -1,0 +1,214 @@
+﻿<UserControl x:Name="root"
+    x:Class="DBF.UserControls.StartListControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DBF.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    d:DesignHeight="450"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Left"
+            Margin="5,5,0,0">
+            <TextBlock
+                FontSize="16"
+                FontWeight="Bold"
+                Text="Startliste:  " />
+            <TextBlock                
+                FontSize="16"
+                FontWeight="Bold" 
+                Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+            Height="28"
+            Visibility="{Binding ErrorMessage, Converter={StaticResource HideEmptyConverter}}">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="Red"
+                FontSize="16"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="{Binding ErrorMessage}" />
+        </Border>
+
+
+        <syncfusion:SfDataGrid Name="dgStartTeams" Grid.Row="2"
+            AllowEditing="False"
+            AllowResizingColumns="True"
+            AllowTriStateSorting="False"
+            AlternatingRowStyle="{StaticResource alternatingRowStyle}"
+            AlternationCount="2"
+            AutoExpandGroups="True"
+            AutoGenerateColumns="False"
+            AutoGenerateRelations="False"
+            CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
+            ColumnSizer="Auto"
+            FilterRowPosition="None"
+            FontSize="14"
+                               Margin="0,0,0,10"
+            ItemsSource="{Binding Teams, UpdateSourceTrigger=PropertyChanged}"
+            
+            ScrollViewer.CanContentScroll="True"
+            Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+
+            <syncfusion:SfDataGrid.Columns>
+                <syncfusion:GridTextColumn
+                    HeaderText="Rk"
+                    IsHidden="True"
+                    MappingName="Title" />
+
+                <syncfusion:GridTextColumn
+                    Padding="5,0"
+                    HeaderText="Nr"
+                    MappingName="TeamNo"
+                    TextAlignment="Center" />
+
+                <syncfusion:GridTextColumn x:Name="TeamName"
+                    Width="250"
+                    Padding="5,0"
+                    AllowSorting="False"
+                    HeaderText="Hold"
+                    MappingName="TeamName" />
+
+                <syncfusion:GridTextColumn
+                    Padding="5,0"
+                    HeaderText="Start"
+                    HorizontalHeaderContentAlignment="Center"
+                    MappingName="StartPos"
+                    MinimumWidth="80"
+                    TextAlignment="Center" />
+
+                <syncfusion:GridNumericColumn
+                    Padding="5,0"
+                    HeaderText="Hac"
+                    HorizontalHeaderContentAlignment="Right"
+                    MappingName="AvgHAC" />
+
+                <syncfusion:GridTextColumn
+                    Padding="5,0"
+                    HeaderText="Spillere"
+                    HorizontalHeaderContentAlignment="Left"
+                    MappingName="Names"
+                    MinimumWidth="600"
+                    TextAlignment="Left" />
+            </syncfusion:SfDataGrid.Columns>
+
+            <syncfusion:SfDataGrid.SortColumnDescriptions>
+                <syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />
+                <syncfusion:SortColumnDescription ColumnName="TeamNo" SortDirection="Ascending" />
+            </syncfusion:SfDataGrid.SortColumnDescriptions>
+
+            <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:GroupColumnDescription ColumnName="Title" SortGroupRecords="True" />
+
+            </syncfusion:SfDataGrid.GroupColumnDescriptions>
+        </syncfusion:SfDataGrid>
+        
+        <syncfusion:SfDataGrid Name="dgStartPairs" Grid.Row="3"
+            Padding="5,0,5,0"
+            AllowEditing="False"
+            AllowResizingColumns="True"
+            AllowTriStateSorting="False"
+            AlternatingRowStyle="{StaticResource alternatingRowStyle}"
+            AlternationCount="2"
+            AutoExpandGroups="True"
+            AutoGenerateColumns="False"
+            CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
+            ColumnSizer="Auto"
+            FilterRowPosition="None"
+            FontSize="14"                               
+            ItemsSource="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}"
+            ScrollViewer.CanContentScroll="True"
+            Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+
+            <syncfusion:SfDataGrid.Columns>
+                <syncfusion:GridTextColumn
+                    HeaderText="Rk"
+                    IsHidden="True"
+                    MappingName="Title" />
+
+                <syncfusion:GridTextColumn
+                    HeaderText="Nr"
+                    MappingName="PairNo"
+                    TextAlignment="Center" />
+
+                <syncfusion:GridTextColumn
+                    AllowSorting="False"
+                    HeaderText="Navne"
+                    MappingName="PairName"
+                    MinimumWidth="350" />
+
+                <syncfusion:GridTextColumn
+                    HeaderText="Start"
+                    HorizontalHeaderContentAlignment="Center"
+                    MappingName="StartPos"
+                    TextAlignment="Center" />
+
+                <syncfusion:GridNumericColumn
+                    HeaderText="HAC"
+                    HorizontalHeaderContentAlignment="Right"
+                    MappingName="AvgHAC" />
+
+                <syncfusion:GridPercentColumn
+                    HeaderText="Forventet"
+                    HorizontalHeaderContentAlignment="Center"
+                    MappingName="ExpectedScore" />
+
+                <syncfusion:GridTextColumn
+                    HeaderText="Rank."
+                    HorizontalHeaderContentAlignment="Center"
+                    IsHidden="{Binding DataContext.HideTournamentSummery, ElementName=root}"
+                    MappingName="TournamentRank"
+                    TextAlignment="Center" />
+
+                <syncfusion:GridNumericColumn
+                    HeaderText="Score"
+                    HorizontalHeaderContentAlignment="Right"
+                    IsHidden="{Binding DataContext.HideTournamentSummery, ElementName=root}"
+                    MappingName="TournamentResult" />
+
+                <syncfusion:GridNumericColumn
+                    HeaderText="Hac"
+                    HorizontalHeaderContentAlignment="Right"
+                    IsHidden="{Binding DataContext.HideTournamentSummery, ElementName=root}"
+                    MappingName="HACTotal" />
+
+            </syncfusion:SfDataGrid.Columns>
+
+            <syncfusion:SfDataGrid.StackedHeaderRows>
+                <syncfusion:StackedHeaderRow>
+                    <syncfusion:StackedHeaderRow.StackedColumns>
+                        <syncfusion:StackedColumn ChildColumns="SectionRank,HACRankSection" HeaderText="Placering" />
+                        <syncfusion:StackedColumn ChildColumns="Result,DeltaHAC,MP" HeaderText="Resultat" />
+                        <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="Turneringen" />
+                    </syncfusion:StackedHeaderRow.StackedColumns>
+                </syncfusion:StackedHeaderRow>
+            </syncfusion:SfDataGrid.StackedHeaderRows>
+
+            <syncfusion:SfDataGrid.SortColumnDescriptions>
+                <syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />
+                <syncfusion:SortColumnDescription ColumnName="PairNo" SortDirection="Ascending" />
+            </syncfusion:SfDataGrid.SortColumnDescriptions>
+
+            <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:GroupColumnDescription ColumnName="Title" SortGroupRecords="True" />
+            </syncfusion:SfDataGrid.GroupColumnDescriptions>
+
+        </syncfusion:SfDataGrid>
+
+    </Grid>
+</UserControl>

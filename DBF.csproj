@@ -1,0 +1,168 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWindowsForms>false</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+        <LangVersion>latest</LangVersion>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<RootNamespace>DBF</RootNamespace>
+		<AssemblyName>DBF</AssemblyName>
+		<Platforms>AnyCPU;x64</Platforms>		
+		<ApplicationIcon>Images\DBF_Tools.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="App.config.gem" />
+		<None Remove="Directory.Build.props" />
+		<None Remove="Images\DBF_Tools.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Images\DBF_Tools.ico" />
+		<Resource Include="Images\Splash.png" />
+		<EmbeddedResource Include="Images\projector_48x48.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<SplashScreen Include="Images\DBF_Tools.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</SplashScreen>
+	</ItemGroup>	
+	
+
+	<ItemGroup>
+		<Compile Remove="AudioFiles\**" />
+		<EmbeddedResource Remove="AudioFiles\**" />
+		<None Remove="AudioFiles\**" />
+		<Page Remove="AudioFiles\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="AccessContext.cs" />
+		<Compile Remove="AssemblyInfo.cs" />
+		<Compile Remove="DEVMODE.cs" />
+		<Compile Remove="UserControls\BridgeTimerControl\BridgeTimerControlOld.xaml.cs" />
+		<Compile Remove="ViewModels\ProjectorViewModel.cs" />
+				<None Remove="Views\Splash.png" />
+		<Page Remove="UserControls\BridgeTimerControl\BridgeTimerControlOld.xaml" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.4" />
+		<!--<PackageReference Include="DeepCopy.Fody" Version="1.0.16" />-->
+		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.0" />
+		<PackageReference Include="NAudio" Version="2.2.1" />
+		<PackageReference Include="NetCoreAudio" Version="2.0.0" />
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--<PackageReference Include="CData.Access" Version="24.0.9175" />
+		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />-->
+		
+		<Reference Include="CData.EntityFrameworkCore.Access">
+			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\EFCORE80\CData.EntityFrameworkCore.Access.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Data.CData.Access">
+			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\System.Data.CData.Access.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="syncfusion.ui.wpf.net" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Shared.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Shared.Base" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Grid.Wpf" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="29.2.7" />
+		<PackageReference Include="Syncfusion.Tools.WPF" Version="29.2.7" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<!--<ProjectReference Include="..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Core\Caliburn.Micro.Core.csproj" />
+	  <ProjectReference Include="..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform\Caliburn.Micro.Platform.csproj" />-->
+		<PackageReference Include="Caliburn.Micro" Version="4.0.230" />
+		<PackageReference Include="Caliburn.Micro.Core" Version="4.0.230" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="DataSets\" />
+		<Folder Include="Properties\PublishProfiles\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+
+		<Compile Update="Properties\Settings.Designer.cs">
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		
+		<None Update="Images\projector.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Images\projector_48x48.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+
+		<!--<Content Include="..\..\SyncfusionLicense.txt" Link="SyncfusionLicense.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>-->
+	</ItemGroup>
+
+
+
+	
+
+</Project>
