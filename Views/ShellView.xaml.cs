@@ -37,7 +37,7 @@ namespace DBF.Views
             }
         }
 
-        private void ShellView_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        private void ShellView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // Gem størrelse og position
             if (WindowState == WindowState.Normal
