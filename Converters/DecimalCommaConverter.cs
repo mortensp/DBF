@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace DBF
+namespace DBF.Converters
 {
     public class DecimalCommaConverter : JsonConverter<decimal>
     {

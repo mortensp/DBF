@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DBF Tools"
-#define MyAppVersion "1.0"
+; #define MyAppVersion "0.8.0.0"
 #define MyAppPublisher "Morten Sparding"
-#define MyAppURL "https://www.example.com/"
+#define MyAppURL "https://github.com/mortensp/DBF"
 #define MyAppExeName "DBF.exe"
 
 [Setup]
@@ -12,7 +12,8 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{911BF21C-D8B4-41A6-B83D-D4E3690193B6}
 AppName={#MyAppName}
-AppVersion={#MyAppVersion}
+AppVersion={#GetVersionNumbersString('D:\Build\DBF\publish\DBF.exe')}
+VersionInfoVersion={#GetVersionNumbersString('D:\Build\DBF\publish\DBF.exe')}
 AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
@@ -31,7 +32,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputDir=D:\Build\DBF\bin\Release\Installer
+OutputDir=D:\Build\DBF\Installer
 OutputBaseFilename=DBF Setup
 SolidCompression=yes
 WizardStyle=modern
@@ -43,7 +44,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "D:\Build\DBF\bin\Release\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "D:\Build\DBF\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

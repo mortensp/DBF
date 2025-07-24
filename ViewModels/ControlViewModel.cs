@@ -17,6 +17,7 @@ using Caliburn.Micro;
 using CData.EntityFrameworkCore.Access;
 using CData.Sql;
 using DBF.BridgeMateModel;
+using DBF.Converters;
 using DBF.DataModel;
 using DBF.UserControls;
 using DBF.Views;
