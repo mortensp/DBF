@@ -12,7 +12,8 @@ namespace DBF.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
@@ -24,7 +25,8 @@ namespace DBF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("400")]         public double WindowTop {
+        [global::System.Configuration.DefaultSettingValueAttribute("400")]
+        public double WindowTop {
             get {
                 return ((double)(this["WindowTop"]));
             }
@@ -35,7 +37,8 @@ namespace DBF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("400")]         public double WindowLeft {
+        [global::System.Configuration.DefaultSettingValueAttribute("400")]
+        public double WindowLeft {
             get {
                 return ((double)(this["WindowLeft"]));
             }
@@ -46,7 +49,8 @@ namespace DBF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1100")]         public double WindowHeight {
+        [global::System.Configuration.DefaultSettingValueAttribute("1100")]
+        public double WindowHeight {
             get {
                 return ((double)(this["WindowHeight"]));
             }
@@ -57,7 +61,8 @@ namespace DBF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1000")]         public double WindowWidth {
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public double WindowWidth {
             get {
                 return ((double)(this["WindowWidth"]));
             }
@@ -68,7 +73,8 @@ namespace DBF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]         public int WindowState {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int WindowState {
             get {
                 return ((int)(this["WindowState"]));
             }
