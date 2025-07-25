@@ -35,14 +35,6 @@
 		<SplashScreen Include="Images\DBF_Tools.png">
 		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</SplashScreen>
-	</ItemGroup>	
-	
-
-	<ItemGroup>
-		<Compile Remove="AudioFiles\**" />
-		<EmbeddedResource Remove="AudioFiles\**" />
-		<None Remove="AudioFiles\**" />
-		<Page Remove="AudioFiles\**" />
 	</ItemGroup>
 
 	<ItemGroup>
