@@ -3,4 +3,4 @@ This project provides start and result lists captured from the danish BC3 softwa
 As this software only make sence in denmark, the rest of the text will be in danish. 
 
 # Installation
-[Download seneste release](https://github.com/mortensp/DBF/releases/latest/download/DBF.Setup.exe) og installere det ved at dobbelt klikke på filen i mappen Overførelser
+[Download seneste release](https://github.com/mortensp/DBF/releases/latest/download/DBF.Setup.exe) og installere programmet ved, at dobbelt klikke på filen i mappen Overførelser
