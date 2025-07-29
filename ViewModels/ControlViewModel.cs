@@ -183,7 +183,10 @@ namespace DBF.ViewModels
         #region Public Methods
             public void AddTimer() => Configuration.AddTimer();
 
-            public void Help() { }
+            public void TimersHelp() {
+            var window = new TimersHelpWindow(); // Views\TimersHelpWindow.xaml
+            window.ShowDialog();
+        }
 
             public async void ShowStartList()
             {

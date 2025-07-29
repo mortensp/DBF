@@ -29,11 +29,15 @@
 		<None Remove="App.config.gem" />
 		<None Remove="Directory.Build.props" />
 		<None Remove="Images\DBF_Tools.ico" />
+		<None Remove="Images\guideTilUr.jpg" />
 		<None Remove="licensing.htm" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Resource Include="Images\DBF_Tools.ico" />
+		<Resource Include="Images\guideTilUr.jpg">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Resource>
 		<Resource Include="Images\Splash.png" />
 		<EmbeddedResource Include="Images\projector_48x48.ico" />
 	</ItemGroup>
@@ -52,12 +56,15 @@
 		<Compile Remove="UpdateManager.cs" />
 		<Compile Remove="UserControls\BridgeTimerControl\BridgeTimerControlOld.xaml.cs" />
 		<Compile Remove="ViewModels\ProjectorViewModel.cs" />
+		<Compile Remove="ViewModels\TestViewModel.cs" />
 		<Compile Remove="Views\DownloadProgressWindow.xaml.cs" />
 		<Compile Remove="Views\DownloadProgressWindowOld.cs" />
+		<Compile Remove="Views\TestView.xaml.cs" />
 				<None Remove="Views\Splash.png" />
 		<Page Remove="UserControls\BridgeTimerControl\BridgeTimerControlOld.xaml" />
 		<Page Remove="Views\DownloadProgressWindow.xaml" />
 		<Page Remove="Views\DownloadProgressWindowOld.xaml" />
+		<Page Remove="Views\TestView.xaml" />
 	</ItemGroup>
 
 

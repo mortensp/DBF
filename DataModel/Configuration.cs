@@ -78,7 +78,7 @@ namespace DBF.DataModel
                                                                                 new Preset("Par - 7 runder af 4 spil", false, false,  7, 4, 4, 0,27, 0, 1, 12,5),
                                                                                 new Preset("Par - 9 runder af 3 spil", false, false,  9, 3,  5,0, 20, 0, 1, 12,5),
                                                                                 new Preset("Par - 11 runder af 2 spil",false, false, 11, 2,  6,0,13, 0, 1, 12,5),
-                                                                                new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,28, 0, 0,15,5)
+                                                                                new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,26, 0, 0,15,5)
                                                                         };
 
             public bool                                TimersCanClose   { get; set; }
