@@ -135,6 +135,21 @@
     </Style>
 
 
+    <!--<Style x:Key="ThickRightBorderStyle" TargetType="{x:Type sfgrid:GridCell}">
+        <Setter Property="BorderThickness" Value="0,1,2,0"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="FontFamily" Value="Courier New" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="ThickLeftBorderStyle"  TargetType="{x:Type sfgrid:GridCell}" >
+        <Setter Property="BorderThickness" Value="2,0,1,0"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="FontFamily" Value="Courier New" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>-->
+
+
     <Style x:Key="captionRowStyle" TargetType="sfgrid:CaptionSummaryRowControl">
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Margin" Value="0,5,0,0"/>
@@ -160,5 +175,11 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+
+    <DataTemplate x:Key="ColumnSeparatorTemplate">
+        <Border BorderBrush="Black" BorderThickness="2,0,2,0" />
+    </DataTemplate>
+
 
 </ResourceDictionary>

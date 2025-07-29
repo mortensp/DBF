@@ -15,6 +15,10 @@ namespace DBF.UserControls
         private bool            parentIsViewbox = false;
         //private bool            collapsGroups   = false;
         private int             groupNo         = -1;
+        private int             pairGroups      = 0;
+        private int             teamGroups      = 0;
+        private int pairRows = 0;
+        private int teamRows = 0;
         private int maxRows = Properties.Settings.Default.MaxRows;
         private DispatcherTimer groupTimer;
 
@@ -23,7 +27,8 @@ namespace DBF.UserControls
             InitializeComponent();
 
             this.Loaded                                  += UserControl_Loaded;
-            dgPairs.ItemsSourceChanged              += (s, e) => pagingSetup();
+            dgPairs.ItemsSourceChanged += (s, e) => setupPaging();
+            dgTeams.ItemsSourceChanged += (s, e) => setupPaging();
             dgPairs.Columns["PairName"].ColumnSizer  = GridLengthUnitType.SizeToCells;
             dgTeams.Columns["Names"].ColumnSizer     = GridLengthUnitType.SizeToCells;
 
@@ -44,19 +49,24 @@ namespace DBF.UserControls
             if (parent is not null)
                 parentIsViewbox = true;
 
-            pagingSetup();
+            setupPaging();
         }
 
-        private void pagingSetup()
+        private void setupPaging()
         {
             if (parentIsViewbox)
             {
                 //collapsGroups = false;
                 groupNo       = -1;
+                pairGroups    = dgPairs.View?.Groups?.Count ?? 0;
+                teamGroups    = dgTeams.View?.Groups?.Count ?? 0;
+                pairRows = dgPairs.View?.Records.Count ?? 0;
+                teamRows = dgTeams.View?.Records.Count ?? 0;
 
-                if (dgPairs.View.Records.Count >  maxRows)
+                if (pairRows + teamRows>  maxRows)
                 {
                     dgPairs.CollapseAllGroup();
+                    dgTeams.CollapseAllGroup();
                     showNextGroup();
                     groupTimer.Start();
                 }
@@ -68,12 +78,18 @@ namespace DBF.UserControls
         private void showNextGroup()
         {
             if (groupNo >  -1)
+                if (groupNo <  pairGroups)
                 dgPairs.CollapseGroup(dgPairs.View.Groups[groupNo] as Group);
+                else
+                    dgTeams.CollapseGroup(dgTeams.View.Groups[groupNo - pairGroups] as Group);
 
-            if (++groupNo >= dgPairs.View.Groups.Count)
+            if (++groupNo >= pairGroups + teamGroups)
                 groupNo = 0;
 
+            if (groupNo <  pairGroups)
             dgPairs.ExpandGroup(dgPairs.View.Groups[groupNo] as Group);
+            else
+                dgTeams.ExpandGroup(dgTeams.View.Groups[groupNo - pairGroups] as Group);
         }
     }
 }

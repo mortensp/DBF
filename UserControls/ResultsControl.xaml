@@ -8,6 +8,7 @@
     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
     d:DesignHeight="450"
     d:DesignWidth="800"
+             Margin="8,0,8,0"
     mc:Ignorable="d">
 
     <Grid>
@@ -46,8 +47,8 @@
         </Border>
 
         <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="2"
+            Margin="0,0,0,10"
             Padding="5,0,5,0"
-							   Margin="0,0,0,10"
             AllowEditing="False"
             AllowResizingColumns="True"
             AllowTriStateSorting="False"
@@ -58,7 +59,7 @@
             CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
-            FontSize="14"            
+            FontSize="14"
             ItemsSource="{Binding Teams}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
@@ -83,6 +84,11 @@
                     MinimumWidth="350" />
 
                 <!--  Kamp Resultat  -->
+                <syncfusion:GridTemplateColumn
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
+                    Width="2"
+                    MappingName="Separator" />
+
                 <syncfusion:GridTextColumn
                     Width="100"
                     CellStyle="{StaticResource CenteredCourierNew}"
@@ -131,7 +137,7 @@
             </syncfusion:SfDataGrid.GroupColumnDescriptions>
         </syncfusion:SfDataGrid>
 
-		<syncfusion:SfDataGrid Name="dgPairs" Grid.Row="3"
+        <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="3"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowResizingColumns="True"
@@ -148,66 +154,72 @@
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
-			<syncfusion:SfDataGrid.Columns>
+            <syncfusion:SfDataGrid.Columns>
 
-				<syncfusion:GridTextColumn
+                <syncfusion:GridTextColumn
                     HeaderText="Rk"
                     IsHidden="True"
                     MappingName="Title" />
 
-				<syncfusion:GridNumericColumn
+                <syncfusion:GridNumericColumn
                     HeaderText="Nr"
                     MappingName="PairNo"
                     NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
-				<syncfusion:GridTextColumn
+                <syncfusion:GridTextColumn
                     AllowSorting="False"
                     HeaderText="Navne"
                     MappingName="PairName"
                     MinimumWidth="350" />
 
-				<syncfusion:GridNumericColumn
+                <!--<syncfusion:GridNumericColumn
                     Width="60"
                     HeaderText="Hac"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="AvgHAC"
-                    TextAlignment="Right" />
+                    TextAlignment="Right" />-->
 
-				<!--  Placering  -->
-				<syncfusion:GridNumericColumn
-                    HeaderText="Rang"
+                <!--  Placering  -->
+                <syncfusion:GridTemplateColumn
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
+                    Width="2"
+                    MappingName="Separator" />
+
+                <syncfusion:GridNumericColumn
+                    HeaderText="Score"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="SectionRank"
                     NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
-				<syncfusion:GridTextColumn
+                <syncfusion:GridTextColumn
                     HeaderText="Hac"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="HACRankSection"
                     TextAlignment="Center" />
 
-				<!--  Sektionens Score  -->
-				<syncfusion:GridPercentColumn
+                <!--  Sektionens Score  -->
+
+                <syncfusion:GridPercentColumn
                     HeaderText="Opnået"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="ActualScore" />
 
-				<syncfusion:GridNumericColumn
+                <syncfusion:GridNumericColumn
                     HeaderText="Score"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="Result"
                     TextAlignment="Right" />
 
-				<syncfusion:GridNumericColumn
+                <syncfusion:GridNumericColumn
                     Width="60"
                     HeaderText="Hac"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="DeltaHAC"
                     TextAlignment="Right" />
 
-				<syncfusion:GridTextColumn
+                <syncfusion:GridTextColumn
                     Width="40"
                     AllowSorting="False"
                     HeaderText="MP"
@@ -215,8 +227,13 @@
                     MappingName="MP"
                     TextAlignment="Center" />
 
-				<!--  Tourneringens Score  -->
-				<syncfusion:GridNumericColumn
+                <!--  Tourneringens Score  -->
+                <syncfusion:GridTemplateColumn
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
+                    Width="2"
+                    MappingName="Separator2" />
+
+                <syncfusion:GridNumericColumn
                     HeaderText="Rang."
                     HorizontalHeaderContentAlignment="Center"
                     IsHidden="{Binding DataContext.HideTournamentSummery, ElementName=root}"
@@ -224,39 +241,39 @@
                     NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
-				<syncfusion:GridNumericColumn
+                <syncfusion:GridNumericColumn
                     Width="60"
                     HeaderText="Score"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="{Binding DataContext.HideTournamentSummery, ElementName=root}"
                     MappingName="TournamentResult" />
 
-				<syncfusion:GridNumericColumn
+                <syncfusion:GridNumericColumn
                     Width="60"
                     HeaderText="Hac"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="{Binding DataContext.HideTournamentSummery, ElementName=root}"
                     MappingName="HACTotal" />
-			</syncfusion:SfDataGrid.Columns>
+            </syncfusion:SfDataGrid.Columns>
 
-			<syncfusion:SfDataGrid.StackedHeaderRows>
-				<syncfusion:StackedHeaderRow>
-					<syncfusion:StackedHeaderRow.StackedColumns>
-						<syncfusion:StackedColumn ChildColumns="SectionRank,HACRankSection" HeaderText="Rangering" />
-						<syncfusion:StackedColumn ChildColumns="ExpectedScore,ActualScore,Result,DeltaHAC,MP" HeaderText="Resultat" />
-						<syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="Turneringen" />
-					</syncfusion:StackedHeaderRow.StackedColumns>
-				</syncfusion:StackedHeaderRow>
-			</syncfusion:SfDataGrid.StackedHeaderRows>
+            <syncfusion:SfDataGrid.StackedHeaderRows>
+                <syncfusion:StackedHeaderRow>
+                    <syncfusion:StackedHeaderRow.StackedColumns>
+                        <syncfusion:StackedColumn ChildColumns="SectionRank,HACRankSection" HeaderText="Stilling" />
+                        <syncfusion:StackedColumn ChildColumns="ExpectedScore,ActualScore,Result,DeltaHAC,MP" HeaderText="Resultat" />
+                        <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="Turneringen" />
+                    </syncfusion:StackedHeaderRow.StackedColumns>
+                </syncfusion:StackedHeaderRow>
+            </syncfusion:SfDataGrid.StackedHeaderRows>
 
-			<syncfusion:SfDataGrid.SortColumnDescriptions>
-				<syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />
-				<syncfusion:SortColumnDescription ColumnName="SectionRank" SortDirection="Ascending" />
-			</syncfusion:SfDataGrid.SortColumnDescriptions>
+            <syncfusion:SfDataGrid.SortColumnDescriptions>
+                <syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />
+                <syncfusion:SortColumnDescription ColumnName="SectionRank" SortDirection="Ascending" />
+            </syncfusion:SfDataGrid.SortColumnDescriptions>
 
-			<syncfusion:SfDataGrid.GroupColumnDescriptions>
-				<syncfusion:GroupColumnDescription ColumnName="Title" />
-			</syncfusion:SfDataGrid.GroupColumnDescriptions>
-		</syncfusion:SfDataGrid>
-	</Grid>
+            <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:GroupColumnDescription ColumnName="Title" />
+            </syncfusion:SfDataGrid.GroupColumnDescriptions>
+        </syncfusion:SfDataGrid>
+    </Grid>
 </UserControl>

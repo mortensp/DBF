@@ -30,7 +30,7 @@ namespace DBF.DataModel
         }
 
         private string configDir, presetsPath, timerSettingPath, jsonData, jsonPresets, jsonTimers;
-        //private List <TimerSetting> TimerSettings = new();
+
         #region Constructors
             public Configuration()
             {
@@ -73,20 +73,28 @@ namespace DBF.DataModel
             public  ObservableCollection <CustomColor> BackgroundColors;
             private int                                visibleTimerCount = 0;
             public ObservableCollection<BridgeTimer>   BridgeTimers     { get; set; } = new();
-            public BindableCollection<Preset> Presets { get; set; } = new();
+            public BindableCollection<Preset>          Presets          { get; set; } = new()
+                                                                        {
+                                                                                new Preset("Par - 7 runder af 4 spil", false, false,  7, 4, 4, 0,27, 0, 1, 12,5),
+                                                                                new Preset("Par - 9 runder af 3 spil", false, false,  9, 3,  5,0, 20, 0, 1, 12,5),
+                                                                                new Preset("Par - 11 runder af 2 spil",false, false, 11, 2,  6,0,13, 0, 1, 12,5),
+                                                                                new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,28, 0, 0,15,5)
+                                                                        };
+
             public bool                                TimersCanClose   { get; set; }
             public bool                                TimersCanBeAdded { get; set; }
 
             public bool TimersActive
-        {
-            get
             {
-                for (int i = 0; i < visibleTimerCount; i++)
-                    if (BridgeTimers[i].IsStarted)
-                        return true;
-                return false;
+                get
+                {
+                    for (int i = 0; i <  visibleTimerCount; i++)
+                        if (BridgeTimers[i].IsStarted)
+                            return true;
+
+                    return false;
+                }
             }
-        }
         #endregion
 
         #region Private and Internal methods
