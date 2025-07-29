@@ -5,13 +5,12 @@
     xmlns:Notification="clr-namespace:Syncfusion.Windows.Controls.Notification;assembly=Syncfusion.SfBusyIndicator.WPF"
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:conv="clr-namespace:DBF.Converters"
+    xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"    
     mc:Ignorable="d">
-
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -25,8 +24,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <WrapPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0">
-            <!--Bridge Center eller Hoveklub-->
+        <WrapPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"
+            Margin="0,0,0,8">
+            <!--  Bridge Center eller Hoveklub  -->
             <Label FontWeight="Bold">
                 Klub:
             </Label>
@@ -35,11 +35,11 @@
                 Width="Auto"
                 MinWidth="100"
                 HorizontalAlignment="Left"
-                ItemsSource="{Binding MainClubs}"
                 DisplayMemberPath="Name"
+                ItemsSource="{Binding MainClubs}"
                 SelectedItem="{Binding SelectedMainClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--Under kubben navn-->
+            <!--  Under kubben navn  -->
             <Label FontWeight="Bold">
                 Hold:
             </Label>
@@ -51,7 +51,7 @@
                 ItemsSource="{Binding Clubs}"
                 SelectedItem="{Binding SelectedClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--Spilledato og tid-->
+            <!--  Spilledato og tid  -->
             <Label Grid.Column="0" Grid.Row="0"
                 FontWeight="Bold">
                 Dato:
@@ -69,21 +69,38 @@
             MinHeight="400">
 
             <TabItem Header="Par - Startliste">
-                <ctl:StartListControl x:Name="startListControl" />
+                <ScrollViewer>
+                    <ctl:StartListControl x:Name="startListControl" />
+                </ScrollViewer>
             </TabItem>
-
 
             <TabItem Header="Bridge Ure">
-                <Viewbox>
-                    <ctl:TimersPanel Timers="{Binding Configuration.BridgeTimers}" TimersCanBeAdded="{Binding Configuration.TimersCanBeAdded}" />
-                </Viewbox>
-            </TabItem>
+                <WrapPanel>
+                    <WrapPanel Grid.ColumnSpan="2" Grid.Row="0"
+                        Margin="5,4,5,0"
+                        Visibility="{Binding ButtonsVisibility, ElementName=Root}">
+                        <Button x:Name="AddTimer"
+                            Width="70"
+                            cal:Message.Attach="[Event Click] = [Action AddTimer]"
+                            Content="Tilføj ur"
+                            IsEnabled="{Binding Configuration.TimersCanBeAdded, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button
+                            Width="70"
+                            cal:Message.Attach="[Event Click] = [Action Help]"
+                            Content="Hjælp" />
+                    </WrapPanel>
 
+                    <Viewbox>
+                        <ctl:TimersPanel Timers="{Binding Configuration.BridgeTimers}" TimersCanBeAdded="{Binding Configuration.TimersCanBeAdded}" />
+                    </Viewbox>
+                </WrapPanel>
+            </TabItem>
 
             <TabItem Header="Resultater">
-                <ctl:ResultsControl x:Name="resultsControl" />
+                <ScrollViewer>
+                    <ctl:ResultsControl x:Name="resultsControl" />
+                </ScrollViewer>
             </TabItem>
-
         </TabControl>
 
         <Label Grid.Row="2" FontWeight="Bold">Projektor:</Label>

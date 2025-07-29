@@ -10,9 +10,11 @@
     xmlns:local="clr-namespace:DBF.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-    WindowStartupLocation="Manual"
+    WindowStartupLocation="CenterOwner"
+    Height="600"
+    Width="800"
     mc:Ignorable="d">
-    <Viewbox Focusable="False">
+    <Viewbox Focusable="False" >
         <ContentControl Grid.Row="1"
             Content="{Binding CurrentView}"
             IsTabStop="False" />

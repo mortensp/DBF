@@ -11,31 +11,29 @@ namespace DBF.ViewModels
 {
     public class TimerSettingViewModel : Screen
     {
-        private       Preset                            selectedPreset     { get; set; }
+        private          Preset         selectedPreset     { get; set; }
         private          TimerSetting   setting;
-        private readonly IWindowManager _windowManager;
+        private readonly IWindowManager windowManager;
 
         #region Constructors
             public TimerSettingViewModel(Configuration configuration)
             {
-                Configuration               = configuration;
-                _windowManager              = IoC.Get<IWindowManager>();
-                //NewSetting.PropertyChanged += onSettingPropertyChanged;
+                Configuration  = configuration;
+                windowManager = IoC.Get<IWindowManager>();
             }
         #endregion
 
         #region public Properties
             public static ObservableCollection<CustomColor> NewColorCollection { get; set; } = new()
-                                                {
-                                                    new CustomColor { ColorName = "Rød", Color = (Color)ColorConverter.ConvertFromString("#F2460D")},
-                                                    new CustomColor { ColorName = "Blå", Color = (Color)ColorConverter.ConvertFromString("#00b0ff") },
-                                                    new CustomColor { ColorName = "range", Color = (Color)ColorConverter.ConvertFromString("#FF9D00")},
-                                                    new CustomColor { ColorName = "Grøn", Color = (Color)ColorConverter.ConvertFromString("#81C784")},
-                                                };
+                                                    {
+                                                        new CustomColor { ColorName = "Rød", Color = (Color)ColorConverter.ConvertFromString("#F2460D")},
+                                                        new CustomColor { ColorName = "Blå", Color = (Color)ColorConverter.ConvertFromString("#00b0ff") },
+                                                        new CustomColor { ColorName = "range", Color = (Color)ColorConverter.ConvertFromString("#FF9D00")},
+                                                        new CustomColor { ColorName = "Grøn", Color = (Color)ColorConverter.ConvertFromString("#81C784")},
+                                                    };
 
             public        Configuration                     Configuration      { get; private set; }
             public        TimerSetting                      NewSetting         { get; set; } = new();
-
             public        Color                             BackgroundColor    { get; set; }
             public Preset SelectedPreset
             {
@@ -61,7 +59,6 @@ namespace DBF.ViewModels
 
                     selectedPreset = FindPreset(NewSetting);
                     NotifyOfPropertyChange(nameof(SelectedPreset));
-                    //    NotifyOfPropertyChange(nameof(Setting));
                 }
             }
         #endregion
@@ -71,6 +68,7 @@ namespace DBF.ViewModels
             {
                 await TryCloseAsync();
             }
+
 
             public async void AcceptSetting()
             {
@@ -94,7 +92,7 @@ namespace DBF.ViewModels
             public async void AddPreset()
             {
                 var dialog = IoC.Get<PresetNameViewModel>();
-                await _windowManager.ShowDialogAsync(dialog);
+                await windowManager.ShowDialogAsync(dialog);
 
                 if (!string.IsNullOrEmpty(dialog.PresetName))
                 {
@@ -144,17 +142,17 @@ namespace DBF.ViewModels
                 if (sender is Preset preset)
                 {
                     if (selectedPreset is not null
-                    && preset.Matches(selectedPreset))
-                       return;
-                    
-                    preset.Name = null;
+                    &&  preset.Matches(selectedPreset))
+                        return;
+
+                    preset.Name   = null;
                     var newPreset = FindPreset(preset);
 
-                if (newPreset is not null )
-                if (selectedPreset is null)
-                    SelectedPreset = newPreset;
-                else
-                    SelectedPreset.Name = newPreset?.Name;
+                    if (newPreset is not null)
+                        if (selectedPreset is null)
+                            SelectedPreset = newPreset;
+                        else
+                            SelectedPreset.Name = newPreset?.Name;
                 }
             }
         #endregion

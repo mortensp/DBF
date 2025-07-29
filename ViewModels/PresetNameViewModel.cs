@@ -6,7 +6,7 @@ namespace DBF.ViewModels
 {
     public class PresetNameViewModel : Screen
     {
-        //private WindowManager _windowManager = IoC.Get<WindowManager>();
+        //private WindowManager windowManager = IoC.Get<WindowManager>();
         public readonly Configuration Configuration;
 
         public PresetNameViewModel(Configuration configuration)

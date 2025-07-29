@@ -22,21 +22,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <WrapPanel Grid.ColumnSpan="2" Grid.Row="0"
-            Visibility="{Binding ButtonsVisibility, ElementName=Root}">
-            <Button x:Name="AddTimer"
-                Width="70"
-                Margin="5,0"
-                cal:Message.Attach="[Event Click] = [Action AddTimer]"
-                Content="Tilføj ur"
-                IsEnabled="{Binding Configuration.TimersCanBeAdded, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="70"
-                Margin="5,0"
-                cal:Message.Attach="[Event Click] = [Action Help]"
-                Content="Hjælp" />
-        </WrapPanel>
-
         <local:BridgeTimerControl x:Name="timer1" Grid.Column="0" Grid.Row="1"
             ButtonsVisibility="{Binding ButtonsVisibility, ElementName=Root}"
             Timer="{Binding Configuration.BridgeTimers[0], UpdateSourceTrigger=PropertyChanged}" />

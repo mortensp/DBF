@@ -37,6 +37,7 @@ namespace DBF
         //}
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
+            
             // Show screen at startup
             DisplayRootViewForAsync<ShellViewModel>();
             var screen = IoC.Get<ShellViewModel>();

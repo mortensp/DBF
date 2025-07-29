@@ -64,10 +64,17 @@ namespace DBF.UserControls
                         ctl.CanClose = ctl.ButtonsVisibility == Visibility.Visible;
                 }
             #endregion
+
+       
+        #endregion
+
+        #region Public Properties
+            public Visibility UpButtonVisibility { get; private set; }
+            public Visibility DownButtonVisibility { get; private set; }
         #endregion
 
         #region Private Methods        
-            private void BtnBack_Click(object sender, RoutedEventArgs e)     => Timer.Back();
+        private void BtnBack_Click(object sender, RoutedEventArgs e)     => Timer.Back();
 
             private void btnClose_Click(object sender, RoutedEventArgs e)    => Configuration.CloseTimer(Timer);
 
@@ -84,6 +91,10 @@ namespace DBF.UserControls
             private void BtnSetting_Click(object sender, RoutedEventArgs e)  => Timer.OpenSetting();
 
             private void BtnStart_Click(object sender, RoutedEventArgs e)    => Timer.Start();
+
+            private void BtnUp_Click(object sender, RoutedEventArgs e)       => Configuration.TimerUp(Timer);
+
+            private void BtnDown_Click(object sender, RoutedEventArgs e)     => Configuration.TimerDown(Timer);
         #endregion
     }
 }

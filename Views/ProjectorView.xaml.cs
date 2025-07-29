@@ -22,7 +22,9 @@ namespace DBF.Views
         public ProjectorView()
         {
             InitializeComponent();
+#if RELEASE
             Loaded += (s, e) => WindowState = WindowState.Maximized;
+#endif
         }
     }
 }

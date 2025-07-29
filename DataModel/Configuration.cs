@@ -72,19 +72,21 @@ namespace DBF.DataModel
         #region Public Properties
             public  ObservableCollection <CustomColor> BackgroundColors;
             private int                                visibleTimerCount = 0;
+            public ObservableCollection<BridgeTimer>   BridgeTimers     { get; set; } = new();
+            public BindableCollection<Preset> Presets { get; set; } = new();
+            public bool                                TimersCanClose   { get; set; }
+            public bool                                TimersCanBeAdded { get; set; }
 
-            public ObservableCollection<BridgeTimer> BridgeTimers     { get; set; } = new();
-
-            public BindableCollection<Preset>        Presets          { get; set; } = new()
-                                                                    {
-                                                                            new Preset("Par - 7 runder af 4 spil", false, false,  7, 4, 4, 0,27, 0, 1, 12,5),
-                                                                            new Preset("Par - 9 runder af 3 spil", false, false,  9, 3,  5,0, 20, 0, 1, 12,5),
-                                                                            new Preset("Par - 11 runder af 2 spil",false, false, 11, 2,  6,0,13, 0, 1, 12,5),
-                                                                            new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,28, 0, 0,15,5)
-                                                                    };
-
-            public bool                              TimersCanClose   { get; set; }
-            public bool                              TimersCanBeAdded { get; set; }
+            public bool TimersActive
+        {
+            get
+            {
+                for (int i = 0; i < visibleTimerCount; i++)
+                    if (BridgeTimers[i].IsStarted)
+                        return true;
+                return false;
+            }
+        }
         #endregion
 
         #region Private and Internal methods
@@ -166,6 +168,10 @@ namespace DBF.DataModel
                             BridgeTimers.Add(timer);
                         }
                     }
+
+                    //BridgeTimers[0].ShowUpButton                       = Visibility.Visible;
+                    //BridgeTimers[VisibleTimerCount - 1].ShowDownButton = Visibility.Collapsed;
+                    SetUpDownVisibility();
                 }
 
                 internal void SavePresets()
@@ -194,31 +200,80 @@ namespace DBF.DataModel
             #region Private and Internal Methods              
                 internal void AddTimer()
                 {
-                    foreach (var bridgeTimer in BridgeTimers)
-                        if (bridgeTimer.Visibility != Visibility.Visible)
-                        {
-                            bridgeTimer.Visibility = Visibility.Visible;
-                            VisibleTimerCount++;
-                            SaveSettings();
-                            return;
-                        }
+                    if (visibleTimerCount <  4)
+                    {
+                        var bridgeTimer = BridgeTimers[visibleTimerCount];
+
+                        bridgeTimer.Visibility = Visibility.Visible;
+
+                        VisibleTimerCount++;
+                        SaveSettings();
+                        SetUpDownVisibility();
+                    }
                 }
 
                 internal void CloseTimer(BridgeTimer timer)
                 {
-                    var result = MessageBox.Show("Dette nulstiller uret fuldtsændigt. Vil du nulstille uret?", "Bekræftelse", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-
-                    if (result == MessageBoxResult.OK)
+                    if (!timer.IsStarted
+                    ||  MessageBoxResult.OK == MessageBox.Show( "Dette nulstiller uret fuldtsændigt. Vil du nulstille uret?"
+                                                              , "Bekræftelse"
+                                                              , MessageBoxButton.OKCancel
+                                                              , MessageBoxImage.Question))
                     {
                         VisibleTimerCount--;
-                        timer.Reset();
+                        timer.Reset(false);
                         timer.Visibility = Visibility.Collapsed;
+
+                        // Move the collapsed timer to the end of the list
                         BridgeTimers.Remove(timer);
                         BridgeTimers.Add(timer);
+
                         SaveSettings();
+                        SetUpDownVisibility();
+                    }
+                }
+
+                internal void TimerUp(BridgeTimer timer)
+                {
+                    if (timer.Visibility == Visibility.Visible)
+                    {
+                        var i               = BridgeTimers.IndexOf(timer);
+                        var gem             = BridgeTimers[i - 1];
+                        BridgeTimers[i - 1] = timer;
+                        BridgeTimers[i]     = gem;
+
+                        SaveSettings();
+                        SetUpDownVisibility();
+                    }
+                }
+
+                internal void TimerDown(BridgeTimer timer)
+                {
+                    if (timer.Visibility == Visibility.Visible)
+                    {
+                        var i               = BridgeTimers.IndexOf(timer);
+                        var gem             = BridgeTimers[i + 1];
+                        BridgeTimers[i + 1] = timer;
+                        BridgeTimers[i]     = gem;
+
+                        SaveSettings();
+                        SaveSettings();
+                        SetUpDownVisibility();
                     }
                 }
             #endregion
+
+            private void SetUpDownVisibility()
+            {
+                foreach (var timer in BridgeTimers)
+                {
+                    timer.ShowUpButton   = Visibility.Visible;
+                    timer.ShowDownButton = Visibility.Visible;
+                }
+
+                BridgeTimers[0].ShowUpButton                       = Visibility.Collapsed;
+                BridgeTimers[visibleTimerCount - 1].ShowDownButton = Visibility.Collapsed;
+            }
         #endregion
     }
 }

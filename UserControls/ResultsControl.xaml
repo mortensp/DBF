@@ -45,7 +45,7 @@
                 Text="{Binding ErrorMessage}" />
         </Border>
 
-        <syncfusion:SfDataGrid Name="dgTeamResults" Grid.Row="2"
+        <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="2"
             Padding="5,0,5,0"
 							   Margin="0,0,0,10"
             AllowEditing="False"
@@ -131,7 +131,7 @@
             </syncfusion:SfDataGrid.GroupColumnDescriptions>
         </syncfusion:SfDataGrid>
 
-		<syncfusion:SfDataGrid Name="dgPairResults" Grid.Row="3"
+		<syncfusion:SfDataGrid Name="dgPairs" Grid.Row="3"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowResizingColumns="True"

@@ -30,13 +30,6 @@ using Syncfusion.XlsIO.Parser.Biff_Records;
 
 namespace DBF.ViewModels
 {
-    public class PlayerName
-    {
-        public int    Id    { get; set; }
-        public string Name  { get; set; }
-        public string strID { get; set; }
-    }
-
     public class ControlViewModel : Screen
     {
         static string BC3path = @"C:\BC3\Hjemmeside\";
@@ -58,7 +51,7 @@ namespace DBF.ViewModels
         private          FileSystemWatcher                       watcher;
         private          int                                     sectionNo;
         private readonly ConcurrentDictionary <string, DateTime> _lastFileEvent = new();
-
+        
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration)
             {
@@ -92,10 +85,10 @@ namespace DBF.ViewModels
                 }
             }
 
-            public Configuration                  Configuration         { get; set; }
+            public Configuration                                     Configuration         { get; set; }
 
             // MainClubs
-            public ObservableCollection<MainClub> MainClubs             { get; set; } = [];
+            public ObservableCollection<MainClub>                    MainClubs             { get; set; } = [];
             //
             public MainClub SelectedMainClub
             {
@@ -131,7 +124,7 @@ namespace DBF.ViewModels
             }
 
             // Clubs
-            public ObservableCollection<Club>     Clubs                 { get; set; } = [];
+            public ObservableCollection<Club>                        Clubs                 { get; set; } = [];
             //
             public Club SelectedClub
             {
@@ -179,12 +172,12 @@ namespace DBF.ViewModels
                 }
             }
 
-            public bool                           HideTournamentSummery { get; set; } = false;
-            public DateTime             Date { get; set; }
-            public List<GroupSection> GroupSections { get; set; }
-            public BindableCollection<Pair>       Pairs                 { get; set; } = [];
-            public BindableCollection<Team>       Teams                 { get; set; } = [];
-            public string                         ErrorMessage          { get; set; }
+            public bool                                              HideTournamentSummery { get; set; } = false;
+            public DateTime                                          Date                  { get; set; }
+            public List<GroupSection>                                GroupSections         { get; set; }
+            public BindableCollection<Pair>                          Pairs                 { get; set; } = [];
+            public BindableCollection<Team>                          Teams                 { get; set; } = [];
+            public string                                            ErrorMessage          { get; set; }
         #endregion
 
         #region Public Methods
@@ -217,8 +210,20 @@ namespace DBF.ViewModels
             }
         #endregion
 
+     
+        public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
+        {
+            if (Configuration.TimersActive)
+            {
+                var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
+                return Task.FromResult(result == MessageBoxResult.Yes);
+            }
+            else
+                return Task.FromResult(true); 
+        }
+
         #region Private Method
-            private void LoadMainClub()
+        private void LoadMainClub()
             {
                 foreach (var path in Directory.GetDirectories(BC3path)
                                               .Select(dir => Path.GetFileName(dir))
@@ -614,7 +619,6 @@ namespace DBF.ViewModels
                 }
             }
 
-            //[DllImport("user32.dll")]             //public static extern int ChangeDisplaySettingEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, int dwflags, IntPtr lParam);
             private async Task ShowProjector()
             {
                 var screens = WpfScreenHelper.Screen.AllScreens.ToList();
@@ -635,15 +639,24 @@ namespace DBF.ViewModels
                         projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
                     }
 
+#if RELEASE
                     projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
                     projectorView.Left                  = screenTwo.WorkingArea.Left;
                     projectorView.Top                   = screenTwo.WorkingArea.Top;
                     projectorView.Width                 = screenTwo.WorkingArea.Width;
                     projectorView.Height                = screenTwo.WorkingArea.Height;
                     projectorView.WindowState           = WindowState.Maximized;
+#else
+                    projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
+                    projectorView.Left                  = screenTwo.WorkingArea.Left;
+                    projectorView.Top                   = screenTwo.WorkingArea.Top;
+                    projectorView.Width                 = 800;
+                    projectorView.Height                = 600;
+                    //projectorView.WindowState           = WindowState.Maximized;
+#endif
                 }
 
-                // Flyt ShellView-aktivering herud, så den ALTID får fokus til sidst
+                // Move ShellView activation out here, so that it ALWAS get focus in the end.
                 var shellVm   = IoC.Get<ShellViewModel>();
                 var shellView = shellVm.GetView() as Window;
 
@@ -655,38 +668,6 @@ namespace DBF.ViewModels
                     shellView.Focus();
                 }
             }
-
-            //private void bringViewToFront(string vm = null)
-            //{
-            //    var shellView = Application.Current.Windows
-            //                                       .OfType<DBF.Views.ShellView>()
-            //                                       .FirstOrDefault();
-
-            //    if (shellView != null)
-            //    {
-            //        if (shellView.WindowState == WindowState.Minimized)
-            //            shellView.WindowState =  WindowState.Normal;
-
-            //        shellView.Activate();
-            //        shellView.Topmost = true;
-            //        shellView.Topmost = false;
-            //        shellView.Focus();
-            //    }
-            //}
-
-            //private void bringShellViewToFront()
-            //{
-            //    var shellVm   = IoC.Get<ShellViewModel>();
-            //    var shellView = shellVm.GetView() as Window;
-
-            //    if (shellView != null)
-            //    {
-            //        shellView.Activate();
-            //        shellView.Topmost = true;
-            //        shellView.Focus();
-            //        shellView.Topmost = false;
-            //    }
-            //}
         #endregion
     }
 }

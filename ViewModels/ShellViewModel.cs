@@ -1,5 +1,6 @@
-﻿using Caliburn.Micro;
-
+﻿using System.Reflection;
+using Caliburn.Micro;
+using Github;
 
 namespace DBF.ViewModels
 {
@@ -10,11 +11,16 @@ namespace DBF.ViewModels
         }
 
         #region Show Screens
-        public async void OpenControlView()        
-        {
-            var screen = IoC.Get<ControlViewModel>();            
-            await ActivateItemAsync(screen);            
-        }
+            public async void OpenControlView()
+            {
+#if RELEASE
+                var updater = new UpdateManager("mortensp", "DBF");
+                await updater.CheckForUpdateAsync();
+#endif
+
+                var screen = IoC.Get<ControlViewModel>();
+                await ActivateItemAsync(screen);
+            }
         #endregion
     }
 }

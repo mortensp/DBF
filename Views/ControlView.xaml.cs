@@ -14,19 +14,19 @@ namespace DBF.Views
         {
             InitializeComponent();
 
-            //this.dgStartTeams.Loaded += dgStartTeams_Loaded;
+            //this.dgTeams.Loaded += dgStartTeams_Loaded;
         }
 
-        //private void dgStartTeams_Loaded(object sender, System.Windows.RoutedEventArgs e)          => Exnand();
+        //private void dgStartTeams_Loaded(object sender, System.Windows.RoutedEventArgs e)          => Expand();
 
-        //private void DataGrid_SortColumnsChanged(object sender, GridSortColumnsChangedEventArgs e) => Exnand();
+        //private void DataGrid_SortColumnsChanged(object sender, GridSortColumnsChangedEventArgs e) => Expand();
 
-        //private void Exnand()
+        //private void Expand()
         //{
-        //    this.dgStartTeams.Dispatcher.BeginInvoke( System.Windows.Threading.DispatcherPriority.ApplicationIdle
+        //    this.dgTeams.Dispatcher.BeginInvoke( System.Windows.Threading.DispatcherPriority.ApplicationIdle
         //                                            , new Action(() =>
         //                                                         {
-        //                                                             this.dgStartTeams.ExpandAllDetailsView();
+        //                                                             this.dgTeams.ExpandAllDetailsView();
         //                                                         }));
         //}
     }

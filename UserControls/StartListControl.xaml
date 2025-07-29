@@ -19,16 +19,16 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0"
-            Orientation="Horizontal"
+            Margin="5,5,0,0"
             HorizontalAlignment="Left"
-            Margin="5,5,0,0">
+            Orientation="Horizontal">
             <TextBlock
                 FontSize="16"
                 FontWeight="Bold"
                 Text="Startliste:  " />
-            <TextBlock                
+            <TextBlock
                 FontSize="16"
-                FontWeight="Bold" 
+                FontWeight="Bold"
                 Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
         </StackPanel>
 
@@ -46,7 +46,8 @@
         </Border>
 
 
-        <syncfusion:SfDataGrid Name="dgStartTeams" Grid.Row="2"
+        <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="2"
+            Margin="0,0,0,10"
             AllowEditing="False"
             AllowResizingColumns="True"
             AllowTriStateSorting="False"
@@ -59,9 +60,7 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
-                               Margin="0,0,0,10"
             ItemsSource="{Binding Teams, UpdateSourceTrigger=PropertyChanged}"
-            
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
@@ -117,8 +116,8 @@
 
             </syncfusion:SfDataGrid.GroupColumnDescriptions>
         </syncfusion:SfDataGrid>
-        
-        <syncfusion:SfDataGrid Name="dgStartPairs" Grid.Row="3"
+
+        <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="3"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowResizingColumns="True"
@@ -130,7 +129,7 @@
             CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
-            FontSize="14"                               
+            FontSize="14"
             ItemsSource="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
