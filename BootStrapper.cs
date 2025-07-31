@@ -18,7 +18,7 @@ namespace DBF
     //[TraceOn()]
     public class Bootstrapper : BootstrapperBase
     {
-             public Bootstrapper()
+        public Bootstrapper()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -37,11 +37,10 @@ namespace DBF
         //}
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            
             // Show screen at startup
             DisplayRootViewForAsync<ShellViewModel>();
             var screen = IoC.Get<ShellViewModel>();
-            var view = screen.GetView() as ShellView;
+            //var view   = screen.GetView() as ShellView;
             screen.OpenControlView();
 
             // Restore Taskbar Icon.
@@ -49,7 +48,7 @@ namespace DBF
         }
 
         #region SimpleContainer Overrides and Configuration.
-        private readonly SimpleContainer _container = new();
+            private readonly SimpleContainer _container = new();
 
             protected override void Configure()
             {
@@ -58,29 +57,29 @@ namespace DBF
                 _container.Instance<IWindowManager>(new WindowManager());
                 _container.Singleton<IEventAggregator, EventAggregator>();
                 _container.Singleton<Configuration>();
-
+            
                 foreach (var viewModel in SelectViewModels())
                     if (_container.HasHandler(viewModel, null) == false)
-                        if (viewModel.Name == "TimerSettingViewModel"
+                        if (viewModel.Name == "SettingsViewModel"
+                        ||  viewModel.Name == "TimerSettingViewModel"
                         ||  viewModel.Name == "PresetNameViewModel")
                             _container.RegisterPerRequest(viewModel, null, viewModel);
                         else
                             _container.RegisterSingleton(viewModel, null, viewModel);
 
-            var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
+                var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
 
-            ViewLocator.LocateTypeForModelType = (Type modelType, DependencyObject displayLocation, object context) =>
+                ViewLocator.LocateTypeForModelType = (Type modelType, DependencyObject displayLocation, object context) =>
                                                      {
                                                          if (modelType == typeof(ControlViewModel))
-                                                         if(  context   is string viewName
-                                                         &&  viewName  == "ProjectorView")
-                                                             return typeof(ProjectorView);
+                                                             if (context  is string viewName
+                                                             &&  viewName == "ProjectorView")
+                                                                 return typeof(ProjectorView);
 
                                                          return defaultLocateTypeForModelType(modelType, displayLocation, context);
                                                      };
-
-                var cfg = _container.GetInstance<Configuration>(null);
-            }
+           
+        }
 
             protected override object GetInstance(Type service, string key)
             {

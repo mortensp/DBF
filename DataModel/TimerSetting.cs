@@ -13,6 +13,8 @@ namespace DBF.DataModel
     {
         private Color? color;
         //private Brush  background = Brushes.White;
+
+        #region Constructors
         public TimerSetting( string name = null
                            , bool customPreset = true
                            , bool teamMatch = false
@@ -41,6 +43,7 @@ namespace DBF.DataModel
             Color      = color;
             Visibility = visibility;
         }
+        #endregion
 
         public Color? Color
         {

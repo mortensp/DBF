@@ -55,7 +55,7 @@ namespace DBF.DataModel
         #region Public Methods
             public async void OpenSetting()
             {
-                var screen        = IoC.Get<TimerSettingViewModel>();
+                var screen        = IoC.Get<TimerSettingsViewModel>();
                 var windowManager = IoC.Get<IWindowManager>();
                 screen.Setting    = this;
                 await windowManager.ShowDialogAsync(screen);

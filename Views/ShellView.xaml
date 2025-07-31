@@ -13,6 +13,18 @@
     WindowState="Normal"
     mc:Ignorable="d">
     <Grid>
-        <ContentControl x:Name="ActiveItem" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="Indstillinger" />
+            <MenuItem  Header="Hjælp" >
+                <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="Bridgeurene" />
+            </MenuItem>
+        </Menu>
+
+        <ContentControl x:Name="ActiveItem" Grid.Row="1" />
     </Grid>
 </Window>

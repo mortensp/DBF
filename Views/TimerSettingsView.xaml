@@ -1,5 +1,5 @@
 ﻿<Window x:Name="root"
-    x:Class="DBF.Views.TimerSettingView"
+    x:Class="DBF.Views.TimerSettingsView"
     Title="Indstil uret"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -54,6 +54,7 @@
                     FontSize="16"
                     FontWeight="Bold"
                     Text="Indstil uret" />
+                
                 <Grid Margin="0,0,0,0" DataContext="{Binding NewSetting}">
                     <Grid.RowDefinitions>
                         <!--  Add a row for each field  -->

@@ -15,13 +15,14 @@ using System.Windows.Shapes;
 namespace DBF.Views
 {
     /// <summary>
-    /// Interaction logic for TestView.xaml
+    /// Interaction logic for ConfigurationView.xaml
     /// </summary>
-    public partial class TestView : Window
+    public partial class ConfigurationView : Window
     {
-        public TestView()
+        public ConfigurationView()
         {
             InitializeComponent();
         }
     }
 }
+

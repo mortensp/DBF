@@ -2,9 +2,11 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Caliburn.Micro;
 using Syncfusion.Data;
 using Syncfusion.UI.Xaml.Grid;
-
+using DBF.DataModel;
+using Group = Syncfusion.Data.Group;
 namespace DBF.UserControls
 {
     /// <summary>
@@ -12,6 +14,8 @@ namespace DBF.UserControls
     /// </summary>
     public partial class StartListControl : UserControl
     {
+        private Configuration config = IoC.Get<Configuration>();
+
         private bool            parentIsViewbox = false;
         //private bool            collapsGroups   = false;
         private int             groupNo         = -1;
@@ -19,7 +23,7 @@ namespace DBF.UserControls
         private int             teamGroups      = 0;
         private int pairRows = 0;
         private int teamRows = 0;
-        private int maxRows = Properties.Settings.Default.MaxRows;
+        
         private DispatcherTimer groupTimer;
 
         public StartListControl()
@@ -33,9 +37,14 @@ namespace DBF.UserControls
             dgTeams.Columns["Names"].ColumnSizer     = GridLengthUnitType.SizeToCells;
 
             // Initialiser timeren
-            groupTimer           = new DispatcherTimer();
-            groupTimer.Interval  = TimeSpan.FromSeconds(Properties.Settings.Default.DisplaySecounds);
+            groupTimer           = new DispatcherTimer();            
+            groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
             groupTimer.Tick     += (s, e) => showNextGroup();
+            config.PropertyChanged += (s, e) => 
+            { 
+                groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
+                setupPaging();
+                };
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -63,7 +72,7 @@ namespace DBF.UserControls
                 pairRows = dgPairs.View?.Records.Count ?? 0;
                 teamRows = dgTeams.View?.Records.Count ?? 0;
 
-                if (pairRows + teamRows>  maxRows)
+                if (pairRows + teamRows> config.ProjectorMaxRows)
                 {
                     dgPairs.CollapseAllGroup();
                     dgTeams.CollapseAllGroup();
@@ -71,8 +80,12 @@ namespace DBF.UserControls
                     groupTimer.Start();
                 }
                 else
+                {
+                    dgPairs.ExpandAllGroup();
+                    dgTeams.ExpandAllGroup();
                     groupTimer.Stop();
             }
+        }
         }
 
         private void showNextGroup()

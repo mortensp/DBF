@@ -1,0 +1,118 @@
+﻿<Window x:Class="DBF.Views.ConfigurationView"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cal="http://www.caliburnproject.org"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dbf="clr-namespace:DBF"
+    xmlns:local="clr-namespace:DBF.ViewModels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:DBF.DataModel"
+    xmlns:sf="http://schemas.syncfusion.com/wpf"
+    Height="200"
+        Width="400"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderThickness" Value="2" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderThickness" Value="2" />
+
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Padding="12"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            CornerRadius="6">
+
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,0"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Text="Projektor:" />
+
+                <Grid Margin="0,0,0,0" DataContext="{Binding NewSettings}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="170" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Projector Interval:  -->
+                    <TextBlock Grid.Column="0" Grid.Row="0"
+                        VerticalAlignment="Center"
+                        Text="Interval, bladning på projektor:" />
+
+                    <StackPanel Grid.Column="1" Grid.Row="0"
+                        Margin="0,4,0,5"
+                        Orientation="Horizontal">
+                        <TextBox
+                            Width="50"
+                            Margin="0,0,4,0"
+                            Text="{Binding ProjectorInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="4,0,4,0"
+                            VerticalAlignment="Center"
+                            Text="sekunder" />
+
+                    </StackPanel>
+
+                    <!--  Maximum rows  -->
+
+                    <TextBlock Grid.Column="0" Grid.Row="1"
+                        VerticalAlignment="Center"
+                        Text="Max Pr/hold af gangen :" />
+
+                    <TextBox Grid.Column="1" Grid.Row="1"
+                        Width="50"
+                        Margin="0,5,0,5"
+                        HorizontalAlignment="Left"
+                        Text="{Binding ProjectorMaxRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1"
+            Margin="0,12,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Width="80"
+                Margin="0,0,8,0"
+                cal:Message.Attach="[Event Click] = [Action Cancel]"
+                Content="Annuller"
+                IsCancel="True" />
+            <Button
+                Width="80"
+                cal:Message.Attach="[Event Click] = [Action AcceptSetting]"
+                Content="Anvend"
+                IsDefault="True" />
+        </StackPanel>
+    </Grid>
+
+</Window>

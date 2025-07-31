@@ -51,7 +51,7 @@ namespace DBF.ViewModels
         private          FileSystemWatcher                       watcher;
         private          int                                     sectionNo;
         private readonly ConcurrentDictionary <string, DateTime> _lastFileEvent = new();
-        
+
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration)
             {
@@ -85,10 +85,12 @@ namespace DBF.ViewModels
                 }
             }
 
-            public Configuration                                     Configuration         { get; set; }
+            public Configuration                  Configuration         { get; set; }
+            
 
             // MainClubs
-            public ObservableCollection<MainClub>                    MainClubs             { get; set; } = [];
+            public ObservableCollection<MainClub> MainClubs             { get; set; } = [];
+
             //
             public MainClub SelectedMainClub
             {
@@ -124,7 +126,7 @@ namespace DBF.ViewModels
             }
 
             // Clubs
-            public ObservableCollection<Club>                        Clubs                 { get; set; } = [];
+            public ObservableCollection<Club>     Clubs                 { get; set; } = [];
             //
             public Club SelectedClub
             {
@@ -172,22 +174,21 @@ namespace DBF.ViewModels
                 }
             }
 
-            public bool                                              HideTournamentSummery { get; set; } = false;
-            public DateTime                                          Date                  { get; set; }
-            public List<GroupSection>                                GroupSections         { get; set; }
-            public BindableCollection<Pair>                          Pairs                 { get; set; } = [];
-            public BindableCollection<Team>                          Teams                 { get; set; } = [];
-            public string                                            ErrorMessage          { get; set; }
+            public bool                           HideTournamentSummery { get; set; } = false;
+            public DateTime                       Date                  { get; set; }
+            public List<GroupSection>             GroupSections         { get; set; }
+            public BindableCollection<Pair>       Pairs                 { get; set; } = [];
+            public BindableCollection<Team>       Teams                 { get; set; } = [];
+            public string                         ErrorMessage          { get; set; }
         #endregion
 
         #region Public Methods
             public void AddTimer() => Configuration.AddTimer();
 
-            public void TimersHelp() {
-            var window = new TimersHelpWindow(); // Views\TimersHelpWindow.xaml
-            window.ShowDialog();
-        }
-
+            //    public void TimersHelp() {
+            //    var window = new TimersHelpWindow(); // Views\TimersHelpWindow.xaml
+            //    window.ShowDialog();
+            //}
             public async void ShowStartList()
             {
                 if (CurrentView is not StartListControl)
@@ -213,7 +214,6 @@ namespace DBF.ViewModels
             }
         #endregion
 
-     
         public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
         {
             if (Configuration.TimersActive)
@@ -222,11 +222,11 @@ namespace DBF.ViewModels
                 return Task.FromResult(result == MessageBoxResult.Yes);
             }
             else
-                return Task.FromResult(true); 
+                return Task.FromResult(true);
         }
 
         #region Private Method
-        private void LoadMainClub()
+            private void LoadMainClub()
             {
                 foreach (var path in Directory.GetDirectories(BC3path)
                                               .Select(dir => Path.GetFileName(dir))
@@ -478,7 +478,6 @@ namespace DBF.ViewModels
                         }
                     }
                 }
-
                 catch (Exception ex)
                 {
                     throw ex;
@@ -614,7 +613,6 @@ namespace DBF.ViewModels
                         return (T)serializer.Deserialize(reader);
                     }
                 }
-
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);

@@ -5,217 +5,253 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
 using DBF.UserControls;
+using Microsoft.Extensions.Options;
 using Syncfusion.Data.Extensions;
 using Syncfusion.Windows.Tools.Controls;
 using static System.TimeZoneInfo;
 
 namespace DBF.DataModel
 {
-    public class Configuration : PropertyChangedBase
+    public partial class Configuration : PropertyChangedBase
     {
-        private static readonly string[] audioExtensions = new[] { ".wav", ".mp3" };
-        private int VisibleTimerCount
-        {
-            get => visibleTimerCount;
-            set
-            {
-                visibleTimerCount = value;
-                TimersCanClose    = VisibleTimerCount >  1;
-                TimersCanBeAdded  = VisibleTimerCount <  4;
-            }
-        }
-
-        private string configDir, presetsPath, timerSettingPath, jsonData, jsonPresets, jsonTimers;
+        private static readonly string[]             audioExtensions   = new[] { ".wav", ".mp3" };
+        public static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions { WriteIndented = true, };
+        private static         string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
+        private static         string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
+        private                Configuration         loadedConfig      = null;
+        private                int                   visibleTimerCount = 0;
 
         #region Constructors
-            public Configuration()
+            static Configuration()
             {
-                BackgroundColors = 
-                [
-                                 new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#F2460D"), ColorName = "Rød (dbf)" },
-                                 new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#00b0ff"), ColorName = "Blå (dbf)" },
-                                 new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FF9D00"), ColorName = "Orange (dbf)" },
-                                 new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#81C784"), ColorName = "Grøn (dbf)" },
-                                 ];
+                SerializerOptions.Converters.Add(new PresetCollectionConverter());
 
-                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); // Roaming folder
-                configDir          = Path.Combine(appDataPath, "DBFTools");
-                presetsPath        = Path.Combine(configDir  , "presets.json");
-                timerSettingPath   = Path.Combine(configDir  , "timerSetting.json");
+                // Make sure that Roaming folder exists
+                var configDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools";
 
-                // Make sure that directory and files exists
                 if (!Directory.Exists(configDir))
                     Directory.CreateDirectory(configDir);
 
-                // Store builtIn defaults
-                if (!File.Exists(presetsPath))
-                {
-                    string json = JsonSerializer.Serialize( Presets.Where(p => p.CustomPreset == true).ToObservableCollection<Preset>()
-                                                          , new JsonSerializerOptions { WriteIndented = true });
-                    File.WriteAllText(presetsPath, json);
-                }
+                //Assembly assembly = Assembly.GetExecutingAssembly();
+                //var names = assembly.GetManifestResourceNames();
 
-                if (!File.Exists(timerSettingPath))
-                {
-                    string json = JsonSerializer.Serialize(BridgeTimers, new JsonSerializerOptions { WriteIndented = true });
-                    File.WriteAllText(timerSettingPath, json);
-                }
-
-                Load();
+                //foreach (var name in names.Where(n => n.StartsWith("DBF.AudioFiles.")))
+                //    Console.WriteLine(name);
             }
+
+            public Configuration()
+            {
+            }
+
+            //public Configuration(Configuration loaded)
+            //{
+            //    Update(loaded);
+            //}
         #endregion
 
         #region Public Properties
-            public  ObservableCollection <CustomColor> BackgroundColors;
-            private int                                visibleTimerCount = 0;
-            public ObservableCollection<BridgeTimer>   BridgeTimers     { get; set; } = new();
-            public BindableCollection<Preset>          Presets          { get; set; } = new()
-                                                                        {
-                                                                                new Preset("Par - 7 runder af 4 spil", false, false,  7, 4, 4, 0,27, 0, 1, 12,5),
-                                                                                new Preset("Par - 9 runder af 3 spil", false, false,  9, 3,  5,0, 20, 0, 1, 12,5),
-                                                                                new Preset("Par - 11 runder af 2 spil",false, false, 11, 2,  6,0,13, 0, 1, 12,5),
-                                                                                new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,26, 0, 0,15,5)
-                                                                        };
+            #region Public Properties - Serilizable
+                public string                            AppVersion        { get; private set; } = currentversion;
+                public int                               ProjectorInterval { get; set; } = 20;
+                public int                               ProjectorMaxRows  { get; set; } = 40;
 
-            public bool                                TimersCanClose   { get; set; }
-            public bool                                TimersCanBeAdded { get; set; }
+                public ObservableCollection<BridgeTimer> BridgeTimers      { get; set; } = new();
+            #endregion
 
-            public bool TimersActive
-            {
-                get
+            #region Public Properties - JsonIgore
+                [JsonIgnore]
+                public bool                              TimersCanBeAdded  { get; set; }
+
+                [JsonIgnore]
+                public int VisibleTimerCount
                 {
-                    for (int i = 0; i <  visibleTimerCount; i++)
-                        if (BridgeTimers[i].IsStarted)
-                            return true;
-
-                    return false;
+                    get => visibleTimerCount;
+                    set
+                    {
+                        visibleTimerCount = value;
+                        //TimersCanClose   = VisibleTimerCount > 1;
+                        TimersCanBeAdded = VisibleTimerCount <  4;
+                    }
                 }
+
+                [JsonIgnore]
+                public BindableCollection<Preset>        Presets           { get; set; } = new()
+                                                        {
+                                                           new Preset("Par - 7 runder af 4 spil", false, false,  7, 4, 4, 0,27, 0, 1, 12,5),
+                                                           new Preset("Par - 9 runder af 3 spil", false, false,  9, 3,  5,0, 20, 0, 1, 12,5),
+                                                           new Preset("Par - 11 runder af 2 spil",false, false, 11, 2,  6,0,13, 0, 1, 12,5),
+                                                           new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,26, 0, 0,15,5)
+                                                        };
+
+                [JsonIgnore]
+                public ObservableCollection <CustomColor> BackgroundColors = new()
+                                                        {
+                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#F2460D"), ColorName = "Rød (dbf)" },
+                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#00b0ff"), ColorName = "Blå (dbf)" },
+                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FF9D00"), ColorName = "Orange (dbf)" },
+                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#81C784"), ColorName = "Grøn (dbf)" },
+                                                        };
+
+                [JsonIgnore]
+                public bool TimersActive
+                {
+                    get
+                    {
+                        for (int i = 0; i <  VisibleTimerCount; i++)
+                            if (BridgeTimers[i].IsStarted)
+                                return true;
+
+                        return false;
+                    }
+                }
+            #endregion
+        #endregion
+
+        #region Public Methods
+            public void Load()
+            {
+                if (!File.Exists(path))
+                {
+                    AppVersion = currentversion;
+                    Save();
+                }
+                else
+                {
+                    var jsonData = File.ReadAllText(path);
+                    loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, SerializerOptions);
+
+                    Update(loadedConfig);
+                }
+
+                loadTimers();
+            }
+
+            private void loadTimers()
+            {
+                int i;
+                BridgeTimers = new();
+
+                for (i = 0; i <  4; i++)
+                {
+                    BridgeTimer timer;
+
+                    if (loadedConfig?.BridgeTimers is null || loadedConfig.BridgeTimers.Count == 0)
+                    {
+                        timer = new BridgeTimer();
+                        timer.Update(Presets[i]);
+                        timer.Name  = null;
+                        timer.Color = BackgroundColors[i].Color;
+                        timer.Group = ((char)('A' + i)).ToString(); // Set group to A, B, C or D
+
+                        if (visibleTimerCount >  1) // Lad som standard de to første være visible
+                            timer.Visibility = System.Windows.Visibility.Collapsed;
+                    }
+                    else
+                        if (loadedConfig.BridgeTimers.Count >  i)
+                            timer = loadedConfig.BridgeTimers[i];
+                        else
+                        {
+                            timer = new();
+                            timer.Update(Presets[i]);
+                            timer.Visibility = System.Windows.Visibility.Collapsed;
+                        }
+
+                    if (string.IsNullOrEmpty(timer.Sound))
+                        timer.Sound = AudioPlayer.Sounds[i];
+
+                    timer.UpdateDisplay();
+                    BridgeTimers.Add(timer);
+
+                    if (timer.Visibility == Visibility.Visible)
+                        VisibleTimerCount++;
+                }
+
+                for (; i <  4; i++)
+                {
+                    var timer = new BridgeTimer();
+                    timer.Update(Presets[i]);
+                    timer.Name       = null;
+                    timer.Color      = BackgroundColors[i].Color;
+                    timer.Group      = ((char)('A' + i)).ToString(); // Set group to A, B, C or D
+                    timer.Visibility = Visibility.Collapsed;
+                    timer.Sound      = AudioPlayer.Sounds[i];
+
+                    BridgeTimers.Add(timer);
+
+                    if (timer.Visibility == Visibility.Visible)
+                        VisibleTimerCount++;
+                }
+
+                // Put Collapsed timers at the end
+                for (i = BridgeTimers.Count - 1; i >= 0; i--)
+                {
+                    var timer = BridgeTimers[i];
+
+                    if (timer.Visibility != Visibility.Visible)
+                    {
+                        BridgeTimers.Remove(timer);
+                        BridgeTimers.Add(timer);
+                    }
+                }
+
+                if (visibleTimerCount == 0)
+                {
+                    BridgeTimers[0].Visibility = Visibility.Visible;
+                    visibleTimerCount          = 1;
+                }
+
+                SetUpDownVisibility();
+            }
+
+            public void Save()
+            {
+                string json = JsonSerializer.Serialize(this, SerializerOptions);
+                File.WriteAllText(path, json);
+            }
+
+            public void Update(Configuration newConfiguration)
+            {
+                if (newConfiguration.hasUserValues)
+                {
+                    ProjectorInterval = newConfiguration.ProjectorInterval;
+                    ProjectorMaxRows  = newConfiguration.ProjectorMaxRows;
+                }
+
+                // Keep built-in Presets
+                foreach (var preset in newConfiguration.Presets)
+                    if (Presets.FirstOrDefault(p => p.Name == preset.Name) == null)
+                        Presets.Add(preset);
             }
         #endregion
 
         #region Private and Internal methods
-            #region Load and Save methods
-                internal void Load()
+            #region Private and Internal Methods          
+                private bool hasUserValues
                 {
-                    Assembly assembly = Assembly.GetExecutingAssembly();
-                    var      names    = assembly.GetManifestResourceNames();
-
-                    foreach (var name in names.Where(n => n.StartsWith("DBF.AudioFiles.")))
-                        Console.WriteLine(name);
-
-                    jsonData          = File.ReadAllText(presetsPath);
-                    var loadedPresets = JsonSerializer.Deserialize<ObservableCollection<Preset>>(jsonData);
-
-                    foreach (var preset in loadedPresets)
-                        if (Presets.FirstOrDefault(p => p.Name == preset.Name) == null)
-                            Presets.Add(preset);
-
-                    jsonData         = File.ReadAllText(timerSettingPath);
-                    var loadedTimers = JsonSerializer.Deserialize<ObservableCollection<BridgeTimer>>(jsonData);
-                    int i;
-
-                    for (i = 0; i <  4; i++)
+                    get
                     {
-                        BridgeTimer timer;
-
-                        if (loadedTimers is null || loadedTimers.Count == 0)
-                        {
-                            timer = new BridgeTimer();
-                            timer.Update(Presets[i]);
-                            timer.Name  = null;
-                            timer.Color = BackgroundColors[i].Color;
-                            timer.Group = ((char)('A' + i)).ToString(); // Set group to A, B, C or D
-                        }
+                        if (AppVersion.CompareTo("v0.9.3.0") <= 0)
+                            return !(ProjectorInterval == 20 && ProjectorMaxRows == 40);
                         else
-                            if (loadedTimers.Count >  i)
-                                timer = loadedTimers[i];
-                            else
-                            {
-                                timer = new();
-                                timer.Update(Presets[i]);
-                                timer.Visibility = System.Windows.Visibility.Collapsed;
-                            }
-
-                        if (string.IsNullOrEmpty(timer.Sound))
-                            timer.Sound = AudioPlayer.Sounds[i];
-
-                        timer.UpdateDisplay();
-                        BridgeTimers.Add(timer);
-
-                        if (timer.Visibility == Visibility.Visible)
-                            VisibleTimerCount++;
+                            return false;
                     }
-
-                    for (; i <  4; i++)
-                    {
-                        var timer = new BridgeTimer();
-                        timer.Update(Presets[i]);
-                        timer.Name       = null;
-                        timer.Color      = BackgroundColors[i].Color;
-                        timer.Group      = ((char)('A' + i)).ToString(); // Set group to A, B, C or D
-                        timer.Visibility = Visibility.Collapsed;
-                        timer.Sound      = AudioPlayer.Sounds[i];
-
-                        BridgeTimers.Add(timer);
-
-                        if (timer.Visibility == Visibility.Visible)
-                            VisibleTimerCount++;
-                    }
-
-                    for (i = BridgeTimers.Count - 1; i >= 0; i--)
-                    {
-                        var timer = BridgeTimers[i];
-
-                        if (timer.Visibility != Visibility.Visible)
-                        {
-                            BridgeTimers.Remove(timer);
-                            BridgeTimers.Add(timer);
-                        }
-                    }
-
-                    //BridgeTimers[0].ShowUpButton                       = Visibility.Visible;
-                    //BridgeTimers[VisibleTimerCount - 1].ShowDownButton = Visibility.Collapsed;
-                    SetUpDownVisibility();
                 }
 
-                internal void SavePresets()
-                {
-                    jsonPresets = JsonSerializer.Serialize<ObservableCollection<Preset>>(Presets.Where(p => p.CustomPreset == true).ToObservableCollection<Preset>());
-
-                    File.WriteAllText(presetsPath, jsonPresets);
-                }
-
-                internal void SaveSettings()
-                {
-                    jsonTimers = JsonSerializer.Serialize<ObservableCollection<BridgeTimer>>(BridgeTimers);
-
-                    File.WriteAllText(timerSettingPath, jsonTimers);
-
-                    VisibleTimerCount = BridgeTimers.Count(ts => ts.Visibility == Visibility.Visible);
-                }
-
-                internal void Save()
-                {
-                    SavePresets();
-                    SaveSettings();
-                }
-            #endregion
-
-            #region Private and Internal Methods              
                 internal void AddTimer()
                 {
-                    if (visibleTimerCount <  4)
+                    if (VisibleTimerCount <  4)
                     {
-                        var bridgeTimer = BridgeTimers[visibleTimerCount];
+                        var bridgeTimer = BridgeTimers[VisibleTimerCount];
 
                         bridgeTimer.Visibility = Visibility.Visible;
 
                         VisibleTimerCount++;
-                        SaveSettings();
+                        Save();
                         SetUpDownVisibility();
                     }
                 }
@@ -236,7 +272,7 @@ namespace DBF.DataModel
                         BridgeTimers.Remove(timer);
                         BridgeTimers.Add(timer);
 
-                        SaveSettings();
+                        Save();
                         SetUpDownVisibility();
                     }
                 }
@@ -250,7 +286,7 @@ namespace DBF.DataModel
                         BridgeTimers[i - 1] = timer;
                         BridgeTimers[i]     = gem;
 
-                        SaveSettings();
+                        Save();
                         SetUpDownVisibility();
                     }
                 }
@@ -264,8 +300,7 @@ namespace DBF.DataModel
                         BridgeTimers[i + 1] = timer;
                         BridgeTimers[i]     = gem;
 
-                        SaveSettings();
-                        SaveSettings();
+                        Save();
                         SetUpDownVisibility();
                     }
                 }
@@ -280,7 +315,7 @@ namespace DBF.DataModel
                 }
 
                 BridgeTimers[0].ShowUpButton                       = Visibility.Collapsed;
-                BridgeTimers[visibleTimerCount - 1].ShowDownButton = Visibility.Collapsed;
+                BridgeTimers[VisibleTimerCount - 1].ShowDownButton = Visibility.Collapsed;
             }
         #endregion
     }

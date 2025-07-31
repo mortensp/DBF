@@ -82,29 +82,5 @@ namespace DBF.Properties {
                 this["WindowState"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
-        public int DisplaySecounds {
-            get {
-                return ((int)(this["DisplaySecounds"]));
-            }
-            set {
-                this["DisplaySecounds"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
-        public int MaxRows {
-            get {
-                return ((int)(this["MaxRows"]));
-            }
-            set {
-                this["MaxRows"] = value;
-            }
-        }
     }
 }

@@ -9,14 +9,14 @@ using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.ViewModels
 {
-    public class TimerSettingViewModel : Screen
+    public class TimerSettingsViewModel : Screen
     {
         private          Preset         selectedPreset     { get; set; }
         private          TimerSetting   setting;
         private readonly IWindowManager windowManager;
 
         #region Constructors
-            public TimerSettingViewModel(Configuration configuration)
+            public TimerSettingsViewModel(Configuration configuration)
             {
                 Configuration  = configuration;
                 windowManager = IoC.Get<IWindowManager>();
@@ -86,7 +86,7 @@ namespace DBF.ViewModels
 
                 Setting.Update(NewSetting);
                 await TryCloseAsync();
-                Configuration.SaveSettings();
+                Configuration.Save();
             }
 
             public async void AddPreset()
@@ -100,7 +100,7 @@ namespace DBF.ViewModels
                     var preset      = new Preset(NewSetting);
                     Configuration.Presets.Add(preset);
 
-                    Configuration.SavePresets();
+                    Configuration.Save();
                     SelectedPreset = preset;
                 }
             }
@@ -108,7 +108,7 @@ namespace DBF.ViewModels
             public void SavePreset()
             {
                 SelectedPreset.Update(NewSetting);
-                Configuration.SavePresets();
+                Configuration.Save();
             }
 
             public void DeletePreset()
@@ -116,7 +116,7 @@ namespace DBF.ViewModels
                 if (SelectedPreset.CustomPreset)
                 {
                     Configuration.Presets.Remove(selectedPreset);
-                    Configuration.SavePresets();
+                    Configuration.Save();
                     NewSetting.Name = null;
                     SelectedPreset  = FindPreset(NewSetting);
                 }

@@ -17,9 +17,9 @@ namespace DBF.Views
     /// <summary>
     /// Interaction logic for TimerSettingView.xaml
     /// </summary>
-    public partial class TimerSettingView : Window
+    public partial class TimerSettingsView : Window
     {
-        public TimerSettingView()
+        public TimerSettingsView()
         {
             InitializeComponent();
         }

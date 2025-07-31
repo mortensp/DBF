@@ -152,7 +152,7 @@
 
     <Style x:Key="captionRowStyle" TargetType="sfgrid:CaptionSummaryRowControl">
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Margin" Value="0,5,0,0"/>
+        <Setter Property="Margin" Value="0,5,0,0" />
         <!--<Setter Property="Foreground" Value="{Binding Group.Key, Converter={StaticResource GroupColorConverter}}"/>-->
         <Setter Property="Template">
             <Setter.Value>
@@ -164,11 +164,9 @@
                             Foreground="Black"
                             Text="{Binding Key, Converter={StaticResource FirstPartConverter}}" />
 
-                        <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" 
-                                   Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
+                        <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
 
-                        <TextBlock Foreground="Black" 
-                                   Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
+                        <TextBlock Foreground="Black" Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
 
                     </StackPanel>
                 </ControlTemplate>

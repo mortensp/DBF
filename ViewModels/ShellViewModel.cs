@@ -1,13 +1,17 @@
 ﻿using System.Reflection;
 using Caliburn.Micro;
+using DBF.DataModel;
+using DBF.Views;
 using Github;
+using static System.TimeZoneInfo;
 
 namespace DBF.ViewModels
 {
     public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
     {
-        public ShellViewModel()
+        public ShellViewModel(Configuration configuration)
         {
+            configuration.Load();
         }
 
         #region Show Screens
@@ -22,5 +26,22 @@ namespace DBF.ViewModels
                 await ActivateItemAsync(screen);
             }
         #endregion
+
+        public async Task OpenSettingsAsync()
+        {
+            // Åbn indstillinger
+            var screen = IoC.Get<ConfigurationViewModel>();
+            var windowManager = IoC.Get<IWindowManager>();
+            
+            await windowManager.ShowDialogAsync(screen);
+        }
+
+ 
+
+        public void TimersHelp()
+        {
+            var window = new TimersHelpWindow(); // Views\TimersHelpWindow.xaml
+            window.ShowDialog();
+        }
     }
 }
