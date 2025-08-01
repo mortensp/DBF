@@ -9,7 +9,7 @@
     Width="1100"
     Height="900"
     FontSize="14"
-    WindowStartupLocation="CenterScreen"
+    
     WindowState="Normal"
     mc:Ignorable="d">
     <Grid>

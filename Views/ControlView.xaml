@@ -20,6 +20,7 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -65,7 +66,20 @@
                 SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </WrapPanel>
 
-        <TabControl Grid.ColumnSpan="2" Grid.Row="1"
+        <Border Grid.Row="1" Grid.Column="2"
+            Height="28"
+            Visibility="{Binding ErrorMessage, Converter={StaticResource HideEmptyConverter}}">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="Red"
+                FontSize="16"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="{Binding ErrorMessage}" />
+        </Border>
+        
+        <TabControl Grid.ColumnSpan="2" Grid.Row="2"
             MinHeight="400">
 
             <TabItem Header="Par - Startliste">
@@ -102,9 +116,9 @@
             </TabItem>
         </TabControl>
 
-        <Label Grid.Row="2" FontWeight="Bold">Projektor:</Label>
+        <Label Grid.Row="3" FontWeight="Bold" Grid.Column="0">Projektor:</Label>
 
-        <WrapPanel Grid.Column="1" Grid.Row="2"
+        <WrapPanel Grid.Column="1" Grid.Row="3"
             Margin="10,0,10,0"
             HorizontalAlignment="Center">
             <Button

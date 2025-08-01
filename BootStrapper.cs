@@ -60,7 +60,7 @@ namespace DBF
             
                 foreach (var viewModel in SelectViewModels())
                     if (_container.HasHandler(viewModel, null) == false)
-                        if (viewModel.Name == "SettingsViewModel"
+                        if (viewModel.Name == "ConfigurationViewModel"
                         ||  viewModel.Name == "TimerSettingViewModel"
                         ||  viewModel.Name == "PresetNameViewModel")
                             _container.RegisterPerRequest(viewModel, null, viewModel);

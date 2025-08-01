@@ -50,7 +50,7 @@
                     FontWeight="Bold"
                     Text="Projektor:" />
 
-                <Grid Margin="0,0,0,0" DataContext="{Binding NewSettings}">
+                <Grid Margin="0,0,0,0" DataContext="{Binding NewConfiguration}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

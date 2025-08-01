@@ -12,18 +12,18 @@ namespace DBF.ViewModels
 {
     public class ConfigurationViewModel : Screen
     {
+        private Configuration configuration;
 
         #region Constructors
             public ConfigurationViewModel(Configuration configuration)
             {
-                Configuration = configuration;
-                NewConfiguration = Configuration.DeepCopy();
+                this.configuration = configuration;
+                NewConfiguration.Update(configuration);
             }
         #endregion
 
         #region public Properties  
-            public Configuration Configuration { get; private set; }
-            public Configuration NewConfiguration { get; set; }
+            public Configuration NewConfiguration { get; set; } = new();
         #endregion
 
         #region Public Methods
@@ -35,8 +35,8 @@ namespace DBF.ViewModels
             public async void AcceptSetting()
             {
                 await TryCloseAsync();
-                Configuration.Update(NewConfiguration);
-                Configuration.Save();
+                configuration.Update(NewConfiguration);
+                configuration.Save();
             }
         #endregion
     }

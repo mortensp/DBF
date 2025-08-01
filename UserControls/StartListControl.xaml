@@ -13,7 +13,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+    
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -32,21 +32,7 @@
                 Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
         </StackPanel>
 
-        <Border Grid.Row="1"
-            Height="28"
-            Visibility="{Binding ErrorMessage, Converter={StaticResource HideEmptyConverter}}">
-            <TextBlock
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Background="Red"
-                FontSize="16"
-                FontWeight="Bold"
-                Foreground="White"
-                Text="{Binding ErrorMessage}" />
-        </Border>
-
-
-        <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="2"
+        <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="1"
             Margin="0,0,0,10"
             AllowEditing="False"
             AllowResizingColumns="True"
@@ -117,7 +103,7 @@
             </syncfusion:SfDataGrid.GroupColumnDescriptions>
         </syncfusion:SfDataGrid>
 
-        <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="3"
+        <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="2"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowResizingColumns="True"

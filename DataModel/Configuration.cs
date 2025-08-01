@@ -48,7 +48,7 @@ namespace DBF.DataModel
             {
             }
 
-            //public Configuration(Configuration loaded)
+            //public configuration(configuration loaded)
             //{
             //    Update(loaded);
             //}
