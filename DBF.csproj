@@ -1,29 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<AssemblyTitle>DBF</AssemblyTitle>
+		<AssemblyName>DBF</AssemblyName>
+		<Description>DBF Tools - Viser Start og resultatlister og 1-4 bruidgeure</Description>
+		<RootNamespace>DBF</RootNamespace>
+		<Company>Morten Sparding</Company>
+		<Product>DBF Tools</Product>
+		<Copyright>Copyright © 2025</Copyright>
+
+		<AssemblyVersion>0.9.4.0</AssemblyVersion>
+		<FileVersion>0.9.4.0</FileVersion>
+
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWindowsForms>false</UseWindowsForms>
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
-		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-		<RootNamespace>DBF</RootNamespace>
-		<AssemblyName>DBF</AssemblyName>
+
 		<Platforms>AnyCPU;x64</Platforms>
 		<ApplicationIcon>Images\DBF_Tools.ico</ApplicationIcon>
-		<Version>0.9.3</Version>
-		<AssemblyVersion>0.9.3.0</AssemblyVersion>
-		<FileVersion>0.9.3.0</FileVersion>
+		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+		<ComVisible>false</ComVisible>
+		<Guid>8e71374d-fd18-4298-8e6b-816e21df3aa8</Guid>
+	 <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!--<None Remove="App.config.gem" />-->
 		<None Remove="Directory.Build.props" />
-		<None Remove="Images\DBF_Tools.ico" />
-		<!--<None Remove="Images\guideTilUr.jpg" />-->
-		<!--<None Remove="licensing.htm" />-->
+		<!--<None Remove="Images\DBF_Tools.ico" />-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,7 +41,7 @@
 		<Resource Include="Images\guideTilUr.jpg">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
-		<Resource Include="Images\Splash.png" />
+		<!--<Resource Include="Images\Splash.png" />-->
 		<EmbeddedResource Include="Images\projector_48x48.ico" />
 	</ItemGroup>
 
@@ -66,27 +74,25 @@
 
 
 	<ItemGroup>
+		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.1" />
+		<!--<ProjectReference Include="..\..\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
+	</ItemGroup>
+
+
+	<ItemGroup>
 		<PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.4" />
-		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.1" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="NetCoreAudio" Version="2.0.0" />
-
-		<!--<PackageReference Include="PropertyChanged.Fody" Version="4.1.0"/>-->
-		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
-		<!--<PackageReference Include="PropertyChanged.Fody" Version="4.1.0">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>-->
-
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.7" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="CData.Access" Version="24.0.9175" />
-		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />-->
+	
 
 		<Reference Include="CData.EntityFrameworkCore.Access">
 			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\EFCORE80\CData.EntityFrameworkCore.Access.dll</HintPath>
@@ -94,18 +100,20 @@
 		<Reference Include="System.Data.CData.Access">
 			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\System.Data.CData.Access.dll</HintPath>
 		</Reference>
+		<!--<PackageReference Include="CData.Access" Version="24.0.9175" />
+		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />-->
 	</ItemGroup>
 
 	<ItemGroup>
 		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 og åbenbart også 8:-) -->
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
-			<PrivateAssets>all</PrivateAssets>
+			<!--<PrivateAssets>all</PrivateAssets>-->
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
-			<PrivateAssets>all</PrivateAssets>
+			<!--<PrivateAssets>all</PrivateAssets>-->
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 
@@ -136,7 +144,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="DataSets\" />
+		<!--<Folder Include="DataSets\" />-->
 		<Folder Include="Properties\PublishProfiles\" />
 	</ItemGroup>
 
@@ -184,5 +192,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+
+
 
 </Project>

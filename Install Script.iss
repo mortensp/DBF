@@ -2,7 +2,6 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DBF Tools"
-; #define MyAppVersion "0.8.0.1"
 #define MyAppPublisher "Morten Sparding"
 #define MyAppURL "https://github.com/mortensp/DBF"
 #define MyAppExeName "DBF.exe"

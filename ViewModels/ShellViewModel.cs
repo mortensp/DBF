@@ -18,13 +18,12 @@ namespace DBF.ViewModels
             public async void OpenControlView()
             {
 #if RELEASE
-                var updater = new UpdateManager("mortensp", "DBF");
-                await updater.CheckForUpdateAsync();
+            var updater = new UpdateManager("mortensp", "DBF");
+            await updater.CheckForUpdateAsync();
 #endif
-
-                var screen = IoC.Get<ControlViewModel>();
-                await ActivateItemAsync(screen);
-            }
+            var screen = IoC.Get<ControlViewModel>();
+            await ActivateItemAsync(screen);
+        }
         #endregion
 
         public async Task OpenSettingsAsync()

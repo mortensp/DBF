@@ -30,7 +30,7 @@ namespace DBF.DataModel
         public override int GetHashCode()
         {
             // Brug de samme properties som i Equals
-            return HashCode.Combine(Id);
+            return Id.GetHashCode();
         }
     }
 
