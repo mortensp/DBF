@@ -9,9 +9,12 @@ namespace DBF.ViewModels
 {
     public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
     {
-        public ShellViewModel(Configuration configuration)
+        IWindowManager windowManager;
+
+        public ShellViewModel(Configuration configuration, IWindowManager windowManager)
         {
             configuration.Load();
+            this.windowManager = windowManager;
         }
 
         #region Show Screens
@@ -30,17 +33,27 @@ namespace DBF.ViewModels
         {
             // Åbn indstillinger
             var screen = IoC.Get<ConfigurationViewModel>();
-            var windowManager = IoC.Get<IWindowManager>();
             
             await windowManager.ShowDialogAsync(screen);
         }
 
  
-
         public void TimersHelp()
         {
             var window = new TimersHelpWindow(); // Views\TimersHelpWindow.xaml
             window.ShowDialog();
         }
+
+        public async void ShowAbout()
+        {
+            //var window = new AboutView();
+            //window.ShowDialog();
+
+            
+            var screen = IoC.Get<AboutViewModel>();
+
+            await windowManager.ShowDialogAsync(screen);
+        }
+
     }
 }

@@ -22,6 +22,7 @@
             <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="Indstillinger" />
             <MenuItem  Header="Hjælp" >
                 <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="Bridgeurene" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="Om" />
             </MenuItem>
         </Menu>
 

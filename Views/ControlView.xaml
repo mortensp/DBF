@@ -97,10 +97,7 @@
                             cal:Message.Attach="[Event Click] = [Action AddTimer]"
                             Content="Tilføj ur"
                             IsEnabled="{Binding Configuration.TimersCanBeAdded, UpdateSourceTrigger=PropertyChanged}" />
-                        <!--<Button
-                            Width="70"
-                            cal:Message.Attach="[Event Click] = [Action TimersHelp]"
-                            Content="Hjælp" />-->
+                    
                     </WrapPanel>
 
                     <Viewbox>
