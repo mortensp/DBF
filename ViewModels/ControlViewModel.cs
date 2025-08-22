@@ -125,7 +125,6 @@ namespace DBF.ViewModels
                             }
                         }
                     }
-
                     catch (Exception ex)
                     {
                         throw ex;
@@ -315,6 +314,7 @@ namespace DBF.ViewModels
                                  : SelectedClub.MainTournaments
                                                .SelectMany(mt => mt.PlayingTime).OrderByDescending(s => s.Date).ToObservableCollection();
                 }
+
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -344,7 +344,6 @@ namespace DBF.ViewModels
 
                     Date = playingTime.Date;
 
-                    //foreach (var grp in GroupSections)
                     for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
                     {
                         var grp = GroupSections[grpNo];
@@ -356,16 +355,9 @@ namespace DBF.ViewModels
                                 if (!InterWovenHowell)
                                     InterWovenHowell = grp.Tournament.MovementPlanType == "1";
 
-                                var howellCount = grp.Resultlist.Pairs.Count / 2;
-                                var rankA       = 1;
-                                var rankB       = 1;
-
                                 foreach (var pair in grp.Resultlist.Pairs)
                                 {
                                     pair.Placering = pair.Rank;
-
-                                    if (InterWovenHowell)
-                                        pair.SubGroup = pair.PairNo <= howellCount ? "1. halvdel" : "2. halvdel";
 
                                     if (grp.Tournament.MovementPlanType == "4") // EV at Mitchell                                    
                                         pair.SubGroup = pair.Direction == "2" ? "ØV" : "NS";
@@ -373,10 +365,6 @@ namespace DBF.ViewModels
                                     pair.Title = grp.Tournament.Title;
                                     Pairs.Add(pair.DeepCopy());
                                 }
-
-                                //if (InterWovenHowell)
-                                //    foreach (var pair in Pairs.OrderBy(p => p.Rank))
-                                //        pair.Placering = pair.PairNo <= howellCount ? rankA++ : rankB++;
                             }
 
                             if (grp.Startlist is not null)
@@ -461,6 +449,7 @@ namespace DBF.ViewModels
                             Teams = new BindableCollection<Team>(Teams.OrderBy(t => t.TournamentRank));
                     }
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -508,6 +497,7 @@ namespace DBF.ViewModels
 
                     return mainclub;
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -598,7 +588,6 @@ namespace DBF.ViewModels
                             }
                     }
                 }
-
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -705,6 +694,7 @@ namespace DBF.ViewModels
                         else
                             Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -744,7 +734,6 @@ namespace DBF.ViewModels
                         return (T)serializer.Deserialize(reader);
                     }
                 }
-
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -778,7 +767,6 @@ namespace DBF.ViewModels
                         //projectorView.Left = screenOne.WorkingArea.Left;
                         projectorView.Left = screenOne.WpfBounds.Left + screenOne.WpfBounds.Width - projectorView.Width;
                     }
-
 #endif
                 }
                 else
