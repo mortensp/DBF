@@ -25,23 +25,25 @@
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<ComVisible>false</ComVisible>
 		<Guid>8e71374d-fd18-4298-8e6b-816e21df3aa8</Guid>
-	 <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<PlatformTarget>x86</PlatformTarget>
 
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Remove="Directory.Build.props" />
-		<!--<None Remove="Images\DBF_Tools.ico" />-->
+		<None Remove="Inno Setup Script.iss.old" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Resource Include="Images\DBF_Tools.ico">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
+
 		<Resource Include="Images\guideTilUr.jpg">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
-		<!--<Resource Include="Images\Splash.png" />-->
+
 		<EmbeddedResource Include="Images\projector_48x48.ico" />
 	</ItemGroup>
 
@@ -54,6 +56,7 @@
 	<ItemGroup>
 		<Compile Remove="AccessContext.cs" />
 		<Compile Remove="AssemblyInfo.cs" />
+		<Compile Remove="DataModel\AccessContext.cs" />
 		<Compile Remove="DEVMODE.cs" />
 		<Compile Remove="Shell.cs" />
 		<Compile Remove="UpdateManager.cs" />
@@ -74,8 +77,31 @@
 
 
 	<ItemGroup>
+		<!--<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Core\Caliburn.Micro.Core.csproj" />
+			<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform.Core\Caliburn.Micro.Platform.Core.csproj" />
+			<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform\Caliburn.Micro.Platform.csproj" />-->
+
+		<PackageReference Include="Caliburn.Micro" Version="4.0.230" />
+		<PackageReference Include="Caliburn.Micro.Core" Version="4.0.230" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.1" />
 		<!--<ProjectReference Include="..\..\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
+	</ItemGroup>
+
+	<ItemGroup>
+		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 og åbenbart også 8:-) -->
+		<Reference Include="CData.EntityFrameworkCore.Access">
+			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\EFCORE80\CData.EntityFrameworkCore.Access.dll</HintPath>
+		</Reference>
+
+		<Reference Include="System.Data.CData.Access">
+			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\System.Data.CData.Access.dll</HintPath>
+		</Reference>
+
+		<!--<PackageReference Include="CData.Access" Version="24.0.9175" />
+		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />-->
 	</ItemGroup>
 
 
@@ -91,34 +117,17 @@
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 	</ItemGroup>
 
-	<ItemGroup>
-	
-
-		<Reference Include="CData.EntityFrameworkCore.Access">
-			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\EFCORE80\CData.EntityFrameworkCore.Access.dll</HintPath>
-		</Reference>
-		<Reference Include="System.Data.CData.Access">
-			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\System.Data.CData.Access.dll</HintPath>
-		</Reference>
-		<!--<PackageReference Include="CData.Access" Version="24.0.9175" />
-		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />-->
-	</ItemGroup>
 
 	<ItemGroup>
-		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 og åbenbart også 8:-) -->
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
-			<!--<PrivateAssets>all</PrivateAssets>-->
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
-			<!--<PrivateAssets>all</PrivateAssets>-->
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-
 	</ItemGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="syncfusion.ui.wpf.net" Version="29.2.7" />
@@ -135,16 +144,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Core\Caliburn.Micro.Core.csproj" />
-			<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform.Core\Caliburn.Micro.Platform.Core.csproj" />
-			<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform\Caliburn.Micro.Platform.csproj" />-->
-
-		<PackageReference Include="Caliburn.Micro" Version="4.0.230" />
-		<PackageReference Include="Caliburn.Micro.Core" Version="4.0.230" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<!--<Folder Include="DataSets\" />-->
 		<Folder Include="Properties\PublishProfiles\" />
 	</ItemGroup>
 
@@ -170,13 +169,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-
 		<None Update="Images\projector.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		
 		<None Update="Images\projector_48x48.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		
 		<None Update="Properties\Settings.settings">
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -186,13 +186,13 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 
-		<!--<Content Include="Images\DBF_Tools.ico" />-->
-
 		<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+
+		<None Update="InstallerFiles\AccessDatabaseEngine_2010_x86.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</None>
 	</ItemGroup>
-
-
-
 </Project>

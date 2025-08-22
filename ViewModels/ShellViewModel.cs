@@ -23,6 +23,9 @@ namespace DBF.ViewModels
 #if RELEASE
             var updater = new UpdateManager("mortensp", "DBF");
             await updater.CheckForUpdateAsync();
+
+            AccessInstaller.CheckAndInstall();
+            
 #endif
             var screen = IoC.Get<ControlViewModel>();
             await ActivateItemAsync(screen);

@@ -174,7 +174,7 @@
 
             </syncfusion:SfDataGrid.Columns>
 
-            <syncfusion:SfDataGrid.StackedHeaderRows>
+            <!--<syncfusion:SfDataGrid.StackedHeaderRows>
                 <syncfusion:StackedHeaderRow>
                     <syncfusion:StackedHeaderRow.StackedColumns>
                         <syncfusion:StackedColumn ChildColumns="SectionRank,HACRankSection" HeaderText="Placering" />
@@ -182,7 +182,7 @@
                         <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="Turneringen" />
                     </syncfusion:StackedHeaderRow.StackedColumns>
                 </syncfusion:StackedHeaderRow>
-            </syncfusion:SfDataGrid.StackedHeaderRows>
+            </syncfusion:SfDataGrid.StackedHeaderRows>-->
 
             <syncfusion:SfDataGrid.SortColumnDescriptions>
                 <syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />

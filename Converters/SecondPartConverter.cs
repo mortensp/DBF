@@ -16,7 +16,7 @@ namespace DBF.Converters
             var tekst = value?.ToString();
             var index1 = tekst?.IndexOf('-') ?? -1;
             var index2 = tekst?.IndexOf(':') ?? -1;
-            return index1 == 0 
+            return index1 <= 0 
                 ? string.Empty
                 : tekst.Substring(index1+1, index2 - index1-1);
         }

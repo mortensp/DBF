@@ -6,12 +6,13 @@
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DBF.Views"
-    xmlns:vm="clr-namespace:DBF.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:DBF.ViewModels"
+    Width="650"
+    Height="500"
     Padding="20"
-    WindowStartupLocation="CenterOwner"
-    Height="500" Width="650"
     d:DataContext="{d:DesignInstance vm:AboutViewModel, IsDesignTimeCreatable=True}"
+    WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
     <Grid Background="#F0F0F0">
@@ -57,16 +58,12 @@
 
                 <!--  Luk-knap  -->
                 <Button
-                    Width="100"
+                    Width="80"
                     Margin="0,20,0,0"
                     Padding="5"
                     HorizontalAlignment="Center"
                     cal:Message.Attach="Close"
-                    Background="#3498DB"
-                    BorderThickness="0"
-                    Content="Luk"
-                    FontWeight="SemiBold"
-                    Foreground="White" />
+                    Content="Luk" />
             </StackPanel>
         </Border>
     </Grid>

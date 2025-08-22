@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
+using DBF.Helpers;
 using DBF.ViewModels;
 using DBF.Views;
 using Microsoft.DotNet.DesignTools.ViewModels;

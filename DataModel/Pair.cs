@@ -86,6 +86,10 @@ namespace DBF.DataModel
             }
         }
 
+        [XmlIgnore] public int Placering { get; set; }
+
+        [XmlIgnore] public string SubGroup { get; set; }
+
         // ---
         public string PairName
         {

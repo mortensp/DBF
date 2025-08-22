@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
+using DBF.Helpers;
 using DBF.ViewModels;
 
 namespace DBF.DataModel
