@@ -86,8 +86,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.1" />
-		<!--<ProjectReference Include="..\..\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
+		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.1" />    
+		<!--<ProjectReference Include="..\..\Common Libs\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -189,7 +189,7 @@
 		<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-
+		
 		<None Update="InstallerFiles\AccessDatabaseEngine_2010_x86.exe">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
