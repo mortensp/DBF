@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 using Baksteen.Extensions.DeepCopy;
@@ -226,6 +227,8 @@ namespace DBF.ViewModels
 
                     if (Pairs.Count >  0)
                         Pairs = new BindableCollection<Pair>(Pairs.OrderBy(p => p.Placering));
+
+                    //Pairs.NotifyOfPropertyChange(nameof(Pairs.Count));
                 }
             }
 
@@ -386,6 +389,10 @@ namespace DBF.ViewModels
                                 ShowAsOneGroup           = false;
                                 ShowAsOneGroupVisibility = Visibility.Visible;
                             }
+                            else
+                                if (Pairs.Count >  0)
+                                    Pairs = new BindableCollection<Pair>(Pairs.OrderBy(p => p.Placering));
+                            //Pairs.NotifyOfPropertyChange(nameof(Pairs.Count));
                         }
                         else
                         {
@@ -743,14 +750,19 @@ namespace DBF.ViewModels
 
             private async Task ShowProjector()
             {
-                var screens = WpfScreenHelper.Screen.AllScreens.ToList();
+                var projectorScreen = WpfScreenHelper.Screen.AllScreens
+                                                             .Where(s => !s.Primary) 
+                                                             .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height) 
+                                                             .FirstOrDefault(); 
 
-                if (screens.Count <  2)
+            
+
+                if (projectorScreen is null)
                 {
 #if RELEASE
                     MessageBox.Show("Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K", "Info");
 #else
-                    var screenOne = screens[0]; // Get the second screen (index 1)
+                    var primaryScreen= WpfScreenHelper.Screen.PrimaryScreen;
 
                     var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
@@ -761,19 +773,16 @@ namespace DBF.ViewModels
 
                         projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
                         projectorView.WindowState           = WindowState.Normal;
-                        projectorView.Top                   = screenOne.WorkingArea.Top;
+                        projectorView.Top                   = primaryScreen.WorkingArea.Top;
                         projectorView.Width                 = 800;
                         projectorView.Height                = 600;
-                        //projectorView.Left = screenOne.WorkingArea.Left;
-                        projectorView.Left = screenOne.WpfBounds.Left + screenOne.WpfBounds.Width - projectorView.Width;
+                        projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                     }
 #endif
                 }
                 else
 
                 {
-                    var screenTwo = screens[^1]; // Get the second screen (index 1)
-
                     var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
                     if (projectorView is null)
@@ -783,10 +792,10 @@ namespace DBF.ViewModels
                     }
 
                     projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
-                    projectorView.Left                  = screenTwo.WorkingArea.Left;
-                    projectorView.Top                   = screenTwo.WorkingArea.Top;
-                    projectorView.Width                 = screenTwo.WorkingArea.Width;
-                    projectorView.Height                = screenTwo.WorkingArea.Height;
+                    projectorView.Left                  = projectorScreen.WorkingArea.Left;
+                    projectorView.Top                   = projectorScreen.WorkingArea.Top;
+                    projectorView.Width                 = projectorScreen.WorkingArea.Width;
+                    projectorView.Height                = projectorScreen.WorkingArea.Height;
                     projectorView.WindowState           = WindowState.Maximized;
                 }
 

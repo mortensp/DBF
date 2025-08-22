@@ -5,7 +5,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
-using Syncfusion.Data;
 using Group = Syncfusion.Data.Group;
 
 namespace DBF.UserControls
@@ -44,6 +43,9 @@ namespace DBF.UserControls
                 groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
                 setupPaging();
                 };
+
+
+            
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -58,6 +60,8 @@ namespace DBF.UserControls
                 parentIsViewbox = true;
 
             setupPaging();
+
+
         }
 
         private void setupPaging()
@@ -103,5 +107,6 @@ namespace DBF.UserControls
             else
                 dgTeams.ExpandGroup(dgTeams.View.Groups[groupNo - pairGroups] as Group);
         }
+
     }
 }
