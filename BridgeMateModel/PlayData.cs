@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DBF.BridgeMateModel
 {
-    public partial class PlayDatum
+    public partial class PlayData
     {
         public int? Id { get; set; }
         public short? Section { get; set; }

@@ -19,13 +19,14 @@ namespace DBF.DataModel
     {
         private DispatcherTimer _timer;
         //
-        private static readonly TimeSpan      _oneHour        = new TimeSpan(1, 0, 0);
-        private static readonly TimeSpan      _fiveMinutes    = new TimeSpan(0, 5, 0);
-        private static readonly TimeSpan      _twoMinutes     = new TimeSpan(0, 2, 0);
+        private static readonly TimeSpan      _oneHour        = new TimeSpan(1, 0,  0);
+        private static readonly TimeSpan      _fiveMinutes    = new TimeSpan(0, 5,  0);
+        private static readonly TimeSpan      _twoMinutes     = new TimeSpan(0, 2,  0);
+        private static readonly TimeSpan      _threshold      = new TimeSpan(0, 0,  1);
         private                 TimeSpan      _startTime      = new TimeSpan(0, 21, 0);
-        private                 TimeSpan      _transitionTime = new TimeSpan(0, 1, 0);
+        private                 TimeSpan      _transitionTime = new TimeSpan(0, 1,  0);
         private                 TimeSpan      _breakTime      = new TimeSpan(0, 12, 0);
-        private                 TimeSpan      _warningTime    = new TimeSpan(0, 5, 0);
+        private                 TimeSpan      _warningTime    = new TimeSpan(0, 5,  0);
         private                 TimeSpan      _remainingTime  = TimeSpan.MinValue;
         private                 bool          _isStarted;
         private                 bool          _isAtBreak      = false;
@@ -36,8 +37,8 @@ namespace DBF.DataModel
 
         public BridgeTimer()
         {
-            _timer       = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _timer.Tick += Timer_Tick;
+            _timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer.Tick+= Timer_Tick;
         }
 
         #region Public Properties
@@ -46,11 +47,12 @@ namespace DBF.DataModel
             [JsonIgnore] public Visibility    WarningVisiblity { get; set; } = Visibility.Hidden;
             [JsonIgnore] public string        Round            { get; set; }
             [JsonIgnore] public string        MoreInfo         { get; set; }
-            [JsonIgnore] public bool          IsPaused  => _isPaused;
-            [JsonIgnore] public bool          IsStarted => _isStarted;
+            [JsonIgnore] public bool IsPaused => _isPaused;
+            [JsonIgnore] public bool IsStarted=> _isStarted;
+            [JsonIgnore] public bool IsActive => _isStarted && _round <= Rounds;
 
-        [JsonIgnore] public Visibility ShowUpButton { get; set; } = Visibility.Visible;
-        [JsonIgnore] public Visibility ShowDownButton { get; set; } = Visibility.Visible;
+            [JsonIgnore] public Visibility    ShowUpButton     { get; set; } = Visibility.Visible;
+            [JsonIgnore] public Visibility    ShowDownButton   { get; set; } = Visibility.Visible;
         #endregion
 
         #region Public Methods
@@ -62,10 +64,10 @@ namespace DBF.DataModel
                 await windowManager.ShowDialogAsync(screen);
 
                 // If the dialog was enden with save, then our Settings was updated
-                _startTime      = new TimeSpan(Hours, Minutes, Seconds);
-                _breakTime      = new TimeSpan(0, BreakMinutes, 0);
-                _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
-                _warningTime    = new TimeSpan(0, WarningMinutes, 0);
+                _startTime      = new TimeSpan(     Hours,  Minutes,           Seconds);
+                _breakTime      = new TimeSpan(     0,      BreakMinutes,      0);
+                _transitionTime = new TimeSpan(     0,      TransitionMinutes, 0);
+                _warningTime    = new TimeSpan(     0,      WarningMinutes,    0);
 
                 if (!IsStarted)
                     _remainingTime = _startTime;
@@ -121,14 +123,17 @@ namespace DBF.DataModel
                                             }
 
                 if (_remainingTime == TimeSpan.MinValue)
-                    _remainingTime =  _startTime = new TimeSpan(Hours, Minutes, Seconds);
+                    _remainingTime =  _startTime = new TimeSpan(Hours,                                                 Minutes, Seconds);
 
-                Time = _remainingTime.ToString(_remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
+                Time = _remainingTime.ToString(                _remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
 
-                if (_isAtBreak)
-                    WarningVisiblity = (_remainingTime >  TimeSpan.Zero && _remainingTime <  _twoMinutes && _breakTime >= _twoMinutes) ? Visibility.Visible : Visibility.Collapsed;
+                if (_round >  Rounds)
+                    WarningVisiblity = Visibility.Collapsed;
                 else
-                    WarningVisiblity = (_remainingTime >  TimeSpan.Zero && _remainingTime <  _warningTime) ? Visibility.Visible : Visibility.Collapsed;
+                    if (_isAtBreak)
+                        WarningVisiblity = (_remainingTime >  TimeSpan.Zero && _remainingTime <  _twoMinutes && _breakTime >= _twoMinutes) ? Visibility.Visible : Visibility.Collapsed;
+                    else
+                        WarningVisiblity = (_remainingTime >  TimeSpan.Zero && _remainingTime <  _warningTime) ? Visibility.Visible : Visibility.Collapsed;
 
                 Info     = $"Vi spiller {Rounds} {RoundsText} af {BoardsPerRound} spil";
                 MoreInfo = string.Empty;
@@ -186,8 +191,7 @@ namespace DBF.DataModel
 
             public void Back()
             {
-                StopCountdown();
-
+                //StopCountdown();
                 if (_round == 1)
                 {
                     _isStarted     = false;
@@ -203,14 +207,14 @@ namespace DBF.DataModel
                         else
                             _remainingTime = _breakTime;
                     else
-                        if (_isAtTransition || _remainingTime <  _startTime)
+                        if (_isAtTransition)
                         {
                             _isAtTransition = false;
                             _remainingTime  = _startTime;
                         }
                         else
-                            if (_remainingTime <  _startTime)
-                                _remainingTime =  _startTime;
+                            if (_startTime.Subtract(_remainingTime) >  _threshold)
+                                _remainingTime = _startTime;
                             else
                             {
                                 _round--;
@@ -231,10 +235,8 @@ namespace DBF.DataModel
             {
                 if (_isStarted)
                     if (_isPaused)
-                    {
-                        _isPaused = false;
+                        //_isPaused = false;
                         Start();
-                    }
                     else
                     {
                         _isPaused = true;
@@ -244,8 +246,7 @@ namespace DBF.DataModel
 
             public void Forward()
             {
-                StopCountdown();
-
+                //StopCountdown();
                 if (_round <= Rounds)
                 {
                     if (_isAtBreak)
@@ -264,7 +265,8 @@ namespace DBF.DataModel
                             else
                             {
                                 _round++;
-                                _remainingTime = _startTime;
+                                _remainingTime  = _startTime;
+                                _isAtTransition = false;
                             }
                 }
 
@@ -298,9 +300,9 @@ namespace DBF.DataModel
                     _isStarted      = false;
                     _isStarted      = false;
                     _remainingTime  = _startTime;
-                    _startTime      = new TimeSpan(Hours, Minutes, Seconds);
-                    _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
-                    _breakTime      = new TimeSpan(0, BreakMinutes, 0);
+                    _startTime      = new TimeSpan(Hours, Minutes,           Seconds);
+                    _transitionTime = new TimeSpan(0,     TransitionMinutes, 0);
+                    _breakTime      = new TimeSpan(0,     BreakMinutes,      0);
                     _round          = 1;
 
                     //Info = $"Vi spiller {Rounds} {RoundsText} af {BoardsPerRound} spil";
@@ -330,9 +332,9 @@ namespace DBF.DataModel
                         _timer.Stop();
             }
 
-            private string RoundText  => TeamMatch ? "halvleg" : "runde";
+            private string        RoundText => TeamMatch ? "halvleg" : "runde";
 
-            private string RoundsText => TeamMatch ? "halvlege" : "runder";
+            private string        RoundsText=> TeamMatch ? "halvlege" : "runder";
         #endregion
     }
 }

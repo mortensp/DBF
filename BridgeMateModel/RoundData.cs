@@ -6,7 +6,7 @@ namespace DBF.BridgeMateModel
     /// <summary>
     /// Hvem møder hvem ved hvilket bord og med hvilke spil
     /// </summary>
-    public partial class RoundDatum
+    public partial class RoundData
     {
         public short? Section { get; set; }
         public short? Table { get; set; }

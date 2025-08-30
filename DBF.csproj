@@ -1,17 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+			<AssemblyVersion>0.9.8.0</AssemblyVersion>
+		<FileVersion>0.9.8.0</FileVersion>
+
 		<AssemblyTitle>DBF</AssemblyTitle>
 		<AssemblyName>DBF</AssemblyName>
 		<Description>DBF Tools - Viser Start og resultatlister og 1-4 bruidgeure</Description>
 		<RootNamespace>DBF</RootNamespace>
 		<Company>Morten Sparding</Company>
 		<Product>DBF Tools</Product>
-		<Copyright>Copyright © 2025</Copyright>
-
-		<AssemblyVersion>0.9.7.0</AssemblyVersion>
-		<FileVersion>0.9.7.0</FileVersion>
-
+		<Copyright>Copyright © 2025</Copyright>	
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<Nullable>disable</Nullable>
@@ -19,7 +18,6 @@
 		<UseWindowsForms>false</UseWindowsForms>
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
-
 		<Platforms>AnyCPU;x64</Platforms>
 		<ApplicationIcon>Images\DBF_Tools.ico</ApplicationIcon>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -56,7 +54,9 @@
 	<ItemGroup>
 		<Compile Remove="AccessContext.cs" />
 		<Compile Remove="AssemblyInfo.cs" />
+		<Compile Remove="BridgeMateModel\AccessContext.cs" />
 		<Compile Remove="DataModel\AccessContext.cs" />
+		<Compile Remove="DataModel\PlayingSession.cs" />
 		<Compile Remove="DEVMODE.cs" />
 		<Compile Remove="Helpers\CustomCaptionSummaryCellRenderer.cs" />
 		<Compile Remove="Helpers\SfGridBehavior.cs" />
@@ -88,7 +88,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.1" />    
+		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.3" />
 		<!--<ProjectReference Include="..\..\Common Libs\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
 	</ItemGroup>
 

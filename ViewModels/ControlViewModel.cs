@@ -1,9 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -23,6 +25,7 @@ using DBF.DataModel;
 using DBF.UserControls;
 using DBF.Views;
 using Microsoft.DotNet.DesignTools.Protocol.Values;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -68,10 +71,10 @@ namespace DBF.ViewModels
                 watcher.Changed+= folderUpdated;
                 watcher.Created+= folderUpdated;
 
-                //using (var db = new AccessContext())
-                //{
-                //    var list = db.Tables.ToList();
-                //}
+                //var db     = new BridgeMateContext();
+                //var player = db.PlayerNames.First(p => p.Id == 13082);
+                //db.ListTables();
+                //
                 LoadMainClub();
             }
         #endregion
@@ -155,7 +158,8 @@ namespace DBF.ViewModels
                 set
                 {
                     if (Set(ref spilleDage, value))
-                        SelectedPlayingTime = PlayingTimes.FirstOrDefault();
+                        SelectedPlayingTime = PlayingTimes.Where(pt => pt.Date <= DateTime.Now.Date).FirstOrDefault()
+                                           ?? PlayingTimes.Where(pt => pt.Date >  DateTime.Now.Date).LastOrDefault();
                 }
             }
 
@@ -310,15 +314,24 @@ namespace DBF.ViewModels
             {
                 try
                 {
-                    PlayingTimes = SelectedClub is null
-                                 ? SelectedMainClub.Clubs
-                                                   .SelectMany(club => club.MainTournaments)
-                                                   .SelectMany(mt => mt.PlayingTime).OrderByDescending(s => s.Date).ToObservableCollection()
-                                 : SelectedClub.MainTournaments
-                                               .SelectMany(mt => mt.PlayingTime).OrderByDescending(s => s.Date).ToObservableCollection();
+                    ObservableCollection<PlayingTime> playingtimes = [];
+
+                    var mainTournaments = SelectedClub is null
+                                        ? SelectedMainClub.Clubs.SelectMany(club => club.MainTournaments)
+                                        : SelectedClub.MainTournaments;
+
+                    foreach (var mt in mainTournaments)
+
+                        foreach (var pt in mt.PlayingTime)
+                        {
+                            pt.MainTournament = mt;
+                            playingtimes.Add(pt);
+                        }
+
+                    PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
 
-                catch (Exception)
+                catch (Exception ex)
                 {
                     PlayingTimes.Clear();
                 }
@@ -431,7 +444,7 @@ namespace DBF.ViewModels
                             {
                                 var earlierSection = getGroupSection(sectionFile.FileName, grp.Tournament);
 
-                                rnd = earlierSection.Rounds[^1];
+                                rnd = earlierSection?.Rounds[^1];
 
                                 if (rnd is not null && rnd.RoundCompleted)
                                     foreach (var team in Teams.Where(t => t.Title == grp.Tournament.Title))
@@ -733,12 +746,12 @@ namespace DBF.ViewModels
                         xml = System.Text.RegularExpressions.Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
 
                         // Remove empty tags
-                        xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
-                        xml = Regex.Replace(xml, @"<\w+\s*(/>|/>\s*</\1*s>)", string.Empty); //<TagName/>
+                        xml = Regex.Replace(                     xml,       @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
+                        xml = Regex.Replace(                     xml,       @"<\w+\s*(/>|/>\s*</\1*s>)",  string.Empty); //<TagName/>
 
                         var       serializer = new XmlSerializer(typeof(T));
-                        using var reader     = new StringReader(xml);
-                        return (T)serializer.Deserialize(reader);
+                        using var reader     = new StringReader( xml);
+                        return (T)serializer.Deserialize(        reader);
                     }
                 }
                 catch (Exception)
@@ -751,18 +764,16 @@ namespace DBF.ViewModels
             private async Task ShowProjector()
             {
                 var projectorScreen = WpfScreenHelper.Screen.AllScreens
-                                                             .Where(s => !s.Primary) 
-                                                             .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height) 
-                                                             .FirstOrDefault(); 
-
-            
+                                                            .Where(s => !s.Primary)
+                                                            .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height)
+                                                            .FirstOrDefault();
 
                 if (projectorScreen is null)
                 {
 #if RELEASE
                     MessageBox.Show("Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K", "Info");
 #else
-                    var primaryScreen= WpfScreenHelper.Screen.PrimaryScreen;
+                    var primaryScreen = WpfScreenHelper.Screen.PrimaryScreen;
 
                     var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
@@ -776,7 +787,7 @@ namespace DBF.ViewModels
                         projectorView.Top                   = primaryScreen.WorkingArea.Top;
                         projectorView.Width                 = 800;
                         projectorView.Height                = 600;
-                        projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
+                        projectorView.Left                  = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                     }
 #endif
                 }

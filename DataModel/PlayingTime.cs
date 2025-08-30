@@ -3,16 +3,20 @@ using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {
-    [XmlRoot(ElementName = "PlayingTime")]     public class PlayingTime : IEquatable<PlayingTime>
+    [XmlRoot(ElementName = "PlayingTime")]
+    public class PlayingTime : IEquatable<PlayingTime>
     {
-        [XmlAttribute(AttributeName = "Date")] public string                DateStr            { get; set; }
-        [XmlElement("GroupTournament")]        public List<GroupTournament> TournamentFiles { get; set; }
+        [XmlAttribute(AttributeName = "Date")] public string                DateStr         { get; set; }
+        [XmlElement("GroupTournament")] public        List<GroupTournament> TournamentFiles { get; set; }
 
         //-----
-        public DateTime Date              => DateTime.Parse(DateStr);
+        public DateTime              Date=> DateTime.Parse(DateStr);
 
         //-----
-        public override string ToString() => string.IsNullOrEmpty(DateStr) ? null : Date.ToShortDateString() + " " + Date.ToShortTimeString();
+        [XmlIgnore]
+        public                                        MainTournament        MainTournament  { get; set; }
+
+        public override string ToString()=> (string.IsNullOrEmpty(DateStr) ? null : Date.ToShortDateString() + " " + Date.ToShortTimeString())+$" - {MainTournament.ShortName}";
 
         public override bool Equals(object obj)
         {

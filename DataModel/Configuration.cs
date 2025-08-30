@@ -103,7 +103,7 @@ namespace DBF.DataModel
                     get
                     {
                         for (int i = 0; i <  VisibleTimerCount; i++)
-                            if (BridgeTimers[i].IsStarted)
+                            if (BridgeTimers[i].IsActive )
                                 return true;
 
                         return false;

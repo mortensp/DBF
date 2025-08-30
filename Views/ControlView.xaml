@@ -82,7 +82,7 @@
         <TabControl Grid.ColumnSpan="2" Grid.Row="2"
             MinHeight="400">
 
-            <TabItem Header="Par - Startliste">
+            <TabItem Header="Startliste">
                 <ScrollViewer>
                     <ctl:StartListControl x:Name="startListControl" />
                 </ScrollViewer>

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DBF.BridgeMateModel
 {
-    public partial class BiddingDatum
+    public partial class BiddingData
     {
         [Column("ID", TypeName = "int")] public  int?      Id        { get; set; }
         [Column(TypeName = "smallint")] public   short?    Section   { get; set; }
