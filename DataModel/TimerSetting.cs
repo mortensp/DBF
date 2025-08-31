@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
@@ -13,41 +14,40 @@ namespace DBF.DataModel
     {
         private Color? color;
         //private Brush  background = Brushes.White;
-
         #region Constructors
-        public TimerSetting( string name = null
-                           , bool customPreset = true
-                           , bool teamMatch = false
-                           , int rounds = 0
-                           , int boardsPerRound = 0
-                           , int breakAfterRound = 0
-                           , int hours = 0
-                           , int minutes = 0
-                           , int seconds = 0
-                           , int transitionMinutes = 0
-                           , int breakMinutes = 0
-                           ,int warningMinutes = 0
-                           //
-                           , string group = ""
-                           , string info = ""
-                           , Color? color = null
-                           , string sound = null
-                           , int volume = 50
-                           , Visibility visibility = Visibility.Visible
-                           ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes,warningMinutes)
-        {
-            Group      = group;
-            Info       = info;
-            Sound      = sound;
-            Volume     = volume;
-            Color      = color;
-            Visibility = visibility;
-        }
+            public TimerSetting( string name = null
+                               , bool customPreset = true
+                               , bool teamMatch = false
+                               , int rounds = 0
+                               , int boardsPerRound = 0
+                               , int breakAfterRound = 0
+                               , int hours = 0
+                               , int minutes = 0
+                               , int seconds = 0
+                               , int transitionMinutes = 0
+                               , int breakMinutes = 0
+                               , int warningMinutes = 0
+                               //
+                               , GroupFlags groups = 0
+                               , string info = ""
+                               , Color? color = null
+                               , string sound = null
+                               , int volume = 50
+                               , Visibility visibility = Visibility.Visible
+                               ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
+            {
+                Groups     = groups;
+                Info       = info;
+                Sound      = sound;
+                Volume     = volume;
+                Color      = color;
+                Visibility = visibility;
+            }
         #endregion
 
         public Color? Color
         {
-            get => color;
+            get=> color;
             set
             {
                 if (Set(ref color, value))
@@ -58,13 +58,14 @@ namespace DBF.DataModel
             }
         }
 
-                     public string     Group          { get; set; }
-                     public string     Info           { get; set; }
-        [JsonIgnore] public Brush      Background     { get; set; }
-                     public string     Sound          { get; set; }
-                     public int        Volume         { get; set; }
-                     public Visibility Visibility     { get; set; }
-                     
+        public              GroupFlags Groups     { get; set; }
+        public              string     Info       { get; set; }
+        [JsonIgnore] public Brush      Background { get; set; }
+        public              string     Sound      { get; set; }
+        public              int        Volume     { get; set; }
+        public              Visibility Visibility { get; set; }
+
+        public              string     GroupStr   { get => Groups.ToFriendlyString(); }
 
         public new void Update(Preset preset)
         {
@@ -83,8 +84,9 @@ namespace DBF.DataModel
 
             if (preset is TimerSetting tSetting)
             {
-                Group      = tSetting.Group;
+                Groups     = tSetting.Groups;
                 Info       = tSetting.Info;
+                Volume = 0;
                 Sound      = tSetting.Sound;
                 Volume     = tSetting.Volume;
                 Color      = tSetting.Color;

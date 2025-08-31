@@ -138,8 +138,8 @@
                         <TextBlock x:Name="group" Grid.Column="1" Grid.Row="5"
                             Margin="0,8,0,0"
                             HorizontalAlignment="Center"
-                            FontWeight="Bold"
-                            Text="{Binding Timer.Group, UpdateSourceTrigger=PropertyChanged}" />
+                            FontWeight="Bold"                                  
+                            Text="{Binding Timer.GroupStr, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </Border>
 

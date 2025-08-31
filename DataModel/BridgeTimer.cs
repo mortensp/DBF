@@ -47,12 +47,12 @@ namespace DBF.DataModel
             [JsonIgnore] public Visibility    WarningVisiblity { get; set; } = Visibility.Hidden;
             [JsonIgnore] public string        Round            { get; set; }
             [JsonIgnore] public string        MoreInfo         { get; set; }
+            [JsonIgnore] public Visibility    ShowUpButton     { get; set; } = Visibility.Visible;
+            [JsonIgnore] public Visibility    ShowDownButton   { get; set; } = Visibility.Visible;
+            //
             [JsonIgnore] public bool IsPaused => _isPaused;
             [JsonIgnore] public bool IsStarted=> _isStarted;
             [JsonIgnore] public bool IsActive => _isStarted && _round <= Rounds;
-
-            [JsonIgnore] public Visibility    ShowUpButton     { get; set; } = Visibility.Visible;
-            [JsonIgnore] public Visibility    ShowDownButton   { get; set; } = Visibility.Visible;
         #endregion
 
         #region Public Methods
@@ -333,7 +333,6 @@ namespace DBF.DataModel
             }
 
             private string        RoundText => TeamMatch ? "halvleg" : "runde";
-
             private string        RoundsText=> TeamMatch ? "halvlege" : "runder";
         #endregion
     }

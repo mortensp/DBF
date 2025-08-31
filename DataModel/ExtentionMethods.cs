@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,14 +15,15 @@ namespace DBF.DataModel
     {
         public static double AsDouble(this string str, double defaultValue = 0)   => double.TryParse(str, CultureInfo.InvariantCulture, out double val) ? val : defaultValue;
 
-        public static decimal AsDecimal(this string str, decimal defaultValue = 0) => decimal.TryParse(str, CultureInfo.InvariantCulture, out decimal val) ? val : defaultValue;
-        public static int AsInt(this string str, int defaultValue = 0) => int.TryParse(str, out int val) ? val : defaultValue;
-        
-        public static bool AsBool(this string str, bool defaultValue = false)                => bool.TryParse(str, out bool val) ? val : defaultValue;
+        public static decimal AsDecimal(this string str, decimal defaultValue = 0)=> decimal.TryParse(str, CultureInfo.InvariantCulture, out decimal val) ? val : defaultValue;
 
-        static public TimeSpan Max(this TimeSpan t1, TimeSpan t2) => t1 >  t2 ? t1 : t2;
+        public static int AsInt(this string str, int defaultValue = 0)            => int.TryParse(str, out int val) ? val : defaultValue;
 
-        static public TimeSpan Min(this TimeSpan t1, TimeSpan t2) => t1 <  t2 ? t1 : t2;
+        public static bool AsBool(this string str, bool defaultValue = false)     => bool.TryParse(str, out bool val) ? val : defaultValue;
+
+        static public TimeSpan Max(this TimeSpan t1, TimeSpan t2)                 => t1 >  t2 ? t1 : t2;
+
+        static public TimeSpan Min(this TimeSpan t1, TimeSpan t2)                 => t1 <  t2 ? t1 : t2;
 
         public static void Merge<T>(this T target, T other)
         {
@@ -92,6 +94,30 @@ namespace DBF.DataModel
                         prop.SetValue(target, value);
                 }
             }
+        }
+
+        public static string ToFriendlyString(this Enum value, string separator = ", ", string lastSeparator = " og ")
+        {
+            var type  = value.GetType();
+            var flags = Enum.GetValues(type).Cast<Enum>()
+                                            .Where(f => Convert.ToInt32(f) != 0 && value.HasFlag(f))
+                                            .ToList();
+
+            var names = flags.Select(f =>
+                                     {
+                                         var field = type.GetField(f.ToString());
+                                         var attr  = field?.GetCustomAttribute<DescriptionAttribute>();
+                                         return attr?.Description ?? f.ToString();
+                                     }).ToList();
+
+            if (names.Count == 0)
+                return "";
+
+            if (names.Count == 1)
+                return names[0];
+
+            // Sæt sidste separator som " og "
+            return string.Join(separator, names.Take(names.Count - 1)) + lastSeparator + names.Last();
         }
     }
 }

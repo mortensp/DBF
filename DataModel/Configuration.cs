@@ -19,12 +19,12 @@ namespace DBF.DataModel
 {
     public partial class Configuration : PropertyChangedBase
     {
-        private static readonly string[]             audioExtensions   = new[] { ".wav", ".mp3" };
-        public static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions { WriteIndented = true, };
-        private static         string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
-        private static         string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
-        private                Configuration         loadedConfig      = null;
-        private                int                   visibleTimerCount = 0;
+        private static readonly string[]              audioExtensions   = new[] { ".wav", ".mp3" };
+        public static readonly  JsonSerializerOptions SerializerOptions = new JsonSerializerOptions { WriteIndented = true, };
+        private static          string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
+        private static          string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
+        private                 Configuration         loadedConfig      = null;
+        private                 int                   visibleTimerCount = 0;
 
         #region Constructors
             static Configuration()
@@ -70,7 +70,7 @@ namespace DBF.DataModel
                 [JsonIgnore]
                 public int VisibleTimerCount
                 {
-                    get => visibleTimerCount;
+                    get=> visibleTimerCount;
                     set
                     {
                         visibleTimerCount = value;
@@ -79,23 +79,23 @@ namespace DBF.DataModel
                     }
                 }
 
-                [JsonIgnore]
+                //[JsonIgnore]
                 public BindableCollection<Preset>        Presets           { get; set; } = new()
-                                                        {
-                                                           new Preset("Par - 7 runder af 4 spil", false, false,  7, 4, 4, 0,27, 0, 1, 12,5),
-                                                           new Preset("Par - 9 runder af 3 spil", false, false,  9, 3,  5,0, 20, 0, 1, 12,5),
-                                                           new Preset("Par - 11 runder af 2 spil",false, false, 11, 2,  6,0,13, 0, 1, 12,5),
-                                                           new Preset("Hold kamp af 32 spil",     false, true,   2, 16, 1,1,26, 0, 0,15,5)
-                                                        };
+                                                                {
+                                                                   new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5),
+                                                                   new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 20, 0, 1, 12, 5),
+                                                                   new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 13, 0, 1, 12, 5),
+                                                                   new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 26, 0, 0, 15, 5)
+                                                                };
 
                 [JsonIgnore]
-                public ObservableCollection <CustomColor> BackgroundColors = new()
-                                                        {
-                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#F2460D"), ColorName = "Rød (dbf)" },
-                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#00b0ff"), ColorName = "Blå (dbf)" },
-                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FF9D00"), ColorName = "Orange (dbf)" },
-                                                            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#81C784"), ColorName = "Grøn (dbf)" },
-                                                        };
+                public ObservableCollection<CustomColor> BackgroundColors = new()
+                                                                {
+                                                                    new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#F2460D"), ColorName = "Rød (dbf)" },
+                                                                    new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#00b0ff"), ColorName = "Blå (dbf)" },
+                                                                    new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FF9D00"), ColorName = "Orange (dbf)" },
+                                                                    new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#81C784"), ColorName = "Grøn (dbf)" },
+                                                                };
 
                 [JsonIgnore]
                 public bool TimersActive
@@ -103,7 +103,7 @@ namespace DBF.DataModel
                     get
                     {
                         for (int i = 0; i <  VisibleTimerCount; i++)
-                            if (BridgeTimers[i].IsActive )
+                            if (BridgeTimers[i].IsActive)
                                 return true;
 
                         return false;
@@ -144,9 +144,9 @@ namespace DBF.DataModel
                     {
                         timer = new BridgeTimer();
                         timer.Update(Presets[i]);
-                        timer.Name  = null;
-                        timer.Color = BackgroundColors[i].Color;
-                        timer.Group = ((char)('A' + i)).ToString(); // Set group to A, B, C or D
+                        timer.Name   = null;
+                        timer.Color  = BackgroundColors[i].Color;
+                        timer.Groups = (GroupFlags)(1 << i); // Set group to A, B, C or D
 
                         if (visibleTimerCount >  1) // Lad som standard de to første være visible
                             timer.Visibility = System.Windows.Visibility.Collapsed;
@@ -177,7 +177,7 @@ namespace DBF.DataModel
                     timer.Update(Presets[i]);
                     timer.Name       = null;
                     timer.Color      = BackgroundColors[i].Color;
-                    timer.Group      = ((char)('A' + i)).ToString(); // Set group to A, B, C or D
+                    timer.Groups     = (GroupFlags)(1 << i); // Set group to A, B, C or D
                     timer.Visibility = Visibility.Collapsed;
                     timer.Sound      = AudioPlayer.Sounds[i];
 
@@ -210,6 +210,7 @@ namespace DBF.DataModel
 
             public void Save()
             {
+                // Only Custom Presets are saved due to PresetCollectionConverter
                 string json = JsonSerializer.Serialize(this, SerializerOptions);
                 File.WriteAllText(path, json);
             }

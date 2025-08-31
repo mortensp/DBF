@@ -5,39 +5,40 @@ using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
 using DBF.DataModel;
+using DBF.UserControls;
 using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.ViewModels
 {
     public class TimerSettingsViewModel : Screen
     {
-        private          Preset         selectedPreset     { get; set; }
+        private       Preset                            selectedPreset     { get; set; }
         private          TimerSetting   setting;
         private readonly IWindowManager windowManager;
 
         #region Constructors
             public TimerSettingsViewModel(Configuration configuration)
             {
-                Configuration  = configuration;
+                Configuration = configuration;
                 windowManager = IoC.Get<IWindowManager>();
             }
         #endregion
 
         #region public Properties
             public static ObservableCollection<CustomColor> NewColorCollection { get; set; } = new()
-                                                    {
-                                                        new CustomColor { ColorName = "Rød", Color = (Color)ColorConverter.ConvertFromString("#F2460D")},
-                                                        new CustomColor { ColorName = "Blå", Color = (Color)ColorConverter.ConvertFromString("#00b0ff") },
-                                                        new CustomColor { ColorName = "range", Color = (Color)ColorConverter.ConvertFromString("#FF9D00")},
-                                                        new CustomColor { ColorName = "Grøn", Color = (Color)ColorConverter.ConvertFromString("#81C784")},
-                                                    };
+                                                        {
+                                                            new CustomColor { ColorName = "Rød", Color = (Color)ColorConverter.ConvertFromString("#F2460D")},
+                                                            new CustomColor { ColorName = "Blå", Color = (Color)ColorConverter.ConvertFromString("#00b0ff") },
+                                                            new CustomColor { ColorName = "range", Color = (Color)ColorConverter.ConvertFromString("#FF9D00")},
+                                                            new CustomColor { ColorName = "Grøn", Color = (Color)ColorConverter.ConvertFromString("#81C784")},
+                                                        };
 
             public        Configuration                     Configuration      { get; private set; }
             public        TimerSetting                      NewSetting         { get; set; } = new();
             public        Color                             BackgroundColor    { get; set; }
-            public Preset SelectedPreset
+                        public Preset SelectedPreset
             {
-                get => selectedPreset;
+                get=> selectedPreset;
                 set
                 {
                     selectedPreset = value;
@@ -47,11 +48,11 @@ namespace DBF.ViewModels
                 }
             }
 
-            public bool CustomPreset => selectedPreset is not null && selectedPreset.CustomPreset == true;
+            public        bool                              CustomPreset=> selectedPreset is not null && selectedPreset.CustomPreset == true;
 
             public TimerSetting Setting
             {
-                get => setting;
+                get=> setting;
                 set
                 {
                     Set(ref setting, value);
@@ -68,7 +69,6 @@ namespace DBF.ViewModels
             {
                 await TryCloseAsync();
             }
-
 
             public async void AcceptSetting()
             {
@@ -98,7 +98,7 @@ namespace DBF.ViewModels
                 {
                     NewSetting.Name = dialog.PresetName;
                     var preset      = new Preset(NewSetting);
-                    Configuration.Presets.Add(preset);
+                    Configuration.Presets.Add(   preset);
 
                     Configuration.Save();
                     SelectedPreset = preset;
@@ -133,7 +133,7 @@ namespace DBF.ViewModels
                 AudioPlayer.Play(NewSetting.Sound, (int)NewSetting.Volume);
             }
 
-            private Preset FindPreset(Preset preset) => Configuration.Presets.FirstOrDefault(p => p.Matches(preset));
+            private Preset FindPreset(Preset preset)=> Configuration.Presets.FirstOrDefault(p => p.Matches(preset));
         #endregion
 
         #region Private Methods

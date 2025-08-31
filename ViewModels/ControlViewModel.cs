@@ -331,7 +331,7 @@ namespace DBF.ViewModels
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
 
-                catch (Exception ex)
+                catch (Exception )
                 {
                     PlayingTimes.Clear();
                 }
