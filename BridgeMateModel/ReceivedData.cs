@@ -18,8 +18,8 @@ namespace DBF.BridgeMateModel
         public string  Result { get; set; }
         public string  LeadCard { get; set; }
         public string  Remarks { get; set; }
-        public DateTime? DateLog { get; set; }
-        public DateTime? TimeLog { get; set; }
+        public DateTime DateLog { get; set; }
+        public DateTime TimeLog { get; set; }
         public bool? Processed { get; set; }
         public bool? Processed1 { get; set; }
         public bool? Processed2 { get; set; }

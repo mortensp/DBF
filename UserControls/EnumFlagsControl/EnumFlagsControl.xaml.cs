@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using PropertyChanged;
 
 namespace DBF.UserControls
 {
@@ -22,6 +23,8 @@ namespace DBF.UserControls
         public static readonly DependencyProperty EnumTypeProperty = 
                                DependencyProperty.Register( nameof(               EnumType), typeof(Type), typeof(EnumFlagsControl)
                                                           , new PropertyMetadata(null,     OnEnumTypeChanged));
+
+    
 
         public Type EnumType
         {
@@ -49,6 +52,7 @@ namespace DBF.UserControls
             set=> SetValue(OrientationProperty, value);
         }
 
+        [SuppressPropertyChangedWarnings]
         private static void OnEnumTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is EnumFlagsControl ctrl)
@@ -67,6 +71,7 @@ namespace DBF.UserControls
             }
         }
 
+        [SuppressPropertyChangedWarnings]
         private static void OnSelectedFlagsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is EnumFlagsControl ctrl)

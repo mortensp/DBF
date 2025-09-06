@@ -1,5 +1,6 @@
 ﻿//using BigBin;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -21,7 +22,7 @@ namespace DBF
     {
         public Bootstrapper()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(                                       CodePagesEncodingProvider.Instance);
 
             FrameworkElement.LanguageProperty
                             .OverrideMetadata( typeof(FrameworkElement)
@@ -51,6 +52,7 @@ namespace DBF
         #region SimpleContainer Overrides and Configuration.
             private readonly SimpleContainer _container = new();
 
+            [DebuggerStepThrough]
             protected override void Configure()
             {
                 SyncFusion.FindandRegisterLicenseKey();
@@ -58,7 +60,8 @@ namespace DBF
                 _container.Instance<IWindowManager>(new WindowManager());
                 _container.Singleton<IEventAggregator, EventAggregator>();
                 _container.Singleton<Configuration>();
-            
+                _container.Singleton<BridgeMate>();
+
                 foreach (var viewModel in SelectViewModels())
                     if (_container.HasHandler(viewModel, null) == false)
                         if (viewModel.Name == "ConfigurationViewModel"
@@ -70,18 +73,24 @@ namespace DBF
 
                 var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
 
-                ViewLocator.LocateTypeForModelType = (Type modelType, DependencyObject displayLocation, object context) =>
-                                                     {
-                                                         if (modelType == typeof(ControlViewModel))
-                                                             if (context  is string viewName
-                                                             &&  viewName == "ProjectorView")
-                                                                 return typeof(ProjectorView);
+                ViewLocator.LocateTypeForModelType = FindTypeForModelType(defaultLocateTypeForModelType);
+            }
 
-                                                         return defaultLocateTypeForModelType(modelType, displayLocation, context);
-                                                     };
-           
-        }
+            [DebuggerStepThrough]
+            private static Func<Type, DependencyObject, object, Type> FindTypeForModelType(Func<Type, DependencyObject, object, Type> defaultLocateTypeForModelType)
+            {
+                return (Type modelType, DependencyObject displayLocation, object context) =>
+                       {
+                           if (modelType == typeof(ControlViewModel))
+                               if (context  is string viewName
+                               &&  viewName == "ProjectorView")
+                                   return typeof(ProjectorView);
 
+                           return defaultLocateTypeForModelType(modelType, displayLocation, context);
+                       };
+            }
+
+            [DebuggerStepThrough]
             protected override object GetInstance(Type service, string key)
             {
                 var instance = _container.GetInstance(service, key);
@@ -92,7 +101,7 @@ namespace DBF
                 throw new InvalidOperationException("Could not locate any instances.");
             }
 
-            protected override IEnumerable<object> GetAllInstances(Type service) => _container.GetAllInstances(service);
+            protected override IEnumerable<object> GetAllInstances(Type service)=> _container.GetAllInstances(service);
 
             protected override void BuildUp(object instance)
             {

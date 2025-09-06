@@ -12,8 +12,9 @@ namespace DBF.DataModel
 {
     public class TimerSetting : Preset
     {
-        private Color? color;
-        //private Brush  background = Brushes.White;
+        private Color? fgColor;
+        private Color? bgColor;
+
         #region Constructors
             public TimerSetting( string name = null
                                , bool customPreset = true
@@ -30,36 +31,57 @@ namespace DBF.DataModel
                                //
                                , GroupFlags groups = 0
                                , string info = ""
-                               , Color? color = null
+                               , Color? foregroundColor = null
+                               , Color? backgroundColor = null
                                , string sound = null
                                , int volume = 50
                                , Visibility visibility = Visibility.Visible
                                ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
             {
-                Groups     = groups;
-                Info       = info;
-                Sound      = sound;
-                Volume     = volume;
-                Color      = color;
-                Visibility = visibility;
+                Groups          = groups;
+                Info            = info;
+                Sound           = sound;
+                Volume          = volume;
+                BackgroundColor = backgroundColor;
+                ForegroundColor = backgroundColor;
+                Visibility      = visibility;
             }
         #endregion
 
-        public Color? Color
+        public Color? ForegroundColor
         {
-            get=> color;
+            get=> fgColor;
             set
             {
-                if (Set(ref color, value))
-                    if (value is null)
-                        Background = new SolidColorBrush(Colors.White);
-                    else
-                        Background = new SolidColorBrush((Color)value);
+                if (Set(ref fgColor,value))
+                    Foreground = new SolidColorBrush(value is null ? Colors.Black : (Color)value);
             }
         }
 
+        public Color? BackgroundColor
+        {
+            get=> bgColor;
+            set
+            {
+                if (Set(ref bgColor, value))
+                {
+                    Background = new SolidColorBrush(value is null ? Colors.White: (Color)value);
+                    ForegroundColor = getContrastingColor(value ?? Colors.White);
+                }
+            }
+        }
+
+        //TODO: kan senere helt fjernes
+        public Color? Color
+        {
+            get=> BackgroundColor;
+            set=> BackgroundColor = value;
+        }
+
+        
         public              GroupFlags Groups     { get; set; }
         public              string     Info       { get; set; }
+        [JsonIgnore] public Brush      Foreground { get; set; }
         [JsonIgnore] public Brush      Background { get; set; }
         public              string     Sound      { get; set; }
         public              int        Volume     { get; set; }
@@ -84,14 +106,24 @@ namespace DBF.DataModel
 
             if (preset is TimerSetting tSetting)
             {
-                Groups     = tSetting.Groups;
-                Info       = tSetting.Info;
-                Volume = 0;
-                Sound      = tSetting.Sound;
-                Volume     = tSetting.Volume;
-                Color      = tSetting.Color;
-                Visibility = tSetting.Visibility;
+                Groups          = tSetting.Groups;
+                Info            = tSetting.Info;
+                Volume          = 0;
+                Sound           = tSetting.Sound;
+                Volume          = tSetting.Volume;
+                BackgroundColor = tSetting.BackgroundColor;
+                ForegroundColor = tSetting.ForegroundColor;
+                Visibility      = tSetting.Visibility;
             }
+        }
+
+        private static Color getContrastingColor(Color bgColor)
+        {
+            // Beregn luminans (per W3C standard)
+            double luminance = (0.299 * bgColor.R + 0.587 * bgColor.G + 0.114 * bgColor.B) / 255;
+
+            // Hvis baggrunden er lys, brug sort tekst – ellers hvid
+            return luminance >  0.5 ? Colors.Black : Colors.White;
         }
     }
 }

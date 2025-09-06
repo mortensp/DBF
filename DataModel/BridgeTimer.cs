@@ -39,16 +39,25 @@ namespace DBF.DataModel
         {
             _timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick+= Timer_Tick;
+            base.PropertyChanged+= BridgeTimer_PropertyChanged;
+        }
+
+
+        private void BridgeTimer_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Duration))
+                NotifyOfPropertyChange(nameof(EndTime));
         }
 
         #region Public Properties
-            [JsonIgnore] public Configuration Configuration    { get => configuration ?? (configuration = IoC.Get<Configuration>()); private set => configuration = value; }
+        [JsonIgnore] public Configuration Configuration    { get => configuration ?? (configuration = IoC.Get<Configuration>()); private set => configuration = value; }
             [JsonIgnore] public string        Time             { get; set; } = "21:17";
             [JsonIgnore] public Visibility    WarningVisiblity { get; set; } = Visibility.Hidden;
             [JsonIgnore] public string        Round            { get; set; }
             [JsonIgnore] public string        MoreInfo         { get; set; }
             [JsonIgnore] public Visibility    ShowUpButton     { get; set; } = Visibility.Visible;
             [JsonIgnore] public Visibility    ShowDownButton   { get; set; } = Visibility.Visible;
+        [JsonIgnore] public  TimeOnly      EndTime     => Configuration.StartTime.AddMinutes(Duration);
             //
             [JsonIgnore] public bool IsPaused => _isPaused;
             [JsonIgnore] public bool IsStarted=> _isStarted;

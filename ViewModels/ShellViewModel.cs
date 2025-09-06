@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
@@ -28,9 +30,18 @@ namespace DBF.ViewModels
 
                 //AccessInstaller.CheckAndInstall();
 #endif
-                var screen = IoC.Get<ControlViewModel>();
-                await ActivateItemAsync(screen);
+            var screen = IoC.Get<ControlViewModel>();
+
+            //// Test PropertyChanged event is working
+            //screen.PropertyChanged += (sender, e) =>
+            //{
+            //    if (sender is ControlViewModel vm)
+            //        Debug.WriteLine("PropertyChanged: " + e.PropertyName);
+            //};
+
+            await ActivateItemAsync(screen);
             }
+           
         #endregion
 
         public async Task OpenSettingsAsync()

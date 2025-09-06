@@ -6,6 +6,7 @@ using System.Windows.Media;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.UserControls;
+using Syncfusion.UI.Xaml.Schedule;
 using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.ViewModels
@@ -15,35 +16,39 @@ namespace DBF.ViewModels
         private       Preset                            selectedPreset     { get; set; }
         private          TimerSetting   setting;
         private readonly IWindowManager windowManager;
+        private          bool           onOpen = false;
 
         #region Constructors
             public TimerSettingsViewModel(Configuration configuration)
             {
-                Configuration = configuration;
-                windowManager = IoC.Get<IWindowManager>();
+                Configuration      = configuration;
+                windowManager      = IoC.Get<IWindowManager>();
+                NewColorCollection = new ObservableCollection<CustomColor>(Configuration.BackgroundColors);
+            NewSetting.PropertyChanged += newSetting_PropertyChanged;
             }
+
+        private void newSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if( e.PropertyName== nameof(NewSetting.Duration))
+            NotifyOfPropertyChange(nameof(EndTime));
+        }
         #endregion
 
         #region public Properties
-            public static ObservableCollection<CustomColor> NewColorCollection { get; set; } = new()
-                                                        {
-                                                            new CustomColor { ColorName = "Rød", Color = (Color)ColorConverter.ConvertFromString("#F2460D")},
-                                                            new CustomColor { ColorName = "Blå", Color = (Color)ColorConverter.ConvertFromString("#00b0ff") },
-                                                            new CustomColor { ColorName = "range", Color = (Color)ColorConverter.ConvertFromString("#FF9D00")},
-                                                            new CustomColor { ColorName = "Grøn", Color = (Color)ColorConverter.ConvertFromString("#81C784")},
-                                                        };
-
+        public static ObservableCollection<CustomColor> NewColorCollection { get; private set; }
             public        Configuration                     Configuration      { get; private set; }
             public        TimerSetting                      NewSetting         { get; set; } = new();
             public        Color                             BackgroundColor    { get; set; }
-                        public Preset SelectedPreset
+            public        Color                             ForegroundColor    { get; set; }
+            public        TimeOnly                          EndTime=> Configuration.StartTime.AddMinutes(NewSetting.Duration);
+            public Preset SelectedPreset
             {
                 get=> selectedPreset;
                 set
                 {
                     selectedPreset = value;
 
-                    if (value != null)
+                    if (value != null && !onOpen)
                         NewSetting.Update(value);
                 }
             }
@@ -55,11 +60,16 @@ namespace DBF.ViewModels
                 get=> setting;
                 set
                 {
-                    Set(ref setting, value);
-                    NewSetting.Update(value);
+                    if (Set(ref setting, value))
+                    {
+                        onOpen = true;
+                        NewSetting.Update(value);
 
-                    selectedPreset = FindPreset(NewSetting);
-                    NotifyOfPropertyChange(nameof(SelectedPreset));
+                        SelectedPreset = FindPreset(NewSetting);
+                        //selectedPreset = FindPreset(NewSetting);
+                        //NotifyOfPropertyChange(nameof(SelectedPreset));
+                        onOpen = false;
+                    }
                 }
             }
         #endregion
@@ -125,7 +135,9 @@ namespace DBF.ViewModels
             public void VolumeChanged(RoutedPropertyChangedEventArgs<double> e)
             {
                 double newValue = e.NewValue;
-                AudioPlayer.Play(NewSetting.Sound, (int)newValue);
+
+                if (!onOpen)
+                    AudioPlayer.Play(NewSetting.Sound, (int)newValue);
             }
 
             public void SoundChanged()
@@ -156,5 +168,10 @@ namespace DBF.ViewModels
                 }
             }
         #endregion
+
+        protected override void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace DBF.DataModel
         [XmlIgnore]
         public                                        MainTournament        MainTournament  { get; set; }
 
-        public override string ToString()=> (string.IsNullOrEmpty(DateStr) ? null : Date.ToShortDateString() + " " + Date.ToShortTimeString())+$" - {MainTournament.ShortName}";
+        public override string ToString()=> (string.IsNullOrEmpty(DateStr) ? null : Date.ToShortDateString() + " " + Date.ToShortTimeString())+$" - {MainTournament?.ShortName}";
 
         public override bool Equals(object obj)
         {

@@ -10,7 +10,8 @@ namespace DBF.DataModel
     /// Denne indeholder bl.a. beskrivelse og filnavn. Den fil der peges på indeholder
     /// Tournament, som er en yderligere beskrivelse af Rækken på den pågældende spille dag
     /// </summary>
-    [XmlRoot(ElementName = "GroupTournament")]     public class GroupTournament : IEquatable<GroupTournament>
+    [XmlRoot(ElementName = "GroupTournament")]     
+    public class GroupTournament : IEquatable<GroupTournament>
     {
         public int LastCompletedRound => LastCompletedRoundStr.AsInt();
 

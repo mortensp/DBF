@@ -61,6 +61,7 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
+            HeaderRowHeight="25"
             ItemsSource="{Binding Teams, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
@@ -141,7 +142,6 @@
 
         <syncfusion:SfDataGrid Name="dgPairs" Grid.ColumnSpan="2" Grid.Row="2"
             Padding="5,0,5,0"
-            
             AllowEditing="False"
             AllowResizingColumns="True"
             AllowTriStateSorting="False"
@@ -153,6 +153,7 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
+            HeaderRowHeight="25"
             ItemsSource="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
@@ -194,9 +195,16 @@
                     TextAlignment="Center" />
 
                 <syncfusion:GridTextColumn
-                    HeaderText="Hac"
+                    HeaderText="Hac rk"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="HACRankSection"
+                    TextAlignment="Center" />
+
+                <syncfusion:GridTextColumn x:Name="hacgrp"
+                    HeaderText="Hac grp"
+                    HorizontalHeaderContentAlignment="Center"
+                    IsHidden="{Binding HacGrpHidden}"
+                    MappingName="HACRankSectionPart"
                     TextAlignment="Center" />
 
                 <!--  Sektionens Score  -->
@@ -259,7 +267,7 @@
             <syncfusion:SfDataGrid.StackedHeaderRows>
                 <syncfusion:StackedHeaderRow>
                     <syncfusion:StackedHeaderRow.StackedColumns>
-                        <syncfusion:StackedColumn ChildColumns="Placering,HACRankSection" HeaderText="Stilling" />
+                        <syncfusion:StackedColumn ChildColumns="Placering,HACRankSection,HACRankSectionPart" HeaderText="Stilling" />
                         <syncfusion:StackedColumn ChildColumns="ExpectedScore,ActualScore,Result,DeltaHAC,MP" HeaderText="Resultat" />
                         <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="Turneringen" />
                     </syncfusion:StackedHeaderRow.StackedColumns>

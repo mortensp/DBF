@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-			<AssemblyVersion>0.9.9.0</AssemblyVersion>
-		<FileVersion>0.9.9.0</FileVersion>
+			<AssemblyVersion>0.9.9.3</AssemblyVersion>
+		<FileVersion>0.9.9.3</FileVersion>
 
 		<AssemblyTitle>DBF</AssemblyTitle>
 		<AssemblyName>DBF</AssemblyName>
@@ -85,13 +85,22 @@
 
 		<PackageReference Include="Caliburn.Micro" Version="4.0.230" />
 		<PackageReference Include="Caliburn.Micro.Core" Version="4.0.230" />
+	
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.3" />
-		<!--<ProjectReference Include="..\..\Common Libs\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
+				<!--<ProjectReference Include="..\..\Common Libs\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
 	</ItemGroup>
 
+	<ItemGroup>	
+	<PackageReference Include="Fody" Version="6.9.3">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+	</ItemGroup>
+	
 	<ItemGroup>
 		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 og åbenbart også 8:-) -->
 		<Reference Include="CData.EntityFrameworkCore.Access">
@@ -113,7 +122,6 @@
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.1" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="NetCoreAudio" Version="2.0.0" />
-		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
@@ -191,6 +199,8 @@
 		<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+
+		<None Include="FodyWeavers.xsd" />
 		
 		<None Update="InstallerFiles\AccessDatabaseEngine_2010_x86.exe">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

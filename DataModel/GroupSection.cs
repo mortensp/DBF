@@ -27,6 +27,8 @@ namespace DBF.DataModel
         [XmlAttribute(AttributeName = "HacRoundBOId")]      public string      HacRoundBOId      { get; set; }
 
         //-----
+        public bool Completed => !Rounds.Any(r => r.RoundCompleted == false);
+
         public int BoardsPerRound => Boards.Boardspec.Boards.Count / (Rounds?.Count ?? 1);
 
         public                                                     Tournament  Tournament        { get; set; }

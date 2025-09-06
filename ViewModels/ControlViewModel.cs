@@ -1,44 +1,35 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Data.OleDb;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 using Baksteen.Extensions.DeepCopy;
 using Caliburn.Micro;
-using CData.EntityFrameworkCore.Access;
-using CData.Sql;
-using DBF.BridgeMateModel;
 using DBF.Converters;
 using DBF.DataModel;
 using DBF.UserControls;
 using DBF.Views;
-using Microsoft.DotNet.DesignTools.Protocol.Values;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Syncfusion.Data.Extensions;
-using Syncfusion.XlsIO.Parser.Biff_Records;
 
 namespace DBF.ViewModels
 {
+    public static class MovementPlans
+    {
+        public const string InterWovenHowell = "1";
+        public const string Howell           = "1";
+        public const string Mitchell         = "4";
+    }
+
     public class ControlViewModel : Screen
     {
-        private static string BC3path = @"C:\BC3\Hjemmeside\";
         //static string path = @"C:\BC3\Hjemmeside - Kopi\Resultater_2172\";
-        private readonly IWindowManager _windowManager;
+        private readonly IWindowManager windowManager;
 
         private Club             selectedClub;
         private UserControl      startListControl = new StartListControl();
@@ -55,13 +46,14 @@ namespace DBF.ViewModels
         private          FileSystemWatcher                      watcher;
         private          int                                    sectionNo;
         private          bool                                   showAsOneGroup = true;
-        private readonly ConcurrentDictionary<string, DateTime> _lastFileEvent = new();
+        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent  = new();
 
         #region Constructors
-            public ControlViewModel(IWindowManager windowManager, Configuration configuration)
+            public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
             {
+                BridgeMate                          = bridgeMate;
                 Configuration                       = configuration;
-                _windowManager                      = windowManager;
+                this.windowManager                  = windowManager;
                 Thread.CurrentThread.CurrentCulture = Global.DkCulture;
 
                 watcher                       = new FileSystemWatcher();
@@ -71,15 +63,19 @@ namespace DBF.ViewModels
                 watcher.Changed+= folderUpdated;
                 watcher.Created+= folderUpdated;
 
-                //var db     = new BridgeMateContext();
-                //var player = db.PlayerNames.First(p => p.Id == 13082);
-                //db.ListTables();
-                //
-                LoadMainClub();
+                LoadMainClubs();
             }
         #endregion
 
         #region Public Properties
+            //public TimeOnly EndTime
+            //{
+            //    get
+            //    {
+            //        return Configuration.EndTime;
+            //    }
+            //}
+
             public UserControl CurrentView
             {
                 get=> currentView ?? (currentView = timersPanel);
@@ -91,6 +87,7 @@ namespace DBF.ViewModels
             }
 
             public Configuration                  Configuration            { get; set; }
+            public BridgeMate                     BridgeMate               { get; set; }
 
             // MainClubs
             public ObservableCollection<MainClub> MainClubs                { get; set; } = [];
@@ -121,11 +118,12 @@ namespace DBF.ViewModels
                                 watcher.Filters.Add("Main.XML");
                                 watcher.EnableRaisingEvents = true;
 
-                                Clubs = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
-                                                               .ToObservableCollection();
+                                Clubs    = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
+                                                                  .ToObservableCollection();
+                                var club = Clubs?.FirstOrDefault();
 
-                                if (Clubs is not null)
-                                    SelectedClub = Clubs.FirstOrDefault();
+                                SelectedClub = null; // nødvendig, da club og SelectedClub kun sammenlignes på feltet Id, dvs. kan væe ens.
+                                SelectedClub = club;
                             }
                         }
                     }
@@ -147,7 +145,13 @@ namespace DBF.ViewModels
                     ErrorMessage = "";
 
                     if (Set(ref selectedClub, value))
-                        FetchPlayingTimes();
+                        if (value is null)
+                        {
+                            PlayingTimes.Clear();
+                            SelectedPlayingTime = null;
+                        }
+                        else
+                            FetchPlayingTimes();
                 }
             }
 
@@ -169,7 +173,8 @@ namespace DBF.ViewModels
                 set
                 {
                     if (Set(ref playingTime, value))
-                        FetchPlayingTime();
+                        if (value is not null)
+                            FetchPlayingTime();
                 }
             }
 
@@ -237,6 +242,7 @@ namespace DBF.ViewModels
             }
 
             public Visibility                     ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
+            public bool                           HacGrpHidden             { get; set; } = true;
         #endregion
 
         #region Public Methods
@@ -266,6 +272,14 @@ namespace DBF.ViewModels
                 await ShowProjector();
             }
 
+            public void CloseProjector()
+            {
+                var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
+
+                if (projectorView is not null)
+                    projectorView.Close();
+            }
+
             public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
             {
                 if (Configuration.TimersActive)
@@ -279,16 +293,16 @@ namespace DBF.ViewModels
         #endregion
 
         #region Private Method
-            private void LoadMainClub()
+            private void LoadMainClubs()
             {
-                if (string.IsNullOrWhiteSpace(BC3path)
-                || !Directory.Exists(BC3path))
+                if (string.IsNullOrWhiteSpace(Configuration.HomepagePath)
+                || !Directory.Exists(Configuration.HomepagePath))
                 {
-                    MessageBox.Show($"Mappen: '{BC3path}' findes ikke", "Fejl");
+                    MessageBox.Show($"Mappen: '{Configuration.HomepagePath}' findes ikke", "Fejl");
                     return;
                 }
 
-                foreach (var path in Directory.GetDirectories(BC3path)
+                foreach (var path in Directory.GetDirectories(Configuration.HomepagePath)
                                               .Select(dir => Path.GetFileName(dir))
                                               .Where(name => name.StartsWith("Resultater_", StringComparison.OrdinalIgnoreCase)))
                 {
@@ -303,10 +317,11 @@ namespace DBF.ViewModels
 
                 if (MainClubs.Count == 0)
                 {
-                    MessageBox.Show($"Kan ikke finde Resultater i mappen: {BC3path}", "Fejl");
+                    MessageBox.Show($"Kan ikke finde Resultater i mappen: {Configuration.HomepagePath}", "Fejl");
                     return;
                 }
 
+                MainClubs        = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
                 SelectedMainClub = MainClubs[0];
             }
 
@@ -331,7 +346,7 @@ namespace DBF.ViewModels
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
 
-                catch (Exception )
+                catch (Exception)
                 {
                     PlayingTimes.Clear();
                 }
@@ -342,16 +357,20 @@ namespace DBF.ViewModels
             /// </summary>
             private void FetchPlayingTime()
             {
+                // XML lookup
                 ShowAsOneGroup           = true;
+                HacGrpHidden             = true;
                 ShowAsOneGroupVisibility = Visibility.Collapsed;
                 ErrorMessage             = "";
                 Pairs.Clear();
                 Teams.Clear();
                 bool InterWovenHowell = false;
+                bool RoundCompleted   = true;
 
                 try
                 {
-                    tournaments = getTournaments(playingTime);
+                    Configuration.StartTime = TimeOnly.FromDateTime(playingTime.Date);                                     
+                tournaments = getTournaments(playingTime);
 
                     if (tournaments.Count == 0)
                         return;
@@ -364,23 +383,55 @@ namespace DBF.ViewModels
                     {
                         var grp = GroupSections[grpNo];
 
+                        if (!grp.Completed)
+                            RoundCompleted = false;
+
                         if (grp.Tournament.TournamentType.Text == "Parturnering")
                         {
                             if (grp.Resultlist is not null)
                             {
                                 if (!InterWovenHowell)
-                                    InterWovenHowell = grp.Tournament.MovementPlanType == "1";
+                                    InterWovenHowell = grp.Tournament.MovementPlanType == MovementPlans.InterWovenHowell;
 
                                 foreach (var pair in grp.Resultlist.Pairs)
                                 {
                                     pair.Placering = pair.Rank;
 
-                                    if (grp.Tournament.MovementPlanType == "4") // EV at Mitchell                                    
+                                    if (grp.Tournament.MovementPlanType == MovementPlans.Mitchell)
                                         pair.SubGroup = pair.Direction == "2" ? "ØV" : "NS";
 
                                     pair.Title = grp.Tournament.Title;
                                     Pairs.Add(pair.DeepCopy());
                                 }
+
+                                if (grp.Tournament.MovementPlanType == MovementPlans.Mitchell)
+                                {
+                                    HacGrpHidden = false;
+                                    var hacGrp   = 1;
+
+                                    foreach (var pair in Pairs.Where(p => p.Direction == "1").OrderBy(p => p.HACRankSection))
+                                        pair.HACRankSectionPart = hacGrp++;
+
+                                    hacGrp = 1;
+
+                                    foreach (var pair in Pairs.Where(p => p.Direction == "2").OrderBy(p => p.HACRankSection))
+                                        pair.HACRankSectionPart = hacGrp++;
+                                }
+                                else
+                                    if (InterWovenHowell)
+                                    {
+                                        HacGrpHidden = false;
+                                        var hacGrp   = 1;
+                                        var grpSize  = Pairs.Count >> 1;
+
+                                        foreach (var pair in Pairs.Take(grpSize).OrderBy(p => p.HACRankSection))
+                                        pair.HACRankSectionPart = hacGrp++;
+
+                                        hacGrp = 1;
+
+                                        foreach (var pair in Pairs.Skip(grpSize).OrderBy(p => p.HACRankSection))
+                                        pair.HACRankSectionPart = hacGrp++;
+                                    }
                             }
 
                             if (grp.Startlist is not null)
@@ -405,7 +456,6 @@ namespace DBF.ViewModels
                             else
                                 if (Pairs.Count >  0)
                                     Pairs = new BindableCollection<Pair>(Pairs.OrderBy(p => p.Placering));
-                            //Pairs.NotifyOfPropertyChange(nameof(Pairs.Count));
                         }
                         else
                         {
@@ -484,6 +534,15 @@ namespace DBF.ViewModels
                     NotifyOfPropertyChange(nameof(Teams));
                 }
 
+#if DEBUG
+                // BridgeMate lookup
+                if (string.IsNullOrEmpty(ErrorMessage)
+                    //&& !RoundCompleted  //TODO: Test skal med igen
+                    )
+                    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
+                else
+                    BridgeMate.Close();
+#endif
                 // Restore Taskbar Icon.
                 //Execute.OnUIThread(() =>
                 //                   {
@@ -493,7 +552,7 @@ namespace DBF.ViewModels
 
             private MainClub loadMainClub(int no)
             {
-                var path     = BC3path + @$"Resultater_{no}\";
+                var path     = Configuration.HomepagePath + @$"Resultater_{no}\";
                 var filename = path + @"Main.xml";
 
                 try
@@ -694,13 +753,13 @@ namespace DBF.ViewModels
                 {
                     var now = DateTime.UtcNow;
 
-                    if (_lastFileEvent.TryGetValue(e.FullPath, out DateTime last))
+                    if (lastFileEvent.TryGetValue(e.FullPath, out DateTime last))
                         if ((now - last).TotalMilliseconds <  500)
                             return; // Ignorer duplikat
                         else
-                            _lastFileEvent[e.FullPath] = now;
+                            lastFileEvent[e.FullPath] = now;
                     else
-                        _lastFileEvent.TryAdd(e.FullPath, now);
+                        lastFileEvent.TryAdd(e.FullPath, now);
 
                     if (e.ChangeType == WatcherChangeTypes.Changed)
                         //Debug.WriteLine($"File changed: {e.Name}");
@@ -779,7 +838,7 @@ namespace DBF.ViewModels
 
                     if (projectorView is null)
                     {
-                        await _windowManager.ShowWindowAsync(this, "ProjectorView");
+                        await windowManager.ShowWindowAsync(this, "ProjectorView");
                         projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
                         projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -798,7 +857,7 @@ namespace DBF.ViewModels
 
                     if (projectorView is null)
                     {
-                        await _windowManager.ShowWindowAsync(this, "ProjectorView");
+                        await windowManager.ShowWindowAsync(this, "ProjectorView");
                         projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
                     }
 

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
+using PropertyChanged;
 
 namespace DBF.DataModel
 {
+    [AddINotifyPropertyChangedInterface]
     [XmlRoot(ElementName = "Club")]     public class Club : IEquatable<Club>
     {
         [XmlAttribute(AttributeName = "Name")]     public string               Name           { get; set; }

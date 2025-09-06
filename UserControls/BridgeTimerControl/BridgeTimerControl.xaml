@@ -56,7 +56,7 @@
             <StackPanel>
                 <!--  Timer Display  -->
                 <Border Padding="0" CornerRadius="6">
-                    <Grid Background="{Binding Timer.Background, UpdateSourceTrigger=PropertyChanged}" TextBlock.FontSize="20">
+                    <Grid Name="display" Background="{Binding Timer.Background, UpdateSourceTrigger=PropertyChanged}" TextBlock.FontSize="20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50" />
                             <ColumnDefinition Width="*" />
@@ -140,6 +140,12 @@
                             HorizontalAlignment="Center"
                             FontWeight="Bold"                                  
                             Text="{Binding Timer.GroupStr, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <!--<TextBlock  Grid.Column="2" Grid.Row="5"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Center"
+                            FontWeight="Bold"                                  
+                            Text="{Binding Timer.EndTime, UpdateSourceTrigger=PropertyChanged}" />-->
                     </Grid>
                 </Border>
 

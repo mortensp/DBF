@@ -60,7 +60,7 @@ namespace DBF.DataModel
 
         public string Name
         {
-            get => name;
+            get=> name;
             set
             {
                 if (name != value)
@@ -73,7 +73,7 @@ namespace DBF.DataModel
 
         public bool CustomPreset
         {
-            get => customPreset;
+            get=> customPreset;
             set
             {
                 if (customPreset != value)
@@ -84,16 +84,22 @@ namespace DBF.DataModel
             }
         }
 
-        public bool TeamMatch         { get; set; }
-        public int  Rounds            { get; set; }
-        public int  BoardsPerRound    { get; set; }
-        public int  BreakAfterRound   { get; set; }
-        public int  Hours             { get; set; }
-        public int  Minutes           { get; set; }
-        public int  Seconds           { get; set; }
-        public int  TransitionMinutes { get; set; }
-        public int  BreakMinutes      { get; set; }
-        public int  WarningMinutes    { get; set; }
+        public bool   TeamMatch         { get; set; }
+        public int    Rounds            { get; set; }
+        public int    BoardsPerRound    { get; set; }
+        public int    BreakAfterRound   { get; set; }
+        public int    Hours             { get; set; }
+        public int    Minutes           { get; set; }
+        public int    Seconds           { get; set; }
+        public int    TransitionMinutes { get; set; }
+        public int    BreakMinutes      { get; set; }
+        public int    WarningMinutes    { get; set; }
+
+        public double Duration => BreakMinutes
+                                + Rounds * Hours * 60
+                                + Rounds * Minutes 
+                                + Rounds *  Seconds / 60d
+                                + (Rounds - 1) * (BreakMinutes == 0 ? TransitionMinutes : Math.Max(0, TransitionMinutes));
 
         public bool Matches(Preset other)
         {
@@ -110,7 +116,7 @@ namespace DBF.DataModel
                  &&  WarningMinutes    == other.WarningMinutes;
         }
 
-        override public string ToString() => Name;
+        override public string ToString()=> Name;
 
         internal void Update(Preset other)
         {
