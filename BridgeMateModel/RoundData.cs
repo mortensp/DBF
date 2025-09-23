@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DBF.BridgeMateModel
 {
@@ -16,5 +17,10 @@ namespace DBF.BridgeMateModel
         public short? LowBoard { get; set; }
         public short? HighBoard { get; set; }
         public string  CustomBoards { get; set; }
+
+        
+        [NotMapped] public int BoardsPlayed { get; set; }
+        [NotMapped] public int BoardsPerRound => (HighBoard ?? 0) - (LowBoard ?? 0) + 1;
+        [NotMapped] public bool Done => BoardsPlayed == BoardsPerRound;
     }
 }

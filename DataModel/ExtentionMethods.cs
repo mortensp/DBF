@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Schedule;
 
 namespace DBF.DataModel
@@ -21,9 +22,21 @@ namespace DBF.DataModel
 
         public static bool AsBool(this string str, bool defaultValue = false)     => bool.TryParse(str, out bool val) ? val : defaultValue;
 
+        static public TimeOnly Max(this TimeOnly t1, DateTime t2)                 => t1.Max(TimeOnly.FromDateTime(t2));
+
+        static public TimeOnly Min(this TimeOnly t1, DateTime t2)                 => t1.Min(TimeOnly.FromDateTime(t2));
+
+        static public TimeOnly Max(this TimeOnly t1, TimeOnly t2)                 => t1 >  t2 ? t1 : t2;
+
+        static public TimeOnly Min(this TimeOnly t1, TimeOnly t2)                 => t1 <  t2 ? t1 : t2;
+
         static public TimeSpan Max(this TimeSpan t1, TimeSpan t2)                 => t1 >  t2 ? t1 : t2;
 
         static public TimeSpan Min(this TimeSpan t1, TimeSpan t2)                 => t1 <  t2 ? t1 : t2;
+
+        static public DateTime Max(this DateTime t1, DateTime t2)                 => t1 >  t2 ? t1 : t2;
+
+        static public DateTime Min(this DateTime t1, DateTime t2)                 => t1 <  t2 ? t1 : t2;
 
         public static void Merge<T>(this T target, T other)
         {
@@ -118,6 +131,20 @@ namespace DBF.DataModel
 
             // Sæt sidste separator som " og "
             return string.Join(separator, names.Take(names.Count - 1)) + lastSeparator + names.Last();
+        }
+
+        public static void RefreshSorting(this SfDataGrid sfDataGrid)
+        {
+            // Ryd og genanvend sorteringen
+            var sortDescriptions = sfDataGrid.SortColumnDescriptions.ToList();
+            var desc = sfDataGrid.SortColumnDescriptions;
+
+            desc.Clear();
+            
+            foreach (var sortDesc in sortDescriptions)
+            {
+                desc.Add(sortDesc);
+            }
         }
     }
 }

@@ -14,33 +14,33 @@ namespace DBF.ViewModels
     public class TimerSettingsViewModel : Screen
     {
         private       Preset                            selectedPreset     { get; set; }
-        private          TimerSetting   setting;
+        private          BridgeTimer    setting;
         private readonly IWindowManager windowManager;
         private          bool           onOpen = false;
 
         #region Constructors
             public TimerSettingsViewModel(Configuration configuration)
             {
-                Configuration      = configuration;
-                windowManager      = IoC.Get<IWindowManager>();
-                NewColorCollection = new ObservableCollection<CustomColor>(Configuration.BackgroundColors);
-            NewSetting.PropertyChanged += newSetting_PropertyChanged;
+                Configuration              = configuration;
+                windowManager              = IoC.Get<IWindowManager>();
+                NewColorCollection         = new ObservableCollection<CustomColor>(Configuration.BackgroundColors);
+                NewSetting.PropertyChanged+= newSetting_PropertyChanged;
             }
 
-        private void newSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if( e.PropertyName== nameof(NewSetting.Duration))
-            NotifyOfPropertyChange(nameof(EndTime));
-        }
+            private void newSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(NewSetting.Duration))
+                    NotifyOfPropertyChange(nameof(EndTime));
+            }
         #endregion
 
         #region public Properties
-        public static ObservableCollection<CustomColor> NewColorCollection { get; private set; }
+            public static ObservableCollection<CustomColor> NewColorCollection { get; private set; }
             public        Configuration                     Configuration      { get; private set; }
             public        TimerSetting                      NewSetting         { get; set; } = new();
             public        Color                             BackgroundColor    { get; set; }
             public        Color                             ForegroundColor    { get; set; }
-            public        TimeOnly                          EndTime=> Configuration.StartTime.AddMinutes(NewSetting.Duration);
+            public        TimeOnly                          EndTime=> TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(NewSetting.Duration));
             public Preset SelectedPreset
             {
                 get=> selectedPreset;
@@ -55,7 +55,7 @@ namespace DBF.ViewModels
 
             public        bool                              CustomPreset=> selectedPreset is not null && selectedPreset.CustomPreset == true;
 
-            public TimerSetting Setting
+            public BridgeTimer Setting
             {
                 get=> setting;
                 set
@@ -64,11 +64,8 @@ namespace DBF.ViewModels
                     {
                         onOpen = true;
                         NewSetting.Update(value);
-
                         SelectedPreset = FindPreset(NewSetting);
-                        //selectedPreset = FindPreset(NewSetting);
-                        //NotifyOfPropertyChange(nameof(SelectedPreset));
-                        onOpen = false;
+                        onOpen         = false;
                     }
                 }
             }
@@ -168,10 +165,5 @@ namespace DBF.ViewModels
                 }
             }
         #endregion
-
-        protected override void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-        }
     }
 }

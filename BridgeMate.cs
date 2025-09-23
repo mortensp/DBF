@@ -1,29 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
-using Syncfusion.UI.Xaml.Diagram.Controls;
-using Syncfusion.UI.Xaml.Schedule;
+using Microsoft.DotNet.DesignTools.Protocol.Values;
 
 namespace DBF
 {
     public class BridgeMate : INotifyPropertyChanged
     {
-        private readonly DispatcherTimer   timer;
-        private          DateTime          sidstTjekket;
-        private          BridgeMateContext db;
-        private readonly Configuration     configuration;
-        //private          string            bmDir    = null;
-        private string bmFile   = null;
-        private int    bmClubNo = -1;
+        private          FileSystemWatcher                      watcher;
+        private readonly DispatcherTimer                        timer;
+        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent = new();
+        private          ReceivedData                           last          = new();
+        private          BridgeMateContext                      db;
+        private readonly Configuration                          configuration;
+        private          string                                 bmFile        = null;
+        private          int                                    bmClubNo      = -1;
+        private          DateTime                               lastDate;
+        private          int                                    lastClub      = -1;
 
         #region Public Properties
             public Session                                     Session  { get; private set; }
@@ -35,88 +34,163 @@ namespace DBF
         #endregion
 
         #region Constructors
-            public BridgeMate(Configuration configuration)
+            public BridgeMate(Configuration _configuration)
             {
-                this.configuration = configuration;
-                this.sidstTjekket  = DateTime.MinValue;
+                configuration = _configuration;
+                //
+                watcher                       = new FileSystemWatcher(configuration.BridgeMatePath);
+                watcher.NotifyFilter          = NotifyFilters.FileName | NotifyFilters.CreationTime;
+                watcher.Filter                = "*.bws";
+                watcher.IncludeSubdirectories = true;
+                watcher.Created              += fileCreated;
 
-                this.timer = new DispatcherTimer
-                             {
-                                 Interval = TimeSpan.FromSeconds(7)
-                             };
+                //
+                timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(7) };
+                timer.Tick+= Timer_Tick;
             }
         #endregion
 
         public void CheckOrOpen(DateTime date, int clubNo)
         {
+            if (clubNo <  0)
+                return;
+
             if (date   == Session?.Date
             &&  clubNo == bmClubNo
             &&  bmFile is not null)
-                return;
+                return; // Allerede åbnet
+
+            lastDate = date;
+            lastClub = clubNo;
 
             var path  = $"{configuration.BridgeMatePath}{clubNo}\\";
-            var after = DateTime.Now.AddDays(-60); //TODO: rettes ned til 14 dage;
+            var after = DateTime.Now.AddDays(-14); //TODO: rettes ned til 14 dage;
 
             if (!Directory.Exists(path))
                 MessageBox.Show($"Mappen: '{path}' findes ikke. Så oplysningerne fra terminalerne kan ikke indlæses", "Fejl");
             else
-            {
                 foreach (var file in Directory.GetFiles(path, "*.bws")
                                               .Where(f => File.GetLastWriteTime(f) >= after)
                                               .OrderByDescending(f => File.GetLastWriteTime(f))) //TODO: skal det være oprettelses datetime?
                 {
                     db = new BridgeMateContext(file);
-
-                    foreach (var session in db.Sessions)
-                        if (session.Date == date)
-                        {
-                            if (file != bmFile)
+                    try
+                    {
+                        foreach (var session in db.Sessions)
+                            if (session.Date == date)
                             {
-                                bmFile   = file;
-                                bmClubNo = clubNo;
-                                Session  = session;
-                                db       = new BridgeMateContext(bmFile);
-
-                                if (Session.Status != 2)
+                                if (file != bmFile)
                                 {
-                                    //timer.Tick += Timer_Tick;
-                                    //timer.Start();
-                                }
-                            }
+                                    bmFile   = file;
+                                    bmClubNo = clubNo;
+                                    lastClub = -1;      // undgå gentagne åbniner, hvis der er ændringer i mappen
+                                    Session  = session;
+                                    db       = new BridgeMateContext(bmFile);
 
-                            return;
-                        }
-                }                                
-            }
+                                    if (Session.Status != 2)
+                                    {
+                                        timer.Start();
+                                        Tables = new(db.Tables);
+                                        Rounds = new(db.RoundData);
+                                    }
+
+                                    watcher.EnableRaisingEvents = false;
+                                }
+
+                                return;
+                            }
+                    }
+
+                    catch (Exception)
+                    {
+                        continue;
+                        //MessageBox.Show($"BridgeMate Serveren er ikke startet korrekt", "Fejl");
+                    }
+                }
 
             // BridgeMate er fil ikke fundet
             Close();
+
+            watcher.EnableRaisingEvents = true;
         }
 
+    
         public void Close()
         {
+            watcher.EnableRaisingEvents = false;
             timer.Stop();
             bmFile   = null;
             bmClubNo = -1;
             Session  = null;
             db       = null;
+            Received.Clear();
+        }
+
+        private void fileCreated(object sender, FileSystemEventArgs e)
+        {
+            // Debounce: Ignorer events for samme fil inden for 500 ms
+            try
+            {
+                var now = DateTime.UtcNow;
+
+                if (lastFileEvent.TryGetValue(e.FullPath, out DateTime last))
+                    if ((now - last).TotalMilliseconds <  500)
+                        return; // Ignorer duplikat
+                    else
+                        lastFileEvent[e.FullPath] = now;
+                else
+                    lastFileEvent.TryAdd(e.FullPath, now);
+
+                if (e.ChangeType == WatcherChangeTypes.Created)
+                    CheckOrOpen(lastDate, lastClub);
+                else
+                    Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
+            }
+            catch (Exception)
+            {
+                MessageBox.Show($"Fejl ved læsning af BridgeMate mappen", "Fejl");
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            var nye = db.ReceivedData
-                        .Where(p =>  p.DateLog >  sidstTjekket
-                                 ||  p.DateLog == sidstTjekket && p.TimeLog >  sidstTjekket
-                                 )
+            int cnt   = Received.Count;
+            var table = Tables;
+
+            foreach (var data in db.ReceivedData.Where(r =>  r.DateLog >  last.DateLog
+                                                         ||  r.DateLog == last.DateLog
+                                                         &&  r.TimeLog >  last.TimeLog)
+                                                .OrderBy(r => r.TimeLog))
+            {
+                last = data;
+
+                var round = Rounds.First(r => r.Table == data.Table && r.Round == data.Round);
+
+                if (data?.Erased == true)
+                {
+                    Received.Remove(data);
+                    round.BoardsPlayed--;
+                }
+                else
+                {
+                    Received.Add(data);
+                    round.BoardsPlayed++;
+                }
+            }
+
+            if (Received.Count >  cnt)
+                OnPropertyChanged(nameof(Received));
+
+            var rnds = Rounds
+                        .GroupBy(o => (o.Section, o.Round))
+                        .OrderBy(o => o.Key)
+                        .Select(g => new
+                        {
+                            Section = g.Key.Section,
+                            Round = g.Key.Round,
+                            Done = g.Count(g => g.Done) == Tables.Count(t => t.Section == g.Key.Section)
+                        })
                         .ToList();
-
-            foreach (var entry in nye)
-                Received.Add(entry);
-
-            if (nye.Any())
-                OnPropertyChanged(nameof(Tables));
-
-            sidstTjekket = DateTime.UtcNow;
         }
 
         protected void OnPropertyChanged(string propertyName)

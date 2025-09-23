@@ -1,10 +1,15 @@
-﻿//using System.configuration;
+﻿using System.Data;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
+using DBF.Helpers;
+using DBF.ViewModels;
+using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.Grid;
 using Group = Syncfusion.Data.Group;
 
 namespace DBF.UserControls
@@ -16,36 +21,42 @@ namespace DBF.UserControls
     {
         private Configuration config = IoC.Get<Configuration>();
 
-        private bool            parentIsViewbox = false;
-        //private bool            collapsGroups   = false;
-        private int             groupNo         = -1;
-        private int             pairGroups      = 0;
-        private int             teamGroups      = 0;
-        private int pairRows = 0;
-        private int teamRows = 0;
-        
-        private DispatcherTimer groupTimer;
+        private bool              parentIsViewbox  = false;
+        private int               displayLineIndex = -1;
+        private Interval          interval         = new(0, 0);
+        private int               linesAllocated   = 0;
+        private int               linesNeeded      = 0;
+        private IEnumerable<Pair> pairs;
+        private IEnumerable<Team> teams;
+        private int               pairRows         = 0;
+        private int               teamRows         = 0;
+        private List<Interval>    displayLines     = [];
+        private DispatcherTimer   groupTimer;
 
         public ResultsControl()
         {
             InitializeComponent();
+            this.DataContextChanged+= ResultsControl_DataContextChanged;
+            this.Loaded            += UserControl_Loaded;
 
-            this.Loaded                += UserControl_Loaded;
-            dgPairs.ItemsSourceChanged += (s, e) => setupPaging();
-            dgTeams.ItemsSourceChanged += (s, e) => setupPaging();
+            dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
+            dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
+            dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
+            dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
+            dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+            dgPairs.ItemsSourceChanged             += onPairsChanged;
+
+            dgTeams.Columns["TeamName"].ColumnSizer = GridLengthUnitType.SizeToCells;
+            dgTeams.GroupCollapsed                 += (s, e) => dgTeams.RefreshSorting();
+            dgTeams.GroupExpanded                  += (s, e) => dgTeams.RefreshSorting();
+            dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
+            dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+            dgTeams.ItemsSourceChanged             += onTeamsChanged;
 
             // Initialiser timeren
-            groupTimer           = new DispatcherTimer();
-            groupTimer.Interval  = TimeSpan.FromSeconds(config.ProjectorInterval);
-            groupTimer.Tick     += (s, e) => showNextGroup();
-            config.PropertyChanged += (s, e) => 
-            { 
-                groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
-                setupPaging();
-                };
-
-
-            
+            groupTimer             = new DispatcherTimer();
+            groupTimer.Tick       += (s, e) => showNextGroup();
+            config.PropertyChanged+= (s, e) => setupPaging();
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -60,53 +71,201 @@ namespace DBF.UserControls
                 parentIsViewbox = true;
 
             setupPaging();
+        }
 
+        private void onPairsChanged(object s, GridItemsSourceChangedEventArgs e)
+        {
+            if (s              is SfDataGrid dg
+            &&  dg.ItemsSource is not null)
+            {
+                dg.ClearFilters();
+                dg.GroupColumnDescriptions.Clear();
+                dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
 
+                pairs = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Pair>;
+
+                // SubGroups?                
+                if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
+                    dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
+
+                dg.View.RefreshFilter();
+                dg.View.Filter = item =>  displayLines.Count == 0
+                                      ||  item               is Pair pair
+                                      &&  displayLines[displayLineIndex].Contains(pair.EntryNo);
+                // 
+                setupPaging();
+
+                dg.Visibility = pairs.Any(p => p.ResultStr == null) ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
+        private void onTeamsChanged(object s, GridItemsSourceChangedEventArgs e)
+        {
+            if (s              is SfDataGrid dg
+            &&  dg.ItemsSource is not null)
+            {
+                dg.ClearFilters();
+
+                dg.GroupColumnDescriptions.Clear();
+                dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
+
+                teams = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Team>;
+
+                dg.View.RefreshFilter();
+                dg.View.Filter = item =>  displayLines.Count == 0
+                                      ||  item               is Team team
+                                      &&  displayLines[displayLineIndex].Contains(team.EntryNo);
+                // 
+                setupPaging();
+
+                dg.Visibility = teams.Any(p => p.ImpScoreStr == null) ? Visibility.Collapsed : Visibility.Visible;
+            }
         }
 
         private void setupPaging()
         {
             if (parentIsViewbox)
             {
-                //collapsGroups = false;
-                groupNo       = -1;
-                pairGroups    = dgPairs.View?.Groups?.Count ?? 0;
-                teamGroups    = dgTeams.View?.Groups?.Count ?? 0;
-                pairRows = dgPairs.View?.Records.Count ?? 0;
-                teamRows = dgTeams.View?.Records.Count ?? 0;
+                groupTimer.Stop();
+                groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
 
-                if (pairRows + teamRows > config.ProjectorMaxRows)
+                displayLines     = [];
+                displayLineIndex = -1;
+                linesAllocated   = 0;
+                linesNeeded      = 0;
+                interval         = new(0, 0);
+                pairRows         = pairs?.Count() ?? 0;
+                teamRows         = teams?.Count() ?? 0;
+
+                dgPairs.View?.RefreshFilter();
+                dgTeams.View?.RefreshFilter();
+
+                if (pairRows + teamRows >  0)
                 {
-                    dgPairs.CollapseAllGroup();
-                    dgTeams.CollapseAllGroup();
-                    showNextGroup();
-                    groupTimer.Start();
-                }
-                else
-                {
-                    dgPairs.ExpandAllGroup();
-                    dgTeams.ExpandAllGroup();
-                    groupTimer.Stop();
+                    splitDataGrid(dgPairs);
+                    splitDataGrid(dgTeams);
+
+                    if (linesNeeded >  config.ProjectorMaxRows)
+                    {
+                        showNextGroup();
+                        groupTimer.Start();
+                    }
+                    else
+                        displayLines = [new Interval(0, pairRows + teamRows)];
                 }
             }
         }
 
-        private void showNextGroup()
-        {            
-            if (groupNo >  -1)
-                if (groupNo <  pairGroups)
-                    dgPairs.CollapseGroup(dgPairs.View.Groups[groupNo] as Group);
-                else
-                    dgTeams.CollapseGroup(dgTeams.View.Groups[groupNo - pairGroups] as Group);
+        #region Display Line Groups
+            private void splitDataGrid(SfDataGrid dataGrid)
+            {
+                if (dataGrid?.View is null)
+                    return;
 
-            if (++groupNo >= pairGroups + teamGroups)
-                groupNo = 0;
+                foreach (Group group in dataGrid.View.Groups.OrderBy(g => ((Group)g).Key))
+                {
+                    linesNeeded+= group.LineCount();
 
-            if (groupNo <  pairGroups)
-                dgPairs.ExpandGroup(dgPairs.View.Groups[groupNo] as Group);
-            else
-                dgTeams.ExpandGroup(dgTeams.View.Groups[groupNo - pairGroups] as Group);
-        }
+                    if (group.LineCount() <= config.ProjectorMaxRows - linesAllocated)
+                        addGroup(group);
+                    else
+                    {
+                        if (!interval.IsEmpty)
+                            endInterval();
 
+                        if (group.Groups is null || group.Groups.Count == 0)
+                            splitGroup(group);
+                        else
+                            foreach (Group subgroup in group.Groups)
+                                if (subgroup.LineCount() <= config.ProjectorMaxRows - linesAllocated)
+                                    addGroup(subgroup);
+                                else
+                                    splitGroup(subgroup);
+                    }
+                }
+
+                if (!interval.IsEmpty)
+                    endInterval();
+            }
+
+            private void addGroup(Group group)
+            {
+                interval.To   += group.Records.Count();
+                linesAllocated+= group.LineCount();
+            }
+
+            private void splitGroup(Group group)
+            {
+                for (int rows = group.Records.Count; rows >  0;)
+                {
+                    var cnt     = Math.Min(rows, config.ProjectorMaxRows - linesAllocated - 1);
+                    interval.To+= cnt;
+                    displayLines.Add(             interval);
+                    interval       = new Interval(interval.To, interval.To);
+                    linesAllocated = 0;
+                    rows          -= cnt;
+                }
+            }
+
+            public void endInterval()
+            {
+                if (interval.To >  interval.From)
+                    displayLines.Add(         interval);
+
+                interval       = new Interval(interval.To, interval.To);
+                linesAllocated = 0;
+            }
+
+            private void showNextGroup()
+            {
+                if (++displayLineIndex >= displayLines.Count)
+                    displayLineIndex = 0;
+
+                dgPairs.View?.RefreshFilter();
+                dgTeams.View?.RefreshFilter();
+            }
+        #endregion
+
+        #region OnDatacontextChanged
+            private void ResultsControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+            {
+                UpdateColumnVisibility();
+
+                if (e.NewValue is ControlViewModel vm)
+                    vm.PropertyChanged += ViewModel_PropertyChanged;
+
+                if (e.OldValue is ControlViewModel oldVm)
+                    oldVm.PropertyChanged -= ViewModel_PropertyChanged;
+            }
+
+            private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(ControlViewModel.HideHacGrp) || 
+                    e.PropertyName == nameof(ControlViewModel.ShowAsOneGroup) || 
+                    e.PropertyName == nameof(ControlViewModel.HideTournamentSummery))
+                    UpdateColumnVisibility();
+            }
+
+            private void UpdateColumnVisibility()
+            {
+                if (this.DataContext is ControlViewModel vm)
+                {
+                    // HideHacGrp
+                    var hacGrpColumn = dgPairs.Columns.FirstOrDefault(c => c.MappingName == "HACRankSectionPart");
+
+                    if (hacGrpColumn != null)
+                        hacGrpColumn.IsHidden = vm.HideHacGrp;
+
+                    // HideTournamentSummery
+                    var tournamentColumns = dgPairs.Columns.Where(c =>
+                                                                 c.MappingName == "TournamentRank" ||
+                        c.MappingName == "TournamentResult" ||
+                        c.MappingName == "HACTotal");
+
+                    foreach (var col in tournamentColumns)
+                        col.IsHidden = vm.HideTournamentSummery;
+                }
+            }
+        #endregion
     }
 }

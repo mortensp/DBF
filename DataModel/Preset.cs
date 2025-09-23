@@ -96,10 +96,9 @@ namespace DBF.DataModel
         public int    WarningMinutes    { get; set; }
 
         public double Duration => BreakMinutes
-                                + Rounds * Hours * 60
-                                + Rounds * Minutes 
-                                + Rounds *  Seconds / 60d
-                                + (Rounds - 1) * (BreakMinutes == 0 ? TransitionMinutes : Math.Max(0, TransitionMinutes));
+                                + Rounds * (Hours * 60 + Minutes + Seconds / 60d)
+                                + (BreakAfterRound >0 && BreakAfterRound<Rounds ? Rounds - 2 : Rounds - 1)
+                                * Math.Max(0, TransitionMinutes);
 
         public bool Matches(Preset other)
         {

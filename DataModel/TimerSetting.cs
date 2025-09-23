@@ -43,7 +43,7 @@ namespace DBF.DataModel
                 Sound           = sound;
                 Volume          = volume;
                 BackgroundColor = backgroundColor;
-                ForegroundColor = backgroundColor;
+                ForegroundColor = foregroundColor;
                 Visibility      = visibility;
             }
         #endregion
@@ -71,12 +71,12 @@ namespace DBF.DataModel
             }
         }
 
-        //TODO: kan senere helt fjernes
-        public Color? Color
-        {
-            get=> BackgroundColor;
-            set=> BackgroundColor = value;
-        }
+        ////TODO: kan senere helt fjernes
+        //public Color? Color
+        //{
+        //    get=> BackgroundColor;
+        //    set=> BackgroundColor = value;
+        //}
 
         
         public              GroupFlags Groups     { get; set; }

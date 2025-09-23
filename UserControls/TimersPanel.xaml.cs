@@ -30,8 +30,8 @@ namespace DBF.UserControls
             #region Dependency Property TimersProperty
                 public ObservableCollection<BridgeTimer> Timers
                 {
-                    get => (ObservableCollection<BridgeTimer>)GetValue(TimersProperty);
-                    set => SetValue(TimersProperty, value);
+                    get=> (ObservableCollection<BridgeTimer>)GetValue(TimersProperty);
+                    set=> SetValue(TimersProperty, value);
                 }
 
                 public static readonly DependencyProperty TimersProperty = 
@@ -43,8 +43,8 @@ namespace DBF.UserControls
             #region Dependency Property ButtonsVisibility
                 public Visibility ButtonsVisibility
                 {
-                    get => (Visibility)GetValue(ButtonsVisibilityProperty);
-                    set => SetValue(ButtonsVisibilityProperty, value);
+                    get=> (Visibility)GetValue(ButtonsVisibilityProperty);
+                    set=> SetValue(ButtonsVisibilityProperty, value);
                 }
 
                 public static readonly DependencyProperty ButtonsVisibilityProperty = 
@@ -57,8 +57,8 @@ namespace DBF.UserControls
             #region Dependency Property TimersCanBeAddedProperty
                 public bool TimersCanBeAdded
                 {
-                    get => (bool)GetValue(TimersCanBeAddedProperty);
-                    set => SetValue(TimersCanBeAddedProperty, value);
+                    get=> (bool)GetValue(TimersCanBeAddedProperty);
+                    set=> SetValue(TimersCanBeAddedProperty, value);
                 }
 
                 public static readonly DependencyProperty TimersCanBeAddedProperty = 
@@ -66,11 +66,10 @@ namespace DBF.UserControls
                                                                   , typeof(bool)
                                                                   , typeof(TimersPanel)
                                                                   , new PropertyMetadata(true));
-        #endregion
+            #endregion
         #endregion
 
         private DBF.DataModel.Configuration configuration;
         public DBF.DataModel.Configuration Configuration { get => configuration ?? (configuration = IoC.Get<DBF.DataModel.Configuration>()); private set => configuration = value; }
-
     }
 }

@@ -2,6 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:DBF.Converters"
+    xmlns:local="clr-namespace:DBF"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     xmlns:sfgrid="clr-namespace:Syncfusion.UI.Xaml.Grid;assembly=Syncfusion.SfGrid.WPF"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
@@ -12,6 +13,7 @@
     <conv:FirstPartConverter x:Key="FirstPartConverter" />
     <conv:SecondPartConverter x:Key="SecondPartConverter" />
     <conv:ThirdPartConverter x:Key="ThirdPartConverter" />
+    <conv:FourthPartConverter x:Key="FourthPartConverter" />
     <conv:GroupColorConverter x:Key="GroupColorConverter" />
     <conv:EnumCastConverter x:Key="EnumCastConverter" />
 
@@ -154,32 +156,49 @@
 
     <Style x:Key="captionRowStyle" TargetType="sfgrid:CaptionSummaryRowControl">
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Margin" Value="0,5,0,0" />
-        <!--<Setter Property="Foreground" Value="{Binding Group.Key, Converter={StaticResource GroupColorConverter}}"/>-->
+        <!--<Setter Property="Margin" Value="0,5,0,0" />-->
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="sfgrid:CaptionSummaryRowControl">
+                <ControlTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock
                             Margin="10,0,0,0"
                             FontWeight="Bold"
                             Foreground="Black"
                             Text="{Binding Key, Converter={StaticResource FirstPartConverter}}" />
-
                         <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
-
                         <TextBlock Foreground="Black" Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
-
+                        <TextBlock
+                            FontWeight="Normal"
+                            Foreground="Black"
+                            Text="{Binding Key, Converter={StaticResource FourthPartConverter}}" />
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
+    <Style x:Key="captionRowStyle2" TargetType="sfgrid:CaptionSummaryRowControl">
+        <Setter Property="FontWeight" Value="Bold" />
+        <!--<Setter Property="Margin" Value="0,5,0,0" />-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            FontWeight="Bold"
+                            Foreground="Black"
+                            Text="{Binding Key, Converter={StaticResource FirstPartConverter}}" />
+                        <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
+                        <TextBlock Foreground="Black" Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <DataTemplate x:Key="ColumnSeparatorTemplate">
         <Border BorderBrush="Black" BorderThickness="2,0,2,0" />
     </DataTemplate>
-
-
 </ResourceDictionary>

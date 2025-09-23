@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-			<AssemblyVersion>0.9.9.4</AssemblyVersion>
-		<FileVersion>0.9.9.4</FileVersion>
+		<AssemblyVersion>0.9.9.6</AssemblyVersion>
+		<FileVersion>0.9.9.6</FileVersion>
 
 		<AssemblyTitle>DBF</AssemblyTitle>
 		<AssemblyName>DBF</AssemblyName>
@@ -25,7 +25,6 @@
 		<Guid>8e71374d-fd18-4298-8e6b-816e21df3aa8</Guid>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<PlatformTarget>x86</PlatformTarget>
-
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -59,8 +58,11 @@
 		<Compile Remove="DataModel\PlayingSession.cs" />
 		<Compile Remove="DEVMODE.cs" />
 		<Compile Remove="Helpers\CustomCaptionSummaryCellRenderer.cs" />
+		<Compile Remove="Helpers\CustomGroupCaptionSelector.cs" />
+		<Compile Remove="Helpers\SelectorHelper.cs" />
 		<Compile Remove="Helpers\SfGridBehavior.cs" />
 		<Compile Remove="Shell.cs" />
+		<Compile Remove="TextReplacer.cs" />
 		<Compile Remove="UpdateManager.cs" />
 		<Compile Remove="UserControls\BridgeTimerControl\BridgeTimerControlOld.xaml.cs" />
 		<Compile Remove="ViewModels\ProjectorViewModel.cs" />
@@ -103,16 +105,16 @@
 	
 	<ItemGroup>
 		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 og åbenbart også 8:-) -->
-		<Reference Include="CData.EntityFrameworkCore.Access">
+		<!--<Reference Include="CData.EntityFrameworkCore.Access">
 			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\EFCORE80\CData.EntityFrameworkCore.Access.dll</HintPath>
 		</Reference>
 
 		<Reference Include="System.Data.CData.Access">
 			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\System.Data.CData.Access.dll</HintPath>
-		</Reference>
+		</Reference>-->
 
-		<!--<PackageReference Include="CData.Access" Version="24.0.9175" />
-		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />-->
+		<PackageReference Include="CData.Access" Version="24.0.9175" />
+		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />
 	</ItemGroup>
 
 
@@ -140,17 +142,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="syncfusion.ui.wpf.net" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Shared.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Shared.Base" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Grid.Wpf" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="29.2.7" />
-		<PackageReference Include="Syncfusion.Tools.WPF" Version="29.2.7" />
+		<PackageReference Include="syncfusion.ui.wpf.net" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Shared.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Shared.Base" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Grid.Wpf" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="31.1.19" />
+		<PackageReference Include="Syncfusion.Tools.WPF" Version="31.1.19" />
 	</ItemGroup>
 
 	<ItemGroup>

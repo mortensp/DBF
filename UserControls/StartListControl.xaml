@@ -3,17 +3,22 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:DBF.UserControls"
+    xmlns:help="clr-namespace:DBF.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    xmlns:userctl="clr-namespace:DBF.UserControls"
     d:DesignHeight="450"
     d:DesignWidth="400"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="PairsViewSource" Source="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}" />
+        <CollectionViewSource x:Key="TeamsViewSource" Source="{Binding Teams, UpdateSourceTrigger=PropertyChanged}" />
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -41,12 +46,11 @@
             AlternationCount="2"
             AutoExpandGroups="True"
             AutoGenerateColumns="False"
-            AutoGenerateRelations="False"
             CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
-            ItemsSource="{Binding Teams, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
@@ -54,7 +58,7 @@
                 <syncfusion:GridTextColumn
                     HeaderText="Rk"
                     IsHidden="True"
-                    MappingName="Title" />
+                    MappingName="Group" />
 
                 <syncfusion:GridTextColumn
                     Padding="5,0"
@@ -93,19 +97,20 @@
             </syncfusion:SfDataGrid.Columns>
 
             <syncfusion:SfDataGrid.SortColumnDescriptions>
-                <syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />
+                <syncfusion:SortColumnDescription ColumnName="Group" SortDirection="Ascending" />
                 <syncfusion:SortColumnDescription ColumnName="TeamNo" SortDirection="Ascending" />
             </syncfusion:SfDataGrid.SortColumnDescriptions>
 
-            <syncfusion:SfDataGrid.GroupColumnDescriptions>
-                <syncfusion:GroupColumnDescription ColumnName="Title" SortGroupRecords="True" />
-
-            </syncfusion:SfDataGrid.GroupColumnDescriptions>
+            <!--<syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:GroupColumnDescription ColumnName="Group" />
+                <syncfusion:GroupColumnDescription ColumnName="SubGroup" />
+            </syncfusion:SfDataGrid.GroupColumnDescriptions>-->
         </syncfusion:SfDataGrid>
 
         <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="2"
             Padding="5,0,5,0"
             AllowEditing="False"
+            AllowGrouping="True"
             AllowResizingColumns="True"
             AllowTriStateSorting="False"
             AlternatingRowStyle="{StaticResource alternatingRowStyle}"
@@ -116,19 +121,28 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
-            ItemsSource="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
+            NavigationMode="Row"
             ScrollViewer.CanContentScroll="True"
+            ShowColumnWhenGrouped="True"
+            ShowGroupDropArea="True"
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn
                     HeaderText="Rk"
                     IsHidden="True"
-                    MappingName="Title" />
+                    MappingName="Group" />
 
                 <syncfusion:GridTextColumn
+                    HeaderText="Led"
+                    IsHidden="True"
+                    MappingName="SubGroup" />
+
+                <syncfusion:GridNumericColumn
                     HeaderText="Nr"
                     MappingName="PairNo"
+                    NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
                 <syncfusion:GridTextColumn
@@ -174,26 +188,11 @@
 
             </syncfusion:SfDataGrid.Columns>
 
-            <!--<syncfusion:SfDataGrid.StackedHeaderRows>
-                <syncfusion:StackedHeaderRow>
-                    <syncfusion:StackedHeaderRow.StackedColumns>
-                        <syncfusion:StackedColumn ChildColumns="SectionRank,HACRankSection" HeaderText="Placering" />
-                        <syncfusion:StackedColumn ChildColumns="Result,DeltaHAC,MP" HeaderText="Resultat" />
-                        <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="Turneringen" />
-                    </syncfusion:StackedHeaderRow.StackedColumns>
-                </syncfusion:StackedHeaderRow>
-            </syncfusion:SfDataGrid.StackedHeaderRows>-->
-
             <syncfusion:SfDataGrid.SortColumnDescriptions>
-                <syncfusion:SortColumnDescription ColumnName="Title" SortDirection="Ascending" />
+                <syncfusion:SortColumnDescription ColumnName="Group" SortDirection="Ascending" />
+                <syncfusion:SortColumnDescription ColumnName="SubGroup" SortDirection="Ascending" />
                 <syncfusion:SortColumnDescription ColumnName="PairNo" SortDirection="Ascending" />
             </syncfusion:SfDataGrid.SortColumnDescriptions>
-
-            <syncfusion:SfDataGrid.GroupColumnDescriptions>
-                <syncfusion:GroupColumnDescription ColumnName="Title" SortGroupRecords="True" />
-            </syncfusion:SfDataGrid.GroupColumnDescriptions>
-
         </syncfusion:SfDataGrid>
-
     </Grid>
 </UserControl>

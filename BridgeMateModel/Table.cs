@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DBF.BridgeMateModel
 {
     /// <summary>
-    /// Indeholder en rækker for hver ComputerId og for hvert bord i hver Section og Title
+    /// Indeholder en rækker for hver ComputerId og for hvert bord i hver Section og Group
     /// </summary>
     [PrimaryKey(nameof(ComputerId), nameof(Section), nameof(Group), nameof(TableNo))]
     public partial class Table

@@ -12,7 +12,7 @@
     xmlns:model="clr-namespace:DBF.DataModel"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     Width="500"
-    Height="590"  
+    Height="590"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
@@ -333,24 +333,21 @@
                         Text="Spilletid:" />
 
                     <StackPanel Grid.Column="1" Grid.Row="12"
-                                HorizontalAlignment="Left"
+                        HorizontalAlignment="Left"
                         Orientation="Horizontal">
-                        <TextBlock 
-                            
+                        <TextBlock
                             Margin="0,5"
                             HorizontalAlignment="Left"
                             FontWeight="Bold"
-                            Text="{Binding DataContext.Configuration.StartTime, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            Text="{Binding DataContext.Configuration.StartTime, StringFormat='{}{0:HH:mm}', RelativeSource={RelativeSource AncestorType=Window}}" />
 
-                        <TextBlock 
-                            
+                        <TextBlock
                             Margin="0,5"
                             HorizontalAlignment="Left"
                             FontWeight="Bold"
                             Text=" - " />
-                        
-                        <TextBlock 
-                            
+
+                        <TextBlock
                             Margin="0,5"
                             HorizontalAlignment="Left"
                             FontWeight="Bold"

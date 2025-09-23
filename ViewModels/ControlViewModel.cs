@@ -15,7 +15,9 @@ using DBF.Converters;
 using DBF.DataModel;
 using DBF.UserControls;
 using DBF.Views;
+using PropertyChanged;
 using Syncfusion.Data.Extensions;
+using Syncfusion.DocIO.DLS;
 
 namespace DBF.ViewModels
 {
@@ -28,25 +30,22 @@ namespace DBF.ViewModels
 
     public class ControlViewModel : Screen
     {
-        //static string path = @"C:\BC3\Hjemmeside - Kopi\Resultater_2172\";
-        private readonly IWindowManager windowManager;
-
-        private Club             selectedClub;
-        private UserControl      startListControl = new StartListControl();
-        private UserControl      timersPanel      = new TimersPanel() { ButtonsVisibility = Visibility.Collapsed };
-        private UserControl      resultsControl   = new ResultsControl();
-        private UserControl      currentView;
-        private MainClub         selectedMainClub;
-        private PlayingTime      playingTime;
-        private List<Tournament> tournaments;
-
-        private          JsonSerializerOptions                  JsonOptions    = new JsonSerializerOptions { Converters = { new DecimalCommaConverter() } };
-        private          Encoding                               iso_8859_1     = System.Text.Encoding.GetEncoding("iso-8859-1");
-        private          ObservableCollection<PlayingTime>      spilleDage     = [];
+        private readonly IWindowManager                         windowManager;
+        private          Club                                   selectedClub;
+        private          UserControl                            startListControl = new StartListControl();
+        private          UserControl                            timersPanel      = new TimersPanel() { ButtonsVisibility = Visibility.Collapsed };
+        private          UserControl                            resultsControl   = new ResultsControl();
+        private          UserControl                            currentView;
+        private          MainClub                               selectedMainClub;
+        private          PlayingTime                            playingTime;
+        private          List<Tournament>                       tournaments;
+        private          JsonSerializerOptions                  JsonOptions      = new JsonSerializerOptions { Converters = { new DecimalCommaConverter() } };
+        private          Encoding                               iso_8859_1       = System.Text.Encoding.GetEncoding("iso-8859-1");
+        private          ObservableCollection<PlayingTime>      spilleDage       = [];
         private          FileSystemWatcher                      watcher;
+        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent    = new();
         private          int                                    sectionNo;
-        private          bool                                   showAsOneGroup = true;
-        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent  = new();
+        private          bool                                   showAsOneGroup   = true;
 
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
@@ -63,19 +62,14 @@ namespace DBF.ViewModels
                 watcher.Changed+= folderUpdated;
                 watcher.Created+= folderUpdated;
 
+                Pairs.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Pairs);
+                Teams.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Teams);
+
                 LoadMainClubs();
             }
         #endregion
 
         #region Public Properties
-            //public TimeOnly EndTime
-            //{
-            //    get
-            //    {
-            //        return Configuration.EndTime;
-            //    }
-            //}
-
             public UserControl CurrentView
             {
                 get=> currentView ?? (currentView = timersPanel);
@@ -190,6 +184,7 @@ namespace DBF.ViewModels
             }
 
             public bool                           HideTournamentSummery    { get; set; } = false;
+            public bool                           HideHacGrp               { get; set; } = true;
             public DateTime                       Date                     { get; set; }
             public List<GroupSection>             GroupSections            { get; set; }
             public BindableCollection<Pair>       Pairs                    { get; set; } = [];
@@ -206,43 +201,15 @@ namespace DBF.ViewModels
                         if (value == true)
                             foreach (var pair in Pairs)
                             {
-                                pair.SubGroup  = null;
+                                pair.SubGroup  = "";
                                 pair.Placering = pair.SectionRank;
                             }
                         else
-                            for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
-                            {
-                                var grp = GroupSections[grpNo];
-
-                                if (grp.Tournament.TournamentType.Text == "Parturnering"
-                                &&  grp.Resultlist                     is not null)
-                                {
-                                    var InterwovenHowell = grp.Tournament.MovementPlanType == "1"; // Indvævet Howell
-                                    var howellCount      = grp.Resultlist.Pairs.Count / 2;
-                                    var rankA            = 1;
-                                    var rankB            = 1;
-
-                                    foreach (var pair in Pairs.OrderBy(p => p.SectionRank))
-                                    {
-                                        pair.Placering = pair.PairNo <= howellCount ? rankA++ : rankB++;
-
-                                        if (InterwovenHowell)
-                                            pair.SubGroup = pair.PairNo <= howellCount ? "1. halvdel" : "2. halvdel";
-                                        else
-                                            pair.SubGroup = null;
-                                    }
-                                }
-                            }
-
-                    if (Pairs.Count >  0)
-                        Pairs = new BindableCollection<Pair>(Pairs.OrderBy(p => p.Placering));
-
-                    //Pairs.NotifyOfPropertyChange(nameof(Pairs.Count));
+                            initSubgroups();
                 }
             }
 
             public Visibility                     ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
-            public bool                           HacGrpHidden             { get; set; } = true;
         #endregion
 
         #region Public Methods
@@ -355,22 +322,24 @@ namespace DBF.ViewModels
             /// <summary>
             /// Henter XML data for den valgte Spille dag og klokkeslet
             /// </summary>
-            private void FetchPlayingTime()
+            private void FetchPlayingTime(bool newSession = true)
             {
-                // XML lookup
-                ShowAsOneGroup           = true;
-                HacGrpHidden             = true;
-                ShowAsOneGroupVisibility = Visibility.Collapsed;
-                ErrorMessage             = "";
+                ShowAsOneGroup                 = true;
+                HideHacGrp                     = true;
+                ShowAsOneGroupVisibility       = Visibility.Collapsed;
+                ErrorMessage                   = "";
+                BindableCollection<Pair> pairs = [];
+                BindableCollection<Team> teams = [];
                 Pairs.Clear();
                 Teams.Clear();
                 bool InterWovenHowell = false;
+                bool Mitchell         = false;
                 bool RoundCompleted   = true;
 
                 try
                 {
-                    Configuration.StartTime = TimeOnly.FromDateTime(playingTime.Date);                                     
-                tournaments = getTournaments(playingTime);
+                    Configuration.StartTime = playingTime.Date;
+                    tournaments             = getTournaments(playingTime);
 
                     if (tournaments.Count == 0)
                         return;
@@ -390,46 +359,41 @@ namespace DBF.ViewModels
                         {
                             if (grp.Resultlist is not null)
                             {
-                                if (!InterWovenHowell)
-                                    InterWovenHowell = grp.Tournament.MovementPlanType == MovementPlans.InterWovenHowell;
+                                InterWovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
+                                Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
 
                                 foreach (var pair in grp.Resultlist.Pairs)
                                 {
-                                    pair.Placering = pair.Rank;
-
-                                    if (grp.Tournament.MovementPlanType == MovementPlans.Mitchell)
-                                        pair.SubGroup = pair.Direction == "2" ? "ØV" : "NS";
-
-                                    pair.Title = grp.Tournament.Title;
-                                    Pairs.Add(pair.DeepCopy());
+                                    pair.Group = grp.Tournament.Title;
+                                    pairs.Add(pair);
                                 }
 
-                                if (grp.Tournament.MovementPlanType == MovementPlans.Mitchell)
+                                if (Mitchell)
                                 {
-                                    HacGrpHidden = false;
-                                    var hacGrp   = 1;
+                                    HideHacGrp = false;
+                                    var hacGrp = 1;
 
-                                    foreach (var pair in Pairs.Where(p => p.Direction == "1").OrderBy(p => p.HACRankSection))
+                                    foreach (var pair in pairs.Where(p => p.Direction == "1").OrderBy(p => p.HACRankSection))
                                         pair.HACRankSectionPart = hacGrp++;
 
                                     hacGrp = 1;
 
-                                    foreach (var pair in Pairs.Where(p => p.Direction == "2").OrderBy(p => p.HACRankSection))
+                                    foreach (var pair in pairs.Where(p => p.Direction == "2").OrderBy(p => p.HACRankSection))
                                         pair.HACRankSectionPart = hacGrp++;
                                 }
                                 else
                                     if (InterWovenHowell)
                                     {
-                                        HacGrpHidden = false;
-                                        var hacGrp   = 1;
-                                        var grpSize  = Pairs.Count >> 1;
+                                        HideHacGrp       = false;
+                                        var subGroupSize = pairs.Count >> 1;
+                                        var hacGrp       = 1;
 
-                                        foreach (var pair in Pairs.Take(grpSize).OrderBy(p => p.HACRankSection))
+                                        foreach (var pair in pairs.Take(subGroupSize).OrderBy(p => p.HACRankSection))
                                         pair.HACRankSectionPart = hacGrp++;
 
                                         hacGrp = 1;
 
-                                        foreach (var pair in Pairs.Skip(grpSize).OrderBy(p => p.HACRankSection))
+                                        foreach (var pair in pairs.Skip(subGroupSize).OrderBy(p => p.HACRankSection))
                                         pair.HACRankSectionPart = hacGrp++;
                                     }
                             }
@@ -437,12 +401,12 @@ namespace DBF.ViewModels
                             if (grp.Startlist is not null)
                                 foreach (var pair in grp.Startlist.Pairs)
                                 {
-                                    var res = Pairs.FirstOrDefault(p => p.Title == grp.Tournament.Title && p.PairNo == pair.PairNo);
+                                    var res = pairs.FirstOrDefault(p => p.Group == grp.Tournament.Title && p.PairNo == pair.PairNo);
 
                                     if (res is null)
                                     {
-                                        pair.Title = grp.Tournament.Title;
-                                        Pairs.Add(pair.DeepCopy());
+                                        pair.Group = grp.Tournament.Title;
+                                        pairs.Add(pair);
                                     }
                                     else
                                         res.StartPos = pair.StartPos;
@@ -453,23 +417,20 @@ namespace DBF.ViewModels
                                 ShowAsOneGroup           = false;
                                 ShowAsOneGroupVisibility = Visibility.Visible;
                             }
-                            else
-                                if (Pairs.Count >  0)
-                                    Pairs = new BindableCollection<Pair>(Pairs.OrderBy(p => p.Placering));
                         }
                         else
                         {
                             foreach (var team in grp.Rounds[0].Startlist.Teams)
                             {
-                                team.Title = grp.Tournament.Title;
-                                Teams.Add(team);
+                                team.Group = grp.Tournament.Title;
+                                teams.Add(team);
                             }
 
-                            // Merge the four lists
+                            // Merge the four lists, ie. start, results, HAC and Butler
                             var rnd = grp.Rounds[^1];
 
                             if (rnd is not null && rnd.RoundCompleted)
-                                foreach (var team in Teams.Where(t => t.Title == grp.Tournament.Title))
+                                foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title))
                                 {
                                     var sta = rnd.Startlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
 
@@ -490,6 +451,7 @@ namespace DBF.ViewModels
                             else
                                 ErrorMessage = "Den aktuelle sektion er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!!";
 
+                            // Add KP from earlier sections
                             foreach (var sectionFile in tournaments[grpNo].SectionFiles.Where(f => f.No <  grp.SectionNo))
                             {
                                 var earlierSection = getGroupSection(sectionFile.FileName, grp.Tournament);
@@ -497,7 +459,7 @@ namespace DBF.ViewModels
                                 rnd = earlierSection?.Rounds[^1];
 
                                 if (rnd is not null && rnd.RoundCompleted)
-                                    foreach (var team in Teams.Where(t => t.Title == grp.Tournament.Title))
+                                    foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title))
                                     {
                                         var res = rnd.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
 
@@ -508,40 +470,43 @@ namespace DBF.ViewModels
                                     ErrorMessage = $"Runden d. {earlierSection.DateStr} er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
                             }
 
-                            // Sort teams by TotalKP
+                            // Setup TournamentRank Rank by Total KP
                             var totalRank = 1;
 
-                            foreach (var team in Teams.Where(t => t.Title == grp.Tournament.Title).OrderByDescending(t => t.TotalKP))
+                            foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title).OrderByDescending(t => t.TotalKP))
                                 team.TournamentRank = totalRank++;
                         }
-
-                        if (Teams.Count >  0)
-                            Teams = new BindableCollection<Team>(Teams.OrderBy(t => t.TournamentRank));
                     }
-                }
 
+                    var i = 0;
+
+                    initSubgroups();
+
+                    foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
+                        pair.EntryNo = i++;
+
+                    foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
+                        team.EntryNo = i++;
+                }
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-
-                    Pairs.Clear();
-                    Teams.Clear();
                 }
 
                 finally
                 {
-                    NotifyOfPropertyChange(nameof(Pairs));
-                    NotifyOfPropertyChange(nameof(Teams));
+                    Pairs = pairs;
+                    Teams = teams;
                 }
 
 #if DEBUG
                 // BridgeMate lookup
-                if (string.IsNullOrEmpty(ErrorMessage)
-                    //&& !RoundCompleted  //TODO: Test skal med igen
-                    )
-                    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
-                else
-                    BridgeMate.Close();
+                if (newSession)
+                    if (string.IsNullOrEmpty(ErrorMessage)
+                    && !RoundCompleted)
+                        BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
+                    else
+                        BridgeMate.Close();
 #endif
                 // Restore Taskbar Icon.
                 //Execute.OnUIThread(() =>
@@ -550,275 +515,316 @@ namespace DBF.ViewModels
                 //                   });
             }
 
-            private MainClub loadMainClub(int no)
-            {
-                var path     = Configuration.HomepagePath + @$"Resultater_{no}\";
-                var filename = path + @"Main.xml";
-
-                try
+            #region Load and Reload MainClub
+                private MainClub loadMainClub(int no)
                 {
-                    var mainclub = deserialize<MainClub>(filename);
+                    var path     = Configuration.HomepagePath + @$"Resultater_{no}\";
+                    var filename = path + @"Main.xml";
 
-                    if (mainclub.Clubs is null)
+                    try
                     {
-                        System.Threading.Thread.Sleep(1000);
-                        mainclub = deserialize<MainClub>(filename);
+                        var mainclub = deserialize<MainClub>(filename);
+
+                        if (mainclub.Clubs is null)
+                        {
+                            System.Threading.Thread.Sleep(1000);
+                            mainclub = deserialize<MainClub>(filename);
+                        }
+
+                        if (mainclub.Clubs is null)
+                        {
+                            ErrorMessage = $"Fejl ved læsning af Main.xml";
+                            return null;
+                        }
+
+                        mainclub.Path = path;
+                        mainclub.No   = no;
+
+                        return mainclub;
                     }
 
-                    if (mainclub.Clubs is null)
+                    catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
                         return null;
                     }
-
-                    mainclub.Path = path;
-                    mainclub.No   = no;
-
-                    return mainclub;
                 }
 
-                catch (Exception)
+                private void reloadMain()
                 {
-                    ErrorMessage = $"Fejl ved læsning af Main.xml";
-                    return null;
-                }
-            }
-
-            private void reloadMain()
-            {
-                try
-                {
-                    if (SelectedMainClub is not null)
+                    try
                     {
-                        var main = loadMainClub(SelectedMainClub.No);
+                        if (SelectedMainClub is not null)
+                        {
+                            var main = loadMainClub(SelectedMainClub.No);
 
-                        if (main?.Clubs is not null)
-                            foreach (var clubNew in main.Clubs)
-                            {
-                                var clubOld = Clubs.FirstOrDefault(c => c.Id == clubNew.Id);
+                            if (main?.Clubs is not null)
+                                foreach (var clubNew in main.Clubs)
+                                {
+                                    var clubOld = Clubs.FirstOrDefault(c => c.Id == clubNew.Id);
 
-                                if (clubOld is null)
-                                    for (var i = 0; i <  Clubs.Count; i++)
-                                    {
-                                        if (string.Compare(Clubs[i].Name, clubNew.Name, StringComparison.CurrentCulture) <= 0)
+                                    if (clubOld is null)
+                                        for (var i = 0; i <  Clubs.Count; i++)
                                         {
-                                            Execute.OnUIThread(() => Clubs.Insert(i, clubNew));
-                                            break;
+                                            if (string.Compare(Clubs[i].Name, clubNew.Name, StringComparison.CurrentCulture) <= 0)
+                                            {
+                                                Execute.OnUIThread(() => Clubs.Insert(i, clubNew));
+                                                break;
+                                            }
+                                        }
+                                    else
+                                    //if (clubNew.Id == clubOld.Id)
+                                    {
+                                        // Update PlayingTimes for existing club
+                                        var playingTimesNew = (SelectedClub is null
+                                                             ? main.Clubs.SelectMany(club => club.MainTournaments)
+                                                             : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
+                                                                          .SelectMany(mt => mt.PlayingTime);
+
+                                        foreach (var playingTimeNew in playingTimesNew)
+                                        {
+                                            var playingTimeOld = PlayingTimes.FirstOrDefault(pt => pt.Date == playingTimeNew.Date);
+
+                                            if (playingTimeOld is null)
+                                                for (var i = 0; i <  PlayingTimes.Count; i++)
+                                                {
+                                                    if (PlayingTimes[i].Date <  playingTimeNew.Date)
+                                                    {
+                                                        Execute.OnUIThread(() => PlayingTimes.Insert(i, playingTimeNew));
+                                                        break;
+                                                    }
+                                                }
+                                            else
+                                                if (playingTimeOld.Date == playingTimeNew.Date)
+                                                {
+                                                    foreach (var fileNew in playingTimeNew.TournamentFiles)
+                                                    {
+                                                        var fileOld = playingTimeOld.TournamentFiles.FirstOrDefault(o => o.FileName == fileNew.FileName);
+
+                                                        if (fileOld is null)
+                                                        {
+                                                            foreach (var file in playingTimeOld.TournamentFiles)
+                                                            watcher.Filters.Remove(file.FileName);
+
+                                                            Execute.OnUIThread(() => playingTimeOld.TournamentFiles = playingTimeNew.TournamentFiles);
+                                                            SelectedPlayingTime = null;
+                                                            SelectedPlayingTime = playingTimeOld;
+                                                            return;
+                                                        }
+                                                        else
+                                                            // Update existing tournament fileNew                                             
+                                                            fileOld.Merge(fileNew);
+                                                    }
+
+                                                //if (updatedFile)
+                                                //{
+                                                //    SelectedPlayingTime = null;
+                                                //    SelectedPlayingTime = playingTimeOld;
+                                                //}
+                                                }
                                         }
                                     }
-                                else
-                                //if (clubNew.Id == clubOld.Id)
-                                {
-                                    // Update PlayingTimes for existing club
-                                    var playingTimesNew = (SelectedClub is null
-                                                         ? main.Clubs.SelectMany(club => club.MainTournaments)
-                                                         : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                      .SelectMany(mt => mt.PlayingTime);
-
-                                    foreach (var playingTimeNew in playingTimesNew)
-                                    {
-                                        var playingTimeOld = PlayingTimes.FirstOrDefault(pt => pt.Date == playingTimeNew.Date);
-
-                                        if (playingTimeOld is null)
-                                            for (var i = 0; i <  PlayingTimes.Count; i++)
-                                            {
-                                                if (PlayingTimes[i].Date <  playingTimeNew.Date)
-                                                {
-                                                    Execute.OnUIThread(() => PlayingTimes.Insert(i, playingTimeNew));
-                                                    break;
-                                                }
-                                            }
-                                        else
-                                            if (playingTimeOld.Date == playingTimeNew.Date)
-                                            {
-                                                //var updatedFile = false;
-                                                //var date        = new DateTime(2025, 04, 30, 18, 45, 0);
-                                                //var oldDate     = playingTimeOld.Date;
-
-                                                //if (oldDate == date)
-                                                //    Debugger.Break();
-                                                foreach (var fileNew in playingTimeNew.TournamentFiles)
-                                                {
-                                                    var fileOld = playingTimeOld.TournamentFiles.FirstOrDefault(o => o.FileName == fileNew.FileName);
-
-                                                    if (fileOld is null)
-                                                    {
-                                                        foreach (var file in playingTimeOld.TournamentFiles)
-                                                        watcher.Filters.Remove(file.FileName);
-
-                                                        Execute.OnUIThread(() => playingTimeOld.TournamentFiles = playingTimeNew.TournamentFiles);
-                                                        SelectedPlayingTime = null;
-                                                        SelectedPlayingTime = playingTimeOld;
-                                                        return;
-                                                    }
-                                                    else
-                                                        // Update existing tournament fileNew                                             
-                                                        fileOld.Merge(fileNew);
-                                                }
-
-                                            //if (updatedFile)
-                                            //{
-                                            //    SelectedPlayingTime = null;
-                                            //    SelectedPlayingTime = playingTimeOld;
-                                            //}
-                                            }
-                                    }
                                 }
-                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ErrorMessage = "Fejl ved læsning af Main.xml";
                     }
                 }
-                catch (Exception)
+            #endregion
+
+            private void initSubgroups()
+            {
+                for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
                 {
-                    ErrorMessage = "Fejl ved læsning af Main.xml";
+                    var grp = GroupSections[grpNo];
+
+                    if (grp.Tournament.TournamentType.Text == "Parturnering"
+                    &&  grp.Resultlist                     is not null)
+                    {
+                        var InterwovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
+                        var Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
+                        var subGroupSize     = grp.Resultlist.Pairs.Count >> 1;
+                        var rankA            = 1;
+                        var rankB            = 1;
+
+                        foreach (var pair in Pairs.OrderBy(p => p.SectionRank))
+                        {
+                            pair.Placering = pair.Rank;
+                            pair.Group     = grp.Tournament.Title;
+
+                            if (InterwovenHowell)
+                            {
+                                pair.SubGroup  = pair.PairNo <= subGroupSize ? "1. halvdel" : "2. halvdel";
+                                pair.Placering = pair.PairNo <= subGroupSize ? rankA++ : rankB++;
+                            }
+                            else
+                                if (Mitchell)
+                                {
+                                    pair.SubGroup  = pair.Direction == "2" ? "ØV" : "NS";
+                                    pair.Placering = pair.Rank;
+                                }
+                                else
+                                {
+                                    pair.SubGroup  = "";
+                                    pair.Placering = pair.Rank;
+                                }
+                        }
+                    }
                 }
             }
 
-            private List<Tournament> getTournaments(PlayingTime pt)
-            {
-                foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("MT")).ToList())
-                    watcher.Filters.Remove(pathName);
+            #region Get XML data
+                private List<Tournament> getTournaments(PlayingTime pt)
+                {
+                    foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("MT")).ToList())
+                        watcher.Filters.Remove(pathName);
 
-                List<Tournament> tournaments = new();
+                    List<Tournament> tournaments = new();
 
-                if (pt is null || pt.TournamentFiles is null)
-                    ErrorMessage = $"Data for er ikke sendt til hjemmesiden";
-                else
-                    foreach (var tournamentFile in pt.TournamentFiles)
-                    {
-                        var path       = SelectedMainClub.Path + tournamentFile.FileName;
-                        var tournament = deserialize<Tournament>(path);
-
-                        watcher.Filters.Add(tournamentFile.FileName);
-
-                        if (tournament is null)
-                            if (string.IsNullOrEmpty(ErrorMessage))
-                                ErrorMessage = $"Data for '{tournamentFile.GroupName}' er ikke sendt til hjemmesiden";
-                            else
-                                ErrorMessage = $"Data er ikke sendt til hjemmesiden";
-                        else
+                    if (pt is null || pt.TournamentFiles is null)
+                        ErrorMessage = $"Data for er ikke sendt til hjemmesiden";
+                    else
+                        foreach (var tournamentFile in pt.TournamentFiles)
                         {
-                            tournament.SectionNo = tournamentFile.Section?.SectionNo ?? 1;
-                            tournaments.Add(tournament);
+                            var path       = SelectedMainClub.Path + tournamentFile.FileName;
+                            var tournament = deserialize<Tournament>(path);
+
+                            watcher.Filters.Add(tournamentFile.FileName);
+
+                            if (tournament is null)
+                                if (string.IsNullOrEmpty(ErrorMessage))
+                                    ErrorMessage = $"Data for '{tournamentFile.GroupName}' er ikke sendt til hjemmesiden";
+                                else
+                                    ErrorMessage = $"Data er ikke sendt til hjemmesiden";
+                            else
+                            {
+                                tournament.SectionNo = tournamentFile.Section?.SectionNo ?? 1;
+                                tournaments.Add(tournament);
+                            }
+                        }
+
+                    return tournaments;
+                }
+
+                private List<GroupSection> getGroupSections(PlayingTime pt, List<Tournament> tournaments)
+                {
+                    List<GroupSection> sections = new();
+                    SectionNo                   = 1;
+
+                    foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("GT")).ToList())
+                        watcher.Filters.Remove(pathName);
+
+                    foreach (var tur in tournaments)
+                    {
+                        var path    = SelectedMainClub.Path + tur.SectionFile.FileName;
+                        var section = deserialize<GroupSection>(path);
+
+                        watcher.Filters.Add(tur.SectionFile.FileName);
+
+                        if (section != null)
+                        {
+                            section.Tournament = tur;
+                            sections.Add(section);
+
+                            if (tur.SectionNo >  SectionNo)
+                                SectionNo = tur.SectionNo;
                         }
                     }
 
-                return tournaments;
-            }
+                    return sections;
+                }
 
-            private List<GroupSection> getGroupSections(PlayingTime pt, List<Tournament> tournaments)
-            {
-                List<GroupSection> sections = new();
-                SectionNo                   = 1;
-
-                foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("GT")).ToList())
-                    watcher.Filters.Remove(pathName);
-
-                foreach (var tur in tournaments)
+                private GroupSection getGroupSection(String fileName, Tournament tournament)
                 {
-                    var path    = SelectedMainClub.Path + tur.SectionFile.FileName;
+                    var path    = SelectedMainClub.Path + fileName;
                     var section = deserialize<GroupSection>(path);
 
-                    watcher.Filters.Add(tur.SectionFile.FileName);
+                    watcher.Filters.Add(fileName);
 
                     if (section != null)
-                    {
-                        section.Tournament = tur;
-                        sections.Add(section);
+                        section.Tournament = tournament;
 
-                        if (tur.SectionNo >  SectionNo)
-                            SectionNo = tur.SectionNo;
+                    return section;
+                }
+
+                private T deserialize<T>(string fullPath) where T : new()
+
+                {
+                    try
+                    {
+                        if (!File.Exists(fullPath))
+                            return default;
+
+                        if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
+                        {
+                            string json = File.ReadAllText(fullPath, iso_8859_1);
+                            return JsonSerializer.Deserialize<T>(json, JsonOptions);
+                        }
+                        else // XML
+                        {
+                            // Hvis filen ikke findes, returner null
+                            string xml = File.ReadAllText(fullPath, iso_8859_1);
+
+                            // Erstat Fjern tag værdier, som kun består af blanke og - tegn
+                            xml = Regex.Replace(xml, @">(-|\s)+<", "><");
+
+                            // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
+                            xml = System.Text.RegularExpressions.Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
+
+                            // Remove empty tags
+                            xml = Regex.Replace(                     xml,       @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
+                            xml = Regex.Replace(                     xml,       @"<\w+\s*(/>|/>\s*</\1*s>)",  string.Empty); //<TagName/>
+
+                            var       serializer = new XmlSerializer(typeof(T));
+                            using var reader     = new StringReader( xml);
+                            return (T)serializer.Deserialize(        reader);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                        return new T();
                     }
                 }
+            #endregion
 
-                return sections;
-            }
-
-            private GroupSection getGroupSection(String fileName, Tournament tournament)
-            {
-                var path    = SelectedMainClub.Path + fileName;
-                var section = deserialize<GroupSection>(path);
-
-                watcher.Filters.Add(fileName);
-
-                if (section != null)
-                    section.Tournament = tournament;
-
-                return section;
-            }
-
-            private void folderUpdated(object sender, FileSystemEventArgs e)
-            {
-                // Debounce: Ignorer events for samme fil inden for 500 ms
-                try
+            #region Look for Folder or file updates
+                private void folderUpdated(object sender, FileSystemEventArgs e)
                 {
-                    var now = DateTime.UtcNow;
-
-                    if (lastFileEvent.TryGetValue(e.FullPath, out DateTime last))
-                        if ((now - last).TotalMilliseconds <  500)
-                            return; // Ignorer duplikat
-                        else
-                            lastFileEvent[e.FullPath] = now;
-                    else
-                        lastFileEvent.TryAdd(e.FullPath, now);
-
-                    if (e.ChangeType == WatcherChangeTypes.Changed)
-                        //Debug.WriteLine($"File changed: {e.Name}");
-                        if (e.Name == "Main.XML")
-                            reloadMain();
-                        else
-                            FetchPlayingTime();
-                    else
-                        if (e.ChangeType == WatcherChangeTypes.Created)
-                            Debug.WriteLine($"File created: {e.Name}");
-                        else
-                            Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
-                }
-
-                catch (Exception)
-                {
-                    ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-                }
-            }
-
-            private T deserialize<T>(string fullPath) where T : new()
-
-            {
-                try
-                {
-                    if (!File.Exists(fullPath))
-                        return default;
-
-                    if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
+                    // Debounce: Ignorer events for samme fil inden for 500 ms
+                    try
                     {
-                        string json = File.ReadAllText(fullPath, iso_8859_1);
-                        return JsonSerializer.Deserialize<T>(json, JsonOptions);
+                        var now = DateTime.UtcNow;
+
+                        if (lastFileEvent.TryGetValue(e.FullPath, out DateTime last))
+                            if ((now - last).TotalMilliseconds <  500)
+                                return; // Ignorer duplikat
+                            else
+                                lastFileEvent[e.FullPath] = now;
+                        else
+                            lastFileEvent.TryAdd(e.FullPath, now);
+
+                        if (e.ChangeType == WatcherChangeTypes.Changed)
+                            //Debug.WriteLine($"File changed: {e.Name}");
+                            if (e.Name == "Main.XML")
+                                reloadMain();
+                            else
+                                FetchPlayingTime(false);
+                        else
+                            if (e.ChangeType == WatcherChangeTypes.Created)
+                                Debug.WriteLine($"File created: {e.Name}");
+                            else
+                                Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
-                    else // XML
+
+                    catch (Exception)
                     {
-                        // Hvis filen ikke findes, returner null
-                        string xml = File.ReadAllText(fullPath, iso_8859_1);
-
-                        // Erstat Fjern tag værdier, som kun består af blanke og - tegn
-                        xml = Regex.Replace(xml, @">(-|\s)+<", "><");
-
-                        // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
-                        xml = System.Text.RegularExpressions.Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
-
-                        // Remove empty tags
-                        xml = Regex.Replace(                     xml,       @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
-                        xml = Regex.Replace(                     xml,       @"<\w+\s*(/>|/>\s*</\1*s>)",  string.Empty); //<TagName/>
-
-                        var       serializer = new XmlSerializer(typeof(T));
-                        using var reader     = new StringReader( xml);
-                        return (T)serializer.Deserialize(        reader);
+                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
                     }
                 }
-                catch (Exception)
-                {
-                    ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-                    return new T();
-                }
-            }
+            #endregion
 
             private async Task ShowProjector()
             {

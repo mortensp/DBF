@@ -87,6 +87,12 @@ namespace DBF.DataModel
             }
         }
 
-        public string Title     => $"{Group} - {GroupName}:  {TournamentType.Text}";
+        public string Title
+        {
+            get
+            {
+                return $"{Group} - {GroupName}:  {TournamentType.Text} ({MovementPlan})";
+            }
+        }
     }
 }

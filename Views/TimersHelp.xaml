@@ -8,10 +8,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <Grid>
-            <Image Name="helpImage" Stretch="Uniform" Height="1400"/>
+            <Image Name="helpImage"
+                Height="1400"
+                Stretch="Uniform" />
         </Grid>
     </ScrollViewer>
 </Window>
-    

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Syncfusion.Data.Extensions;
 using Syncfusion.XlsIO.Parser.Biff_Records;
 
@@ -15,43 +16,42 @@ namespace DBF.BridgeMateModel
     public partial class BridgeMateContext : DbContext
     {
         #region Constructors
-        
-        public string DatabaseName { get; private set; } = "F:\\2172\\BMDB_Section_1245.bws";
-        public BridgeMateContext()
-        {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        }
+            public         string                     DatabaseName         { get; private set; } = "F:\\2172\\BMDB_Section_1245.bws";
+            public BridgeMateContext()
+            {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            }
 
-        //public BridgeMateContext(DbContextOptions<BridgeMateContext> options)
-        //    : base(options)
-        //{
-        //}
-
-        public BridgeMateContext(string DbIdentifier) 
-        {
-            DatabaseName = DbIdentifier;
-        }
+            //public BridgeMateContext(DbContextOptions<BridgeMateContext> options)
+            //    : base(options)
+            //{
+            //}
+            public BridgeMateContext(string DbIdentifier)
+            {
+                DatabaseName = DbIdentifier;
+            }
         #endregion
-        public virtual DbSet<BiddingData> BiddingData { get; set; }
-        public virtual DbSet<Client> Clients { get; set; }
-        public virtual DbSet<HandEvaluation> HandEvaluations { get; set; }
-        public virtual DbSet<HandRecord> HandRecords { get; set; }
-        public virtual DbSet<IntermediateData> IntermediateData { get; set; }
+
+        public virtual DbSet<BiddingData>         BiddingData          { get; set; }
+        public virtual DbSet<Client>              Clients              { get; set; }
+        public virtual DbSet<HandEvaluation>      HandEvaluations      { get; set; }
+        public virtual DbSet<HandRecord>          HandRecords          { get; set; }
+        public virtual DbSet<IntermediateData>    IntermediateData     { get; set; }
         //public virtual DbSet<LastEntryId>         LastEntryIds         { get; set; }
-        public virtual DbSet<PlayData> PlayData { get; set; }
-        public virtual DbSet<PlayerName> PlayerNames { get; set; }
-        public virtual DbSet<PlayerNumber> PlayerNumbers { get; set; }
-        public virtual DbSet<ReceivedDataCount> ReceivedDataCounts { get; set; }
+        public virtual DbSet<PlayData>            PlayData             { get; set; }
+        public virtual DbSet<PlayerName>          PlayerNames          { get; set; }
+        public virtual DbSet<PlayerNumber>        PlayerNumbers        { get; set; }
+        public virtual DbSet<ReceivedDataCount>   ReceivedDataCounts   { get; set; }
         public virtual DbSet<ReceivedDataGrouped> ReceivedDataGroupeds { get; set; }
-        public virtual DbSet<ReceivedData> ReceivedData { get; set; }
+        public virtual DbSet<ReceivedData>        ReceivedData         { get; set; }
         //public virtual DbSet<ResultCountBoard>    ResultCountBoards    { get; set; }
         //public virtual DbSet<ResultCountRound>    ResultCountRounds    { get; set; }
-        public virtual DbSet<RoundData> RoundData { get; set; }
-        public virtual DbSet<ScoreUpload> ScoreUploads { get; set; }
-        public virtual DbSet<Section> Sections { get; set; }
-        public virtual DbSet<Session> Sessions { get; set; }
-        public virtual DbSet<Setting> Settings { get; set; }
-        public virtual DbSet<Table> Tables { get; set; }
+        public virtual DbSet<RoundData>           RoundData            { get; set; }
+        public virtual DbSet<ScoreUpload>         ScoreUploads         { get; set; }
+        public virtual DbSet<Section>             Sections             { get; set; }
+        public virtual DbSet<Session>             Sessions             { get; set; }
+        public virtual DbSet<Setting>             Settings             { get; set; }
+        public virtual DbSet<Table>               Tables               { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -59,11 +59,14 @@ namespace DBF.BridgeMateModel
                 optionsBuilder.UseAccess($"DataSource={DatabaseName};Readonly=True;charset=Windows-1252;");
 
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            //
+            //optionsBuilder.LogTo(message => Debug.WriteLine(message), LogLevel.Information);
+            //optionsBuilder.EnableSensitiveDataLogging();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-                        base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);
             modelBuilder.UseCollation("Danish_Norwegian_CI_AS");
 
             modelBuilder.Entity<BiddingData>(entity =>
@@ -207,7 +210,7 @@ namespace DBF.BridgeMateModel
                                                 //.ValueGeneratedNever()
                                                 //.HasColumnName("ID");
                                                 entity.ToTable("PlayerNames", "Access");
-                                                entity.HasIndex(e => e.Id, "IDIndex");
+                                                entity.HasIndex(e => e.Id,    "IDIndex");
                                                 entity.HasIndex(e => e.StrId, "strIDIndex");
                                             });
 
@@ -423,13 +426,13 @@ namespace DBF.BridgeMateModel
 
             foreach (var prop in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (prop.PropertyType.IsGenericType &&
+                if (prop.PropertyType.IsGenericType && 
                     prop.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
                 {
                     var tableName = prop.Name;
 
                     if (table is not null
-                    && table != tableName)
+                    &&  table != tableName)
                         continue;
 
                     var dbSet = prop.GetValue(this);
@@ -456,8 +459,8 @@ namespace DBF.BridgeMateModel
 
             Directory.CreateDirectory(folderPath);
 
-            string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
-            using var connection = new OleDbConnection(connectionString);
+            string       connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
+            using var    connection       = new OleDbConnection(connectionString);
             connection.Open();
 
             DataTable tables = connection.GetSchema("Tables");
@@ -469,17 +472,18 @@ namespace DBF.BridgeMateModel
                 if (tableType == "TABLE")
                 {
                     string tableName = row["TABLE_NAME"]?.ToString();
-                    var items = new List<Dictionary<string, object>>();
+                    var    items     = new List<Dictionary<string, object>>();
 
                     using var command = new OleDbCommand($"SELECT * FROM [{tableName}]", connection);
-                    using var reader = command.ExecuteReader();
+                    using var reader  = command.ExecuteReader();
+
                     while (reader.Read())
                     {
                         var dict = new Dictionary<string, object>();
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
+
+                        for (int i = 0; i <  reader.FieldCount; i++)
                             dict[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader.GetValue(i);
-                        }
+
                         items.Add(dict);
                     }
 
@@ -491,27 +495,29 @@ namespace DBF.BridgeMateModel
 
         public void ReadSchema(string tableName)
         {
-            string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
-            using var connection = new OleDbConnection(connectionString);
+            string       connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
+            using var    connection       = new OleDbConnection(connectionString);
             connection.Open();
 
-            DataTable schemaTable;
-            using var command = new OleDbCommand($"SELECT * FROM {tableName}", connection);
-            using var reader = command.ExecuteReader();
-            schemaTable = reader.GetSchemaTable();
+            DataTable       schemaTable;
+            using var       command = new OleDbCommand($"SELECT * FROM {tableName}", connection);
+            using var       reader  = command.ExecuteReader();
+            schemaTable             = reader.GetSchemaTable();
             Debugger.Break();
         }
 
         public void ListTables()
         {
-            string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
-            using var connection = new OleDbConnection(connectionString);
+            string       connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
+            using var    connection       = new OleDbConnection(connectionString);
             connection.Open();
 
             DataTable tables = connection.GetSchema("Tables");
+
             foreach (DataRow row in tables.Rows)
             {
                 string tableType = row["TABLE_TYPE"]?.ToString();
+
                 if (tableType == "TABLE")
                 {
                     string tableName = row["TABLE_NAME"]?.ToString();
@@ -564,43 +570,46 @@ namespace DBF.BridgeMateModel
         //        //dbset.Add(obj);
         //    }
         //}
-
         public IList<object> LoadTableAsObjects(string tableName)
         {
             // Find model type ud fra tableName (DbSet property navn)
             var prop = GetType().GetProperty(tableName, BindingFlags.Public | BindingFlags.Instance);
+
             if (prop == null)
                 throw new ArgumentException($"DbSet property '{tableName}' not found.");
 
             var modelType = prop.PropertyType.GetGenericArguments()[0];
 
-            var result = new List<object>();
-            string connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
-            using var connection = new OleDbConnection(connectionString);
+            var          result           = new List<object>();
+            string       connectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={DatabaseName};";
+            using var    connection       = new OleDbConnection(connectionString);
             connection.Open();
 
             using var command = new OleDbCommand($"SELECT * FROM [{tableName}]", connection);
-            using var reader = command.ExecuteReader();
-            var props = modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            using var reader  = command.ExecuteReader();
+            var       props   = modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             while (reader.Read())
             {
                 var obj = Activator.CreateInstance(modelType);
+
                 foreach (var p in props)
                 {
                     // Prøv at matche property med kolonnenavn
                     var colName = p.Name;
-                    if (!reader.HasColumn(colName)) continue;
 
+                    if (!reader.HasColumn(colName)) continue;
                     var value = reader[colName];
+
                     if (value == DBNull.Value) value = null;
                     p.SetValue(obj, value);
                 }
+
                 result.Add(obj);
             }
+
             return result;
         }
-
     }
 
     // Extension til OleDbDataReader for at tjekke om kolonnen findes
@@ -608,9 +617,10 @@ namespace DBF.BridgeMateModel
     {
         public static bool HasColumn(this OleDbDataReader reader, string columnName)
         {
-            for (int i = 0; i < reader.FieldCount; i++)
+            for (int i = 0; i <  reader.FieldCount; i++)
                 if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
                     return true;
+
             return false;
         }
     }

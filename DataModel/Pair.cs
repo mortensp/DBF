@@ -4,24 +4,16 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Media;
 using System.Xml.Serialization;
+using PropertyChanged;
 //using DeepCopy;
 namespace DBF.DataModel
 {
+    [AddINotifyPropertyChangedInterface]
     //[DebuggerDisplay("{PairNo,2} {Players[0].TeamName} - {Players[1].TeamName}")]     [XmlRoot(ElementName = "Pair")]
     public class Pair : IEquatable<Pair>
     {
-        //public Pair()
-        //{
+        private string direction;
 
-        //}
-
-        ////[DeepCopyConstructor]
-        //public Pair(Pair other)
-        //{
-        //    Title = other.Title;
-        //    PairNoStr = other.PairNoStr;
-        //    Players = new List<Player>(other.Players.Select(p => new Player(p)));
-        //}
         public int          PairNo            => PairNoStr.AsInt();
         public int          PairTournamentRank=> PairTournamentRankStr.AsInt();
         public int          SectionRank       => SectionRankStr.AsInt();
@@ -37,8 +29,7 @@ namespace DBF.DataModel
         public decimal      TournamentResult  => TournamentResultStr.AsDecimal();
         public decimal      HACTotal          => HACTotalStr.AsDecimal();
         public int          HACRankTotal      => HACRankTotalStr.AsInt();
-        public                                                    string       Title                 { get; set; }
-
+        [XmlIgnore] public                                        string       Group                 { get; set; }
         ///-----
         [XmlAttribute(AttributeName = "No")] public               string       PairNoStr             { get; set; }
         [XmlElement(ElementName = "PairTournamentRank")] public   string       PairTournamentRankStr { get; set; }
@@ -58,7 +49,7 @@ namespace DBF.DataModel
         [XmlElement(ElementName = "TournamentResult")] public     string       TournamentResultStr   { get; set; }
         [XmlElement(ElementName = "HACTotal")] public             string       HACTotalStr           { get; set; }
         [XmlElement(ElementName = "HACRankTotal")] public         string       HACRankTotalStr       { get; set; }
-        [XmlElement(ElementName = "Direction")] public            string       Direction             { get; set; }
+        [XmlElement(ElementName = "Direction")] public            string       Direction             { get => direction; set => direction = value; }
         [XmlElement(ElementName = "Comment")] public              string       Comment               { get; set; }
         [XmlElement(ElementName = "TeamNumber")] public           string       TeamNumber            { get; set; }
         [XmlElement(ElementName = "TeamName")] public             string       TeamName              { get; set; }
@@ -79,14 +70,15 @@ namespace DBF.DataModel
             set
             {
                 if (string.IsNullOrEmpty(Direction))
-                    Direction = value;
+                    direction = value;
             }
         }
 
         [XmlIgnore] public                                        int          Placering             { get; set; }
 
-        [XmlIgnore] public                                        string       SubGroup              { get; set; }
-        [XmlIgnore] public                                        int          HACRankSectionPart     { get; set; }
+        [XmlIgnore] public                                        string       SubGroup              { get; set; } = "";
+        [XmlIgnore] public                                        int          HACRankSectionPart    { get; set; }
+        [XmlIgnore] public int EntryNo { get; set; }
 
         // ---
         public string PairName
@@ -117,9 +109,9 @@ namespace DBF.DataModel
                 return string.Empty;
 
             if (Players.Count() == 1)
-                return $"{PairNo,2} {Players[0].Name} - ?";
+                return $"{EntryNo,2} {Group}: {PairNo,2} {Players[0].Name} - ?";
 
-            return $"{PairNo,2} {Players[0].Name} - {Players[1].Name}";
+            return $"{EntryNo,2} {Group}: {PairNo,2} {Players[0].Name} - {Players[1].Name}";
         }
 
         public override bool Equals(object obj)

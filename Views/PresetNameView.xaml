@@ -10,8 +10,8 @@
     Width="600"
     Height="70"
     FontSize="12"
+    Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
-     Loaded="Window_Loaded"
     mc:Ignorable="d">
 
     <Grid Height="auto" VerticalAlignment="Top">
@@ -26,18 +26,20 @@
             Content="Hvad skal den hedde?" />
 
         <TextBox x:Name="PresetName" Grid.Column="1"
-                 VerticalContentAlignment="Center"
-            Height="20" />
+            Height="20"
+            VerticalContentAlignment="Center" />
 
         <WrapPanel Grid.Column="2" VerticalAlignment="Center">
 
-            <Button Width="50"
+            <Button
+                Width="50"
                 Margin="5,0,5,0"
                 HorizontalAlignment="Right"
                 cal:Message.Attach="[Click] = [Action CancelInput]"
                 Content="Cancel" />
 
-            <Button Width="50"
+            <Button
+                Width="50"
                 Margin="5,0,5,0"
                 HorizontalAlignment="Right"
                 cal:Message.Attach="[Click] = [Action ConfirmInput]"
