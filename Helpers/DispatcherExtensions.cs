@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Syncfusion.UI.Xaml.Grid;
 
-namespace DBF
+namespace DBF.Helpers
 {
     public static class DispatcherExtensions
     {

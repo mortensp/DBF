@@ -24,8 +24,6 @@ namespace DBF.UserControls
                                DependencyProperty.Register( nameof(               EnumType), typeof(Type), typeof(EnumFlagsControl)
                                                           , new PropertyMetadata(null,     OnEnumTypeChanged));
 
-    
-
         public Type EnumType
         {
             get=> (Type)GetValue(EnumTypeProperty);
@@ -82,7 +80,7 @@ namespace DBF.UserControls
             }
         }
 
-        private bool _suppressFlagUpdate = false;
+        private bool _suppressFlagUpdate;
 
         internal void UpdateSelectedFlags(Enum flag, bool isSelected)
         {

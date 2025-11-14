@@ -6,14 +6,16 @@ using DBF.DataModel;
 using DBF.Helpers;
 using DBF.UserControls;
 using DBF.Views;
-using Github;
+using GithubTools;
+
+//using Github;
 using static System.TimeZoneInfo;
 
 namespace DBF.ViewModels
 {
     public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
     {
-        private  IWindowManager windowManager;
+        private IWindowManager windowManager;
 
         public ShellViewModel(Configuration configuration, IWindowManager windowManager)
         {
@@ -24,46 +26,33 @@ namespace DBF.ViewModels
         #region Show Screens
             public async void OpenControlView()
             {
-#if RELEASE
-                var updater = new UpdateManager("mortensp", "DBF");
-                await updater.CheckForUpdateAsync();
-
-                //AccessInstaller.CheckAndInstall();
-#endif
-            var screen = IoC.Get<ControlViewModel>();
-
-            //// Test PropertyChanged event is working
-            //screen.PropertyChanged += (sender, e) =>
-            //{
-            //    if (sender is ControlViewModel vm)
-            //        Debug.WriteLine("PropertyChanged: " + e.PropertyName);
-            //};
-
-            await ActivateItemAsync(screen);
+                var screen = IoC.Get<ControlViewModel>();
+                await ActivateItemAsync(screen);
             }
-           
         #endregion
 
         public async Task OpenSettingsAsync()
         {
-            // Åbn indstillinger
+            
             var screen = IoC.Get<ConfigurationViewModel>();
-
             await windowManager.ShowDialogAsync(screen);
         }
 
         public void TimersHelp()
         {
-            var window = new TimersHelpWindow(); // Views\TimersHelpWindow.xaml
+            var window = new TimersHelpWindow(); 
             window.ShowDialog();
         }
 
-        public async void ShowAbout()
+           public void Install()
         {
-            //var window = new AboutView();
-            //window.ShowDialog();
-            var screen = IoC.Get<AboutViewModel>();
+            Github.Update("install");
+            
+        }
 
+        public async void ShowAbout()
+        {            
+            var screen = IoC.Get<AboutViewModel>();
             await windowManager.ShowDialogAsync(screen);
         }
     }

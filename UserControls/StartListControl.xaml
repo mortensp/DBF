@@ -50,6 +50,7 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
+                    QueryRowHeight="SfDataGrid_QueryRowHeight"           
             ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
@@ -93,6 +94,9 @@
                     HorizontalHeaderContentAlignment="Left"
                     MappingName="Names"
                     MinimumWidth="600"
+                    MaximumWidth="600"
+                    TextWrapping="Wrap"
+                    
                     TextAlignment="Left" />
             </syncfusion:SfDataGrid.Columns>
 

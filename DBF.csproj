@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyVersion>0.9.9.6</AssemblyVersion>
-		<FileVersion>0.9.9.6</FileVersion>
-
+		<AssemblyVersion>0.9.9.7</AssemblyVersion>
+		<FileVersion>0.9.9.7</FileVersion>
+		<Version>0.9.9.7</Version>
+		<ProductVersion>0.9.9.7</ProductVersion>
 		<AssemblyTitle>DBF</AssemblyTitle>
 		<AssemblyName>DBF</AssemblyName>
 		<Description>DBF Tools - Viser Start og resultatlister og 1-4 bruidgeure</Description>
@@ -28,8 +29,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Directory.Build.props" />
-		<None Remove="Inno Setup Script.iss.old" />
+		<!--<None Remove="Directory.Build.props" />-->
+		<!--<None Remove="Inno Setup Script.iss.old" />
+		<None Remove="System.Text.Json" />-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -57,10 +59,13 @@
 		<Compile Remove="DataModel\AccessContext.cs" />
 		<Compile Remove="DataModel\PlayingSession.cs" />
 		<Compile Remove="DEVMODE.cs" />
+		<Compile Remove="Helpers\BuildInfo.cs" />
 		<Compile Remove="Helpers\CustomCaptionSummaryCellRenderer.cs" />
 		<Compile Remove="Helpers\CustomGroupCaptionSelector.cs" />
+		<Compile Remove="Helpers\DispatcherExtensions.cs" />
 		<Compile Remove="Helpers\SelectorHelper.cs" />
 		<Compile Remove="Helpers\SfGridBehavior.cs" />
+		<Compile Remove="Helpers\Updater.cs" />
 		<Compile Remove="Shell.cs" />
 		<Compile Remove="TextReplacer.cs" />
 		<Compile Remove="UpdateManager.cs" />
@@ -90,17 +95,16 @@
 	
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Github_UpdateManager_WPF" Version="1.0.3" />
-				<!--<ProjectReference Include="..\..\Common Libs\Github UpdateManager - WPF\Github UpdateManager - WPF.csproj" />-->
-	</ItemGroup>
+
 
 	<ItemGroup>	
 	<PackageReference Include="Fody" Version="6.9.3">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
-		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -125,6 +129,7 @@
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="NetCoreAudio" Version="2.0.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+		<PackageReference Include="System.Management" Version="9.0.9" /> <!--Must match the version in Github Updater-->
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 	</ItemGroup>
@@ -203,6 +208,8 @@
 		</None>
 
 		<None Include="FodyWeavers.xsd" />
+
+		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
 		
 		<None Update="InstallerFiles\AccessDatabaseEngine_2010_x86.exe">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

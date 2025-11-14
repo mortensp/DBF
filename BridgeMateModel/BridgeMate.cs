@@ -13,13 +13,13 @@ namespace DBF
 {
     public class BridgeMate : INotifyPropertyChanged
     {
-        private          FileSystemWatcher                      watcher;
+        private          FileSystemWatcher                      watcher = new();
         private readonly DispatcherTimer                        timer;
         private readonly ConcurrentDictionary<string, DateTime> lastFileEvent = new();
         private          ReceivedData                           last          = new();
         private          BridgeMateContext                      db;
         private readonly Configuration                          configuration;
-        private          string                                 bmFile        = null;
+        private          string                                 bmFile;
         private          int                                    bmClubNo      = -1;
         private          DateTime                               lastDate;
         private          int                                    lastClub      = -1;
@@ -37,13 +37,15 @@ namespace DBF
             public BridgeMate(Configuration _configuration)
             {
                 configuration = _configuration;
-                //
-                watcher                       = new FileSystemWatcher(configuration.BridgeMatePath);
-                watcher.NotifyFilter          = NotifyFilters.FileName | NotifyFilters.CreationTime;
-                watcher.Filter                = "*.bws";
+            //
+            if (Directory.Exists(configuration.BridgeMatePath))
+            {
+                watcher = new FileSystemWatcher(configuration.BridgeMatePath);
+                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.CreationTime;
+                watcher.Filter = "*.bws";
                 watcher.IncludeSubdirectories = true;
-                watcher.Created              += fileCreated;
-
+                watcher.Created += fileCreated;
+            }
                 //
                 timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(7) };
                 timer.Tick+= Timer_Tick;

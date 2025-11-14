@@ -31,10 +31,10 @@ namespace DBF.DataModel
         private                 TimeSpan      _warningTime    = new TimeSpan(0, 5,  0);
         private                 TimeSpan      _remainingTime  = TimeSpan.MinValue;
         private                 bool          _isStarted;
-        private                 bool          _isAtBreak      = false;
-        private                 bool          _isAtTransition = false;
+        private                 bool          _isAtBreak;
+        private                 bool          _isAtTransition;
         private                 bool          _isPaused;
-        private                 Configuration configuration   = null;
+        private                 Configuration configuration;
 
         public BridgeTimer()
         {

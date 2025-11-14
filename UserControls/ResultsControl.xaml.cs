@@ -21,15 +21,15 @@ namespace DBF.UserControls
     {
         private Configuration config = IoC.Get<Configuration>();
 
-        private bool              parentIsViewbox  = false;
+        private bool              parentIsViewbox;
         private int               displayLineIndex = -1;
         private Interval          interval         = new(0, 0);
-        private int               linesAllocated   = 0;
-        private int               linesNeeded      = 0;
+        private int               linesAllocated;
+        private int               linesNeeded;
         private IEnumerable<Pair> pairs;
         private IEnumerable<Team> teams;
-        private int               pairRows         = 0;
-        private int               teamRows         = 0;
+        private int               pairRows;
+        private int               teamRows;
         private List<Interval>    displayLines     = [];
         private DispatcherTimer   groupTimer;
 

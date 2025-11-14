@@ -16,10 +16,10 @@ namespace DBF.ViewModels
         private       Preset                            selectedPreset     { get; set; }
         private          BridgeTimer    setting;
         private readonly IWindowManager windowManager;
-        private          bool           onOpen = false;
+        private          bool           onOpen;
 
         #region Constructors
-            public TimerSettingsViewModel(Configuration configuration)
+        public TimerSettingsViewModel(Configuration configuration)
             {
                 Configuration              = configuration;
                 windowManager              = IoC.Get<IWindowManager>();

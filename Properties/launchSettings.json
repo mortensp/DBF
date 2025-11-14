@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DBF": {
+      "commandName": "Project",
+      "commandLineArgs": "debug"
+    }
+  }
+}

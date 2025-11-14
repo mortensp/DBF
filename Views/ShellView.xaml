@@ -20,10 +20,11 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="Indstillinger" />
+            <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="_Indstillinger" />
             <MenuItem Header="Hjælp">
-                <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="Bridgeurene" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="Om" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="_Bridgeure" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="_Skift program version" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="_Om" />
             </MenuItem>
         </Menu>
 

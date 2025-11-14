@@ -72,7 +72,7 @@ namespace DBF.ViewModels
         #region Public Properties
             public UserControl CurrentView
             {
-                get=> currentView ?? (currentView = timersPanel);
+                get => currentView ?? (currentView = timersPanel);
                 set
                 {
                     currentView = value;
@@ -80,16 +80,16 @@ namespace DBF.ViewModels
                 }
             }
 
-            public Configuration                  Configuration            { get; set; }
-            public BridgeMate                     BridgeMate               { get; set; }
+            public Configuration                  Configuration { get; set; }
+            public BridgeMate                     BridgeMate    { get; set; }
 
             // MainClubs
-            public ObservableCollection<MainClub> MainClubs                { get; set; } = [];
+            public ObservableCollection<MainClub> MainClubs     { get; set; } = [];
 
             //
             public MainClub SelectedMainClub
             {
-                get=> selectedMainClub;
+                get => selectedMainClub;
                 set
                 {
                     try
@@ -121,6 +121,7 @@ namespace DBF.ViewModels
                             }
                         }
                     }
+
                     catch (Exception ex)
                     {
                         throw ex;
@@ -129,11 +130,11 @@ namespace DBF.ViewModels
             }
 
             // Clubs
-            public ObservableCollection<Club>     Clubs                    { get; set; } = [];
+            public ObservableCollection<Club> Clubs { get; set; } = [];
 
             public Club SelectedClub
             {
-                get=> selectedClub;
+                get => selectedClub;
                 set
                 {
                     ErrorMessage = "";
@@ -152,7 +153,7 @@ namespace DBF.ViewModels
             // PlayingTimes
             public ObservableCollection<PlayingTime> PlayingTimes
             {
-                get=> spilleDage;
+                get => spilleDage;
                 set
                 {
                     if (Set(ref spilleDage, value))
@@ -163,7 +164,7 @@ namespace DBF.ViewModels
 
             public PlayingTime SelectedPlayingTime
             {
-                get=> playingTime;
+                get => playingTime;
                 set
                 {
                     if (Set(ref playingTime, value))
@@ -175,7 +176,7 @@ namespace DBF.ViewModels
             // Other 
             public int SectionNo
             {
-                get=> sectionNo;
+                get => sectionNo;
                 set
                 {
                     if (Set(ref sectionNo, value))
@@ -183,16 +184,16 @@ namespace DBF.ViewModels
                 }
             }
 
-            public bool                           HideTournamentSummery    { get; set; } = false;
-            public bool                           HideHacGrp               { get; set; } = true;
-            public DateTime                       Date                     { get; set; }
-            public List<GroupSection>             GroupSections            { get; set; }
-            public BindableCollection<Pair>       Pairs                    { get; set; } = [];
-            public BindableCollection<Team>       Teams                    { get; set; } = [];
-            public string                         ErrorMessage             { get; set; }
+            public bool                     HideTournamentSummery { get; set; }
+            public bool                     HideHacGrp            { get; set; } = true;
+            public DateTime                 Date                  { get; set; }
+            public List<GroupSection>       GroupSections         { get; set; }
+            public BindableCollection<Pair> Pairs                 { get; set; } = [];
+            public BindableCollection<Team> Teams                 { get; set; } = [];
+            public string                   ErrorMessage          { get; set; }
             public bool ShowAsOneGroup
             {
-                get=> showAsOneGroup;
+                get => showAsOneGroup;
                 set
                 {
                     var old = showAsOneGroup;
@@ -209,11 +210,11 @@ namespace DBF.ViewModels
                 }
             }
 
-            public Visibility                     ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
+            public Visibility ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
         #endregion
 
         #region Public Methods
-            public void AddTimer()=> Configuration.AddTimer();
+            public void AddTimer() => Configuration.AddTimer();
 
             public async void ShowStartList()
             {
@@ -312,7 +313,6 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
-
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -488,6 +488,7 @@ namespace DBF.ViewModels
                     foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
                         team.EntryNo = i++;
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -542,7 +543,6 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -579,7 +579,7 @@ namespace DBF.ViewModels
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                          .SelectMany(mt => mt.PlayingTime);
+                                                                                  .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -627,6 +627,7 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -782,6 +783,7 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(        reader);
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -818,7 +820,6 @@ namespace DBF.ViewModels
                             else
                                 Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -854,6 +855,7 @@ namespace DBF.ViewModels
                         projectorView.Height                = 600;
                         projectorView.Left                  = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                     }
+
 #endif
                 }
                 else

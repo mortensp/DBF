@@ -22,5 +22,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Morten Sparding")]
 [assembly: AssemblyProduct("DBF Tools")]
 [assembly: AssemblyCopyright("Copyright © 2025")]
-[assembly: AssemblyVersion("0.9.4.0")]
-[assembly: AssemblyFileVersion("0.9.4.0")]
+//[assembly: AssemblyVersion("0.9.9.7")]
+//[assembly: AssemblyFileVersion("0.9.9.7")]

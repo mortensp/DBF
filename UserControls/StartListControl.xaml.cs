@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -7,8 +8,10 @@ using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
+using Syncfusion.Data;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.UI.Xaml.Grid.Helpers;
 using Group = Syncfusion.Data.Group;
 namespace DBF.UserControls
 {
@@ -19,15 +22,15 @@ namespace DBF.UserControls
     {
         private Configuration config = IoC.Get<Configuration>();
 
-        private bool              parentIsViewbox  = false;
+        private bool              parentIsViewbox;
         private int               displayLineIndex = -1;
         private Interval          interval         = new(0, 0);
-        private int               linesAllocated   = 0;
-        private int               linesNeeded      = 0;
+        private int               linesAllocated;
+        private int               linesNeeded;
         private IEnumerable<Pair> pairs;
         private IEnumerable<Team> teams;
-        private int               pairRows         = 0;
-        private int               teamRows         = 0;
+        private int               pairRows;
+        private int               teamRows;
         private List<Interval>    displayLines     = [];
         private DispatcherTimer   groupTimer;
 
@@ -39,23 +42,23 @@ namespace DBF.UserControls
 
                 // Pairs
                 dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
-                dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
-                dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
+                dgPairs.GroupCollapsed                 += ( s, e) => dgPairs.RefreshSorting();
+                dgPairs.GroupExpanded                  += (  s, e) => dgPairs.RefreshSorting();
                 dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
-                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgPairs.GroupExpanding                 += ( s, e) => { e.Cancel = parentIsViewbox; };
                 dgPairs.ItemsSourceChanged             += onPairsChanged;
 
                 // Teams                
                 dgTeams.Columns["Names"].ColumnSizer = GridLengthUnitType.SizeToCells;
-                dgTeams.GroupCollapsed              += (s, e) => dgTeams.RefreshSorting();
-                dgTeams.GroupExpanded               += (s, e) => dgTeams.RefreshSorting();
+                dgTeams.GroupCollapsed              += ( s, e) => dgTeams.RefreshSorting();
+                dgTeams.GroupExpanded               += (  s, e) => dgTeams.RefreshSorting();
                 dgTeams.GroupCollapsing             += (s, e) => { e.Cancel = parentIsViewbox; };
-                dgTeams.GroupExpanding              += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgTeams.GroupExpanding              += ( s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.ItemsSourceChanged          += onTeamsChanged;
 
                 // Initialiser timeren
                 groupTimer             = new DispatcherTimer();
-                groupTimer.Tick       += (s, e) => showNextGroup();
+                groupTimer.Tick       += (       s, e) => showNextGroup();
                 config.PropertyChanged+= (s, e) => setupPaging();
             }
         #endregion
@@ -150,6 +153,77 @@ namespace DBF.UserControls
                         displayLines = [new Interval(0, pairRows + teamRows)];
                 }
             }
+        }
+
+
+        private void SfDataGrid_QueryRowHeight(object sender, QueryRowHeightEventArgs e)
+        {
+            var dataGrid = sender as SfDataGrid;
+
+            if (dataGrid == null)
+                return;
+
+            // Hent visuel række
+            var rowGenerator = dataGrid.GetRowGenerator();
+            var rowInfo      = rowGenerator.Items[e.RowIndex];
+
+            // Vi håndterer kun data-rækker
+            if (rowInfo?.RowData == null || rowInfo.RowData is Group)
+                return;
+
+            var data = rowInfo.RowData;
+
+            if (data == null)
+                return;
+
+            double maxHeight = dataGrid.RowHeight;
+
+            // Get device DPI -> pixelsPerDip
+            var    dpi          = VisualTreeHelper.GetDpi(dataGrid);
+            double pixelsPerDip = dpi.PixelsPerDip;
+
+            foreach (var col in dataGrid.Columns.OfType<GridTextColumn>().Where(c => c.TextWrapping == TextWrapping.Wrap))
+            {
+                var value = data.GetType().GetProperty(col.MappingName)?.GetValue(data)?.ToString();
+
+                if (string.IsNullOrEmpty(value))
+                    continue;
+
+                var fontFamily = dataGrid.FontFamily;
+                var fontSize   = dataGrid.FontSize;
+                var typeface   = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+
+                // Use overload that accepts pixelsPerDip (DPI aware measurement)
+                var formattedText = new FormattedText( value
+                                                     , CultureInfo.CurrentCulture
+                                                     , FlowDirection.LeftToRight
+                                                     , typeface
+                                                     , fontSize
+                                                     , Brushes.Black
+                                                     , new NumberSubstitution()
+                                                     , TextFormattingMode.Display
+                                                     , pixelsPerDip);
+
+                //var formattedText = new FormattedText(
+                //                                   value
+                //                                 , CultureInfo.CurrentCulture
+                //                                 , FlowDirection.LeftToRight
+                //                                 , new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal)   
+                //                                 , fontSize
+                //                                 , Brushes.Black
+                //                                 , new NumberSubstitution()
+                //                                 , TextFormattingMode.Display);
+                var padding = col.Padding.Left + col.Padding.Right;
+
+                if (formattedText.Width + padding >  col.ActualWidth)
+                {
+                    formattedText.MaxTextWidth = col.ActualWidth;
+                    maxHeight                  = Math.Max(maxHeight, formattedText.Height + padding);
+                }
+            }
+
+            e.Height  = maxHeight;
+            e.Handled = true;
         }
 
         #region Display Line Groups

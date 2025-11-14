@@ -22,7 +22,7 @@ namespace DBF
     {
         public Bootstrapper()
         {
-            Encoding.RegisterProvider(                                       CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider( CodePagesEncodingProvider.Instance);
 
             FrameworkElement.LanguageProperty
                             .OverrideMetadata( typeof(FrameworkElement)
@@ -111,7 +111,7 @@ namespace DBF
             protected override IEnumerable<Assembly> SelectAssemblies()
             {
                 // We pick one type from each assembly to get to the assemblies
-                yield return Assembly.GetAssembly(typeof(ShellViewModel));
+                yield return Assembly.GetAssembly(typeof(Bootstrapper));
             }
 
             protected IEnumerable<Type> SelectViewModels() => SelectAssemblies().SelectMany(a => a.GetTypes())
