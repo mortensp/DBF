@@ -25,7 +25,7 @@ namespace DBF.DataModel
         private static readonly string[] audioExtensions = new[] { ".wav", ".mp3" };
         public static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions { WriteIndented = true, };
         private static string currentversion = "v" + Assembly.GetExecutingAssembly().GetName().Version;
-        private static string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\mortensp\\DBF\\configuration.json";
+        private static string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Mortensp\\DBF\\configuration.json";
         private static string oldPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
         private Configuration loadedConfig;
         private int visibleTimerCount;

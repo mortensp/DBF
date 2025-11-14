@@ -10,7 +10,7 @@ namespace DBF.Helpers
     public class CrashDetector
     {
         private static readonly string CrashFilePath = 
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "mortensp\\DBF", "crashflag.json");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Mortensp\\DBF", "crashflag.json");
 
         public static bool DidCrashLastTime()
         {
