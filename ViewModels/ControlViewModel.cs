@@ -121,7 +121,6 @@ namespace DBF.ViewModels
                             }
                         }
                     }
-
                     catch (Exception ex)
                     {
                         throw ex;
@@ -313,6 +312,7 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
+
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -364,7 +364,9 @@ namespace DBF.ViewModels
 
                                 foreach (var pair in grp.Resultlist.Pairs)
                                 {
+                                    pair.GroupNo = grpNo;
                                     pair.Group = grp.Tournament.Title;
+
                                     pairs.Add(pair);
                                 }
 
@@ -405,6 +407,7 @@ namespace DBF.ViewModels
 
                                     if (res is null)
                                     {
+                                        pair.GroupNo = grpNo;
                                         pair.Group = grp.Tournament.Title;
                                         pairs.Add(pair);
                                     }
@@ -477,18 +480,7 @@ namespace DBF.ViewModels
                                 team.TournamentRank = totalRank++;
                         }
                     }
-
-                    var i = 0;
-
-                    initSubgroups();
-
-                    foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
-                        pair.EntryNo = i++;
-
-                    foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
-                        team.EntryNo = i++;
                 }
-
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -498,8 +490,18 @@ namespace DBF.ViewModels
                 {
                     Pairs = pairs;
                     Teams = teams;
+               
                 }
 
+                 int i =0;
+
+                    initSubgroups();
+
+                    foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
+                        pair.EntryNo = i++;
+
+                    foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
+                        team.EntryNo = i++;
 #if DEBUG
                 // BridgeMate lookup
                 if (newSession)
@@ -543,6 +545,7 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -579,7 +582,7 @@ namespace DBF.ViewModels
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                  .SelectMany(mt => mt.PlayingTime);
+                                                                                          .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -627,7 +630,6 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -635,6 +637,7 @@ namespace DBF.ViewModels
                 }
             #endregion
 
+            
             private void initSubgroups()
             {
                 for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
@@ -650,7 +653,7 @@ namespace DBF.ViewModels
                         var rankA            = 1;
                         var rankB            = 1;
 
-                        foreach (var pair in Pairs.OrderBy(p => p.SectionRank))
+                        foreach (var pair in Pairs.Where(p=>p.GroupNo==grpNo).OrderBy(p => p.SectionRank))
                         {
                             pair.Placering = pair.Rank;
                             pair.Group     = grp.Tournament.Title;
@@ -769,10 +772,10 @@ namespace DBF.ViewModels
                             string xml = File.ReadAllText(fullPath, iso_8859_1);
 
                             // Erstat Fjern tag værdier, som kun består af blanke og - tegn
-                            xml = Regex.Replace(xml, @">(-|\s)+<", "><");
+                            xml = Regex.Replace(                     xml,       @">(-|\s)+<",                 "><");
 
                             // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
-                            xml = System.Text.RegularExpressions.Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
+                            xml = Regex.Replace(                     xml,       @"(?<=\d),(?=\d)",            ".");
 
                             // Remove empty tags
                             xml = Regex.Replace(                     xml,       @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
@@ -783,7 +786,6 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(        reader);
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -820,6 +822,7 @@ namespace DBF.ViewModels
                             else
                                 Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -855,7 +858,6 @@ namespace DBF.ViewModels
                         projectorView.Height                = 600;
                         projectorView.Left                  = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                     }
-
 #endif
                 }
                 else

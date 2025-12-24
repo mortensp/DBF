@@ -9,7 +9,6 @@ using PropertyChanged;
 namespace DBF.DataModel
 {
     [AddINotifyPropertyChangedInterface]
-    //[DebuggerDisplay("{PairNo,2} {Players[0].TeamName} - {Players[1].TeamName}")]     [XmlRoot(ElementName = "Pair")]
     public class Pair : IEquatable<Pair>
     {
         private string direction;
@@ -29,6 +28,7 @@ namespace DBF.DataModel
         public decimal      TournamentResult  => TournamentResultStr.AsDecimal();
         public decimal      HACTotal          => HACTotalStr.AsDecimal();
         public int          HACRankTotal      => HACRankTotalStr.AsInt();
+        [XmlIgnore] public                                        int       GroupNo                 { get; set; }
         [XmlIgnore] public                                        string       Group                 { get; set; }
         ///-----
         [XmlAttribute(AttributeName = "No")] public               string       PairNoStr             { get; set; }
