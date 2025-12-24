@@ -121,6 +121,7 @@ namespace DBF.ViewModels
                             }
                         }
                     }
+
                     catch (Exception ex)
                     {
                         throw ex;
@@ -312,7 +313,6 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
-
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -365,7 +365,7 @@ namespace DBF.ViewModels
                                 foreach (var pair in grp.Resultlist.Pairs)
                                 {
                                     pair.GroupNo = grpNo;
-                                    pair.Group = grp.Tournament.Title;
+                                    pair.Group   = grp.Tournament.Title;
 
                                     pairs.Add(pair);
                                 }
@@ -408,7 +408,7 @@ namespace DBF.ViewModels
                                     if (res is null)
                                     {
                                         pair.GroupNo = grpNo;
-                                        pair.Group = grp.Tournament.Title;
+                                        pair.Group   = grp.Tournament.Title;
                                         pairs.Add(pair);
                                     }
                                     else
@@ -481,27 +481,24 @@ namespace DBF.ViewModels
                         }
                     }
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
                 }
 
-                finally
-                {
-                    Pairs = pairs;
-                    Teams = teams;
-               
-                }
+                int i =0;
 
-                 int i =0;
+                foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
+                    pair.EntryNo = i++;
 
-                    initSubgroups();
-
-                    foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
-                        pair.EntryNo = i++;
-
-                    foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
-                        team.EntryNo = i++;
+                foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
+                    team.EntryNo = i++;
+                                
+                initSubgroups(pairs);
+                Pairs = pairs;
+                Teams = teams;
+                
 #if DEBUG
                 // BridgeMate lookup
                 if (newSession)
@@ -545,7 +542,6 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -582,7 +578,7 @@ namespace DBF.ViewModels
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                          .SelectMany(mt => mt.PlayingTime);
+                                                                                                  .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -630,6 +626,7 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -637,9 +634,10 @@ namespace DBF.ViewModels
                 }
             #endregion
 
-            
-            private void initSubgroups()
+            private void initSubgroups(BindableCollection<Pair> pairs =null   )
             {
+            pairs ??= Pairs;
+
                 for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
                 {
                     var grp = GroupSections[grpNo];
@@ -653,7 +651,7 @@ namespace DBF.ViewModels
                         var rankA            = 1;
                         var rankB            = 1;
 
-                        foreach (var pair in Pairs.Where(p=>p.GroupNo==grpNo).OrderBy(p => p.SectionRank))
+                        foreach (var pair in pairs.Where(p => p.GroupNo == grpNo).OrderBy(p => p.SectionRank))
                         {
                             pair.Placering = pair.Rank;
                             pair.Group     = grp.Tournament.Title;
@@ -786,6 +784,7 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(        reader);
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -822,7 +821,6 @@ namespace DBF.ViewModels
                             else
                                 Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -858,6 +856,7 @@ namespace DBF.ViewModels
                         projectorView.Height                = 600;
                         projectorView.Left                  = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                     }
+
 #endif
                 }
                 else

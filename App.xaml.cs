@@ -14,7 +14,7 @@ namespace DBF
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-#if RELEASE
+#if RELEASE //||DEBUG
             
             Github.Update();
 #endif

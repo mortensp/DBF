@@ -88,6 +88,7 @@ namespace DBF.UserControls
                 if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
                     dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
 
+                dg.RefreshSorting();
                 dg.View.RefreshFilter();
                 dg.View.Filter = item =>  displayLines.Count == 0
                                       ||  item               is Pair pair

@@ -29,7 +29,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Column="0" Grid.Row="0"
+        <StackPanel Grid.Row="0" Grid.Column="0"
             Margin="5,5,0,0"
             HorizontalAlignment="Left"
             Orientation="Horizontal">
@@ -43,14 +43,15 @@
                 Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
         </StackPanel>
 
-        <CheckBox Grid.Column="1" Grid.Row="0"
+        <CheckBox Grid.Row="0" Grid.Column="1"
             Margin="30,6,0,0"
             Content="Vis som én række"
             FontSize="16"
             IsChecked="{Binding ShowAsOneGroup, UpdateSourceTrigger=PropertyChanged}"
             Visibility="{Binding ShowAsOneGroupVisibility}" />
 
-        <syncfusion:SfDataGrid Name="dgTeams" Grid.ColumnSpan="2" Grid.Row="1"
+        <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="1" Grid.ColumnSpan="2"
+            ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             Margin="0,0,0,10"
             Padding="5,0,5,0"
             AllowEditing="False"
@@ -65,7 +66,6 @@
             FilterRowPosition="None"
             FontSize="14"
             HeaderRowHeight="25"
-            ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
@@ -89,8 +89,8 @@
 
                 <!--  Kamp Resultat  -->
                 <syncfusion:GridTemplateColumn
-                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     Width="2"
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     MappingName="Separator" />
 
                 <syncfusion:GridTextColumn
@@ -141,7 +141,8 @@
             </syncfusion:SfDataGrid.GroupColumnDescriptions>-->
         </syncfusion:SfDataGrid>
 
-        <syncfusion:SfDataGrid Name="dgPairs" Grid.ColumnSpan="2" Grid.Row="2"
+        <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="2" Grid.ColumnSpan="2"
+            ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowResizingColumns="True"
@@ -155,7 +156,6 @@
             FilterRowPosition="None"
             FontSize="14"
             HeaderRowHeight="25"
-            ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
@@ -164,7 +164,7 @@
                     HeaderText="Rk"
                     IsHidden="True"
                     MappingName="Group" />
-                
+
                 <syncfusion:GridTextColumn
                     HeaderText="Led"
                     IsHidden="True"
@@ -184,8 +184,8 @@
 
                 <!--  Placering  -->
                 <syncfusion:GridTemplateColumn
-                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     Width="2"
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     MappingName="Separator" />
 
                 <syncfusion:GridNumericColumn
@@ -237,8 +237,8 @@
 
                 <!--  Tourneringens Score  -->
                 <syncfusion:GridTemplateColumn
-                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     Width="2"
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     MappingName="Separator2" />
 
                 <syncfusion:GridNumericColumn
