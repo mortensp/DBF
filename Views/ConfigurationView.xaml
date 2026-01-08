@@ -11,6 +11,7 @@
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     Width="400"
     Height="250"
+    Title="Indstillinger"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 

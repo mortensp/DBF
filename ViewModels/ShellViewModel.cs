@@ -33,25 +33,24 @@ namespace DBF.ViewModels
 
         public async Task OpenSettingsAsync()
         {
-            
             var screen = IoC.Get<ConfigurationViewModel>();
             await windowManager.ShowDialogAsync(screen);
         }
 
         public void TimersHelp()
         {
-            var window = new TimersHelpWindow(); 
+            var window = new TimersHelpWindow();
             window.ShowDialog();
         }
 
-           public void Install()
+        public void Install()
         {
-            Github.Update("install");
-            
+            Github _github = new Github("DBF");
+            _github.Update("install");
         }
 
         public async void ShowAbout()
-        {            
+        {
             var screen = IoC.Get<AboutViewModel>();
             await windowManager.ShowDialogAsync(screen);
         }

@@ -52,14 +52,14 @@ namespace DBF.DataModel
         #region Public Properties
             [JsonIgnore] public Configuration Configuration    { get => configuration ?? (configuration = IoC.Get<Configuration>()); private set => configuration = value; }
             [JsonIgnore] public string        Time             { get; set; } = "21:17";
-            [JsonIgnore] public Visibility    WarningVisiblity { get; set; } = Visibility.Hidden;
+            [JsonIgnore] public Visibility    WarningVisiblity { get; set; } //= Visibility.Hidden;
             [JsonIgnore] public string        RoundText        { get; set; }
             [JsonIgnore] public string        MoreInfo         { get; set; }
-            [JsonIgnore] public Visibility    ShowUpButton     { get; set; } = Visibility.Visible;
-            [JsonIgnore] public Visibility    ShowDownButton   { get; set; } = Visibility.Visible;
+            [JsonIgnore] public Visibility    ShowUpButton     { get; set; } //= Visibility.Visible;
+            [JsonIgnore] public Visibility    ShowDownButton   { get; set; } //= Visibility.Visible;
             [JsonIgnore] public double        MinutesLeft      { get; set; }
             [JsonIgnore] public int           Round            { get; set; } = 1;
-            [JsonIgnore] public TimeOnly EndTime=> TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(MinutesLeft));
+            [JsonIgnore] public TimeOnly EndTime=> TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(Math.Max(MinutesLeft,0)));
             //
             [JsonIgnore]
             public bool IsPaused
@@ -184,8 +184,8 @@ namespace DBF.DataModel
                     else
                     {
                         RoundText = $"Tak for i god ro og orden.";
-                        Info      = "Husk at aflevere kort, melde-";
-                        MoreInfo  = "kasser mm. ovre på reolen";
+                        Info      = "Husk at rydde op på og";
+                        MoreInfo  = "omkring bordet";
                         Time      = string.Empty;
                     }
 

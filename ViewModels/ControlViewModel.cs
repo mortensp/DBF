@@ -9,16 +9,14 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Serialization;
-using Baksteen.Extensions.DeepCopy;
 using Caliburn.Micro;
 using DBF.Converters;
 using DBF.DataModel;
 using DBF.UserControls;
 using DBF.Views;
-using PropertyChanged;
+//using PropertyChanged;
 using Syncfusion.Data.Extensions;
-using Syncfusion.DocIO.DLS;
-
+//using Syncfusion.DocIO.DLS;
 namespace DBF.ViewModels
 {
     public static class MovementPlans
@@ -30,22 +28,33 @@ namespace DBF.ViewModels
 
     public class ControlViewModel : Screen
     {
-        private readonly IWindowManager                         windowManager;
-        private          Club                                   selectedClub;
-        private          UserControl                            startListControl = new StartListControl();
-        private          UserControl                            timersPanel      = new TimersPanel() { ButtonsVisibility = Visibility.Collapsed };
-        private          UserControl                            resultsControl   = new ResultsControl();
-        private          UserControl                            currentView;
-        private          MainClub                               selectedMainClub;
-        private          PlayingTime                            playingTime;
-        private          List<Tournament>                       tournaments;
-        private          JsonSerializerOptions                  JsonOptions      = new JsonSerializerOptions { Converters = { new DecimalCommaConverter() } };
-        private          Encoding                               iso_8859_1       = System.Text.Encoding.GetEncoding("iso-8859-1");
-        private          ObservableCollection<PlayingTime>      spilleDage       = [];
+        private readonly IWindowManager windowManager;
+        private          Club           selectedClub;
+        private          UserControl    startListControl = new StartListControl();
+        private          UserControl    timersPanel      = new TimersPanel()
+                                                           {
+                                                               ButtonsVisibility = Visibility.Collapsed
+                                                           };
+
+        private UserControl           resultsControl = new ResultsControl();
+        private UserControl           currentView;
+        private MainClub              selectedMainClub;
+        private PlayingTime           playingTime;
+        private List<Tournament>      tournaments;
+        private JsonSerializerOptions JsonOptions    = new JsonSerializerOptions
+                                                       {
+                                                           Converters = 
+                                                           {
+                                                                      new DecimalCommaConverter()
+                                                                      }
+                                                       };
+
+        private          Encoding                               iso_8859_1     = System.Text.Encoding.GetEncoding("iso-8859-1");
+        private          ObservableCollection<PlayingTime>      spilleDage     = [];
         private          FileSystemWatcher                      watcher;
-        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent    = new();
+        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent  = new();
         private          int                                    sectionNo;
-        private          bool                                   showAsOneGroup   = true;
+        private          bool                                   showAsOneGroup = true;
 
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
@@ -86,7 +95,6 @@ namespace DBF.ViewModels
             // MainClubs
             public ObservableCollection<MainClub> MainClubs     { get; set; } = [];
 
-            //
             public MainClub SelectedMainClub
             {
                 get => selectedMainClub;
@@ -334,7 +342,7 @@ namespace DBF.ViewModels
                 Teams.Clear();
                 bool InterWovenHowell = false;
                 bool Mitchell         = false;
-                bool RoundCompleted   = true;
+                //bool RoundCompleted   = true;
 
                 try
                 {
@@ -352,8 +360,8 @@ namespace DBF.ViewModels
                     {
                         var grp = GroupSections[grpNo];
 
-                        if (!grp.Completed)
-                            RoundCompleted = false;
+                        //if (!grp.Completed)
+                        //    RoundCompleted = false;
 
                         if (grp.Tournament.TournamentType.Text == "Parturnering")
                         {
@@ -494,16 +502,16 @@ namespace DBF.ViewModels
 
                 foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
                     team.EntryNo = i++;
-                                
+
                 initSubgroups(pairs);
                 Pairs = pairs;
                 Teams = teams;
-                
+
 #if DEBUG
                 // BridgeMate lookup
                 if (newSession)
-                    if (string.IsNullOrEmpty(ErrorMessage)
-                    && !RoundCompleted)
+                    if (string.IsNullOrEmpty(ErrorMessage))
+                    //&& !RoundCompleted)
                         BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
                     else
                         BridgeMate.Close();
@@ -574,11 +582,11 @@ namespace DBF.ViewModels
                                     else
                                     //if (clubNew.Id == clubOld.Id)
                                     {
-                                        // Update PlayingTimes for existing club
+                                        // UpdateAndMarkAppStarted PlayingTimes for existing club
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                                  .SelectMany(mt => mt.PlayingTime);
+                                                                                                                  .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -611,7 +619,7 @@ namespace DBF.ViewModels
                                                             return;
                                                         }
                                                         else
-                                                            // Update existing tournament fileNew                                             
+                                                            // UpdateAndMarkAppStarted existing tournament fileNew                                             
                                                             fileOld.Merge(fileNew);
                                                     }
 
@@ -634,9 +642,9 @@ namespace DBF.ViewModels
                 }
             #endregion
 
-            private void initSubgroups(BindableCollection<Pair> pairs =null   )
+            private void initSubgroups(BindableCollection<Pair> pairs = null)
             {
-            pairs ??= Pairs;
+                pairs ??= Pairs;
 
                 for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
                 {

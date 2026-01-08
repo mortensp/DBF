@@ -12,19 +12,17 @@ namespace DBF
     /// </summary>
     public partial class App : Application
     {
+        Github _github = new Github("DBF");
+
         protected override void OnStartup(StartupEventArgs e)
-        {
-#if RELEASE //||DEBUG
-            
-            Github.Update();
-#endif
-            CrashDetector.MarkAppStarted();
+        {      
+            _github.UpdateAndMarkAppStarted();
             base.OnStartup(e);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            CrashDetector.MarkAppExitedNormally();
+            _github.MarkAppExitedNormally();
             base.OnExit(e);
         }
     }
