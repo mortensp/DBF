@@ -1,8 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -129,7 +132,6 @@ namespace DBF.ViewModels
                             }
                         }
                     }
-
                     catch (Exception ex)
                     {
                         throw ex;
@@ -253,18 +255,21 @@ namespace DBF.ViewModels
                 var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
                 if (projectorView is not null)
+                {
+                    CurrentView = null;
                     projectorView.Close();
+                }
             }
 
-            public override Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
+            public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
             {
                 if (Configuration.TimersActive)
                 {
                     var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
-                    return Task.FromResult(result == MessageBoxResult.Yes);
+                    return await Task.FromResult(result == MessageBoxResult.Yes);
                 }
                 else
-                    return Task.FromResult(true);
+                    return await Task.FromResult(true);
             }
         #endregion
 
@@ -321,6 +326,7 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
+
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -343,7 +349,6 @@ namespace DBF.ViewModels
                 bool InterWovenHowell = false;
                 bool Mitchell         = false;
                 //bool RoundCompleted   = true;
-
                 try
                 {
                     Configuration.StartTime = playingTime.Date;
@@ -362,7 +367,6 @@ namespace DBF.ViewModels
 
                         //if (!grp.Completed)
                         //    RoundCompleted = false;
-
                         if (grp.Tournament.TournamentType.Text == "Parturnering")
                         {
                             if (grp.Resultlist is not null)
@@ -489,7 +493,6 @@ namespace DBF.ViewModels
                         }
                     }
                 }
-
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -511,7 +514,7 @@ namespace DBF.ViewModels
                 // BridgeMate lookup
                 if (newSession)
                     if (string.IsNullOrEmpty(ErrorMessage))
-                    //&& !RoundCompleted)
+                        //&& !RoundCompleted)
                         BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
                     else
                         BridgeMate.Close();
@@ -550,6 +553,7 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -586,7 +590,7 @@ namespace DBF.ViewModels
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                                                  .SelectMany(mt => mt.PlayingTime);
+                                                                                                                                          .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -634,7 +638,6 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -792,7 +795,6 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(        reader);
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -829,6 +831,7 @@ namespace DBF.ViewModels
                             else
                                 Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -859,12 +862,14 @@ namespace DBF.ViewModels
 
                         projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
                         projectorView.WindowState           = WindowState.Normal;
-                        projectorView.Top                   = primaryScreen.WorkingArea.Top;
                         projectorView.Width                 = 800;
                         projectorView.Height                = 600;
-                        projectorView.Left                  = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
-                    }
 
+                        projectorView.Top  = primaryScreen.WorkingArea.Top;
+                        projectorView.Left = primaryScreen.WpfBounds.Left
+                                           + primaryScreen.WpfBounds.Width
+                                           - projectorView.Width;
+                    }
 #endif
                 }
                 else
@@ -901,4 +906,3 @@ namespace DBF.ViewModels
         #endregion
     }
 }
-

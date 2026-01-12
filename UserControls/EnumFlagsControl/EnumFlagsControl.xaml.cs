@@ -14,41 +14,56 @@ namespace DBF.UserControls
             public EnumFlagsControl()
             {
                 InitializeComponent();
-                //DataContext = this;
+
+
             }
         #endregion
 
-        public ObservableCollection<SelectableFlag> Flags { get; } = new();
+        #region public Properties
+            public ObservableCollection<SelectableFlag> Flags { get; } = new();
+        #endregion
 
-        public static readonly DependencyProperty EnumTypeProperty = 
-                               DependencyProperty.Register( nameof(               EnumType), typeof(Type), typeof(EnumFlagsControl)
-                                                          , new PropertyMetadata(null,     OnEnumTypeChanged));
+        #region dependency properties 
+            #region dependency property EnumType
+                public static readonly DependencyProperty EnumTypeProperty = 
+                                       DependencyProperty.Register( nameof(              EnumType), typeof(Type), typeof(EnumFlagsControl)
+                                                                  , new PropertyMetadata(null,     OnEnumTypeChanged));
 
-        public Type EnumType
-        {
-            get=> (Type)GetValue(EnumTypeProperty);
-            set=> SetValue(EnumTypeProperty, value);
-        }
+                public Type EnumType
+                {
+                    get => (Type)GetValue(EnumTypeProperty);
+                    set => SetValue(EnumTypeProperty, value);
+                }
+            #endregion
 
-        public static readonly DependencyProperty SelectedFlagsProperty = 
-                               DependencyProperty.Register( nameof(                        SelectedFlags), typeof(Enum), typeof(EnumFlagsControl)
-                                                          , new FrameworkPropertyMetadata(null,          FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedFlagsChanged));
+            #region dependency property SelectedFlags
+                public static readonly DependencyProperty SelectedFlagsProperty = 
+                                       DependencyProperty.Register( nameof(SelectedFlags)
+                                                                  , typeof(Enum)
+                                                                  , typeof(EnumFlagsControl)
+                                                                  , new FrameworkPropertyMetadata( null
+                                                                                                 , FrameworkPropertyMetadataOptions.BindsTwoWayByDefault
+                                                                                                 , OnSelectedFlagsChanged));
 
-        public Enum SelectedFlags
-        {
-            get=> (Enum)GetValue(SelectedFlagsProperty);
-            set=> SetValue(SelectedFlagsProperty, value);
-        }
+                public Enum SelectedFlags
+                {
+                    get => (Enum)GetValue(SelectedFlagsProperty);
+                    set => SetValue(SelectedFlagsProperty, value);
+                }
+            #endregion
 
-        public static readonly DependencyProperty OrientationProperty = 
-                               DependencyProperty.Register( nameof(               Orientation), typeof(Orientation), typeof(EnumFlagsControl)
-                                                          , new PropertyMetadata(Orientation.Horizontal));
+            #region dependency property Orientation
+                public static readonly DependencyProperty OrientationProperty = 
+                                       DependencyProperty.Register( nameof(              Orientation), typeof(Orientation), typeof(EnumFlagsControl)
+                                                                  , new PropertyMetadata(Orientation.Horizontal));
 
-        public Orientation Orientation
-        {
-            get=> (Orientation)GetValue(OrientationProperty);
-            set=> SetValue(OrientationProperty, value);
-        }
+                public Orientation Orientation
+                {
+                    get => (Orientation)GetValue(OrientationProperty);
+                    set => SetValue(OrientationProperty, value);
+                }
+            #endregion
+        #endregion
 
         [SuppressPropertyChangedWarnings]
         private static void OnEnumTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -84,8 +99,10 @@ namespace DBF.UserControls
 
         internal void UpdateSelectedFlags(Enum flag, bool isSelected)
         {
-            if (_suppressFlagUpdate) return;
-            int current   = Convert.ToInt32(  SelectedFlags ?? Enum.ToObject(EnumType, 0));
+            if (_suppressFlagUpdate)
+                return;
+
+            int current   = Convert.ToInt32(SelectedFlags ?? Enum.ToObject(EnumType, 0));
             int flagValue = Convert.ToInt32(flag);
 
             int updated = isSelected ? (current | flagValue) : (current & ~flagValue);
@@ -100,7 +117,9 @@ namespace DBF.UserControls
 
         private void UpdateCheckboxesFromFlags()
         {
-            if (SelectedFlags == null) return;
+            if (SelectedFlags == null)
+                return;
+
             foreach (var f in Flags)
                 f.IsSelected = SelectedFlags.HasFlag(f.Value);
         }
@@ -115,6 +134,6 @@ namespace DBF.UserControls
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propName = null)
-           => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+                           => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
     }
 }

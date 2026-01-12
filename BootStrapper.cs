@@ -74,6 +74,7 @@ namespace DBF
                 var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
 
                 ViewLocator.LocateTypeForModelType = FindTypeForModelType(defaultLocateTypeForModelType);
+
             }
 
             [DebuggerStepThrough]

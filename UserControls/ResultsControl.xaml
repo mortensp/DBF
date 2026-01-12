@@ -67,7 +67,7 @@
             FontSize="14"
             HeaderRowHeight="25"
             ScrollViewer.CanContentScroll="True"
-            Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+            Visibility="{Binding Teams, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn

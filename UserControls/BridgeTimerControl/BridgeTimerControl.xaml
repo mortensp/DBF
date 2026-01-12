@@ -91,7 +91,7 @@
                             Content="X"
                             Cursor="Hand"
                             ToolTip="Luk uret og sluk"
-                            Visibility="{Binding CanClose, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding CanClose}" />
 
                         <TextBlock Grid.ColumnSpan="3" Grid.Row="1"
                             Margin="0,0,8,0"

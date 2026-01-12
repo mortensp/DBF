@@ -6,6 +6,7 @@
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:Background="White"
     mc:Ignorable="d">
 
     <Grid>
@@ -24,9 +25,7 @@
         <WrapPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
             Margin="0,0,0,8">
             <!--  Bridge Center eller Hoveklub  -->
-            <Label FontWeight="Bold">
-                Klub:
-            </Label>
+            <Label Content="Klub:" FontWeight="Bold" />
 
             <ComboBox Name="cmbClubNo"
                 ItemsSource="{Binding MainClubs}"
@@ -37,9 +36,7 @@
                 SelectedItem="{Binding SelectedMainClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <!--  Under kubben navn  -->
-            <Label FontWeight="Bold">
-                Hold:
-            </Label>
+            <Label Content="Hold:" FontWeight="Bold" />
 
             <ComboBox Name="cmbClub"
                 ItemsSource="{Binding Clubs}"
@@ -50,9 +47,8 @@
 
             <!--  Spilledato og tid  -->
             <Label Grid.Row="0" Grid.Column="0"
-                FontWeight="Bold">
-                Dato:
-            </Label>
+                Content="Dato:"
+                FontWeight="Bold" />
 
             <ComboBox Name="cmbDate" Grid.Row="0" Grid.Column="1"
                 ItemsSource="{Binding PlayingTimes}"
@@ -99,7 +95,7 @@
                             Width="70"
                             cal:Message.Attach="[Event Click] = [Action AddTimer]"
                             Content="Tilføj ur"
-                            IsEnabled="{Binding Configuration.TimersCanBeAdded, UpdateSourceTrigger=PropertyChanged}" />
+                            IsEnabled="{Binding Configuration.TimersCanBeAdded}" />
 
                     </WrapPanel>
 
@@ -123,9 +119,7 @@
         </TabControl>
 
         <Label Grid.Row="3" Grid.Column="0"
-            FontWeight="Bold">
-            Projektor:
-        </Label>
+            FontWeight="Bold" Content="Projektor:"/>
 
         <WrapPanel Grid.Row="3" Grid.Column="1"
             Margin="10,0,10,0"

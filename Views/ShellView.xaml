@@ -8,8 +8,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
-    Width="1100"
-    Height="900"
+    d:Width="1100"
+    d:Height="800"
     FontSize="14"
     WindowState="Normal"
     mc:Ignorable="d">

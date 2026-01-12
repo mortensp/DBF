@@ -21,19 +21,19 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <userctl:BridgeTimerControl x:Name="timer1" Grid.Column="0" Grid.Row="1"
+        <userctl:BridgeTimerControl x:Name="timer1" Grid.Row="1" Grid.Column="0"
             ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
             Timer="{Binding Configuration.BridgeTimers[0], UpdateSourceTrigger=PropertyChanged}" />
 
-        <userctl:BridgeTimerControl x:Name="timer2" Grid.Column="1" Grid.Row="1"
+        <userctl:BridgeTimerControl x:Name="timer2" Grid.Row="1" Grid.Column="1"
             ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
             Timer="{Binding Configuration.BridgeTimers[1], UpdateSourceTrigger=PropertyChanged}" />
 
-        <userctl:BridgeTimerControl x:Name="timer3" Grid.Column="0" Grid.Row="2"
+        <userctl:BridgeTimerControl x:Name="timer3" Grid.Row="2" Grid.Column="0"
             ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
             Timer="{Binding Configuration.BridgeTimers[2], UpdateSourceTrigger=PropertyChanged}" />
 
-        <userctl:BridgeTimerControl x:Name="timer4" Grid.Column="1" Grid.Row="2"
+        <userctl:BridgeTimerControl x:Name="timer4" Grid.Row="2" Grid.Column="1"
             ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
             Timer="{Binding Configuration.BridgeTimers[3], UpdateSourceTrigger=PropertyChanged}" />
 
