@@ -47,7 +47,7 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\AccessDatabaseEngine_2010_x86.exe"; Parameters: "/quiet /norestart /passive"; StatusMsg: "Installerer Access Database Engine 2010..."; Flags: runhidden skipifdoesntexist
+;Filename: "{tmp}\AccessDatabaseEngine_2010_x86.exe"; Parameters: "/quiet /norestart /passive"; StatusMsg: "Installerer Access Database Engine 2010..."; Flags: runhidden skipifdoesntexist
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
