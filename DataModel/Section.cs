@@ -1,5 +1,4 @@
-﻿using DBF.DataModel;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {

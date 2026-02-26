@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
-using DBF.DataModel;
-using Microsoft.EntityFrameworkCore;
-using Syncfusion.XlsIO.Parser.Biff_Records;
 
 namespace DBF.BridgeMateModel
 {

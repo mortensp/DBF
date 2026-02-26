@@ -1,6 +1,4 @@
-﻿using System;
-using System.Xml.Serialization;
-//using DeepCopy;
+﻿using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {

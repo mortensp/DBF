@@ -15,8 +15,10 @@ namespace DBF
         Github _github = new Github("DBF");
 
         protected override void OnStartup(StartupEventArgs e)
-        {      
+        {
+#if RELEASE
             _github.UpdateAndMarkAppStarted();
+#endif
             base.OnStartup(e);
         }
 

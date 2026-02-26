@@ -1,8 +1,9 @@
 ﻿<UserControl
+    x:Name="root"
     x:Class="DBF.UserControls.EnumFlagsControl"
-
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
     <ItemsControl ItemsSource="{Binding Flags, RelativeSource={RelativeSource AncestorType=UserControl}}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -12,9 +13,10 @@
 
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <CheckBox Content="{Binding Name}"
-                          Margin="5,2"
-                          IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                <CheckBox
+                    Margin="5,2"
+                    Content="{Binding Name}"
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}" />
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

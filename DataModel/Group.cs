@@ -1,7 +1,4 @@
-﻿//using Azure.Core.Pipeline;
-//using DeepCopy;
-
-namespace DBF.DataModel
+﻿namespace DBF.DataModel
 {
     public class Group
         { 

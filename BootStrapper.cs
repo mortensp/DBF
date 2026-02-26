@@ -9,6 +9,7 @@ using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Caliburn.Micro;
+using DBF.AudioServices;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.ViewModels;
@@ -22,7 +23,7 @@ namespace DBF
     {
         public Bootstrapper()
         {
-            Encoding.RegisterProvider( CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(                                       CodePagesEncodingProvider.Instance);
 
             FrameworkElement.LanguageProperty
                             .OverrideMetadata( typeof(FrameworkElement)
@@ -37,18 +38,6 @@ namespace DBF
         //{
         //    Console.SetOut(new ToDebugWriter());
         //}
-        protected override void OnStartup(object sender, StartupEventArgs e)
-        {
-            // Show screen at startup
-            DisplayRootViewForAsync<ShellViewModel>();
-            var screen = IoC.Get<ShellViewModel>();
-            //var view   = screen.GetView() as ShellView;
-            screen.OpenControlView();
-
-            // Restore Taskbar Icon.
-            Application.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
-        }
-
         #region SimpleContainer Overrides and Configuration.
             private readonly SimpleContainer _container = new();
 
@@ -61,6 +50,7 @@ namespace DBF
                 _container.Singleton<IEventAggregator, EventAggregator>();
                 _container.Singleton<Configuration>();
                 _container.Singleton<BridgeMate>();
+                _container.Singleton<IAudioService, WindowsAudioService>();
 
                 foreach (var viewModel in SelectViewModels())
                     if (_container.HasHandler(viewModel, null) == false)
@@ -74,7 +64,6 @@ namespace DBF
                 var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
 
                 ViewLocator.LocateTypeForModelType = FindTypeForModelType(defaultLocateTypeForModelType);
-
             }
 
             [DebuggerStepThrough]
@@ -102,9 +91,9 @@ namespace DBF
                 throw new InvalidOperationException("Could not locate any instances.");
             }
 
-            protected override IEnumerable<object> GetAllInstances(Type service)=> _container.GetAllInstances(service);
+            protected override IEnumerable<object> GetAllInstances(Type service) => _container.GetAllInstances(service);
 
-            protected override void BuildUp(object instance)
+            protected override void BuildUp(                       object instance)
             {
                 _container.BuildUp(instance);
             }
@@ -125,6 +114,22 @@ namespace DBF
             //if (e.Exception.InnerException is not null)
             //    Logger.Error(e.Exception.InnerException.Message, "Inner Exception");
             base.OnUnhandledException(sender, e);
+        }
+
+        protected override void OnStartup(object sender, StartupEventArgs e)
+        {
+#if true
+            DisplayRootViewForAsync<TimerSettingsViewModel>();
+            var screen = IoC.Get<TimerSettingsViewModel>();
+#else
+            // Show screen at startup
+            DisplayRootViewForAsync<ShellViewModel>();
+            var screen = IoC.Get<ShellViewModel>();
+            //var view   = screen.GetView() as ShellView;
+            screen.OpenControlView();
+#endif
+            // Restore Taskbar Icon.
+            Application.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
         }
     }
 }

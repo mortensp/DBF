@@ -1,11 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Reflection;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
-using Caliburn.Micro;
-using static System.TimeZoneInfo;
 using Brush = System.Windows.Media.Brush;
 
 namespace DBF.DataModel

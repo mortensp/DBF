@@ -1,7 +1,4 @@
-﻿//using HtmlAgilityPack;
-//using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-
-namespace DBF.Helpers
+﻿namespace DBF.Helpers
 {  
     public class VPTable
     {

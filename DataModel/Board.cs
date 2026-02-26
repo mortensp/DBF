@@ -1,6 +1,4 @@
-﻿//using BridgeTypes;
-using System.Xml.Serialization;
-using Syncfusion.Windows.Shared;
+﻿using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {

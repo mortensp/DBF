@@ -1,7 +1,4 @@
-﻿using System.Data.SqlTypes;
-using System.Globalization;
-using System.Linq;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {

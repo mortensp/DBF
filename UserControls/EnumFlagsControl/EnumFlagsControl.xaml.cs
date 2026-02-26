@@ -14,8 +14,6 @@ namespace DBF.UserControls
             public EnumFlagsControl()
             {
                 InitializeComponent();
-
-
             }
         #endregion
 
@@ -26,7 +24,7 @@ namespace DBF.UserControls
         #region dependency properties 
             #region dependency property EnumType
                 public static readonly DependencyProperty EnumTypeProperty = 
-                                       DependencyProperty.Register( nameof(              EnumType), typeof(Type), typeof(EnumFlagsControl)
+                                       DependencyProperty.Register( nameof(               EnumType), typeof(Type), typeof(EnumFlagsControl)
                                                                   , new PropertyMetadata(null,     OnEnumTypeChanged));
 
                 public Type EnumType
@@ -38,7 +36,7 @@ namespace DBF.UserControls
 
             #region dependency property SelectedFlags
                 public static readonly DependencyProperty SelectedFlagsProperty = 
-                                       DependencyProperty.Register( nameof(SelectedFlags)
+                                       DependencyProperty.Register( nameof(SelectedFlags) 
                                                                   , typeof(Enum)
                                                                   , typeof(EnumFlagsControl)
                                                                   , new FrameworkPropertyMetadata( null
@@ -54,7 +52,7 @@ namespace DBF.UserControls
 
             #region dependency property Orientation
                 public static readonly DependencyProperty OrientationProperty = 
-                                       DependencyProperty.Register( nameof(              Orientation), typeof(Orientation), typeof(EnumFlagsControl)
+                                       DependencyProperty.Register( nameof(               Orientation), typeof(Orientation), typeof(EnumFlagsControl)
                                                                   , new PropertyMetadata(Orientation.Horizontal));
 
                 public Orientation Orientation
@@ -102,7 +100,7 @@ namespace DBF.UserControls
             if (_suppressFlagUpdate)
                 return;
 
-            int current   = Convert.ToInt32(SelectedFlags ?? Enum.ToObject(EnumType, 0));
+            int current   = Convert.ToInt32(  SelectedFlags ?? Enum.ToObject(EnumType, 0));
             int flagValue = Convert.ToInt32(flag);
 
             int updated = isSelected ? (current | flagValue) : (current & ~flagValue);
@@ -134,6 +132,6 @@ namespace DBF.UserControls
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propName = null)
-                           => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+                               => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
     }
 }

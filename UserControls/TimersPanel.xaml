@@ -4,12 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:userctl="clr-namespace:DBF.UserControls"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    xmlns:userctls="clr-namespace:DBF.UserControls"
+
+    d:Background="White"
+  
     mc:Ignorable="d">
 
-    <Grid>
+    <Grid DataContext="{Binding ElementName=root}" d:DataContext="{d:DesignInstance Type=userctls:TimersPanel, IsDesignTimeCreatable=True}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
@@ -18,24 +19,23 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <userctl:BridgeTimerControl x:Name="timer1" Grid.Row="1" Grid.Column="0"
-            ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
-            Timer="{Binding Configuration.BridgeTimers[0], UpdateSourceTrigger=PropertyChanged}" />
+        <userctls:BridgeTimerControl x:Name="timer1" Grid.Row="0" Grid.Column="0"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            Timer="{Binding Configuration.BridgeTimers[0]}" />
 
-        <userctl:BridgeTimerControl x:Name="timer2" Grid.Row="1" Grid.Column="1"
-            ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
-            Timer="{Binding Configuration.BridgeTimers[1], UpdateSourceTrigger=PropertyChanged}" />
+        <userctls:BridgeTimerControl x:Name="timer2" Grid.Row="0" Grid.Column="1"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            Timer="{Binding Configuration.BridgeTimers[1]}" />
 
-        <userctl:BridgeTimerControl x:Name="timer3" Grid.Row="2" Grid.Column="0"
-            ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
-            Timer="{Binding Configuration.BridgeTimers[2], UpdateSourceTrigger=PropertyChanged}" />
+        <userctls:BridgeTimerControl x:Name="timer3" Grid.Row="1" Grid.Column="0"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            Timer="{Binding Configuration.BridgeTimers[2]}" />
 
-        <userctl:BridgeTimerControl x:Name="timer4" Grid.Row="2" Grid.Column="1"
-            ButtonsVisibility="{Binding ButtonsVisibility, ElementName=root}"
-            Timer="{Binding Configuration.BridgeTimers[3], UpdateSourceTrigger=PropertyChanged}" />
+        <userctls:BridgeTimerControl x:Name="timer4" Grid.Row="1" Grid.Column="1"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            Timer="{Binding Configuration.BridgeTimers[3]}" />
 
     </Grid>
 </UserControl>

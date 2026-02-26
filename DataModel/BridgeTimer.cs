@@ -1,81 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
-using DBF.DataModel;
+using DBF.AudioServices;
 using DBF.Helpers;
 using DBF.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace DBF.DataModel
 {
     public partial class BridgeTimer : TimerSetting
     {
-        private DispatcherTimer _timer;
+        private IAudioService _player { get => field ??= IoC.Get<IAudioService>(); set => field = value; }
         //
-        private static readonly TimeSpan      _oneHour        = new TimeSpan(1, 0,  0);
-        private static readonly TimeSpan      _fiveMinutes    = new TimeSpan(0, 5,  0);
-        private static readonly TimeSpan      _twoMinutes     = new TimeSpan(0, 2,  0);
-        private static readonly TimeSpan      _threshold      = new TimeSpan(0, 0,  1);
-        private                 TimeSpan      _startTime      = new TimeSpan(0, 21, 0);
-        private                 TimeSpan      _transitionTime = new TimeSpan(0, 1,  0);
-        private                 TimeSpan      _breakTime      = new TimeSpan(0, 12, 0);
-        private                 TimeSpan      _warningTime    = new TimeSpan(0, 5,  0);
-        private                 TimeSpan      _remainingTime  = TimeSpan.MinValue;
-        private                 bool          _isStarted;
-        private                 bool          _isAtBreak;
-        private                 bool          _isAtTransition;
-        private                 bool          _isPaused;
-        private                 Configuration configuration;
+        private                 DispatcherTimer _timer;
+        private static readonly TimeSpan        _oneHour        = new TimeSpan(1, 0,  0);
+        private static readonly TimeSpan        _fiveMinutes    = new TimeSpan(0, 5,  0);
+        private static readonly TimeSpan        _twoMinutes     = new TimeSpan(0, 2,  0);
+        private static readonly TimeSpan        _threshold      = new TimeSpan(0, 0,  1);
+        private                 TimeSpan        _startTime      = new TimeSpan(0, 21, 0);
+        private                 TimeSpan        _transitionTime = new TimeSpan(0, 1,  0);
+        private                 TimeSpan        _breakTime      = new TimeSpan(0, 12, 0);
+        private                 TimeSpan        _warningTime    = new TimeSpan(0, 5,  0);
+        private                 TimeSpan        _remainingTime  = TimeSpan.MinValue;
+        private                 bool            _isStarted;
+        private                 bool            _isAtBreak;
+        private                 bool            _isAtTransition;
+        private                 bool            _isPaused;
 
         public BridgeTimer()
         {
-            _timer               = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _timer.Tick         += Timer_Tick;
-            base.PropertyChanged+= BridgeTimer_PropertyChanged;
-        }
-
-        private void BridgeTimer_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            //if (e.PropertyName == nameof(MinutesLeft))
-            //    NotifyOfPropertyChange(nameof(EndTime));
+            _timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer.Tick+= Timer_Tick;
         }
 
         #region Public Properties
-            [JsonIgnore] public Configuration Configuration    { get => configuration ?? (configuration = IoC.Get<Configuration>()); private set => configuration = value; }
-            [JsonIgnore] public string        Time             { get; set; } = "21:17";
-            [JsonIgnore] public Visibility    WarningVisiblity { get; set; } //= Visibility.Hidden;
+            [JsonIgnore] public Configuration Configuration    { get => field ??= IoC.Get<Configuration>(); set => field = value; }
+            [JsonIgnore] public string        Time             { get; set; }
+            [JsonIgnore] public Visibility    WarningVisiblity { get; set; }
             [JsonIgnore] public string        RoundText        { get; set; }
             [JsonIgnore] public string        MoreInfo         { get; set; }
-            [JsonIgnore] public Visibility    ShowUpButton     { get; set; } //= Visibility.Visible;
-            [JsonIgnore] public Visibility    ShowDownButton   { get; set; } //= Visibility.Visible;
+            [JsonIgnore] public Visibility    ShowUpButton     { get; set; }
+            [JsonIgnore] public Visibility    ShowDownButton   { get; set; }
             [JsonIgnore] public double        MinutesLeft      { get; set; }
             [JsonIgnore] public int           Round            { get; set; } = 1;
-            [JsonIgnore] public TimeOnly EndTime=> TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(Math.Max(MinutesLeft,0)));
+            [JsonIgnore] public TimeOnly EndTime  => TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(Math.Max(MinutesLeft, 0)));
             //
             [JsonIgnore]
             public bool IsPaused
             {
-                get=> _isPaused;
-                set=> Set(ref _isPaused, value);
+                get => _isPaused;
+                set => Set(ref _isPaused, value);
             }
 
             [JsonIgnore]
             public bool IsStarted
             {
-                get=> _isStarted;
-                set=> Set(ref _isStarted, value);
+                get => _isStarted;
+                set => Set(ref _isStarted, value);
             }
 
-            [JsonIgnore] public bool IsActive=> IsStarted && Round <= Rounds;
+            [JsonIgnore] public bool IsActive => IsStarted && Round <= Rounds;
             [JsonIgnore] public bool IsEnded => Round >  Rounds;
         #endregion
 
@@ -103,15 +89,15 @@ namespace DBF.DataModel
             {
                 if (!_isPaused)
                     if (_remainingTime == _warningTime)
-                        AudioPlayer.Play(Sound, Volume);                            // Warning before end of Round
+                        _player.Play(Sound, Volume);                            // Warning before end of Round
                     else
                         if (_isAtBreak && _remainingTime == _twoMinutes)
-                            AudioPlayer.Play(Sound, Volume);                        // Warning two minutes before end of Break
+                            _player.Play(Sound, Volume);                        // Warning two minutes before end of Break
                         else
                             if (_remainingTime == TimeSpan.Zero)
                                 if (!_isAtBreak && Round == BreakAfterRound)
                                 {
-                                    AudioPlayer.Play("Ding Ding", Volume);          // Break
+                                    _player.Play("Ding Ding", Volume);          // Break
                                     _remainingTime  = _breakTime;
                                     _isAtTransition = false;
                                     _isAtBreak      = true;
@@ -119,14 +105,14 @@ namespace DBF.DataModel
                                 else
                                     if (Round >= Rounds)
                                     {
-                                        AudioPlayer.Play(Sound, Volume);            // End of game                                        
+                                        _player.Play(Sound, Volume);            // End of game                                        
                                         Round++;
                                         _timer.Stop();
                                     }
                                     else
                                         if (_isAtTransition || _isAtBreak)
                                         {
-                                            AudioPlayer.Play("Ding Ding", Volume);  // Start next round
+                                            _player.Play("Ding Ding", Volume);  // Start next round
                                             _remainingTime  = _startTime;
                                             _isAtTransition = false;
                                             _isAtBreak      = false;
@@ -135,13 +121,13 @@ namespace DBF.DataModel
                                         else
                                             if (_transitionTime == TimeSpan.Zero)
                                             {
-                                                AudioPlayer.Play(Sound, Volume);    // End of round
+                                                _player.Play(Sound, Volume);    // End of round
                                                 _remainingTime = _startTime;
                                                 Round++;
                                             }
                                             else
                                             {
-                                                AudioPlayer.Play(Sound, Volume);    // Transition
+                                                _player.Play(Sound, Volume);    // Transition
                                                 _isAtTransition = true;
                                                 _remainingTime  = _transitionTime;
                                             }
@@ -205,7 +191,7 @@ namespace DBF.DataModel
 
                 //if (Duration!=MinutesLeft)
                 //    Debug.WriteLine("Difference in Duration and MinutesLeft");
-        }
+            }
 
             public void Close()
             {
@@ -371,8 +357,8 @@ namespace DBF.DataModel
                         _timer.Stop();
             }
 
-            private string        getRoundText => TeamMatch ? "halvleg" : "runde";
-            private string        getRoundsText=> TeamMatch ? "halvlege" : "runder";
+            private string getRoundText  => TeamMatch ? "halvleg" : "runde";
+            private string getRoundsText => TeamMatch ? "halvlege" : "runder";
         #endregion
     }
 }

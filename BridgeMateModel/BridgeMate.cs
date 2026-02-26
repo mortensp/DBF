@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,7 +8,7 @@ using System.Windows;
 using System.Windows.Threading;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
-using Microsoft.DotNet.DesignTools.Protocol.Values;
+//using Microsoft.DotNet.DesignTools.Protocol.Values;
 
 namespace DBF
 {

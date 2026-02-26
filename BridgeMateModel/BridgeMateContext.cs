@@ -7,9 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Syncfusion.Data.Extensions;
-using Syncfusion.XlsIO.Parser.Biff_Records;
 
 namespace DBF.BridgeMateModel
 {

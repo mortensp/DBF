@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -9,14 +8,9 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
-using DBF.UserControls;
-using Microsoft.DotNet.DesignTools.Protocol.Values;
-using Microsoft.Extensions.Options;
+using DBF.AudioServices;
 using Syncfusion.Data.Extensions;
-using Syncfusion.Pdf.Graphics;
-using Syncfusion.Windows.Controls;
 using Syncfusion.Windows.Tools.Controls;
-using static System.TimeZoneInfo;
 
 namespace DBF.DataModel
 {
@@ -90,13 +84,10 @@ namespace DBF.DataModel
                 var diff = DateTime.Now - startTime;
 
                 if (diff > _zeroTime && diff < limit)
-                {
+                
                     return DateTime.Now;
-                    //if (Set(ref startTime, DateTime.Now))
-                    //    setEndTime();
-
-                    //return startTime;
-                }
+                    
+                
                 else
                     return startTime;
             }
@@ -125,10 +116,10 @@ namespace DBF.DataModel
 
         public BindableCollection<Preset> Presets { get; set; } = new()
                                                                                                                                                                                                                                                         {
-                                                                                                                                                                                                                                                        new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5),
-                                                                                                                                                                                                                                                        new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5),
-                                                                                                                                                                                                                                                        new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5),
-                                                                                                                                                                                                                                                        new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                          new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                        , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                        , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                        , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
                                                                                                                                                                                                                                                         };
 
         [JsonIgnore]
@@ -229,7 +220,7 @@ namespace DBF.DataModel
                 }
 
                 if (string.IsNullOrEmpty(timer.Sound))
-                    timer.Sound = AudioPlayer.Sounds[i];
+                        timer.Sound = AudioResources.Sounds[i];
 
                 BridgeTimers.Add(timer);
 
@@ -248,7 +239,8 @@ namespace DBF.DataModel
                 timer.BackgroundColor = BackgroundColors[i].Color;
                 timer.Groups = (GroupFlags)(1 << i); // Set group to A, B, C or D
                 timer.Visibility = Visibility.Collapsed;
-                timer.Sound = AudioPlayer.Sounds[i];
+               timer.Sound           = AudioResources.Sounds[i];
+
 
                 BridgeTimers.Add(timer);
 

@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Xml.Serialization;
-using Syncfusion.PMML;
+﻿using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {

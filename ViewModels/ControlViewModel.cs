@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -17,9 +14,9 @@ using DBF.Converters;
 using DBF.DataModel;
 using DBF.UserControls;
 using DBF.Views;
-//using PropertyChanged;
+
 using Syncfusion.Data.Extensions;
-//using Syncfusion.DocIO.DLS;
+
 namespace DBF.ViewModels
 {
     public static class MovementPlans

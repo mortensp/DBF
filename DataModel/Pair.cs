@@ -1,8 +1,4 @@
 ﻿//using Azure.Core.Pipeline;
-using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Media;
 using System.Xml.Serialization;
 using PropertyChanged;
 //using DeepCopy;

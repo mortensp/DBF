@@ -1,8 +1,7 @@
-﻿using Syncfusion.Licensing;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Text;
+using Syncfusion.Licensing;
 
 namespace DBF.Helpers
 {

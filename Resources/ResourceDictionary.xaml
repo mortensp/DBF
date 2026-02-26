@@ -19,7 +19,6 @@
     <conv:EnumCastConverter x:Key="EnumCastConverter" />
 
 
-
     <LinearGradientBrush x:Key="HeaderBrush" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientStop Offset="0.000" Color="#FFFFFFFF" />
         <GradientStop Offset="0.194" Color="#AAC6D6EC" />
@@ -123,8 +122,6 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <!--<Setter Property="Padding" Value="5,0,5,0" />-->
     </Style>
-
-
 
     <Style x:Key="CenteredCourierNew" TargetType="{x:Type sfgrid:GridCell}">
         <Setter Property="FontFamily" Value="Courier New" />
