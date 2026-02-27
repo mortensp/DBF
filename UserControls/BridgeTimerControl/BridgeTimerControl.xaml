@@ -4,10 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dm="clr-namespace:DBF.DataModel"
-    xmlns:userctls="clr-namespace:DBF.UserControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userctls="clr-namespace:DBF.UserControls"
     d:Background="white"
-  
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -80,9 +79,9 @@
 
                         <TextBlock Grid.Row="0" Grid.Column="1"
                             Margin="0,0,0,4"
-                            HorizontalAlignment="Center"
                             FontWeight="Bold"
-                            Text="{Binding Timer.RoundText}" />
+                            Text="{Binding Timer.RoundText}"
+                            TextAlignment="Center" />
 
                         <!--  Close button  -->
                         <Button x:Name="btnClose" Grid.Row="0" Grid.Column="2"
@@ -128,31 +127,22 @@
                         </TextBlock>
 
                         <TextBlock x:Name="info" Grid.Row="3" Grid.Column="1"
+                            MaxWidth="400"
+                            MaxHeight="150"
                             Margin="0,0,0,4"
-                            HorizontalAlignment="Center"
                             FontSize="18"
                             FontWeight="SemiBold"
-                            Text="{Binding Timer.Info}" />
+                            Text="{Binding Timer.Info}"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap" />
 
-                        <TextBlock x:Name="extraInfo" Grid.Row="4" Grid.Column="1"
-                            Margin="0,0,0,4"
-                            HorizontalAlignment="Center"
-                            FontSize="18"
-                            FontWeight="SemiBold"
-                            Text="{Binding Timer.MoreInfo}" />
-
-                        <TextBlock x:Name="group" Grid.Row="5" Grid.Column="1"
+                            <TextBlock x:Name="group" Grid.Row="5" Grid.Column="1"
                             Margin="0,8,0,0"
                             HorizontalAlignment="Center"
                             FontWeight="Bold"
                             Text="{Binding Timer.GroupStr}" />
 
-                        <!--<TextBlock  Grid.Column="2" Grid.Row="5"
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Center"
-                            FontWeight="Bold"
-                            Text="{Binding Timer.EndTime, UpdateSourceTrigger=PropertyChanged}" />-->
-                    </Grid>
+                        </Grid>
                 </Border>
 
                 <!--  Timer Control Buttons  -->

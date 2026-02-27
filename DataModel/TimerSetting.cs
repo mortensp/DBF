@@ -31,49 +31,45 @@ namespace DBF.DataModel
                                , string sound = null
                                , int volume = 50
                                , Visibility visibility = Visibility.Visible
+                               , string endGreetingTop = null
+                               , string endGreetingBottom = null
                                ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
             {
-                Groups          = groups;
-                Info            = info;
-                Sound           = sound;
-                Volume          = volume;
-                BackgroundColor = backgroundColor;
-                ForegroundColor = foregroundColor;
-                Visibility      = visibility;
+                Groups            = groups;
+                Info              = info;
+                Sound             = sound;
+                Volume            = volume;
+                BackgroundColor   = backgroundColor;
+                ForegroundColor   = foregroundColor;
+                Visibility        = visibility;
+                EndGreetingTop    = endGreetingBottom;
+                EndGreetingBottom = endGreetingBottom;
             }
         #endregion
 
         public Color? ForegroundColor
         {
-            get=> fgColor;
+            get => fgColor;
             set
             {
-                if (Set(ref fgColor,value))
+                if (Set(                             ref fgColor,                                 value))
                     Foreground = new SolidColorBrush(value is null ? Colors.Black : (Color)value);
             }
         }
 
         public Color? BackgroundColor
         {
-            get=> bgColor;
+            get => bgColor;
             set
             {
                 if (Set(ref bgColor, value))
                 {
-                    Background = new SolidColorBrush(value is null ? Colors.White: (Color)value);
+                    Background      = new SolidColorBrush(value is null ? Colors.White : (Color)value);
                     ForegroundColor = getContrastingColor(value ?? Colors.White);
                 }
             }
         }
 
-        ////TODO: kan senere helt fjernes
-        //public Color? Color
-        //{
-        //    get=> BackgroundColor;
-        //    set=> BackgroundColor = value;
-        //}
-
-        
         public              GroupFlags Groups     { get; set; }
         public              string     Info       { get; set; }
         [JsonIgnore] public Brush      Foreground { get; set; }
@@ -81,8 +77,32 @@ namespace DBF.DataModel
         public              string     Sound      { get; set; }
         public              int        Volume     { get; set; }
         public              Visibility Visibility { get; set; }
-
         public              string     GroupStr   { get => Groups.ToFriendlyString(); }
+        public string EndGreetingTop
+        {
+            get => field;
+            set
+            {
+                value = string.IsNullOrWhiteSpace(value)
+                      ? null
+                      : field = value?.Trim();
+
+                Set(ref field, value);
+            }
+        }
+
+        public string EndGreetingBottom
+        {
+            get => field;
+            set
+            {
+                value = string.IsNullOrWhiteSpace(value)
+                      ? null
+                      : field = value?.Trim();
+
+                Set(ref field, value);
+            }
+        }
 
         public new void Update(Preset preset)
         {
@@ -101,14 +121,16 @@ namespace DBF.DataModel
 
             if (preset is TimerSetting tSetting)
             {
-                Groups          = tSetting.Groups;
-                Info            = tSetting.Info;
-                Volume          = 0;
-                Sound           = tSetting.Sound;
-                Volume          = tSetting.Volume;
-                BackgroundColor = tSetting.BackgroundColor;
-                ForegroundColor = tSetting.ForegroundColor;
-                Visibility      = tSetting.Visibility;
+                Groups            = tSetting.Groups;
+                Info              = tSetting.Info;
+                Volume            = 0;
+                Sound             = tSetting.Sound;
+                Volume            = tSetting.Volume;
+                BackgroundColor   = tSetting.BackgroundColor;
+                ForegroundColor   = tSetting.ForegroundColor;
+                Visibility        = tSetting.Visibility;
+                EndGreetingTop    = tSetting.EndGreetingTop;
+                EndGreetingBottom = tSetting.EndGreetingBottom;
             }
         }
 

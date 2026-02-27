@@ -1,9 +1,8 @@
-﻿<UserControl
-    x:Name="root"
+﻿<UserControl x:Name="root"
     x:Class="DBF.UserControls.EnumFlagsControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+
     <ItemsControl ItemsSource="{Binding Flags, RelativeSource={RelativeSource AncestorType=UserControl}}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>

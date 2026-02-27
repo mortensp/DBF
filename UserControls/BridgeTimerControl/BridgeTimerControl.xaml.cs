@@ -30,7 +30,9 @@ public partial class BridgeTimerControl : UserControl
                       , Time             = "21:17"
                       , RoundText        = "3. Runde"
                       , Info             = "Vi spiller 7 runder af 24 spil"
-                      , MoreInfo         = "Pause efter 4. Runde"
+                      + Environment.NewLine +
+                      //, MoreInfo         = 
+                      "Pause efter 4. Runde"
                       , MinutesLeft      = 13d
                       , WarningVisiblity = Visibility.Visible
                     };
@@ -43,10 +45,11 @@ public partial class BridgeTimerControl : UserControl
 
     #region Dependency Properties
         #region Timer Dependency Property
-            public static readonly DependencyProperty BridgeTimerProperty = DependencyProperty.Register( nameof(Timer)
-                                                                                                       , typeof(BridgeTimer)
-                                                                                                       , typeof(BridgeTimerControl)
-                                                                                                       , new FrameworkPropertyMetadata(null,onBridgeTimerPropertyChanged));
+            public static readonly DependencyProperty BridgeTimerProperty = 
+                                   DependencyProperty.Register( nameof(Timer)
+                                                              , typeof(BridgeTimer)
+                                                              , typeof(BridgeTimerControl)
+                                                              , new FrameworkPropertyMetadata(null,onBridgeTimerPropertyChanged));
             public BridgeTimer Timer
             {
                 get => (BridgeTimer)GetValue(BridgeTimerProperty);

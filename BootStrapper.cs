@@ -41,7 +41,7 @@ namespace DBF
         #region SimpleContainer Overrides and Configuration.
             private readonly SimpleContainer _container = new();
 
-            [DebuggerStepThrough]
+            //[DebuggerStepThrough]
             protected override void Configure()
             {
                 SyncFusion.FindandRegisterLicenseKey();
@@ -55,7 +55,7 @@ namespace DBF
                 foreach (var viewModel in SelectViewModels())
                     if (_container.HasHandler(viewModel, null) == false)
                         if (viewModel.Name == "ConfigurationViewModel"
-                        ||  viewModel.Name == "TimerSettingViewModel"
+                        ||  viewModel.Name == "TimerSettingsViewModel"
                         ||  viewModel.Name == "PresetNameViewModel")
                             _container.RegisterPerRequest(viewModel, null, viewModel);
                         else
@@ -67,7 +67,7 @@ namespace DBF
             }
 
             [DebuggerStepThrough]
-            private static Func<Type, DependencyObject, object, Type> FindTypeForModelType(Func<Type, DependencyObject, object, Type> defaultLocateTypeForModelType)
+        private static Func<Type, DependencyObject, object, Type> FindTypeForModelType(Func<Type, DependencyObject, object, Type> defaultLocateTypeForModelType)
             {
                 return (Type modelType, DependencyObject displayLocation, object context) =>
                        {
@@ -118,7 +118,7 @@ namespace DBF
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-#if true
+#if false
             DisplayRootViewForAsync<TimerSettingsViewModel>();
             var screen = IoC.Get<TimerSettingsViewModel>();
 #else

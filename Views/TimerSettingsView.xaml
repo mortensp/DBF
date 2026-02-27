@@ -1,5 +1,6 @@
 ﻿<Window x:Name="root"
     x:Class="DBF.Views.TimerSettingsView"
+    Title="Indstil uret"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:audio="clr-namespace:DBF.AudioServices"
@@ -11,10 +12,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
-    Title="Indstil uret"
-    Width="500"
-    Height="590"
-    ResizeMode="NoResize"
+    Width="565"
+    Height="620"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
@@ -42,320 +41,360 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border
-            Padding="12"
-            BorderBrush="Gray"
-            BorderThickness="1"
-            CornerRadius="6">
+        <!--  Make this scrollable  -->
+        <ScrollViewer Grid.Row="0"
+            CanContentScroll="True"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto">
 
-            <StackPanel>
-                <TextBlock
-                    Margin="0,0,0,12"
-                    FontSize="16"
-                    FontWeight="Bold"
-                    Text="Indstil uret" />
+            <Border
+                Padding="12"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                CornerRadius="6">
 
-                <Grid DataContext="{Binding NewSetting}" Margin="0,0,0,0">
-                    <Grid.RowDefinitions>
-                        <!--  Add a row for each field  -->
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Text="Indstil uret" />
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                    <Grid DataContext="{Binding NewSetting}" Margin="0,0,0,0">
+                        <Grid.RowDefinitions>
+                            <!--  Add a row for each field  -->
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <!--  Række(r):  -->
-                    <TextBlock Grid.Row="0" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Række(r):" />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <ctl:EnumFlagsControl Grid.Row="0" Grid.Column="1"
-                        EnumType="{x:Type model:GroupFlags}"
-                        Orientation="Horizontal"
-                        SelectedFlags="{Binding Groups, Mode=TwoWay, Converter={StaticResource EnumCastConverter}}" />
-
-                    <!--  Background:  -->
-                    <TextBlock Grid.Row="1" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Baggrund:" />
-
-                    <sf:ColorPickerPalette Name="bgColor" Grid.Row="1" Grid.Column="1"
-                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-                        Width="200"
-                        Height="35"
-                        Margin="0,5"
-                        HorizontalAlignment="Left"
-                        AutomaticColorVisibility="Collapsed"
-                        CustomColorsCollection="{Binding NewColorCollection}"
-                        CustomHeaderText="Udvalgte Farver"
-                        CustomHeaderVisibility="Visible"
-                        SetCustomColors="True"
-                        StandardPanelVisibility="Collapsed"
-                        ThemePanelVisibility="Collapsed"
-                        Color="{Binding NewSetting.BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <!--  Forekground:  -->
-                    <TextBlock Grid.Row="2" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Tekstfarve:" />
-
-                    <sf:ColorPickerPalette Name="fgColor" Grid.Row="2" Grid.Column="1"
-                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-                        Width="200"
-                        Height="35"
-                        Margin="0,5"
-                        HorizontalAlignment="Left"
-                        AutomaticColorVisibility="Collapsed"
-                        CustomColorsCollection="{Binding NewColorCollection}"
-                        CustomHeaderText="Udvalgte Farver"
-                        CustomHeaderVisibility="Visible"
-                        SetCustomColors="True"
-                        StandardPanelVisibility="Collapsed"
-                        ThemePanelVisibility="Collapsed"
-                        Color="{Binding NewSetting.ForegroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-
-                    <!--  Lyd:  -->
-                    <TextBlock Grid.Row="3" Grid.Column="0"
-                        Margin="0,5"
-                        Text="Lyd:" />
-
-                    <WrapPanel Grid.Row="3" Grid.Column="1">
-                        <ComboBox
-                            ItemsSource="{x:Static audio:AudioResources.Sounds}"
-                            SelectedItem="{Binding Sound}"
-                            Width="120"
+                        <!--  Række(r):  -->
+                        <TextBlock Grid.Row="0" Grid.Column="0"
                             Margin="0,5"
-                            cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]" />
+                            VerticalAlignment="Center"
+                            Text="Række(r):" />
 
-                        <Slider x:Name="volume"
+                        <ctl:EnumFlagsControl Grid.Row="0" Grid.Column="1"
+                            EnumType="{x:Type model:GroupFlags}"
+                            Orientation="Horizontal"
+                            SelectedFlags="{Binding Groups, Mode=TwoWay, Converter={StaticResource EnumCastConverter}}" />
+
+                        <!--  Background:  -->
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Baggrund:" />
+
+                        <sf:ColorPickerPalette Name="bgColor" Grid.Row="1" Grid.Column="1"
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
                             Width="200"
+                            Height="35"
                             Margin="0,5"
                             HorizontalAlignment="Left"
-                            cal:Message.Attach="[Event ValueChanged] = [Action VolumeChanged($eventArgs)]"
-                            Maximum="100"
-                            Minimum="0"
-                            Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </WrapPanel>
+                            AutomaticColorVisibility="Collapsed"
+                            CustomColorsCollection="{Binding NewColorCollection}"
+                            CustomHeaderText="Udvalgte Farver"
+                            CustomHeaderVisibility="Visible"
+                            SetCustomColors="True"
+                            StandardPanelVisibility="Collapsed"
+                            ThemePanelVisibility="Collapsed"
+                            Color="{Binding NewSetting.BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!--  Brug indstilling:  -->
-                    <TextBlock Grid.Row="4" Grid.Column="0"
-                        Margin="0,5,0,5"
-                        VerticalAlignment="Center"
-                        Text="Brug indstilling:" />
-
-                    <StackPanel Grid.Row="4" Grid.Column="1"
-                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
-                        <ComboBox x:Name="cbPresets"
-                            ItemsSource="{Binding Configuration.Presets}"
-                            SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Width="120"
+                        <!--  Forekground:  -->
+                        <TextBlock Grid.Row="2" Grid.Column="0"
                             Margin="0,5"
-                            DisplayMemberPath="Name"
-                            IsEditable="False" />
-
-                        <Button
-                            Width="28"
-                            Margin="4,5,0,5"
-                            cal:Message.Attach="[Event Click] = [Action AddPreset]"
-                            Content="+"
-                            ToolTip="Opret ny forudstilling" />
-
-                        <Button
-                            Width="28"
-                            Margin="4,5,0,5"
-                            cal:Message.Attach="[Event Click] = [Action SavePreset]"
-                            Content="💾"
-                            IsEnabled="{Binding CustomPreset}"
-                            ToolTip="Gem forudstilling" />
-
-                        <Button
-                            Width="28"
-                            Margin="4,5,0,5"
-                            cal:Message.Attach="[Event Click] = [Action DeletePreset]"
-                            Content="🗑"
-                            IsEnabled="{Binding CustomPreset}"
-                            ToolTip="Slet forudindstilling" />
-                    </StackPanel>
-
-                    <!--  Holdkamp:  -->
-                    <TextBlock x:Name="chkTeams" Grid.Row="5" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Holdkamp:" />
-
-                    <CheckBox Grid.Row="5" Grid.Column="1"
-                        Margin="0,5"
-                        IsChecked="{Binding TeamMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <!--  Runder:  -->
-                    <TextBlock Grid.Row="6" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Runder:" />
-
-                    <StackPanel Grid.Row="6" Grid.Column="1"
-                        Margin="0,5"
-                        Orientation="Horizontal">
-                        <TextBox
-                            Width="50"
-                            Margin="0,0,4,0"
-                            Text="{Binding Rounds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock
-                            Margin="0,0,4,0"
                             VerticalAlignment="Center"
-                            Text="af:" />
-                        <TextBox
-                            Width="50"
-                            Margin="0,0,4,0"
-                            Text="{Binding BoardsPerRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock VerticalAlignment="Center" Text="spil." />
-                    </StackPanel>
+                            Text="Tekstfarve:" />
 
-                    <!--  Pause efter runde  -->
-                    <TextBlock Grid.Row="7" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Pause efter runde:" />
+                        <sf:ColorPickerPalette Name="fgColor" Grid.Row="2" Grid.Column="1"
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                            Width="200"
+                            Height="35"
+                            Margin="0,5"
+                            HorizontalAlignment="Left"
+                            AutomaticColorVisibility="Collapsed"
+                            CustomColorsCollection="{Binding NewColorCollection}"
+                            CustomHeaderText="Udvalgte Farver"
+                            CustomHeaderVisibility="Visible"
+                            SetCustomColors="True"
+                            StandardPanelVisibility="Collapsed"
+                            ThemePanelVisibility="Collapsed"
+                            Color="{Binding NewSetting.ForegroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <TextBox Grid.Row="7" Grid.Column="1"
-                        Width="50"
-                        Margin="0,5"
-                        HorizontalAlignment="Left"
-                        Text="{Binding BreakAfterRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!--  Tid pr runde:  -->
-                    <TextBlock Grid.Row="8" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Tid pr runde:" />
+                        <!--  Lyd:  -->
+                        <TextBlock Grid.Row="3" Grid.Column="0"
+                            Margin="0,5"
+                            Text="Lyd:" />
 
-                    <StackPanel Grid.Row="8" Grid.Column="1"
-                        Margin="0,5"
-                        Orientation="Horizontal">
-                        <TextBox
-                            Width="40"
-                            Margin="0,0,2,0"
-                            Text="{Binding Hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock VerticalAlignment="Center" Text=":" />
-                        <TextBox
-                            Width="40"
-                            Margin="2,0,2,0"
-                            Text="{Binding Minutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock VerticalAlignment="Center" Text=":" />
-                        <TextBox
-                            Width="40"
-                            Margin="2,0,2,0"
-                            Text="{Binding Seconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock
-                            Margin="4,0,0,0"
+                        <WrapPanel Grid.Row="3" Grid.Column="1">
+                            <ComboBox
+                                ItemsSource="{x:Static audio:AudioResources.Sounds}"
+                                Width="120"
+                                Margin="0,5"
+                                cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]"
+                                SelectedItem="{Binding Sound}" />
+
+                            <Slider x:Name="volume"
+                                Width="200"
+                                Margin="0,5"
+                                HorizontalAlignment="Left"
+                                cal:Message.Attach="[Event ValueChanged] = [Action VolumeChanged($eventArgs)]"
+                                Maximum="100"
+                                Minimum="0"
+                                Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </WrapPanel>
+
+                        <!--  Brug indstilling:  -->
+                        <TextBlock Grid.Row="4" Grid.Column="0"
+                            Margin="0,5,0,5"
                             VerticalAlignment="Center"
-                            Text="(tt:mm:ss)" />
-                    </StackPanel>
+                            Text="Brug indstilling:" />
 
-                    <!--  Advarsel om ikke at starte på nye spil  -->
-                    <TextBlock Grid.Row="9" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Advarsel - start ikke nye spil:" />
+                        <StackPanel Grid.Row="4" Grid.Column="1"
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                            <ComboBox x:Name="cbPresets"
+                                ItemsSource="{Binding Configuration.Presets}"
+                                Width="120"
+                                Margin="0,5"
+                                DisplayMemberPath="Name"
+                                IsEditable="False"
+                                SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <StackPanel Grid.Row="9" Grid.Column="1"
-                        Margin="0,5"
-                        Orientation="Horizontal">
-                        <TextBox Width="50" Text="{Binding WarningMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock
-                            Margin="4,0,0,0"
-                            VerticalAlignment="top"
-                            Text="(minutter)" />
-                    </StackPanel>
+                            <Button
+                                Width="28"
+                                Margin="4,5,0,5"
+                                cal:Message.Attach="[Event Click] = [Action AddPreset]"
+                                Content="+"
+                                ToolTip="Opret ny forudstilling" />
 
+                            <Button
+                                Width="28"
+                                Margin="4,5,0,5"
+                                cal:Message.Attach="[Event Click] = [Action SavePreset]"
+                                Content="💾"
+                                IsEnabled="{Binding CustomPreset}"
+                                ToolTip="Gem forudstilling" />
 
-                    <!--  Tid til rundeskifte:  -->
-                    <TextBlock Grid.Row="10" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Tid til rundeskifte:" />
+                            <Button
+                                Width="28"
+                                Margin="4,5,0,5"
+                                cal:Message.Attach="[Event Click] = [Action DeletePreset]"
+                                Content="🗑"
+                                IsEnabled="{Binding CustomPreset}"
+                                ToolTip="Slet forudindstilling" />
+                        </StackPanel>
 
+                        <!--  Holdkamp:  -->
+                        <TextBlock x:Name="chkTeams" Grid.Row="5" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Holdkamp:" />
 
-                    <StackPanel Grid.Row="10" Grid.Column="1"
-                        Margin="0,5"
-                        Orientation="Horizontal">
-                        <TextBox Width="50" Text="{Binding TransitionMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock
-                            Margin="4,0,0,0"
-                            VerticalAlignment="top"
-                            Text="(minutter)" />
-                    </StackPanel>
+                        <CheckBox Grid.Row="5" Grid.Column="1"
+                            Margin="0,5"
+                            IsChecked="{Binding TeamMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!--  Pausens længde:  -->
-                    <TextBlock Grid.Row="11" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Pausens længde:" />
+                        <!--  Runder:  -->
+                        <TextBlock Grid.Row="6" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Runder:" />
 
-                    <StackPanel Grid.Row="11" Grid.Column="1"
-                        Orientation="Horizontal">
+                        <StackPanel Grid.Row="6" Grid.Column="1"
+                            Margin="0,5"
+                            Orientation="Horizontal">
+                            <TextBox
+                                Width="50"
+                                Margin="0,0,4,0"
+                                Text="{Binding Rounds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Margin="0,0,4,0"
+                                VerticalAlignment="Center"
+                                Text="af:" />
+                            <TextBox
+                                Width="50"
+                                Margin="0,0,4,0"
+                                Text="{Binding BoardsPerRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock VerticalAlignment="Center" Text="spil." />
+                        </StackPanel>
 
-                        <TextBox
+                        <!--  Pause efter runde  -->
+                        <TextBlock Grid.Row="7" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Pause efter runde:" />
+
+                        <TextBox Grid.Row="7" Grid.Column="1"
                             Width="50"
                             Margin="0,5"
-                            Text="{Binding BreakMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            HorizontalAlignment="Left"
+                            Text="{Binding BreakAfterRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <TextBlock
-                            Margin="4,0,0,0"
-                            VerticalAlignment="top"
-                            Text="(minutter)" />
-                    </StackPanel>
+                        <!--  Tid pr runde:  -->
+                        <TextBlock Grid.Row="8" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Tid pr runde:" />
 
-                    <!--  Endtime:  -->
-                    <TextBlock Grid.Row="12" Grid.Column="0"
-                        Margin="0,5"
-                        VerticalAlignment="Center"
-                        Text="Spilletid:" />
+                        <StackPanel Grid.Row="8" Grid.Column="1"
+                            Margin="0,5"
+                            Orientation="Horizontal">
+                            <TextBox
+                                Width="40"
+                                Margin="0,0,2,0"
+                                Text="{Binding Hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock VerticalAlignment="Center" Text=":" />
+                            <TextBox
+                                Width="40"
+                                Margin="2,0,2,0"
+                                Text="{Binding Minutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock VerticalAlignment="Center" Text=":" />
+                            <TextBox
+                                Width="40"
+                                Margin="2,0,2,0"
+                                Text="{Binding Seconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="(tt:mm:ss)" />
+                        </StackPanel>
 
-                    <StackPanel Grid.Row="12" Grid.Column="1"
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal">
-                        <TextBlock
+                        <!--  Advarsel om ikke at starte på nye spil  -->
+                        <TextBlock Grid.Row="9" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Advarsel - start ikke nye spil:" />
+
+                        <StackPanel Grid.Row="9" Grid.Column="1"
+                            Margin="0,5"
+                            Orientation="Horizontal">
+                            <TextBox Width="50" Text="{Binding WarningMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="top"
+                                Text="(minutter)" />
+                        </StackPanel>
+
+
+                        <!--  Tid til rundeskifte:  -->
+                        <TextBlock Grid.Row="10" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Tid til rundeskifte:" />
+
+
+                        <StackPanel Grid.Row="10" Grid.Column="1"
+                            Margin="0,5"
+                            Orientation="Horizontal">
+                            <TextBox Width="50" Text="{Binding TransitionMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="top"
+                                Text="(minutter)" />
+                        </StackPanel>
+
+                        <!--  Pausens længde:  -->
+                        <TextBlock Grid.Row="11" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Pausens længde:" />
+
+                        <StackPanel Grid.Row="11" Grid.Column="1"
+                            Orientation="Horizontal">
+
+                            <TextBox
+                                Width="50"
+                                Margin="0,5"
+                                Text="{Binding BreakMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="top"
+                                Text="(minutter)" />
+                        </StackPanel>
+
+                        <!--  End Greetings:  -->
+                        <TextBlock Grid.Row="12" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Slut hilsen Øverst:" />
+
+                        <TextBox Grid.Row="12" Grid.Column="1"
+                            Width="320"
+                            MaxHeight="50"
                             Margin="0,5"
                             HorizontalAlignment="Left"
+                            AcceptsReturn="True"
                             FontWeight="Bold"
-                            Text="{Binding DataContext.Configuration.StartTime, StringFormat='{}{0:HH:mm}', RelativeSource={RelativeSource AncestorType=Window}}" />
+                            Text="{Binding EndGreetingTop, Mode=TwoWay}"
+                            TextWrapping="Wrap" />
 
-                        <TextBlock
+                        <TextBlock Grid.Row="13" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Slut hilsen Nederst:" />
+
+                        <TextBox Grid.Row="13" Grid.Column="1"
+                            Width="320"
+                            MaxHeight="50"
                             Margin="0,5"
                             HorizontalAlignment="Left"
+                            AcceptsReturn="True"
                             FontWeight="Bold"
-                            Text=" - " />
+                            Text="{Binding EndGreetingBottom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextWrapping="Wrap" />
 
-                        <TextBlock
+                        <!--  Playing Time:  -->
+                        <TextBlock Grid.Row="14" Grid.Column="0"
                             Margin="0,5"
+                            VerticalAlignment="Center"
+                            Text="Spilletid:" />
+
+                        <StackPanel Grid.Row="14" Grid.Column="1"
                             HorizontalAlignment="Left"
-                            FontWeight="Bold"
-                            Text="{Binding DataContext.EndTime, RelativeSource={RelativeSource AncestorType=Window}}" />
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
-        </Border>
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,5"
+                                HorizontalAlignment="Left"
+                                FontWeight="Bold"
+                                Text="{Binding DataContext.Configuration.StartTime, StringFormat='{}{0:HH:mm}', RelativeSource={RelativeSource AncestorType=Window}}" />
+
+                            <TextBlock
+                                Margin="0,5"
+                                HorizontalAlignment="Left"
+                                FontWeight="Bold"
+                                Text=" - " />
+
+                            <TextBlock
+                                Margin="0,5"
+                                HorizontalAlignment="Left"
+                                FontWeight="Bold"
+                                Text="{Binding DataContext.EndTime, RelativeSource={RelativeSource AncestorType=Window}}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
 
         <StackPanel Grid.Row="1"
             Margin="0,12,0,0"

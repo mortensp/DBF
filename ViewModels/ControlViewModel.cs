@@ -129,6 +129,7 @@ namespace DBF.ViewModels
                             }
                         }
                     }
+
                     catch (Exception ex)
                     {
                         throw ex;
@@ -260,7 +261,8 @@ namespace DBF.ViewModels
 
             public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
             {
-                if (Configuration.TimersActive)
+                if (Configuration.TimersActive
+                &&  Window.GetWindow(CurrentView).GetType().Name != "ProjectorView")
                 {
                     var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
                     return await Task.FromResult(result == MessageBoxResult.Yes);
@@ -323,7 +325,6 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
-
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -400,12 +401,12 @@ namespace DBF.ViewModels
                                         var hacGrp       = 1;
 
                                         foreach (var pair in pairs.Take(subGroupSize).OrderBy(p => p.HACRankSection))
-                                        pair.HACRankSectionPart = hacGrp++;
+                                            pair.HACRankSectionPart = hacGrp++;
 
                                         hacGrp = 1;
 
                                         foreach (var pair in pairs.Skip(subGroupSize).OrderBy(p => p.HACRankSection))
-                                        pair.HACRankSectionPart = hacGrp++;
+                                            pair.HACRankSectionPart = hacGrp++;
                                     }
                             }
 
@@ -490,6 +491,7 @@ namespace DBF.ViewModels
                         }
                     }
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -550,7 +552,6 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -587,7 +588,7 @@ namespace DBF.ViewModels
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                                                                          .SelectMany(mt => mt.PlayingTime);
+                                                                                                                                                                  .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -612,7 +613,7 @@ namespace DBF.ViewModels
                                                         if (fileOld is null)
                                                         {
                                                             foreach (var file in playingTimeOld.TournamentFiles)
-                                                            watcher.Filters.Remove(file.FileName);
+                                                                watcher.Filters.Remove(file.FileName);
 
                                                             Execute.OnUIThread(() => playingTimeOld.TournamentFiles = playingTimeNew.TournamentFiles);
                                                             SelectedPlayingTime = null;
@@ -624,17 +625,18 @@ namespace DBF.ViewModels
                                                             fileOld.Merge(fileNew);
                                                     }
 
-                                                //if (updatedFile)
-                                                //{
-                                                //    SelectedPlayingTime = null;
-                                                //    SelectedPlayingTime = playingTimeOld;
-                                                //}
+                                                    //if (updatedFile)
+                                                    //{
+                                                    //    SelectedPlayingTime = null;
+                                                    //    SelectedPlayingTime = playingTimeOld;
+                                                    //}
                                                 }
                                         }
                                     }
                                 }
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -778,20 +780,21 @@ namespace DBF.ViewModels
                             string xml = File.ReadAllText(fullPath, iso_8859_1);
 
                             // Erstat Fjern tag værdier, som kun består af blanke og - tegn
-                            xml = Regex.Replace(                     xml,       @">(-|\s)+<",                 "><");
+                            xml = Regex.Replace(xml, @">(-|\s)+<", "><");
 
                             // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
-                            xml = Regex.Replace(                     xml,       @"(?<=\d),(?=\d)",            ".");
+                            xml = Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
 
                             // Remove empty tags
-                            xml = Regex.Replace(                     xml,       @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
-                            xml = Regex.Replace(                     xml,       @"<\w+\s*(/>|/>\s*</\1*s>)",  string.Empty); //<TagName/>
+                            xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
+                            xml = Regex.Replace(xml, @"<\w+\s*(/>|/>\s*</\1*s>)", string.Empty); //<TagName/>
 
                             var       serializer = new XmlSerializer(typeof(T));
                             using var reader     = new StringReader( xml);
-                            return (T)serializer.Deserialize(        reader);
+                            return (T)serializer.Deserialize(reader);
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -828,7 +831,6 @@ namespace DBF.ViewModels
                             else
                                 Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -855,6 +857,10 @@ namespace DBF.ViewModels
                     if (projectorView is null)
                     {
                         await windowManager.ShowWindowAsync(this, "ProjectorView");
+
+                        // erstat kaldet der viser vinduet (i din eksisterende ShowProjector-metode)
+                        //var projectorViewModel = new ProjectorViewModel(this);
+                        //await windowManager.ShowWindowAsync(projectorViewModel, "ProjectorView");
                         projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
                         projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -867,6 +873,7 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
+
 #endif
                 }
                 else
