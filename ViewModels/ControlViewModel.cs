@@ -56,6 +56,9 @@ namespace DBF.ViewModels
         private          int                                    sectionNo;
         private          bool                                   showAsOneGroup = true;
 
+        // Nyttige felter øverst i klassen - bruges til at undgå af XML filerne er i brug
+        private readonly ConcurrentDictionary<string, CancellationTokenSource> _debounceTokens = new();
+
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
             {
@@ -129,7 +132,6 @@ namespace DBF.ViewModels
                             }
                         }
                     }
-
                     catch (Exception ex)
                     {
                         throw ex;
@@ -261,14 +263,21 @@ namespace DBF.ViewModels
 
             public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
             {
-                if (Configuration.TimersActive
-                &&  Window.GetWindow(CurrentView).GetType().Name != "ProjectorView")
+                try
                 {
-                    var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
-                    return await Task.FromResult(result == MessageBoxResult.Yes);
+                    if (Configuration.TimersActive
+                    &&  Window.GetWindow(CurrentView).GetType().Name != "ProjectorView")
+                    {
+                        var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
+                        return await Task.FromResult(result == MessageBoxResult.Yes);
+                    }
                 }
-                else
-                    return await Task.FromResult(true);
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
+                }
+
+                return await Task.FromResult(true);
             }
         #endregion
 
@@ -325,6 +334,7 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
+
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -491,8 +501,7 @@ namespace DBF.ViewModels
                         }
                     }
                 }
-
-                catch (Exception)
+                catch (Exception ex)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
                 }
@@ -552,6 +561,7 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -588,7 +598,7 @@ namespace DBF.ViewModels
                                         var playingTimesNew = (SelectedClub is null
                                                              ? main.Clubs.SelectMany(club => club.MainTournaments)
                                                              : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                                                                                                  .SelectMany(mt => mt.PlayingTime);
+                                                                                                                                                                                                          .SelectMany(mt => mt.PlayingTime);
 
                                         foreach (var playingTimeNew in playingTimesNew)
                                         {
@@ -636,7 +646,6 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -762,7 +771,6 @@ namespace DBF.ViewModels
                 }
 
                 private T deserialize<T>(string fullPath) where T : new()
-
                 {
                     try
                     {
@@ -771,13 +779,15 @@ namespace DBF.ViewModels
 
                         if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
                         {
-                            string json = File.ReadAllText(fullPath, iso_8859_1);
+                            //string json = File.ReadAllText(fullPath, iso_8859_1);
+                            string json = ReadAllTextWithRetry(fullPath, iso_8859_1);
                             return JsonSerializer.Deserialize<T>(json, JsonOptions);
                         }
                         else // XML
                         {
                             // Hvis filen ikke findes, returner null
-                            string xml = File.ReadAllText(fullPath, iso_8859_1);
+                            //string xml = File.ReadAllText(fullPath, iso_8859_1);
+                            string xml = ReadAllTextWithRetry(fullPath, iso_8859_1);
 
                             // Erstat Fjern tag værdier, som kun består af blanke og - tegn
                             xml = Regex.Replace(xml, @">(-|\s)+<", "><");
@@ -794,17 +804,48 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(reader);
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
                         return new T();
                     }
                 }
+
+                // Tilføj denne private helper-metode i samme klasse (f.eks. nederst i filen)
+                private string ReadAllTextWithRetry(string path, Encoding encoding, int maxAttempts = 10, int initialDelayMs = 100)
+                {
+                    var delay = initialDelayMs;
+
+                    for (int attempt = 1; attempt <= maxAttempts; attempt++)
+                        try
+                        {
+                            // Åbn med ReadWrite sharing så vi kan læse selvom anden proces skriver (hvis den tillader deling).
+                            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                            using var sr = new StreamReader(fs, encoding);
+                            return sr.ReadToEnd();
+                        }
+
+                        catch (IOException) when (attempt <  maxAttempts)
+                        {
+                            Thread.Sleep(delay);
+                            delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
+                        }
+
+                        catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
+                        {
+                            Thread.Sleep(delay);
+                            delay = Math.Min(1000, delay * 2);
+                        }
+
+                    // Sidste forsøg (lader exception boble op hvis det fejler)
+                    using var fsFinal = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                    using var srFinal = new StreamReader(fsFinal, encoding);
+                    return srFinal.ReadToEnd();
+                }
             #endregion
 
             #region Look for Folder or file updates
-                private void folderUpdated(object sender, FileSystemEventArgs e)
+                private void folderUpdatedOld(object sender, FileSystemEventArgs e)
                 {
                     // Debounce: Ignorer events for samme fil inden for 500 ms
                     try
@@ -831,8 +872,110 @@ namespace DBF.ViewModels
                             else
                                 Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
                     }
+
                     catch (Exception)
                     {
+                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                    }
+                }
+
+                // Erstat din eksisterende folderUpdated-metode med denne
+                private void folderUpdated(object sender, FileSystemEventArgs e)
+                {
+                    try
+                    {
+                        var path = e.FullPath;
+
+                        // Cancel evt. eksisterende debounce for samme fil
+                        if (_debounceTokens.TryRemove(path, out var existing))
+                        {
+                            existing.Cancel();
+                            existing.Dispose();
+                        }
+
+                        var cts               = new CancellationTokenSource();
+                        var token             = cts.Token;
+                        _debounceTokens[path] = cts;
+
+                        // Start baggrundsopgave der venter og så behandler filen
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                // Vent lidt for at lade skrive-processen fuldføre (debounce)
+                                await Task.Delay(500, token);
+
+                                // Vent indtil filstørrelsen er stabil (tjek et par gange)
+                                long lastLength = -1;
+
+                                for (int i = 0; i <  6; i++)
+                                {
+                                    if (token.IsCancellationRequested)
+                                        return;
+
+                                    long len = 0;
+
+                                    try
+                                    {
+                                        var fi = new FileInfo(path);
+                                        len    = fi.Exists ? fi.Length : 0;
+                                    }
+                                    catch 
+                                    {
+                                        len = -1;
+                                    }
+
+                                    if (lastLength != -1
+                                    && lastLength == len)
+                                        break;
+
+                                    lastLength = len;
+                                    await Task.Delay(200, token);
+                                }
+
+                                    // Nu kør den faktiske behandling på UI-tråden (som før)
+                                    await Execute.OnUIThreadAsync(() =>
+                                    {
+                                        if (e.ChangeType == WatcherChangeTypes.Changed)
+                                            if (e.Name == "Main.XML")
+                                                reloadMain();
+                                            else
+                                                FetchPlayingTime(false);
+                                        else
+                                            if (e.ChangeType == WatcherChangeTypes.Created)
+                                                Debug.WriteLine($"File Created: {e.Name}");
+                                            else
+                                                Debug.WriteLine($"File {e.ChangeType}: {e.Name}");
+
+                                        // Ensure the lambda returns a Task on all code paths
+                                        return Task.CompletedTask;
+                                    });
+                            }
+
+                            catch (TaskCanceledException)
+                            {
+                                /* debounced away */ 
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"Error processing file event for {e.Name}: {ex.Message}");
+                            }
+
+                            finally
+                            {
+                                if (_debounceTokens.TryRemove(path, out var removed))
+                                {
+                                    removed.Cancel();
+                                    removed.Dispose();
+                                }
+                            }
+
+                        }, token);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"folderUpdated error: {ex.Message}");
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
                     }
                 }
@@ -873,7 +1016,6 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
-
 #endif
                 }
                 else
