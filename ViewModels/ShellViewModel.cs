@@ -106,13 +106,13 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             var process=Process.Start(psi);
             //process.WaitForExit();
 
-            var text= $"FileName         : {psi.FileName}\r\n"
-                    + $"Arguments        : {psi.Arguments}\r\n"
-                    + $"UseShellExecute  : {psi.UseShellExecute}\r\n"
-                    + $"WorkingDirectory : {psi.WorkingDirectory}";
-                    //+ $"exitcode         : {process.ExitCode}";
+            //var text= $"FileName         : {psi.FileName}\r\n"
+            //        + $"Arguments        : {psi.Arguments}\r\n"
+            //        + $"UseShellExecute  : {psi.UseShellExecute}\r\n"
+            //        + $"WorkingDirectory : {psi.WorkingDirectory}";
+            //        //+ $"exitcode         : {process.ExitCode}";
 
-            File.WriteAllText(@"d:\DBFtools.log", text);
+            //File.WriteAllText(@"c:\DBFtools.log", text);
         }
 
         catch (Exception ex)
