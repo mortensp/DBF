@@ -11,29 +11,25 @@ using DBF.ViewModels;
 
 namespace DBF.DataModel
 {
+
     public partial class BridgeTimer : TimerSetting
     {
         private IAudioService _player { get => field ??= IoC.Get<IAudioService>(); set => field = value; }
         //
         private                 DispatcherTimer _timer;
-        private static readonly TimeSpan        _oneHour        = new TimeSpan(1, 0,  0);
-        private static readonly TimeSpan        _fiveMinutes    = new TimeSpan(0, 5,  0);
-        private static readonly TimeSpan        _twoMinutes     = new TimeSpan(0, 2,  0);
-        private static readonly TimeSpan        _twoSeconds     = new TimeSpan(0, 0,  2);
-        private static readonly TimeSpan        _threshold      = new TimeSpan(0, 0,  1);
-        private                 TimeSpan        _startTime      = new TimeSpan(0, 21, 0);
-        private                 TimeSpan        _transitionTime = new TimeSpan(0, 1,  0);
-        private                 TimeSpan        _breakTime      = new TimeSpan(0, 12, 0);
-        private                 TimeSpan        _warningTime    = new TimeSpan(0, 5,  0);
-        private                 TimeSpan        _remainingTime  = TimeSpan.MinValue;
-        private bool _isStarted
-            { 
-            get; 
-            set; 
-            }
-        private                 bool            _isAtBreak;
-        private                 bool            _isAtTransition;
-        private                 bool            _isPaused;
+        private static readonly TimeSpan        _oneHour    = new TimeSpan(1, 0,  0);
+        private static readonly TimeSpan        _twoMinutes = new TimeSpan(0, 2,  0);
+        private static readonly TimeSpan        _threshold  = new TimeSpan(0, 0,  1);
+        //
+        private TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
+        private TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
+        private TimeSpan _breakTime      = new TimeSpan(                   0, 12, 0);
+        private TimeSpan _warningTime    = new TimeSpan(                   0, 5,  0);
+        private TimeSpan _remainingTime  = TimeSpan.MinValue;
+        private bool     _isStarted;
+        private bool     _isAtBreak;
+        private bool     _isAtTransition;
+        private bool     _isPaused;
 
         public BridgeTimer()
         {
@@ -52,7 +48,7 @@ namespace DBF.DataModel
             [JsonIgnore] public double        MinutesLeft      { get; set; }
             [JsonIgnore] public int           Round            { get; set; } = 1;
             [JsonIgnore] public TimeOnly EndTime  => TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(Math.Max(MinutesLeft, 0)));
-           
+
             [JsonIgnore]
             public bool IsPaused
             {
@@ -64,15 +60,14 @@ namespace DBF.DataModel
             public bool IsStarted
             {
                 get => _isStarted;
-            set
-            {
-                if (_isStarted != value)
-                    _isStarted = value;
-
+                set
+                {
+                    if (_isStarted != value)
+                        _isStarted =  value;
+                }
             }
-            }
 
-            [JsonIgnore] public bool IsActive => IsStarted && Round <= Rounds && Round>0;
+            [JsonIgnore] public bool IsActive => IsStarted && Round <= Rounds && Round >  0;
             [JsonIgnore] public bool IsEnded => Round >  Rounds;
         #endregion
 
@@ -100,7 +95,6 @@ namespace DBF.DataModel
             {
                 //if (_remainingTime <= _twoSeconds)
                 //    Debugger.Break();    
-
                 if (!_isPaused)
                     if (_remainingTime == _warningTime)
                         _player.Play(Sound, Volume);                            // Warning before end of Round
@@ -343,6 +337,34 @@ namespace DBF.DataModel
 
                     UpdateDisplay();
                 }
+            }
+
+            public BridgeTimerState CurrentState =>
+                new BridgeTimerState()
+                {
+                    IsStarted = _isStarted
+                  , IsAtBreak = _isAtBreak
+                  , IsAtTransition = _isAtTransition
+                  , RemainingTime = _remainingTime
+                  , Round = this.Round
+                };
+
+            public void Restart(BridgeTimerState state)
+            {
+                StopCountdown();
+
+                _isStarted      = state.IsStarted;
+                _isPaused       = true;
+                _isAtBreak      = state.IsAtBreak;
+                _isAtTransition = state.IsAtTransition;
+                _remainingTime  = state.RemainingTime;
+                Round           = state.Round;
+                //
+                _startTime      = new TimeSpan(Hours, Minutes,           Seconds);
+                _transitionTime = new TimeSpan(0,     TransitionMinutes, 0);
+                _breakTime      = new TimeSpan(0,     BreakMinutes,      0);
+
+                UpdateDisplay();
             }
         #endregion
 

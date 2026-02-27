@@ -266,7 +266,7 @@ namespace DBF.ViewModels
                 try
                 {
                     if (Configuration.TimersActive
-                    &&  Window.GetWindow(CurrentView).GetType().Name != "ProjectorView")
+                    &&  Window.GetWindow(CurrentView)?.GetType().Name != "ProjectorView")
                     {
                         var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
                         return await Task.FromResult(result == MessageBoxResult.Yes);
@@ -501,7 +501,7 @@ namespace DBF.ViewModels
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
                 }

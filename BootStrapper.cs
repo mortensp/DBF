@@ -67,7 +67,7 @@ namespace DBF
             }
 
             [DebuggerStepThrough]
-        private static Func<Type, DependencyObject, object, Type> FindTypeForModelType(Func<Type, DependencyObject, object, Type> defaultLocateTypeForModelType)
+            private static Func<Type, DependencyObject, object, Type> FindTypeForModelType(Func<Type, DependencyObject, object, Type> defaultLocateTypeForModelType)
             {
                 return (Type modelType, DependencyObject displayLocation, object context) =>
                        {
@@ -93,7 +93,7 @@ namespace DBF
 
             protected override IEnumerable<object> GetAllInstances(Type service) => _container.GetAllInstances(service);
 
-            protected override void BuildUp(                       object instance)
+            protected override void BuildUp(object instance)
             {
                 _container.BuildUp(instance);
             }

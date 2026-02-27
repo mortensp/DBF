@@ -2,7 +2,7 @@
   "profiles": {
     "DBF": {
       "commandName": "Project",
-      "commandLineArgs": "debug"
+      "commandLineArgs": "debug:true mode:restart"
     }
   }
 }

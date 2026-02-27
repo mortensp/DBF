@@ -1,14 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
+using AppArguments;
 using Caliburn.Micro;
 using DBF.AudioServices;
+using DBF.ViewModels;
 using Syncfusion.Data.Extensions;
 using Syncfusion.Windows.Tools.Controls;
 
@@ -21,6 +24,7 @@ namespace DBF.DataModel
         private static          string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
         private static          string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Mortensp\\DBF\\configuration.json";
         private static          string                oldPath           = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
+        private static          string                statePath         = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\state.json";
         private                 Configuration         loadedConfig;
         private                 int                   visibleTimerCount;
         private static readonly TimeSpan              _fiveHours        = new TimeSpan(5, 0, 0);
@@ -112,22 +116,22 @@ namespace DBF.DataModel
                 }
 
                 public BindableCollection<Preset> Presets { get; set; } = new()
-                                                                                                                                                                                                                                                                        {
-                                          new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                                        , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                                        , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                                        , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                                                                                                                                                                                                                                                        };
+                                                                                                                                                                                                                                                                                                                                                {
+                                                                                                                  new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                                                                                                , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                                                                                                                , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                                                                                                                , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                                                                                                                                                                                                                                                                                                                                                };
 
                 [JsonIgnore]
                 public ObservableCollection<CustomColor> BackgroundColors = new()
-                                {
-                                      new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
-                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
-                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
-                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
-                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
-                                };
+                                                                                                        {
+                                                                                                              new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
+                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
+                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
+                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
+                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
+                                                                                                        };
 
                 private string bc3Path = @"C:\BC3\";
 
@@ -150,7 +154,7 @@ namespace DBF.DataModel
             public void Load()
             {
                 if (!File.Exists(path)
-                &&  File.Exists(oldPath))
+                &&  File.Exists(  oldPath))
                 {
                     // Sørg for at destination-mappen eksisterer
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -265,6 +269,7 @@ namespace DBF.DataModel
                 }
 
                 SetUpDownVisibility();
+                RestoreState();
             }
 
             public void Save()
@@ -274,6 +279,56 @@ namespace DBF.DataModel
                 File.WriteAllText(path, json);
 
                 setEndTime();
+            }
+
+            public void SaveState()
+            {
+                var controlViewModel = IoC.Get<ControlViewModel>();
+                var state            = new State()
+                                       {
+                                           MainClubName   = controlViewModel.SelectedMainClub?.Name
+                                         , SubClubName    = controlViewModel.SelectedClub?.Name
+                                         , PlayingTimeStr = controlViewModel.SelectedPlayingTime?.DateStr
+                                         , TimerStates    = BridgeTimers.Select(t => t.CurrentState).ToList()
+                                       };
+
+                //var states = BridgeTimers.Select(t => t.CurrentState)
+                //                             .ToList();
+                string json = JsonSerializer.Serialize(state, SerializerOptions);
+                File.WriteAllText(statePath, json);
+            }
+
+            public void RestoreState()
+            {
+                if (Arguments.Values.Lookup("mode") == "restart")
+                {
+                    if (File.Exists(statePath))
+                        try
+                        {
+                            var jsonData = File.ReadAllText(statePath);
+                            var state    = JsonSerializer.Deserialize<State>(jsonData, SerializerOptions);
+
+                            var controlViewModel = IoC.Get<ControlViewModel>();
+
+                            if (state.MainClubName != null)
+                                controlViewModel.SelectedMainClub = controlViewModel.MainClubs.FirstOrDefault(mc => mc.Name == state.MainClubName);
+
+                            if (state.SubClubName != null)
+                                controlViewModel.SelectedClub = controlViewModel.Clubs.FirstOrDefault(mc => mc.Name == state.SubClubName);
+
+                            if (string.IsNullOrWhiteSpace(state.PlayingTimeStr) == false)
+                                controlViewModel.SelectedPlayingTime = controlViewModel.PlayingTimes.FirstOrDefault(mc => mc.DateStr == state.PlayingTimeStr);
+
+                            for (int i = 0; i <  state.TimerStates.Count && i <  state.TimerStates.Count; i++)
+                                BridgeTimers[i].Restart(state.TimerStates[i]);
+                        }
+
+                        //catch (Exception) { /* Ignore */ }
+                        finally { /* Ignore */ }
+                }
+
+                if (File.Exists(statePath))
+                    File.Delete(statePath);
             }
 
             public void Update(Configuration newConfiguration)
