@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows;
 using Caliburn.Micro;
 using DBF.DataModel;
@@ -101,8 +102,17 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
                         , UseShellExecute  = false
                         , WorkingDirectory = Environment.CurrentDirectory
                       };
+                            
+            var process=Process.Start(psi);
+            //process.WaitForExit();
 
-            Process.Start(psi);
+            var text= $"FileName         : {psi.FileName}\r\n"
+                    + $"Arguments        : {psi.Arguments}\r\n"
+                    + $"UseShellExecute  : {psi.UseShellExecute}\r\n"
+                    + $"WorkingDirectory : {psi.WorkingDirectory}";
+                    //+ $"exitcode         : {process.ExitCode}";
+
+            File.WriteAllText(@"d:\DBFtools.log", text);
         }
 
         catch (Exception ex)
