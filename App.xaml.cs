@@ -22,7 +22,7 @@ namespace DBF
         {
             Arguments.Parse(validArgs, requiredArgs, showHelp);
 
-#if RELEASE
+#if (RELEASE || PRODTEST)
             if (Arguments.Values.Lookup("mode") == "restart")
                 _github.MarkAppStarted();
             else
