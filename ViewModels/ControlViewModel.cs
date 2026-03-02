@@ -32,9 +32,9 @@ namespace DBF.ViewModels
         private          Club           selectedClub;
         private          UserControl    startListControl = new StartListControl();
         private          UserControl    timersPanel      = new TimersPanel()
-                                                           {
-                                                               ButtonsVisibility = Visibility.Collapsed
-                                                           };
+        {
+            ButtonsVisibility = Visibility.Collapsed
+        };
 
         private UserControl           resultsControl = new ResultsControl();
         private UserControl           currentView;
@@ -42,1013 +42,1013 @@ namespace DBF.ViewModels
         private PlayingTime           playingTime;
         private List<Tournament>      tournaments;
         private JsonSerializerOptions JsonOptions    = new JsonSerializerOptions
-                                                       {
-                                                           Converters = 
+        {
+            Converters =
                                                            {
                                                                       new DecimalCommaConverter()
                                                                       }
-                                                       };
+        };
 
         private          Encoding                               iso_8859_1     = System.Text.Encoding.GetEncoding("iso-8859-1");
         private          ObservableCollection<PlayingTime>      spilleDage     = [];
         private          FileSystemWatcher                      watcher;
-        private readonly ConcurrentDictionary<string, DateTime> lastFileEvent  = new();
+
         private          int                                    sectionNo;
         private          bool                                   showAsOneGroup = true;
 
         // Nyttige felter øverst i klassen - bruges til at undgå af XML filerne er i brug
-        private readonly ConcurrentDictionary<string, CancellationTokenSource> _debounceTokens = new();
+
+        // Queue to ensure file system events are processed sequentially in the order received
+        // We keep only the latest event per path so near-duplicate events are grouped.
+        private readonly System.Collections.Concurrent.ConcurrentQueue<string> _eventQueue = new();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, FileSystemEventArgs> _latestEvents = new();
+        private readonly System.Threading.SemaphoreSlim _queueSignal = new(0);
+        private int _processingEventLoop;
 
         #region Constructors
-            public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
-            {
-                BridgeMate                          = bridgeMate;
-                Configuration                       = configuration;
-                this.windowManager                  = windowManager;
-                Thread.CurrentThread.CurrentCulture = Global.DkCulture;
+        public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
+        {
+            BridgeMate = bridgeMate;
+            Configuration = configuration;
+            this.windowManager = windowManager;
+            Thread.CurrentThread.CurrentCulture = Global.DkCulture;
 
-                watcher                       = new FileSystemWatcher();
-                watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size;
-                watcher.IncludeSubdirectories = false;
+            watcher = new FileSystemWatcher();
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size;
+            watcher.IncludeSubdirectories = false;
 
-                watcher.Changed+= folderUpdated;
-                watcher.Created+= folderUpdated;
+            watcher.Changed += folderUpdated;
+            watcher.Created += folderUpdated;
 
-                Pairs.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Pairs);
-                Teams.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Teams);
+            Pairs.CollectionChanged += (s, e) => NotifyOfPropertyChange(() => Pairs);
+            Teams.CollectionChanged += (s, e) => NotifyOfPropertyChange(() => Teams);
 
-                LoadMainClubs();
-            }
+            LoadMainClubs();
+#if DEBUG
+            // For at gøre test nemmere
+            SelectedMainClub = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
+            SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
+#endif
+        }
         #endregion
 
         #region Public Properties
-            public UserControl CurrentView
+        public UserControl CurrentView
+        {
+            get => currentView ?? (currentView = timersPanel);
+            set
             {
-                get => currentView ?? (currentView = timersPanel);
-                set
-                {
-                    currentView = value;
-                    NotifyOfPropertyChange(() => CurrentView);
-                }
+                currentView = value;
+                NotifyOfPropertyChange(() => CurrentView);
             }
+        }
 
-            public Configuration                  Configuration { get; set; }
-            public BridgeMate                     BridgeMate    { get; set; }
+        public Configuration Configuration { get; set; }
+        public BridgeMate BridgeMate { get; set; }
 
-            // MainClubs
-            public ObservableCollection<MainClub> MainClubs     { get; set; } = [];
+        // MainClubs
+        public ObservableCollection<MainClub> MainClubs { get; set; } = [];
 
-            public MainClub SelectedMainClub
+        public MainClub SelectedMainClub
+        {
+            get => selectedMainClub;
+            set
             {
-                get => selectedMainClub;
-                set
-                {
-                    try
-                    {
-                        ErrorMessage = "";
-
-                        if (Set(ref selectedMainClub, value))
-                        {
-                            watcher.EnableRaisingEvents = false;
-                            watcher.Filters.Clear();
-
-                            if (value == null)
-                            {
-                                PlayingTimes.Clear();
-                                SelectedPlayingTime = null;
-                            }
-                            else
-                            {
-                                watcher.Path = value.Path;
-                                watcher.Filters.Add("Main.XML");
-                                watcher.EnableRaisingEvents = true;
-
-                                Clubs    = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
-                                                                  .ToObservableCollection();
-                                var club = Clubs?.FirstOrDefault();
-
-                                SelectedClub = null; // nødvendig, da club og SelectedClub kun sammenlignes på feltet Id, dvs. kan væe ens.
-                                SelectedClub = club;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
-                }
-            }
-
-            // Clubs
-            public ObservableCollection<Club> Clubs { get; set; } = [];
-
-            public Club SelectedClub
-            {
-                get => selectedClub;
-                set
+                try
                 {
                     ErrorMessage = "";
 
-                    if (Set(ref selectedClub, value))
-                        if (value is null)
+                    if (Set(ref selectedMainClub, value))
+                    {
+                        watcher.EnableRaisingEvents = false;
+                        watcher.Filters.Clear();
+
+                        if (value == null)
                         {
                             PlayingTimes.Clear();
                             SelectedPlayingTime = null;
                         }
                         else
-                            FetchPlayingTimes();
-                }
-            }
+                        {
+                            watcher.Path = value.Path;
+                            watcher.Filters.Add("Main.XML");
+                            watcher.EnableRaisingEvents = true;
 
-            // PlayingTimes
-            public ObservableCollection<PlayingTime> PlayingTimes
-            {
-                get => spilleDage;
-                set
-                {
-                    if (Set(ref spilleDage, value))
-                        SelectedPlayingTime = PlayingTimes.Where(pt => pt.Date <= DateTime.Now.Date).FirstOrDefault()
-                                           ?? PlayingTimes.Where(pt => pt.Date >  DateTime.Now.Date).LastOrDefault();
-                }
-            }
+                            Clubs = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
+                                                              .ToObservableCollection();
+                            var club = Clubs?.FirstOrDefault();
 
-            public PlayingTime SelectedPlayingTime
-            {
-                get => playingTime;
-                set
-                {
-                    if (Set(ref playingTime, value))
-                        if (value is not null)
-                            FetchPlayingTime();
-                }
-            }
-
-            // Other 
-            public int SectionNo
-            {
-                get => sectionNo;
-                set
-                {
-                    if (Set(ref sectionNo, value))
-                        HideTournamentSummery = SectionNo <  2;
-                }
-            }
-
-            public bool                     HideTournamentSummery { get; set; }
-            public bool                     HideHacGrp            { get; set; } = true;
-            public DateTime                 Date                  { get; set; }
-            public List<GroupSection>       GroupSections         { get; set; }
-            public BindableCollection<Pair> Pairs                 { get; set; } = [];
-            public BindableCollection<Team> Teams                 { get; set; } = [];
-            public string                   ErrorMessage          { get; set; }
-            public bool ShowAsOneGroup
-            {
-                get => showAsOneGroup;
-                set
-                {
-                    var old = showAsOneGroup;
-
-                    if (Set(ref showAsOneGroup, value))
-                        if (value == true)
-                            foreach (var pair in Pairs)
-                            {
-                                pair.SubGroup  = "";
-                                pair.Placering = pair.SectionRank;
-                            }
-                        else
-                            initSubgroups();
-                }
-            }
-
-            public Visibility ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
-        #endregion
-
-        #region Public Methods
-            public void AddTimer() => Configuration.AddTimer();
-
-            public async void ShowStartList()
-            {
-                if (CurrentView is not StartListControl)
-                    CurrentView = startListControl;
-
-                await ShowProjector();
-            }
-
-            public async void ShowBridgeTimers()
-            {
-                if (CurrentView is not TimersPanel)
-                    CurrentView = timersPanel;
-
-                await ShowProjector();
-            }
-
-            public async void ShowResults()
-            {
-                if (CurrentView is not ResultsControl)
-                    CurrentView = resultsControl;
-
-                await ShowProjector();
-            }
-
-            public void CloseProjector()
-            {
-                var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
-
-                if (projectorView is not null)
-                {
-                    CurrentView = null;
-                    projectorView.Close();
-                }
-            }
-
-            public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
-            {
-                try
-                {
-                    if (Configuration.TimersActive
-                    &&  Window.GetWindow(CurrentView)?.GetType().Name != "ProjectorView")
-                    {
-                        var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
-                        return await Task.FromResult(result == MessageBoxResult.Yes);
+                            SelectedClub = null; // nødvendig, da club og SelectedClub kun sammenlignes på feltet Id, dvs. kan væe ens.
+                            SelectedClub = club;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
+                    throw ex;
                 }
-
-                return await Task.FromResult(true);
             }
+        }
+
+        // Clubs
+        public ObservableCollection<Club> Clubs { get; set; } = [];
+
+        public Club SelectedClub
+        {
+            get => selectedClub;
+            set
+            {
+                ErrorMessage = "";
+
+                if (Set(ref selectedClub, value))
+                    if (value is null)
+                    {
+                        PlayingTimes.Clear();
+                        SelectedPlayingTime = null;
+                    }
+                    else
+                        FetchPlayingTimes();
+            }
+        }
+
+        // PlayingTimes
+        public ObservableCollection<PlayingTime> PlayingTimes
+        {
+            get => spilleDage;
+            set
+            {
+                if (Set(ref spilleDage, value))
+                    SelectedPlayingTime = PlayingTimes.Where(pt => pt.Date <= DateTime.Now.Date).FirstOrDefault()
+                                       ?? PlayingTimes.Where(pt => pt.Date > DateTime.Now.Date).LastOrDefault();
+            }
+        }
+
+        public PlayingTime SelectedPlayingTime
+        {
+            get => playingTime;
+            set
+            {
+                if (Set(ref playingTime, value))
+                    if (value is not null)
+                        FetchPlayingTime();
+            }
+        }
+
+        // Other 
+        public int SectionNo
+        {
+            get => sectionNo;
+            set
+            {
+                if (Set(ref sectionNo, value))
+                    HideTournamentSummery = SectionNo < 2;
+            }
+        }
+
+        public bool HideTournamentSummery { get; set; }
+        public bool ImpsPair { get; set; }
+        public bool HideHacGrp { get; set; } = true;
+        public DateTime Date { get; set; }
+        public List<GroupSection> GroupSections { get; set; }
+        public BindableCollection<Pair> Pairs { get; set; } = [];
+        public BindableCollection<Team> Teams { get; set; } = [];
+        public string ErrorMessage { get; set; }
+        public bool ShowAsOneGroup
+        {
+            get => showAsOneGroup;
+            set
+            {
+                var old = showAsOneGroup;
+
+                if (Set(ref showAsOneGroup, value))
+                    if (value == true)
+                        foreach (var pair in Pairs)
+                        {
+                            pair.SubGroup = "";
+                            pair.Placering = pair.SectionRank;
+                        }
+                    else
+                        initSubgroups();
+            }
+        }
+
+        public Visibility ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
+        #endregion
+
+        #region Public Methods
+        public void AddTimer() => Configuration.AddTimer();
+
+        public async void ShowStartList()
+        {
+            if (CurrentView is not StartListControl)
+                CurrentView = startListControl;
+
+            await ShowProjector();
+        }
+
+        public async void ShowBridgeTimers()
+        {
+            if (CurrentView is not TimersPanel)
+                CurrentView = timersPanel;
+
+            await ShowProjector();
+        }
+
+        public async void ShowResults()
+        {
+            if (CurrentView is not ResultsControl)
+                CurrentView = resultsControl;
+
+            await ShowProjector();
+        }
+
+        public void CloseProjector()
+        {
+            var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
+
+            if (projectorView is not null)
+            {
+                CurrentView = null;
+                projectorView.Close();
+            }
+        }
+
+        public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (Configuration.TimersActive
+                && Window.GetWindow(CurrentView)?.GetType().Name != "ProjectorView")
+                {
+                    var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
+                    return await Task.FromResult(result == MessageBoxResult.Yes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
+            }
+
+            return await Task.FromResult(true);
+        }
         #endregion
 
         #region Private Method
-            private void LoadMainClubs()
+        private void LoadMainClubs()
+        {
+            if (string.IsNullOrWhiteSpace(Configuration.HomepagePath)
+            || !Directory.Exists(Configuration.HomepagePath))
             {
-                if (string.IsNullOrWhiteSpace(Configuration.HomepagePath)
-                || !Directory.Exists(Configuration.HomepagePath))
-                {
-                    MessageBox.Show($"Mappen: '{Configuration.HomepagePath}' findes ikke", "Fejl");
-                    return;
-                }
-
-                foreach (var path in Directory.GetDirectories(Configuration.HomepagePath)
-                                              .Select(dir => Path.GetFileName(dir))
-                                              .Where(name => name.StartsWith("Resultater_", StringComparison.OrdinalIgnoreCase)))
-                {
-                    if (int.TryParse(path.Substring(11), out int no))
-                    {
-                        var mainClub = loadMainClub(no);
-
-                        if (mainClub is not null)
-                            MainClubs.Add(mainClub);
-                    }
-                }
-
-                if (MainClubs.Count == 0)
-                {
-                    MessageBox.Show($"Kan ikke finde Resultater i mappen: {Configuration.HomepagePath}", "Fejl");
-                    return;
-                }
-
-                MainClubs        = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
-                SelectedMainClub = MainClubs[0];
+                MessageBox.Show($"Mappen: '{Configuration.HomepagePath}' findes ikke", "Fejl");
+                return;
             }
 
-            private void FetchPlayingTimes()
+            foreach (var path in Directory.GetDirectories(Configuration.HomepagePath)
+                                          .Select(dir => Path.GetFileName(dir))
+                                          .Where(name => name.StartsWith("Resultater_", StringComparison.OrdinalIgnoreCase)))
             {
-                try
+                if (int.TryParse(path.Substring(11), out int no))
                 {
-                    ObservableCollection<PlayingTime> playingtimes = [];
+                    var mainClub = loadMainClub(no);
 
-                    var mainTournaments = SelectedClub is null
+                    if (mainClub is not null)
+                        MainClubs.Add(mainClub);
+                }
+            }
+
+            if (MainClubs.Count == 0)
+            {
+                MessageBox.Show($"Kan ikke finde Resultater i mappen: {Configuration.HomepagePath}", "Fejl");
+                return;
+            }
+
+            MainClubs = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
+            SelectedMainClub = MainClubs[0];
+        }
+
+        private void FetchPlayingTimes()
+        {
+            try
+            {
+                ObservableCollection<PlayingTime> playingtimes = [];
+
+                var mainTournaments = SelectedClub is null
                                         ? SelectedMainClub.Clubs.SelectMany(club => club.MainTournaments)
                                         : SelectedClub.MainTournaments;
 
-                    foreach (var mt in mainTournaments)
+                foreach (var mt in mainTournaments)
 
-                        foreach (var pt in mt.PlayingTime)
-                        {
-                            pt.MainTournament = mt;
-                            playingtimes.Add(pt);
-                        }
+                    foreach (var pt in mt.PlayingTime)
+                    {
+                        pt.MainTournament = mt;
+                        playingtimes.Add(pt);
+                    }
 
-                    PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
-                }
-
-                catch (Exception)
-                {
-                    PlayingTimes.Clear();
-                }
+                PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
             }
 
-            /// <summary>
-            /// Henter XML data for den valgte Spille dag og klokkeslet
-            /// </summary>
-            private void FetchPlayingTime(bool newSession = true)
+            catch (Exception)
             {
-                ShowAsOneGroup                 = true;
-                HideHacGrp                     = true;
-                ShowAsOneGroupVisibility       = Visibility.Collapsed;
-                ErrorMessage                   = "";
-                BindableCollection<Pair> pairs = [];
-                BindableCollection<Team> teams = [];
-                Pairs.Clear();
-                Teams.Clear();
-                bool InterWovenHowell = false;
-                bool Mitchell         = false;
-                //bool RoundCompleted   = true;
-                try
+                PlayingTimes.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Henter XML data for den valgte Spille dag og klokkeslet
+        /// </summary>
+        private void FetchPlayingTime(bool newSession = true)
+        {
+            ShowAsOneGroup = true;
+            HideHacGrp = true;
+            ShowAsOneGroupVisibility = Visibility.Collapsed;
+            ErrorMessage = "";
+            BindableCollection<Pair> pairs = [];
+            BindableCollection<Team> teams = [];
+            Pairs.Clear();
+            Teams.Clear();
+            bool InterWovenHowell = false;
+            bool Mitchell         = false;
+
+            //bool RoundCompleted   = true;
+            try
+            {
+                Configuration.StartTime = playingTime.Date;
+                tournaments = getTournaments(playingTime);
+
+                if (tournaments.Count == 0)
+                    return;
+
+                GroupSections = getGroupSections(playingTime, tournaments);
+
+                Date = playingTime.Date;
+
+                for (var grpNo = 0; grpNo < GroupSections.Count; grpNo++)
                 {
-                    Configuration.StartTime = playingTime.Date;
-                    tournaments             = getTournaments(playingTime);
+                    var grp = GroupSections[grpNo];
 
-                    if (tournaments.Count == 0)
-                        return;
-
-                    GroupSections = getGroupSections(playingTime, tournaments);
-
-                    Date = playingTime.Date;
-
-                    for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
+                    //if (!grp.Completed)
+                    //    RoundCompleted = false;
+                    if (grp.Tournament.TournamentType.Text == "Parturnering")
                     {
-                        var grp = GroupSections[grpNo];
+                        Mitchell = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
+                        ImpsPair = grp.Tournament.TournamentPairCalcType == "3";
 
-                        //if (!grp.Completed)
-                        //    RoundCompleted = false;
-                        if (grp.Tournament.TournamentType.Text == "Parturnering")
+                        if (grp.Resultlist is not null)
                         {
-                            if (grp.Resultlist is not null)
+                            InterWovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
+
+                            foreach (var pair in grp.Resultlist.Pairs)
                             {
-                                InterWovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
-                                Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
+                                pair.GroupNo = grpNo;
+                                pair.Group = grp.Tournament.Title;
 
-                                foreach (var pair in grp.Resultlist.Pairs)
-                                {
-                                    pair.GroupNo = grpNo;
-                                    pair.Group   = grp.Tournament.Title;
+                                pairs.Add(pair);
+                            }
 
-                                    pairs.Add(pair);
-                                }
+                            if (Mitchell)
+                            {
+                                HideHacGrp = false;
+                                var hacGrp = 1;
 
-                                if (Mitchell)
+                                foreach (var pair in pairs.Where(p => p.Direction == "1").OrderBy(p => p.HACRankSection))
+                                    pair.HACRankSectionPart = hacGrp++;
+
+                                hacGrp = 1;
+
+                                foreach (var pair in pairs.Where(p => p.Direction == "2").OrderBy(p => p.HACRankSection))
+                                    pair.HACRankSectionPart = hacGrp++;
+                            }
+                            else
+                                if (InterWovenHowell)
                                 {
                                     HideHacGrp = false;
-                                    var hacGrp = 1;
+                                    var subGroupSize = pairs.Count >> 1;
+                                    var hacGrp       = 1;
 
-                                    foreach (var pair in pairs.Where(p => p.Direction == "1").OrderBy(p => p.HACRankSection))
+                                    foreach (var pair in pairs.Take(subGroupSize).OrderBy(p => p.HACRankSection))
                                         pair.HACRankSectionPart = hacGrp++;
 
                                     hacGrp = 1;
 
-                                    foreach (var pair in pairs.Where(p => p.Direction == "2").OrderBy(p => p.HACRankSection))
+                                    foreach (var pair in pairs.Skip(subGroupSize).OrderBy(p => p.HACRankSection))
                                         pair.HACRankSectionPart = hacGrp++;
                                 }
-                                else
-                                    if (InterWovenHowell)
-                                    {
-                                        HideHacGrp       = false;
-                                        var subGroupSize = pairs.Count >> 1;
-                                        var hacGrp       = 1;
-
-                                        foreach (var pair in pairs.Take(subGroupSize).OrderBy(p => p.HACRankSection))
-                                            pair.HACRankSectionPart = hacGrp++;
-
-                                        hacGrp = 1;
-
-                                        foreach (var pair in pairs.Skip(subGroupSize).OrderBy(p => p.HACRankSection))
-                                            pair.HACRankSectionPart = hacGrp++;
-                                    }
-                            }
-
-                            if (grp.Startlist is not null)
-                                foreach (var pair in grp.Startlist.Pairs)
-                                {
-                                    var res = pairs.FirstOrDefault(p => p.Group == grp.Tournament.Title && p.PairNo == pair.PairNo);
-
-                                    if (res is null)
-                                    {
-                                        pair.GroupNo = grpNo;
-                                        pair.Group   = grp.Tournament.Title;
-                                        pairs.Add(pair);
-                                    }
-                                    else
-                                        res.StartPos = pair.StartPos;
-                                }
-
-                            if (InterWovenHowell)
-                            {
-                                ShowAsOneGroup           = false;
-                                ShowAsOneGroupVisibility = Visibility.Visible;
-                            }
                         }
-                        else
-                        {
-                            foreach (var team in grp.Rounds[0].Startlist.Teams)
+
+                        if (grp.Startlist is not null)
+                            foreach (var pair in grp.Startlist.Pairs)
                             {
-                                team.Group = grp.Tournament.Title;
-                                teams.Add(team);
+                                var res = pairs.FirstOrDefault(p => p.Group == grp.Tournament.Title && p.PairNo == pair.PairNo);
+
+                                if (res is null)
+                                {
+                                    pair.GroupNo = grpNo;
+                                    pair.Group = grp.Tournament.Title;
+                                    pairs.Add(pair);
+                                }
+                                else
+                                    res.StartPos = pair.StartPos;
                             }
 
-                            // Merge the four lists, ie. start, results, HAC and Butler
-                            var rnd = grp.Rounds[^1];
+                        if (InterWovenHowell)
+                        {
+                            ShowAsOneGroup = false;
+                            ShowAsOneGroupVisibility = Visibility.Visible;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var team in grp.Rounds[0].Startlist.Teams)
+                        {
+                            team.Group = grp.Tournament.Title;
+                            teams.Add(team);
+                        }
+
+                        // Merge the four lists, ie. start, results, HAC and Butler
+                        var rnd = grp.Rounds[^1];
+
+                        if (rnd is not null && rnd.RoundCompleted)
+                            foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title))
+                            {
+                                var sta = rnd.Startlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
+
+                                if (sta is not null)
+                                {
+                                    team.Merge(sta);
+                                    var res = rnd?.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
+                                    var hac = rnd?.HACResult.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
+                                    var but = rnd?.ButlerResult.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
+                                    var oth = rnd?.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == res.OpponentTeamNo);
+                                    //
+                                    team.Merge(res);
+                                    team.Merge(hac);
+                                    team.Merge(but);
+                                    team.TotalKP = team.KP ?? 0;
+                                }
+                            }
+                        else
+                            ErrorMessage = "Den aktuelle sektion er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!!";
+
+                        // Add KP from earlier sections
+                        foreach (var sectionFile in tournaments[grpNo].SectionFiles.Where(f => f.No < grp.SectionNo))
+                        {
+                            var earlierSection = getGroupSection(sectionFile.FileName, grp.Tournament);
+
+                            rnd = earlierSection?.Rounds[^1];
 
                             if (rnd is not null && rnd.RoundCompleted)
                                 foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title))
                                 {
-                                    var sta = rnd.Startlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
+                                    var res = rnd.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
 
-                                    if (sta is not null)
+                                    if (res is not null)
+                                        team.TotalKP += res.KP ?? 0;
+                                }
+                            else
+                                ErrorMessage = $"Runden d. {earlierSection.DateStr} er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
+                        }
+
+                        // Setup TournamentRank Rank by Total KP
+                        var totalRank = 1;
+
+                        foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title).OrderByDescending(t => t.TotalKP))
+                            team.TournamentRank = totalRank++;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+            }
+
+            int i =0;
+
+            foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
+                pair.EntryNo = i++;
+
+            foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
+                team.EntryNo = i++;
+
+            initSubgroups(pairs);
+            Pairs = pairs;
+            Teams = teams;
+
+#if DEBUG
+            // BridgeMate lookup
+            if (newSession)
+                //if (string.IsNullOrEmpty(ErrorMessage))
+                //    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
+                //else
+                BridgeMate.Close();
+#endif
+            // Restore Taskbar Icon.
+            //Execute.OnUIThread(() =>
+            //                   {
+            //                       Application.Current.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
+            //                   });
+        }
+
+        #region Load and Reload MainClub
+        private MainClub loadMainClub(int no)
+        {
+            var path     = Configuration.HomepagePath + @$"Resultater_{no}\";
+            var filename = path + @"Main.xml";
+
+            try
+            {
+                var mainclub = deserialize<MainClub>(filename);
+
+                if (mainclub.Clubs is null)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    mainclub = deserialize<MainClub>(filename);
+                }
+
+                if (mainclub.Clubs is null)
+                {
+                    ErrorMessage = $"Fejl ved læsning af Main.xml";
+                    return null;
+                }
+
+                mainclub.Path = path;
+                mainclub.No = no;
+
+                return mainclub;
+            }
+
+            catch (Exception)
+            {
+                ErrorMessage = $"Fejl ved læsning af Main.xml";
+                return null;
+            }
+        }
+
+        private void reloadMain()
+        {
+            try
+            {
+                if (SelectedMainClub is not null)
+                {
+                    var main = loadMainClub(SelectedMainClub.No);
+
+                    if (main?.Clubs is not null)
+                        foreach (var clubNew in main.Clubs)
+                        {
+                            var clubOld = Clubs.FirstOrDefault(c => c.Id == clubNew.Id);
+
+                            if (clubOld is null)
+                                for (var i = 0; i < Clubs.Count; i++)
+                                {
+                                    if (string.Compare(Clubs[i].Name, clubNew.Name, StringComparison.CurrentCulture) <= 0)
                                     {
-                                        team.Merge(sta);
-                                        var res = rnd?.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
-                                        var hac = rnd?.HACResult.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
-                                        var but = rnd?.ButlerResult.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
-                                        var oth = rnd?.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == res.OpponentTeamNo);
-                                        //
-                                        team.Merge(res);
-                                        team.Merge(hac);
-                                        team.Merge(but);
-                                        team.TotalKP = team.KP ?? 0;
+                                        Execute.OnUIThread(() => Clubs.Insert(i, clubNew));
+                                        break;
                                     }
                                 }
                             else
-                                ErrorMessage = "Den aktuelle sektion er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!!";
-
-                            // Add KP from earlier sections
-                            foreach (var sectionFile in tournaments[grpNo].SectionFiles.Where(f => f.No <  grp.SectionNo))
+                            if (clubNew.Id == SelectedClub?.Id)
+                            //if (clubNew.Id == clubOld.Id)
                             {
-                                var earlierSection = getGroupSection(sectionFile.FileName, grp.Tournament);
+                                // Update PlayingTimes for current club
+                                //var playingTimesNew = (SelectedClub is null
+                                //                             ? main.Clubs.SelectMany(club => club.MainTournaments) // rammes aldrig
+                                //                             : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
+                                //                            .SelectMany(mt => mt.PlayingTime);
 
-                                rnd = earlierSection?.Rounds[^1];
+                                var playingTimesNew = SelectedClub.MainTournaments.SelectMany(mt => mt.PlayingTime);
+                                                             
 
-                                if (rnd is not null && rnd.RoundCompleted)
-                                    foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title))
-                                    {
-                                        var res = rnd.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
-
-                                        if (res is not null)
-                                            team.TotalKP += res.KP ?? 0;
-                                    }
-                                else
-                                    ErrorMessage = $"Runden d. {earlierSection.DateStr} er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
-                            }
-
-                            // Setup TournamentRank Rank by Total KP
-                            var totalRank = 1;
-
-                            foreach (var team in teams.Where(t => t.Group == grp.Tournament.Title).OrderByDescending(t => t.TotalKP))
-                                team.TournamentRank = totalRank++;
-                        }
-                    }
-                }
-                catch (Exception )
-                {
-                    ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-                }
-
-                int i =0;
-
-                foreach (var pair in pairs.OrderBy(p => p.Group).ThenBy(p => p.SubGroup).ThenBy(p => p.PairNo))
-                    pair.EntryNo = i++;
-
-                foreach (var team in teams.OrderBy(p => p.Group).ThenBy(t => t.TeamNo))
-                    team.EntryNo = i++;
-
-                initSubgroups(pairs);
-                Pairs = pairs;
-                Teams = teams;
-
-#if DEBUG
-                // BridgeMate lookup
-                if (newSession)
-                    if (string.IsNullOrEmpty(ErrorMessage))
-                        //&& !RoundCompleted)
-                        BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
-                    else
-                        BridgeMate.Close();
-#endif
-                // Restore Taskbar Icon.
-                //Execute.OnUIThread(() =>
-                //                   {
-                //                       Application.Current.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
-                //                   });
-            }
-
-            #region Load and Reload MainClub
-                private MainClub loadMainClub(int no)
-                {
-                    var path     = Configuration.HomepagePath + @$"Resultater_{no}\";
-                    var filename = path + @"Main.xml";
-
-                    try
-                    {
-                        var mainclub = deserialize<MainClub>(filename);
-
-                        if (mainclub.Clubs is null)
-                        {
-                            System.Threading.Thread.Sleep(1000);
-                            mainclub = deserialize<MainClub>(filename);
-                        }
-
-                        if (mainclub.Clubs is null)
-                        {
-                            ErrorMessage = $"Fejl ved læsning af Main.xml";
-                            return null;
-                        }
-
-                        mainclub.Path = path;
-                        mainclub.No   = no;
-
-                        return mainclub;
-                    }
-
-                    catch (Exception)
-                    {
-                        ErrorMessage = $"Fejl ved læsning af Main.xml";
-                        return null;
-                    }
-                }
-
-                private void reloadMain()
-                {
-                    try
-                    {
-                        if (SelectedMainClub is not null)
-                        {
-                            var main = loadMainClub(SelectedMainClub.No);
-
-                            if (main?.Clubs is not null)
-                                foreach (var clubNew in main.Clubs)
+                                foreach (var playingTimeNew in playingTimesNew)
                                 {
-                                    var clubOld = Clubs.FirstOrDefault(c => c.Id == clubNew.Id);
+                                    var playingTimeOld = PlayingTimes.FirstOrDefault(pt => pt.Date == playingTimeNew.Date);
 
-                                    if (clubOld is null)
-                                        for (var i = 0; i <  Clubs.Count; i++)
+                                    if (playingTimeOld is null)
+                                        for (var i = 0; i < PlayingTimes.Count; i++)
                                         {
-                                            if (string.Compare(Clubs[i].Name, clubNew.Name, StringComparison.CurrentCulture) <= 0)
+                                            if (PlayingTimes[i].Date < playingTimeNew.Date)
                                             {
-                                                Execute.OnUIThread(() => Clubs.Insert(i, clubNew));
+                                                Execute.OnUIThread(() => PlayingTimes.Insert(i, playingTimeNew));
                                                 break;
                                             }
                                         }
                                     else
-                                    //if (clubNew.Id == clubOld.Id)
-                                    {
-                                        // UpdateAndMarkAppStarted PlayingTimes for existing club
-                                        var playingTimesNew = (SelectedClub is null
-                                                             ? main.Clubs.SelectMany(club => club.MainTournaments)
-                                                             : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                                                                                                                                                                                          .SelectMany(mt => mt.PlayingTime);
-
-                                        foreach (var playingTimeNew in playingTimesNew)
+                                        if (playingTimeOld.Date == playingTimeNew.Date)
                                         {
-                                            var playingTimeOld = PlayingTimes.FirstOrDefault(pt => pt.Date == playingTimeNew.Date);
+                                            foreach (var fileNew in playingTimeNew.TournamentFiles)
+                                            {
+                                                var fileOld = playingTimeOld.TournamentFiles.FirstOrDefault(o => o.FileName == fileNew.FileName);
 
-                                            if (playingTimeOld is null)
-                                                for (var i = 0; i <  PlayingTimes.Count; i++)
+                                                if (fileOld is null)
                                                 {
-                                                    if (PlayingTimes[i].Date <  playingTimeNew.Date)
-                                                    {
-                                                        Execute.OnUIThread(() => PlayingTimes.Insert(i, playingTimeNew));
-                                                        break;
-                                                    }
+                                                    foreach (var file in playingTimeOld.TournamentFiles)
+                                                        watcher.Filters.Remove(file.FileName);
+
+                                                    Execute.OnUIThread(() => playingTimeOld.TournamentFiles = playingTimeNew.TournamentFiles);
+                                                    SelectedPlayingTime = null;
+                                                    SelectedPlayingTime = playingTimeOld;
+                                                    return;
                                                 }
-                                            else
-                                                if (playingTimeOld.Date == playingTimeNew.Date)
-                                                {
-                                                    foreach (var fileNew in playingTimeNew.TournamentFiles)
-                                                    {
-                                                        var fileOld = playingTimeOld.TournamentFiles.FirstOrDefault(o => o.FileName == fileNew.FileName);
+                                                else
+                                                    // UpdateAndMarkAppStarted existing tournament fileNew                                             
+                                                    fileOld.Merge(fileNew);
+                                            }
 
-                                                        if (fileOld is null)
-                                                        {
-                                                            foreach (var file in playingTimeOld.TournamentFiles)
-                                                                watcher.Filters.Remove(file.FileName);
-
-                                                            Execute.OnUIThread(() => playingTimeOld.TournamentFiles = playingTimeNew.TournamentFiles);
-                                                            SelectedPlayingTime = null;
-                                                            SelectedPlayingTime = playingTimeOld;
-                                                            return;
-                                                        }
-                                                        else
-                                                            // UpdateAndMarkAppStarted existing tournament fileNew                                             
-                                                            fileOld.Merge(fileNew);
-                                                    }
-
-                                                    //if (updatedFile)
-                                                    //{
-                                                    //    SelectedPlayingTime = null;
-                                                    //    SelectedPlayingTime = playingTimeOld;
-                                                    //}
-                                                }
+                                            //if (updatedFile)
+                                            //{
+                                            //    SelectedPlayingTime = null;
+                                            //    SelectedPlayingTime = playingTimeOld;
+                                            //}
                                         }
-                                    }
                                 }
+                            }
                         }
-                    }
-                    catch (Exception)
-                    {
-                        ErrorMessage = "Fejl ved læsning af Main.xml";
-                    }
                 }
-            #endregion
-
-            private void initSubgroups(BindableCollection<Pair> pairs = null)
+            }
+            catch (Exception)
             {
-                pairs ??= Pairs;
+                ErrorMessage = "Fejl ved læsning af Main.xml";
+            }
+        }
+        #endregion
 
-                for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
+        private void initSubgroups(BindableCollection<Pair> pairs = null)
+        {
+            pairs ??= Pairs;
+
+            for (var grpNo = 0; grpNo < GroupSections.Count; grpNo++)
+            {
+                var grp = GroupSections[grpNo];
+
+                if (grp.Tournament.TournamentType.Text == "Parturnering"
+                && grp.Resultlist is not null)
                 {
-                    var grp = GroupSections[grpNo];
+                    var InterwovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
+                    var Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
+                    var subGroupSize     = grp.Resultlist.Pairs.Count >> 1;
+                    var rankA            = 1;
+                    var rankB            = 1;
 
-                    if (grp.Tournament.TournamentType.Text == "Parturnering"
-                    &&  grp.Resultlist                     is not null)
+                    foreach (var pair in pairs.Where(p => p.GroupNo == grpNo).OrderBy(p => p.SectionRank))
                     {
-                        var InterwovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
-                        var Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
-                        var subGroupSize     = grp.Resultlist.Pairs.Count >> 1;
-                        var rankA            = 1;
-                        var rankB            = 1;
+                        pair.Placering = pair.Rank;
+                        pair.Group = grp.Tournament.Title;
 
-                        foreach (var pair in pairs.Where(p => p.GroupNo == grpNo).OrderBy(p => p.SectionRank))
+                        if (InterwovenHowell)
                         {
-                            pair.Placering = pair.Rank;
-                            pair.Group     = grp.Tournament.Title;
-
-                            if (InterwovenHowell)
+                            pair.SubGroup = pair.PairNo <= subGroupSize ? "1. halvdel" : "2. halvdel";
+                            pair.Placering = pair.PairNo <= subGroupSize ? rankA++ : rankB++;
+                        }
+                        else
+                            if (Mitchell)
                             {
-                                pair.SubGroup  = pair.PairNo <= subGroupSize ? "1. halvdel" : "2. halvdel";
-                                pair.Placering = pair.PairNo <= subGroupSize ? rankA++ : rankB++;
+                                pair.SubGroup = pair.Direction == "2" ? "ØV" : "NS";
+                                pair.Placering = pair.Rank;
                             }
                             else
-                                if (Mitchell)
-                                {
-                                    pair.SubGroup  = pair.Direction == "2" ? "ØV" : "NS";
-                                    pair.Placering = pair.Rank;
-                                }
-                                else
-                                {
-                                    pair.SubGroup  = "";
-                                    pair.Placering = pair.Rank;
-                                }
-                        }
+                            {
+                                pair.SubGroup = "";
+                                pair.Placering = pair.Rank;
+                            }
                     }
                 }
             }
+        }
 
-            #region Get XML data
-                private List<Tournament> getTournaments(PlayingTime pt)
+        #region Get XML data
+        private List<Tournament> getTournaments(PlayingTime pt)
+        {
+            foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("MT")).ToList())
+                watcher.Filters.Remove(pathName);
+
+            List<Tournament> tournaments = new();
+
+            if (pt is null || pt.TournamentFiles is null)
+                ErrorMessage = $"Data for er ikke sendt til hjemmesiden";
+            else
+                foreach (var tournamentFile in pt.TournamentFiles)
                 {
-                    foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("MT")).ToList())
-                        watcher.Filters.Remove(pathName);
+                    var path       = SelectedMainClub.Path + tournamentFile.FileName;
+                    var tournament = deserialize<Tournament>(path);
 
-                    List<Tournament> tournaments = new();
+                    watcher.Filters.Add(tournamentFile.FileName);
 
-                    if (pt is null || pt.TournamentFiles is null)
-                        ErrorMessage = $"Data for er ikke sendt til hjemmesiden";
+                    if (tournament is null)
+                        if (string.IsNullOrEmpty(ErrorMessage))
+                            ErrorMessage = $"Data for '{tournamentFile.GroupName}' er ikke sendt til hjemmesiden";
+                        else
+                            ErrorMessage = $"Data er ikke sendt til hjemmesiden";
                     else
-                        foreach (var tournamentFile in pt.TournamentFiles)
+                    {
+                        tournament.SectionNo = tournamentFile.Section?.SectionNo ?? 1;
+                        tournaments.Add(tournament);
+                    }
+                }
+
+            return tournaments;
+        }
+
+        private List<GroupSection> getGroupSections(PlayingTime pt, List<Tournament> tournaments)
+        {
+            List<GroupSection> sections = new();
+            SectionNo = 1;
+
+            foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("GT")).ToList())
+                watcher.Filters.Remove(pathName);
+
+            foreach (var tur in tournaments)
+            {
+                var path    = SelectedMainClub.Path + tur.SectionFile.FileName;
+                var section = deserialize<GroupSection>(path);
+
+                watcher.Filters.Add(tur.SectionFile.FileName);
+
+                if (section != null)
+                {
+                    section.Tournament = tur;
+                    sections.Add(section);
+
+                    if (tur.SectionNo > SectionNo)
+                        SectionNo = tur.SectionNo;
+                }
+            }
+
+            return sections;
+        }
+
+        private GroupSection getGroupSection(String fileName, Tournament tournament)
+        {
+            var path    = SelectedMainClub.Path + fileName;
+            var section = deserialize<GroupSection>(path);
+
+            watcher.Filters.Add(fileName);
+
+            if (section != null)
+                section.Tournament = tournament;
+
+            return section;
+        }
+
+        private T deserialize<T>(string fullPath) where T : new()
+        {
+            try
+            {
+                if (!File.Exists(fullPath))
+                    return default;
+
+                if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
+                {
+                    //string json = File.ReadAllText(fullPath, iso_8859_1);
+                    string json = ReadAllTextWithRetry(fullPath, iso_8859_1);
+                    return JsonSerializer.Deserialize<T>(json, JsonOptions);
+                }
+                else // XML
+                {
+                    // Hvis filen ikke findes, returner null
+                    //string xml = File.ReadAllText(fullPath, iso_8859_1);
+                    string xml = ReadAllTextWithRetry(fullPath, iso_8859_1);
+
+                    // Erstat Fjern tag værdier, som kun består af blanke og - tegn
+                    xml = Regex.Replace(xml, @">(-|\s)+<", "><");
+
+                    // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
+                    xml = Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
+
+                    // Remove empty tags
+                    xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
+                    xml = Regex.Replace(xml, @"<\w+\s*(/>|/>\s*</\1*s>)", string.Empty); //<TagName/>
+
+                    var       serializer = new XmlSerializer(typeof(T));
+                    using var reader     = new StringReader( xml);
+                    return (T)serializer.Deserialize(reader);
+                }
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                return new T();
+            }
+        }
+
+        // Tilføj denne private helper-metode i samme klasse (f.eks. nederst i filen)
+        private string ReadAllTextWithRetry(string path, Encoding encoding, int maxAttempts = 10, int initialDelayMs = 100)
+        {
+            var delay = initialDelayMs;
+
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+                try
+                {
+                    // Åbn med ReadWrite sharing så vi kan læse selvom anden proces skriver (hvis den tillader deling).
+                    using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                    using var sr = new StreamReader(fs, encoding);
+                    return sr.ReadToEnd();
+                }
+
+                catch (IOException) when (attempt < maxAttempts)
+                {
+                    Thread.Sleep(delay);
+                    delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
+                }
+
+                catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+                {
+                    Thread.Sleep(delay);
+                    delay = Math.Min(1000, delay * 2);
+                }
+
+            // Sidste forsøg (lader exception boble op hvis det fejler)
+            using var fsFinal = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var srFinal = new StreamReader(fsFinal, encoding);
+            return srFinal.ReadToEnd();
+        }
+        #endregion
+
+        #region Look for Folder or file updates
+
+
+        // Erstat din eksisterende folderUpdated-metode med denne
+        // Denne version sikrer at events ikke springes over og behandles sekventielt
+        private void folderUpdated(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                var path = e.FullPath;
+
+                // Store/update the latest event for this path. If this is the first event for the path,
+                // enqueue the path so the processor will handle it. This collapses near-duplicate events
+                // for the same file into a single processing run (we keep the latest event).
+                if (_latestEvents.TryAdd(path, e))
+                {
+                    _eventQueue.Enqueue(path);
+                    _queueSignal.Release();
+
+                    // Ensure single processor is running
+                    if (System.Threading.Interlocked.CompareExchange(ref _processingEventLoop, 1, 0) == 0)
+                    {
+                        _ = Task.Run(ProcessEventQueueAsync);
+                    }
+                }
+                else
+                {
+                    // Already queued; update latest event
+                    _latestEvents[path] = e;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"folderUpdated error: {ex.Message}");
+                ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+            }
+        }
+
+        // Processor loop that handles queued FileSystem events one-by-one in order
+        private async Task ProcessEventQueueAsync()
+        {
+            try
+            {
+                while (true)
+                {
+                    await _queueSignal.WaitAsync();
+
+                    if (!_eventQueue.TryDequeue(out var path))
+                        continue; // spurious signal
+
+                    try
+                    {
+                        // Try to get and remove latest event for this path
+                        if (!_latestEvents.TryRemove(path, out var ev))
+                            continue; // nothing to process
+
+                        // Wait a short time for the writer to finish and wait for size-stability
+                        await Task.Delay(200);
+
+                        long lastLength = -1;
+
+                        for (int i = 0; i < 6; i++)
                         {
-                            var path       = SelectedMainClub.Path + tournamentFile.FileName;
-                            var tournament = deserialize<Tournament>(path);
-
-                            watcher.Filters.Add(tournamentFile.FileName);
-
-                            if (tournament is null)
-                                if (string.IsNullOrEmpty(ErrorMessage))
-                                    ErrorMessage = $"Data for '{tournamentFile.GroupName}' er ikke sendt til hjemmesiden";
-                                else
-                                    ErrorMessage = $"Data er ikke sendt til hjemmesiden";
-                            else
+                            long len = 0;
+                            try
                             {
-                                tournament.SectionNo = tournamentFile.Section?.SectionNo ?? 1;
-                                tournaments.Add(tournament);
+                                var fi = new FileInfo(path);
+                                len = fi.Exists ? fi.Length : 0;
                             }
+                            catch
+                            {
+                                len = -1;
+                            }
+
+                            if (lastLength != -1 && lastLength == len)
+                                break;
+
+                            lastLength = len;
+                            await Task.Delay(150);
                         }
 
-                    return tournaments;
-                }
-
-                private List<GroupSection> getGroupSections(PlayingTime pt, List<Tournament> tournaments)
-                {
-                    List<GroupSection> sections = new();
-                    SectionNo                   = 1;
-
-                    foreach (var pathName in watcher.Filters.Where(f => f.StartsWith("GT")).ToList())
-                        watcher.Filters.Remove(pathName);
-
-                    foreach (var tur in tournaments)
-                    {
-                        var path    = SelectedMainClub.Path + tur.SectionFile.FileName;
-                        var section = deserialize<GroupSection>(path);
-
-                        watcher.Filters.Add(tur.SectionFile.FileName);
-
-                        if (section != null)
-                        {
-                            section.Tournament = tur;
-                            sections.Add(section);
-
-                            if (tur.SectionNo >  SectionNo)
-                                SectionNo = tur.SectionNo;
-                        }
-                    }
-
-                    return sections;
-                }
-
-                private GroupSection getGroupSection(String fileName, Tournament tournament)
-                {
-                    var path    = SelectedMainClub.Path + fileName;
-                    var section = deserialize<GroupSection>(path);
-
-                    watcher.Filters.Add(fileName);
-
-                    if (section != null)
-                        section.Tournament = tournament;
-
-                    return section;
-                }
-
-                private T deserialize<T>(string fullPath) where T : new()
-                {
-                    try
-                    {
-                        if (!File.Exists(fullPath))
-                            return default;
-
-                        if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
-                        {
-                            //string json = File.ReadAllText(fullPath, iso_8859_1);
-                            string json = ReadAllTextWithRetry(fullPath, iso_8859_1);
-                            return JsonSerializer.Deserialize<T>(json, JsonOptions);
-                        }
-                        else // XML
-                        {
-                            // Hvis filen ikke findes, returner null
-                            //string xml = File.ReadAllText(fullPath, iso_8859_1);
-                            string xml = ReadAllTextWithRetry(fullPath, iso_8859_1);
-
-                            // Erstat Fjern tag værdier, som kun består af blanke og - tegn
-                            xml = Regex.Replace(xml, @">(-|\s)+<", "><");
-
-                            // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
-                            xml = Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
-
-                            // Remove empty tags
-                            xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
-                            xml = Regex.Replace(xml, @"<\w+\s*(/>|/>\s*</\1*s>)", string.Empty); //<TagName/>
-
-                            var       serializer = new XmlSerializer(typeof(T));
-                            using var reader     = new StringReader( xml);
-                            return (T)serializer.Deserialize(reader);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-                        return new T();
-                    }
-                }
-
-                // Tilføj denne private helper-metode i samme klasse (f.eks. nederst i filen)
-                private string ReadAllTextWithRetry(string path, Encoding encoding, int maxAttempts = 10, int initialDelayMs = 100)
-                {
-                    var delay = initialDelayMs;
-
-                    for (int attempt = 1; attempt <= maxAttempts; attempt++)
-                        try
-                        {
-                            // Åbn med ReadWrite sharing så vi kan læse selvom anden proces skriver (hvis den tillader deling).
-                            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-                            using var sr = new StreamReader(fs, encoding);
-                            return sr.ReadToEnd();
-                        }
-
-                        catch (IOException) when (attempt <  maxAttempts)
-                        {
-                            Thread.Sleep(delay);
-                            delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
-                        }
-
-                        catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
-                        {
-                            Thread.Sleep(delay);
-                            delay = Math.Min(1000, delay * 2);
-                        }
-
-                    // Sidste forsøg (lader exception boble op hvis det fejler)
-                    using var fsFinal = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-                    using var srFinal = new StreamReader(fsFinal, encoding);
-                    return srFinal.ReadToEnd();
-                }
-            #endregion
-
-            #region Look for Folder or file updates
-                private void folderUpdatedOld(object sender, FileSystemEventArgs e)
-                {
-                    // Debounce: Ignorer events for samme fil inden for 500 ms
-                    try
-                    {
-                        var now = DateTime.UtcNow;
-
-                        if (lastFileEvent.TryGetValue(e.FullPath, out DateTime last))
-                            if ((now - last).TotalMilliseconds <  500)
-                                return; // Ignorer duplikat
-                            else
-                                lastFileEvent[e.FullPath] = now;
-                        else
-                            lastFileEvent.TryAdd(e.FullPath, now);
-
-                        if (e.ChangeType == WatcherChangeTypes.Changed)
-                            //Debug.WriteLine($"File changed: {e.Name}");
-                            if (e.Name == "Main.XML")
-                                reloadMain();
-                            else
-                                FetchPlayingTime(false);
-                        else
-                            if (e.ChangeType == WatcherChangeTypes.Created)
-                                Debug.WriteLine($"File created: {e.Name}");
-                            else
-                                Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
-                    }
-
-                    catch (Exception)
-                    {
-                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-                    }
-                }
-
-                // Erstat din eksisterende folderUpdated-metode med denne
-                private void folderUpdated(object sender, FileSystemEventArgs e)
-                {
-                    try
-                    {
-                        var path = e.FullPath;
-
-                        // Cancel evt. eksisterende debounce for samme fil
-                        if (_debounceTokens.TryRemove(path, out var existing))
-                        {
-                            existing.Cancel();
-                            existing.Dispose();
-                        }
-
-                        var cts               = new CancellationTokenSource();
-                        var token             = cts.Token;
-                        _debounceTokens[path] = cts;
-
-                        // Start baggrundsopgave der venter og så behandler filen
-                        _ = Task.Run(async () =>
+                        // Execute handling on UI thread (same behaviour as tidligere)
+                        await Execute.OnUIThreadAsync(() =>
                         {
                             try
                             {
-                                // Vent lidt for at lade skrive-processen fuldføre (debounce)
-                                await Task.Delay(500, token);
-
-                                // Vent indtil filstørrelsen er stabil (tjek et par gange)
-                                long lastLength = -1;
-
-                                for (int i = 0; i <  6; i++)
-                                {
-                                    if (token.IsCancellationRequested)
-                                        return;
-
-                                    long len = 0;
-
-                                    try
-                                    {
-                                        var fi = new FileInfo(path);
-                                        len    = fi.Exists ? fi.Length : 0;
-                                    }
-                                    catch 
-                                    {
-                                        len = -1;
-                                    }
-
-                                    if (lastLength != -1
-                                    && lastLength == len)
-                                        break;
-
-                                    lastLength = len;
-                                    await Task.Delay(200, token);
-                                }
-
-                                    // Nu kør den faktiske behandling på UI-tråden (som før)
-                                    await Execute.OnUIThreadAsync(() =>
-                                    {
-                                        if (e.ChangeType == WatcherChangeTypes.Changed)
-                                            if (e.Name == "Main.XML")
-                                                reloadMain();
-                                            else
-                                                FetchPlayingTime(false);
-                                        else
-                                            if (e.ChangeType == WatcherChangeTypes.Created)
-                                                Debug.WriteLine($"File Created: {e.Name}");
-                                            else
-                                                Debug.WriteLine($"File {e.ChangeType}: {e.Name}");
-
-                                        // Ensure the lambda returns a Task on all code paths
-                                        return Task.CompletedTask;
-                                    });
+                                if (ev.ChangeType == WatcherChangeTypes.Changed)
+                                    if (ev.Name == "Main.XML")
+                                        reloadMain();
+                                    else
+                                        FetchPlayingTime(false);
+                                else 
+                                    if (ev.ChangeType == WatcherChangeTypes.Created)
+                                        Debug.WriteLine($"File Created: {ev.Name}");
+                                    else
+                                        Debug.WriteLine($"File {ev.ChangeType}: {ev.Name}");
                             }
-
-                            catch (TaskCanceledException)
-                            {
-                                /* debounced away */ 
-                            }
-
                             catch (Exception ex)
                             {
-                                Debug.WriteLine($"Error processing file event for {e.Name}: {ex.Message}");
+                                Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
                             }
 
-                            finally
-                            {
-                                if (_debounceTokens.TryRemove(path, out var removed))
-                                {
-                                    removed.Cancel();
-                                    removed.Dispose();
-                                }
-                            }
-
-                        }, token);
+                            return Task.CompletedTask;
+                        });
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"folderUpdated error: {ex.Message}");
-                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                        Debug.WriteLine($"Error processing queued file event: {ex.Message}");
                     }
                 }
-            #endregion
-
-            private async Task ShowProjector()
+            }
+            finally
             {
-                var projectorScreen = WpfScreenHelper.Screen.AllScreens
+                // We never exit the loop in normal operation; ensure flag cleared if we do
+                System.Threading.Interlocked.Exchange(ref _processingEventLoop, 0);
+            }
+        }
+        #endregion
+
+        private async Task ShowProjector()
+        {
+            var projectorScreen = WpfScreenHelper.Screen.AllScreens
                                                             .Where(s => !s.Primary)
                                                             .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height)
                                                             .FirstOrDefault();
 
-                if (projectorScreen is null)
-                {
+            if (projectorScreen is null)
+            {
 #if RELEASE
                     MessageBox.Show("Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K", "Info");
 #else
-                    var primaryScreen = WpfScreenHelper.Screen.PrimaryScreen;
+                var primaryScreen = WpfScreenHelper.Screen.PrimaryScreen;
 
-                    var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
+                var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
-                    if (projectorView is null)
-                    {
-                        await windowManager.ShowWindowAsync(this, "ProjectorView");
-
-                        // erstat kaldet der viser vinduet (i din eksisterende ShowProjector-metode)
-                        //var projectorViewModel = new ProjectorViewModel(this);
-                        //await windowManager.ShowWindowAsync(projectorViewModel, "ProjectorView");
-                        projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
-
-                        projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
-                        projectorView.WindowState           = WindowState.Normal;
-                        projectorView.Width                 = 800;
-                        projectorView.Height                = 600;
-
-                        projectorView.Top  = primaryScreen.WorkingArea.Top;
-                        projectorView.Left = primaryScreen.WpfBounds.Left
-                                           + primaryScreen.WpfBounds.Width
-                                           - projectorView.Width;
-                    }
-#endif
-                }
-                else
-
+                if (projectorView is null)
                 {
-                    var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
+                    await windowManager.ShowWindowAsync(this, "ProjectorView");
 
-                    if (projectorView is null)
-                    {
-                        await windowManager.ShowWindowAsync(this, "ProjectorView");
-                        projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
-                    }
+                    // erstat kaldet der viser vinduet (i din eksisterende ShowProjector-metode)
+                    //var projectorViewModel = new ProjectorViewModel(this);
+                    //await windowManager.ShowWindowAsync(projectorViewModel, "ProjectorView");
+                    projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
                     projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
-                    projectorView.Left                  = projectorScreen.WorkingArea.Left;
-                    projectorView.Top                   = projectorScreen.WorkingArea.Top;
-                    projectorView.Width                 = projectorScreen.WorkingArea.Width;
-                    projectorView.Height                = projectorScreen.WorkingArea.Height;
-                    projectorView.WindowState           = WindowState.Maximized;
-                }
+                    projectorView.WindowState = WindowState.Normal;
+                    projectorView.Width = 800;
+                    projectorView.Height = 600;
 
-                // Move ShellView activation out here, so that it ALWAS get focus in the end.
-                var shellVm   = IoC.Get<ShellViewModel>();
-                var shellView = shellVm.GetView() as Window;
-
-                if (shellView != null)
-                {
-                    shellView.Activate();
-                    shellView.Topmost = true;
-                    shellView.Topmost = false;
-                    shellView.Focus();
+                    projectorView.Top = primaryScreen.WorkingArea.Top;
+                    projectorView.Left = primaryScreen.WpfBounds.Left
+                                       + primaryScreen.WpfBounds.Width
+                                       - projectorView.Width;
                 }
+#endif
             }
+            else
+
+            {
+                var projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
+
+                if (projectorView is null)
+                {
+                    await windowManager.ShowWindowAsync(this, "ProjectorView");
+                    projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
+                }
+
+                projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
+                projectorView.Left = projectorScreen.WorkingArea.Left;
+                projectorView.Top = projectorScreen.WorkingArea.Top;
+                projectorView.Width = projectorScreen.WorkingArea.Width;
+                projectorView.Height = projectorScreen.WorkingArea.Height;
+                projectorView.WindowState = WindowState.Maximized;
+            }
+
+            // Move ShellView activation out here, so that it ALWAS get focus in the end.
+            var shellVm   = IoC.Get<ShellViewModel>();
+            var shellView = shellVm.GetView() as Window;
+
+            if (shellView != null)
+            {
+                shellView.Activate();
+                shellView.Topmost = true;
+                shellView.Topmost = false;
+                shellView.Focus();
+            }
+        }
         #endregion
     }
 }

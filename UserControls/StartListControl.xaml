@@ -2,6 +2,7 @@
     x:Class="DBF.UserControls.StartListControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:DBF.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:help="clr-namespace:DBF.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,6 +15,10 @@
     <UserControl.Resources>
         <CollectionViewSource x:Key="PairsViewSource" Source="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}" />
         <CollectionViewSource x:Key="TeamsViewSource" Source="{Binding Teams, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  proxy that exposes this UserControl.DataContext  -->
+        <help:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
+
     </UserControl.Resources>
 
     <Grid>
@@ -38,6 +43,7 @@
         </StackPanel>
 
         <syncfusion:SfDataGrid Name="dgTeams" Grid.Row="1"
+            ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             Margin="0,0,0,10"
             AllowEditing="False"
             AllowResizingColumns="True"
@@ -50,8 +56,7 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
-                    QueryRowHeight="SfDataGrid_QueryRowHeight"           
-            ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
+            QueryRowHeight="SfDataGrid_QueryRowHeight"
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
 
@@ -93,11 +98,10 @@
                     HeaderText="Spillere"
                     HorizontalHeaderContentAlignment="Left"
                     MappingName="Names"
-                    MinimumWidth="600"
                     MaximumWidth="600"
-                    TextWrapping="Wrap"
-                    
-                    TextAlignment="Left" />
+                    MinimumWidth="600"
+                    TextAlignment="Left"
+                    TextWrapping="Wrap" />
             </syncfusion:SfDataGrid.Columns>
 
             <syncfusion:SfDataGrid.SortColumnDescriptions>
@@ -112,6 +116,7 @@
         </syncfusion:SfDataGrid>
 
         <syncfusion:SfDataGrid Name="dgPairs" Grid.Row="2"
+            ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowGrouping="True"
@@ -125,7 +130,6 @@
             ColumnSizer="Auto"
             FilterRowPosition="None"
             FontSize="14"
-            ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             NavigationMode="Row"
             ScrollViewer.CanContentScroll="True"
             ShowColumnWhenGrouped="True"
@@ -166,11 +170,21 @@
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="AvgHAC" />
 
+                <!--  TODO: Only one of the next two columns will be shown  -->
+                <!-- ViewModelProxyen er nødvendig -->
                 <syncfusion:GridPercentColumn
                     HeaderText="Forventet"
                     HorizontalHeaderContentAlignment="Center"
+                    IsHidden="{Binding Data.ImpsPair, Source={StaticResource ViewModelProxy}}"
                     MappingName="ExpectedScore" />
 
+                <syncfusion:GridNumericColumn
+                    HeaderText="Forventet"
+                    HorizontalHeaderContentAlignment="Center"
+                    IsHidden="{Binding Data.ImpsPair, Source={StaticResource ViewModelProxy}, Converter={StaticResource BooleanInvertConverter}}"
+                    MappingName="ExpectedScore" />
+
+                <!--    -->
                 <syncfusion:GridTextColumn
                     HeaderText="Rank."
                     HorizontalHeaderContentAlignment="Center"

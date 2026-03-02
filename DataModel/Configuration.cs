@@ -254,6 +254,7 @@ namespace DBF.DataModel
                     BridgeTimers[0].Visibility = Visibility.Visible;
                     BridgeTimers[0].UpdateDisplay();
                     visibleTimerCount = 1;
+                    Save();
                 }
 
                 // Move collapsed timers at the end
@@ -379,9 +380,11 @@ namespace DBF.DataModel
                     timer.Visibility = Visibility.Collapsed;
 
                     // Move the collapsed timer to the end of the list
-                    BridgeTimers.Remove(timer);
-                    BridgeTimers.Add(timer);
+                    var idx= BridgeTimers.IndexOf(timer);
 
+                    BridgeTimers.Add(timer);
+                    BridgeTimers.RemoveAt(idx);
+                
                     Save();
                     SetUpDownVisibility();
                 }

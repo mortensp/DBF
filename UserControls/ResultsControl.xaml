@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:help="clr-namespace:DBF.Helpers"
     xmlns:local="clr-namespace:DBF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
@@ -15,6 +16,9 @@
     <UserControl.Resources>
         <CollectionViewSource x:Key="PairsViewSource" Source="{Binding Pairs, UpdateSourceTrigger=PropertyChanged}" />
         <CollectionViewSource x:Key="TeamsViewSource" Source="{Binding Teams, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  proxy that exposes this UserControl.DataContext  -->
+        <help:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
     </UserControl.Resources>
 
     <Grid>
@@ -208,11 +212,20 @@
                     TextAlignment="Center" />
 
                 <!--  Sektionens Score  -->
-
+                <!--  TODO: Only one of the next two columns will be shown  -->
+                <!--  ViewModelProxyen er nødvendig  -->
                 <syncfusion:GridPercentColumn
                     HeaderText="Opnået"
                     HorizontalHeaderContentAlignment="Center"
+                    IsHidden="{Binding Data.ImpsPair, Source={StaticResource ViewModelProxy}}"
                     MappingName="ActualScore" />
+
+                <syncfusion:GridNumericColumn
+                    HeaderText="Opnået"
+                    HorizontalHeaderContentAlignment="Center"
+                    IsHidden="{Binding Data.ImpsPair, Source={StaticResource ViewModelProxy}, Converter={StaticResource BooleanInvertConverter}}"
+                    MappingName="ActualScore" />
+                <!--    -->
 
                 <syncfusion:GridNumericColumn
                     HeaderText="Score"

@@ -361,7 +361,7 @@
                             HorizontalAlignment="Left"
                             AcceptsReturn="True"
                             FontWeight="Bold"
-                            Text="{Binding EndGreetingBottom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding EndGreetingBottom, Mode=TwoWay}"
                             TextWrapping="Wrap" />
 
                         <!--  Playing Time:  -->
