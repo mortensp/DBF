@@ -31,9 +31,11 @@ namespace DBF.DataModel
                                , string sound = null
                                , int volume = 50
                                , Visibility visibility = Visibility.Visible
+                               , string pauseMessage = null
                                , string endGreetingTop = null
                                , string endGreetingBottom = null
-                               ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
+                               , TimeOnly? startTime = null
+                               ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes, startTime)
             {
                 Groups            = groups;
                 Info              = info;
@@ -42,7 +44,8 @@ namespace DBF.DataModel
                 BackgroundColor   = backgroundColor;
                 ForegroundColor   = foregroundColor;
                 Visibility        = visibility;
-                EndGreetingTop    = endGreetingBottom;
+                PauseMessage      = pauseMessage;
+                EndGreetingTop    = endGreetingTop;
                 EndGreetingBottom = endGreetingBottom;
             }
         #endregion
@@ -78,6 +81,19 @@ namespace DBF.DataModel
         public              int        Volume     { get; set; }
         public              Visibility Visibility { get; set; }
         public              string     GroupStr   { get => Groups.ToFriendlyString(); }
+        public string PauseMessage
+        {
+            get => field;
+            set
+            {
+                value = string.IsNullOrWhiteSpace(value)
+                      ? null
+                      : field = value?.Trim();
+
+                Set(ref field, value);
+            }
+        }
+
         public string EndGreetingTop
         {
             get => field;
@@ -112,6 +128,7 @@ namespace DBF.DataModel
             Rounds            = preset.Rounds;
             BoardsPerRound    = preset.BoardsPerRound;
             BreakAfterRound   = preset.BreakAfterRound;
+            StartTime = preset.StartTime;
             Hours             = preset.Hours;
             Minutes           = preset.Minutes;
             Seconds           = preset.Seconds;
@@ -129,6 +146,7 @@ namespace DBF.DataModel
                 BackgroundColor   = tSetting.BackgroundColor;
                 ForegroundColor   = tSetting.ForegroundColor;
                 Visibility        = tSetting.Visibility;
+                PauseMessage      = tSetting.PauseMessage;
                 EndGreetingTop    = tSetting.EndGreetingTop;
                 EndGreetingBottom = tSetting.EndGreetingBottom;
             }

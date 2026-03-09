@@ -30,9 +30,9 @@ public partial class BridgeTimerControl : UserControl
                       , Time             = "21:17"
                       , RoundText        = "3. Runde"
                       , Info             = "Vi spiller 7 runder af 24 spil"
-                      + Environment.NewLine +
-                      //, MoreInfo         = 
-                      "Pause efter 4. Runde"
+                                         + Environment.NewLine +
+                                         //, MoreInfo         = 
+                                         "Pause efter 4. Runde"
                       , MinutesLeft      = 13d
                       , WarningVisiblity = Visibility.Visible
                     };
@@ -105,23 +105,25 @@ public partial class BridgeTimerControl : UserControl
                 set => SetValue(ButtonsVisibilityProperty, value);
             }
 
-            public static readonly DependencyProperty ButtonsVisibilityProperty = 
+    public static readonly DependencyProperty ButtonsVisibilityProperty =
                                    DependencyProperty.Register( nameof(ButtonsVisibility)
                                                               , typeof(Visibility)
                                                               , typeof(BridgeTimerControl)
-                                                              , new FrameworkPropertyMetadata(Visibility.Visible, onButtonsVisibilityPropertyChanged));
+                                                              , new FrameworkPropertyMetadata(Visibility.Visible));//, onButtonsVisibilityPropertyChanged));
 
-            private static void onButtonsVisibilityPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-            {
-                if (d is BridgeTimerControl ctl)
-                    ctl.CanClose = ctl.ButtonsVisibility == Visibility.Visible;
-            }
+            //private static void onButtonsVisibilityPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            //{
+            //    //if (d is BridgeTimerControl ctl)
+            //    //    // ctl.CanClose =
+            //    //ctl.ButtonsVisibility == Visibility.Visible;
+            //}
         #endregion
     #endregion
 
     #region Public Properties
         public Visibility UpButtonVisibility   { get; private set; }
         public Visibility DownButtonVisibility { get; private set; }
+
     #endregion
 
     #region Private Methods        

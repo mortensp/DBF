@@ -21,7 +21,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <userctls:BridgeTimerControl x:Name="timer1" Grid.Row="0" Grid.Column="0"
+        <userctls:BridgeTimerControl x:Name="timer1" Grid.Row="0" Grid.Column="0" 
             ButtonsVisibility="{Binding ButtonsVisibility}"
             Timer="{Binding Configuration.BridgeTimers[0]}" />
 

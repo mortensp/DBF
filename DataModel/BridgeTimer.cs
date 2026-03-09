@@ -3,15 +3,16 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.Helpers;
 using DBF.ViewModels;
+using Syncfusion.UI.Xaml.Schedule;
 
 namespace DBF.DataModel
 {
-
     public partial class BridgeTimer : TimerSetting
     {
         private IAudioService _player { get => field ??= IoC.Get<IAudioService>(); set => field = value; }
@@ -41,6 +42,7 @@ namespace DBF.DataModel
         #region Public Properties
             [JsonIgnore] public Configuration Configuration    { get => field ??= IoC.Get<Configuration>(); set => field = value; }
             [JsonIgnore] public string        Time             { get; set; }
+            [JsonIgnore] public bool          CanClose         { get; set; }
             [JsonIgnore] public Visibility    WarningVisiblity { get; set; }
             [JsonIgnore] public string        RoundText        { get; set; }
             [JsonIgnore] public Visibility    ShowUpButton     { get; set; }
@@ -48,6 +50,60 @@ namespace DBF.DataModel
             [JsonIgnore] public double        MinutesLeft      { get; set; }
             [JsonIgnore] public int           Round            { get; set; } = 1;
             [JsonIgnore] public TimeOnly EndTime  => TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(Math.Max(MinutesLeft, 0)));
+            [JsonIgnore]
+            public DateTime? PauseEndTime
+            {
+                get
+                {
+                    if (Round >  BreakAfterRound
+                    || !_isStarted)
+                        return null;
+
+                    var time = DateTime.Now.AddTimeSpan(_remainingTime);
+
+                    for (var r = Round + 1; r <= BreakAfterRound; r++)
+                    {
+                        time = time.AddTimeSpan(new TimeSpan(Hours, Minutes, Seconds));
+                        time = time.AddMinutes(TransitionMinutes);
+                    }
+
+                    if (_isAtBreak)
+                        return time;
+                    else
+                        return time.AddMinutes(BreakMinutes);
+                }
+            }
+
+            [JsonIgnore]
+            public DateTime? EndTimeSession
+            {
+                get
+                {
+                    _isStarted = true; // test
+
+                    if (Round >  Rounds
+                    || !_isStarted)
+                        return null;
+
+                    var time = PauseEndTime
+                            ?? DateTime.Now.AddTimeSpan(_remainingTime);
+
+                    int r = Round >  BreakAfterRound
+                          ? Round+1
+                          : BreakAfterRound +1;
+
+                    for (; r <= Rounds; r++)
+
+                    {
+                        time = time.AddTimeSpan(new TimeSpan(Hours, Minutes, Seconds));
+
+                        if (r <  Rounds)
+                            time = time.AddMinutes(TransitionMinutes);
+                    }
+
+                    return time;
+                }
+            }
 
             [JsonIgnore]
             public bool IsPaused
@@ -80,10 +136,10 @@ namespace DBF.DataModel
                 await windowManager.ShowDialogAsync(screen);
 
                 // If the dialog was enden with save, then our Settings was updated
-                _startTime      = new TimeSpan(     Hours,  Minutes,           Seconds);
-                _breakTime      = new TimeSpan(     0,      BreakMinutes,      0);
-                _transitionTime = new TimeSpan(     0,      TransitionMinutes, 0);
-                _warningTime    = new TimeSpan(     0,      WarningMinutes,    0);
+                _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                _breakTime      = new TimeSpan(0, BreakMinutes, 0);
+                _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                _warningTime    = new TimeSpan(0, WarningMinutes, 0);
 
                 if (!IsStarted)
                     _remainingTime = _startTime;
@@ -141,9 +197,9 @@ namespace DBF.DataModel
                                             }
 
                 if (_remainingTime == TimeSpan.MinValue)
-                    _remainingTime =  _startTime = new TimeSpan(Hours,                                                 Minutes, Seconds);
+                    _remainingTime =  _startTime = new TimeSpan(Hours, Minutes, Seconds);
 
-                Time = _remainingTime.ToString(                _remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
+                Time = _remainingTime.ToString(_remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
 
                 if (Round >  Rounds)
                     WarningVisiblity = Visibility.Collapsed;
@@ -163,11 +219,15 @@ namespace DBF.DataModel
                 else
                     if (Round <= Rounds)
                         if (_isAtBreak)
-                            RoundText = $"Pause!";
+                        {
+                            RoundText = $"Pause til kl: " + PauseEndTime?.ToString("HH:mm");
+                            Info      = PauseMessage;
+                        }
                         else
                         {
                             if (Round <= BreakAfterRound)
-                                Info += Environment.NewLine + $"Pause efter {BreakAfterRound}. {getRoundText}";
+                                Info += Environment.NewLine
+                                      + $"{BreakMinutes} minutters pause efter {BreakAfterRound}. {getRoundText}";
 
                             if (_isAtTransition)
                                 RoundText = $"Der skiftes til {Round + 1}. {getRoundText}";
@@ -226,7 +286,7 @@ namespace DBF.DataModel
             {
                 if (Round == 1)
                 {
-                    _isStarted     = false;
+                    //_isStarted     = false;
                     _remainingTime = _startTime;
                 }
                 else
@@ -330,24 +390,25 @@ namespace DBF.DataModel
                     _isPaused       = true;
                     _isStarted      = false;
                     _remainingTime  = _startTime;
-                    _startTime      = new TimeSpan(Hours, Minutes,           Seconds);
-                    _transitionTime = new TimeSpan(0,     TransitionMinutes, 0);
-                    _breakTime      = new TimeSpan(0,     BreakMinutes,      0);
+                    _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                    _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                    _breakTime      = new TimeSpan(0, BreakMinutes, 0);
                     Round           = 1;
 
                     UpdateDisplay();
                 }
             }
 
+            [JsonIgnore]
             public BridgeTimerState CurrentState =>
-                new BridgeTimerState()
-                {
-                    IsStarted = _isStarted
-                  , IsAtBreak = _isAtBreak
-                  , IsAtTransition = _isAtTransition
-                  , RemainingTime = _remainingTime
-                  , Round = this.Round
-                };
+                    new BridgeTimerState()
+                    {
+                        IsStarted = _isStarted
+                      , IsAtBreak = _isAtBreak
+                      , IsAtTransition = _isAtTransition
+                      , RemainingTime = _remainingTime
+                      , Round = this.Round
+                    };
 
             public void Restart(BridgeTimerState state)
             {
@@ -360,9 +421,9 @@ namespace DBF.DataModel
                 _remainingTime  = state.RemainingTime;
                 Round           = state.Round;
                 //
-                _startTime      = new TimeSpan(Hours, Minutes,           Seconds);
-                _transitionTime = new TimeSpan(0,     TransitionMinutes, 0);
-                _breakTime      = new TimeSpan(0,     BreakMinutes,      0);
+                _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                _breakTime      = new TimeSpan(0, BreakMinutes, 0);
 
                 UpdateDisplay();
             }

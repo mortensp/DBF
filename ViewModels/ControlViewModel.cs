@@ -395,7 +395,7 @@ namespace DBF.ViewModels
 
                         if (grp.Resultlist is not null)
                         {
-                            InterWovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
+                            InterWovenHowell = grp.Tournament.MovementPlan?.Contains("Indvævet Howell")??false;
 
                             foreach (var pair in grp.Resultlist.Pairs)
                             {
@@ -505,7 +505,7 @@ namespace DBF.ViewModels
                                         team.TotalKP += res.KP ?? 0;
                                 }
                             else
-                                ErrorMessage = $"Runden d. {earlierSection.DateStr} er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
+                                ErrorMessage = $"Runden d. {earlierSection?.DateStr?? playingTime.Date.ToShortDateString()} er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
                         }
 
                         // Setup TournamentRank Rank by Total KP
@@ -682,7 +682,7 @@ namespace DBF.ViewModels
                 if (grp.Tournament.TournamentType.Text == "Parturnering"
                 && grp.Resultlist is not null)
                 {
-                    var InterwovenHowell = grp.Tournament.MovementPlan.Contains("Indvævet Howell");
+                    var InterwovenHowell = grp.Tournament.MovementPlan?.Contains("Indvævet Howell")??false;
                     var Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
                     var subGroupSize     = grp.Resultlist.Pairs.Count >> 1;
                     var rankA            = 1;

@@ -96,8 +96,9 @@
                             Content="X"
                             Cursor="Hand"
                             ToolTip="Luk uret og sluk"
-                            Visibility="{Binding CanClose, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding Timer.CanClose, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
+                        <!--  Row - Time  -->
                         <TextBlock Grid.Row="1" Grid.ColumnSpan="3"
                             Margin="0,0,8,0"
                             HorizontalAlignment="Center"
@@ -126,6 +127,7 @@
                             </Canvas>
                         </TextBlock>
 
+                        <!--  Row - Info  -->
                         <TextBlock x:Name="info" Grid.Row="3" Grid.Column="1"
                             MaxWidth="400"
                             MaxHeight="150"
@@ -136,13 +138,13 @@
                             TextAlignment="Center"
                             TextWrapping="Wrap" />
 
-                            <TextBlock x:Name="group" Grid.Row="5" Grid.Column="1"
+                        <TextBlock x:Name="group" Grid.Row="5" Grid.Column="1"
                             Margin="0,8,0,0"
                             HorizontalAlignment="Center"
                             FontWeight="Bold"
                             Text="{Binding Timer.GroupStr}" />
 
-                        </Grid>
+                    </Grid>
                 </Border>
 
                 <!--  Timer Control Buttons  -->

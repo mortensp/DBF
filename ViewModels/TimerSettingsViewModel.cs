@@ -57,7 +57,11 @@ namespace DBF.ViewModels
             public        TimerSetting                      NewSetting         { get; set; } = new();
             public        Color                             BackgroundColor    { get; set; }
             public        Color                             ForegroundColor    { get; set; }
-            public        TimeOnly                          EndTime            => TimeOnly.FromDateTime(Configuration.StartTime.AddMinutes(NewSetting.Duration));
+
+            public        TimeOnly                          StartTime          => NewSetting.StartTime ?? TimeOnly.FromDateTime(Configuration.StartTime);
+
+            public        TimeOnly                          EndTime            => StartTime.AddMinutes(NewSetting.Duration);
+
             public Preset SelectedPreset
             {
                 get => selectedPreset;
@@ -81,6 +85,10 @@ namespace DBF.ViewModels
                     {
                         onOpen = true;
                         NewSetting.Update(value);
+
+                        if (Configuration.StartTime >  DateTime.MinValue)
+                            NewSetting.StartTime = null;
+
                         SelectedPreset = FindPreset(NewSetting);
                         onOpen         = false;
                     }
@@ -122,7 +130,7 @@ namespace DBF.ViewModels
                 {
                     NewSetting.Name = dialog.PresetName;
                     var preset      = new Preset(NewSetting);
-                    Configuration.Presets.Add(   preset);
+                    Configuration.Presets.Add(preset);
 
                     Configuration.Save();
                     SelectedPreset = preset;
@@ -165,8 +173,14 @@ namespace DBF.ViewModels
         #region Private Methods
             private void newSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(NewSetting.Duration))
+                // When the duration or the start time of the new setting changes,
+                // notify that EndTime has changed. Also notify StartTime so bindings update.
+                if (e.PropertyName == nameof(NewSetting.Duration)
+                ||  e.PropertyName == nameof(NewSetting.StartTime))
+                {
+                    NotifyOfPropertyChange(nameof(StartTime));
                     NotifyOfPropertyChange(nameof(EndTime));
+                }
             }
 
             private void onSettingPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -196,8 +210,8 @@ namespace DBF.ViewModels
                 if (NewSetting is not null)
                     NewSetting.PropertyChanged -= newSetting_PropertyChanged;
             }
+
             return base.OnDeactivateAsync(close, cancellationToken);
         }
-
     }
 }

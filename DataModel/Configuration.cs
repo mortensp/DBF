@@ -87,7 +87,9 @@ namespace DBF.DataModel
                         var limit = TimeSpan.FromMinutes(30 + duration); // tillad 30 min. forsinkelse
                         var diff  = DateTime.Now - startTime;
 
-                        if (diff >  _zeroTime && diff <  limit)
+                        if (startTime == DateTime.MinValue
+                        ||  diff      >  _zeroTime
+                        &&  diff      <  limit)
                             return DateTime.Now;
                         else
                             return startTime;
@@ -116,22 +118,22 @@ namespace DBF.DataModel
                 }
 
                 public BindableCollection<Preset> Presets { get; set; } = new()
-                                                                                                                                                                                                                                                                                                                                                {
-                                                                                                                  new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                                                                                                                , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                                                                                                                , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                                                                                                                , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                                                                                                                                                                                                                                                                                                                                };
+                                                {
+                                                      new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                                    , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                                                    , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                                                    , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                                                };
 
                 [JsonIgnore]
                 public ObservableCollection<CustomColor> BackgroundColors = new()
-                                                                                                        {
-                                                                                                              new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
-                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
-                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
-                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
-                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
-                                                                                                        };
+                                                {
+                                                      new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
+                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
+                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
+                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
+                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
+                                                };
 
                 private string bc3Path = @"C:\BC3\";
 
@@ -154,7 +156,7 @@ namespace DBF.DataModel
             public void Load()
             {
                 if (!File.Exists(path)
-                &&  File.Exists(  oldPath))
+                &&  File.Exists(oldPath))
                 {
                     // Sørg for at destination-mappen eksisterer
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -257,8 +259,16 @@ namespace DBF.DataModel
                     Save();
                 }
 
-                // Move collapsed timers at the end
-                for (i = BridgeTimers.Count - 1; i >= 0; i--)
+                arrangeTimers();
+
+                SetUpDownVisibility();
+                RestoreState();
+            }
+
+            private void arrangeTimers()
+            {
+                // Move collapsed timers at the end and enable/diable Close buttons
+                for (var i = BridgeTimers.Count - 1; i >= 0; i--)
                 {
                     var timer = BridgeTimers[i];
 
@@ -267,10 +277,9 @@ namespace DBF.DataModel
                         BridgeTimers.Remove(timer);
                         BridgeTimers.Add(timer);
                     }
+                    else
+                        timer.CanClose = visibleTimerCount >  1;
                 }
-
-                SetUpDownVisibility();
-                RestoreState();
             }
 
             public void Save()
@@ -362,6 +371,7 @@ namespace DBF.DataModel
 
                     bridgeTimer.UpdateDisplay();
                     VisibleTimerCount++;
+                    arrangeTimers();
                     Save();
                     SetUpDownVisibility();
                 }
@@ -379,12 +389,13 @@ namespace DBF.DataModel
                     timer.Reset(false);
                     timer.Visibility = Visibility.Collapsed;
 
+                  
                     // Move the collapsed timer to the end of the list
-                    var idx= BridgeTimers.IndexOf(timer);
+                    //var idx = BridgeTimers.IndexOf(timer);
+                    //BridgeTimers.Add(timer);
+                    //BridgeTimers.RemoveAt(idx);
+                    arrangeTimers();
 
-                    BridgeTimers.Add(timer);
-                    BridgeTimers.RemoveAt(idx);
-                
                     Save();
                     SetUpDownVisibility();
                 }

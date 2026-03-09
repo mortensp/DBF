@@ -9,7 +9,7 @@ namespace DBF.DataModel
         private bool   customPreset;
 
         [JsonConstructorAttribute]
-        public Preset( string name = null
+        public Preset(string name = null
                      , bool customPreset = true
                      , bool teamMatch = false
                      , int rounds = 9
@@ -21,6 +21,7 @@ namespace DBF.DataModel
                      , int transitionMinutes = 1
                      , int breakMinutes = 12
                      , int warningMinutes = 5
+                     , TimeOnly? startTime = null
                      )
         {
             Name              = name?.ToString();
@@ -29,6 +30,7 @@ namespace DBF.DataModel
             Rounds            = rounds;
             BoardsPerRound    = boardsPerRound;
             BreakAfterRound   = breakAfterRound;
+            StartTime = startTime;
             Hours             = hours;
             Minutes           = minutes;
             Seconds           = seconds;
@@ -45,6 +47,7 @@ namespace DBF.DataModel
             Rounds            = other.Rounds;
             BoardsPerRound    = other.BoardsPerRound;
             BreakAfterRound   = other.BreakAfterRound;
+            StartTime = other.StartTime;
             Hours             = other.Hours;
             Minutes           = other.Minutes;
             Seconds           = other.Seconds;
@@ -55,7 +58,7 @@ namespace DBF.DataModel
 
         public string Name
         {
-            get=> name;
+            get => name;
             set
             {
                 if (name != value)
@@ -68,7 +71,7 @@ namespace DBF.DataModel
 
         public bool CustomPreset
         {
-            get=> customPreset;
+            get => customPreset;
             set
             {
                 if (customPreset != value)
@@ -79,21 +82,24 @@ namespace DBF.DataModel
             }
         }
 
-        public bool   TeamMatch         { get; set; }
-        public int    Rounds            { get; set; }
-        public int    BoardsPerRound    { get; set; }
-        public int    BreakAfterRound   { get; set; }
-        public int    Hours             { get; set; }
-        public int    Minutes           { get; set; }
-        public int    Seconds           { get; set; }
-        public int    TransitionMinutes { get; set; }
-        public int    BreakMinutes      { get; set; }
-        public int    WarningMinutes    { get; set; }
+        public bool      TeamMatch         { get; set; }
+        public int       Rounds            { get; set; }
+        public int       BoardsPerRound    { get; set; }
+        public int       BreakAfterRound   { get; set; }
+        
+        public TimeOnly? StartTime         { get; set; }
 
-        public double Duration => BreakMinutes
-                                + Rounds * (Hours * 60 + Minutes + Seconds / 60d)
-                                + (BreakAfterRound >0 && BreakAfterRound<Rounds ? Rounds - 2 : Rounds - 1)
-                                * Math.Max(0, TransitionMinutes);
+        public int       Hours             { get; set; }
+        public int       Minutes           { get; set; }
+        public int       Seconds           { get; set; }
+        public int       TransitionMinutes { get; set; }
+        public int       BreakMinutes      { get; set; }
+        public int       WarningMinutes    { get; set; }
+
+        public double    Duration          => BreakMinutes
+                                            + Rounds * (Hours * 60 + Minutes + Seconds / 60d)
+                                            + (BreakAfterRound >  0 && BreakAfterRound <  Rounds ? Rounds - 2 : Rounds - 1)
+                                            * Math.Max(0, TransitionMinutes);
 
         public bool Matches(Preset other)
         {
@@ -102,6 +108,7 @@ namespace DBF.DataModel
                  &&  Rounds            == other.Rounds
                  &&  BoardsPerRound    == other.BoardsPerRound
                  &&  BreakAfterRound   == other.BreakAfterRound
+                 &&  StartTime== other.StartTime
                  &&  Hours             == other.Hours
                  &&  Minutes           == other.Minutes
                  &&  Seconds           == other.Seconds
@@ -110,7 +117,7 @@ namespace DBF.DataModel
                  &&  WarningMinutes    == other.WarningMinutes;
         }
 
-        override public string ToString()=> Name;
+        override public string ToString() => Name;
 
         internal void Update(Preset other)
         {
@@ -119,6 +126,7 @@ namespace DBF.DataModel
             Rounds            = other.Rounds;
             BoardsPerRound    = other.BoardsPerRound;
             BreakAfterRound   = other.BreakAfterRound;
+            StartTime = other.StartTime;
             Hours             = other.Hours;
             Minutes           = other.Minutes;
             Seconds           = other.Seconds;

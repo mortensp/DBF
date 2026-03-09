@@ -7,9 +7,9 @@
     xmlns:sfgrid="clr-namespace:Syncfusion.UI.Xaml.Grid;assembly=Syncfusion.SfGrid.WPF"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    
+
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    <conv:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+    <conv:BooleanInvertConverter x:Key="BooleanInvertConverter" />
 
     <conv:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" />
     <conv:HideEmptyConverter x:Key="HideEmptyConverter" />
