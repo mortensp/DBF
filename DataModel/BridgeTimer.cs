@@ -170,7 +170,7 @@ namespace DBF.DataModel
                 //if (_remainingTime <= _twoSeconds)
                 //    Debugger.Break();    
                 if (!_isPaused)
-                    if (_remainingTime == _warningTime)
+                    if (_remainingTime == _warningTime && !_isAtBreak )
                         _player.Play(Sound, Volume);                            // Warning before end of Round
                     else
                         if (_isAtBreak && _remainingTime == _twoMinutes)
