@@ -1,5 +1,6 @@
 ﻿<Window x:Name="root"
     x:Class="DBF.Views.TimerSettingsView"
+    Title="Indstil uret"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:audio="clr-namespace:DBF.AudioServices"
@@ -11,7 +12,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
-    Title="Indstil uret"
     Width="565"
     Height="647"
     WindowStartupLocation="CenterOwner"
@@ -148,10 +148,10 @@
                         <WrapPanel Grid.Row="3" Grid.Column="1">
                             <ComboBox
                                 ItemsSource="{x:Static audio:AudioResources.Sounds}"
-                                SelectedItem="{Binding Sound}"
                                 Width="120"
                                 Margin="0,5"
-                                cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]" />
+                                cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]"
+                                SelectedItem="{Binding Sound}" />
 
                             <Slider x:Name="volume"
                                 Width="200"
@@ -175,11 +175,11 @@
                             Orientation="Horizontal">
                             <ComboBox x:Name="cbPresets"
                                 ItemsSource="{Binding Configuration.Presets}"
-                                SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Width="120"
                                 Margin="0,5"
                                 DisplayMemberPath="Name"
-                                IsEditable="False" />
+                                IsEditable="False"
+                                SelectedItem="{Binding SelectedPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                             <Button
                                 Width="28"
@@ -388,29 +388,29 @@
                         <TextBlock Grid.Row="15" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
-                            Text="Start kl.:" />
+                            Text="Forventet spilletid:" />
 
                         <StackPanel Grid.Row="15" Grid.Column="1"
-                            HorizontalAlignment="Left"
                             Orientation="Horizontal">
-                            <!--<TextBox
-                                Margin="0,5"
-                                HorizontalAlignment="Left"
-                                FontWeight="Bold"
-                                Text="{Binding DataContext.StartTime, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}" />-->
 
-                            <ctl:TimePicker15 SelectedTime="{Binding StartTime, Mode=TwoWay}" />
+                            <TextBlock Margin="0,4" Text="kl. " />
 
                             <TextBlock
-                                Margin="3,4,0,0"
-                                HorizontalAlignment="Left"
-                                Text=" Forventet slut kl. " />
+                                Margin="0,4"
+                                FontWeight="Bold"
+                                Text="{Binding DataContext.Configuration.StartTime, RelativeSource={RelativeSource AncestorType=Window}}" />
+
+                            <TextBlock Margin="0,4" Text=" - " />
 
                             <TextBlock
                                 Margin="0,4"
                                 HorizontalAlignment="Left"
+                                FontWeight="Bold"
                                 Text="{Binding DataContext.EndTime, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            
+
                         </StackPanel>
+
                     </Grid>
                 </StackPanel>
             </Border>

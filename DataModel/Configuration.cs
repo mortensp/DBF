@@ -29,7 +29,7 @@ namespace DBF.DataModel
         private                 int                   visibleTimerCount;
         private static readonly TimeSpan              _fiveHours        = new TimeSpan(5, 0, 0);
         private static readonly TimeSpan              _zeroTime         = new TimeSpan(0, 0, 0);
-        private                 DateTime              startTime;
+        private                 DateTime              startDate         = new(2026,1,1,16,0,0);
 
         #region Constructors
             static Configuration()
@@ -77,28 +77,39 @@ namespace DBF.DataModel
 
             #region Public Properties - JsonIgore
                 [JsonIgnore]
-                public DateTime StartTime
+                public DateTime StartDate
                 {
                     get
                     {
-                        var    active   = BridgeTimers.Where(t => t.Visibility == Visibility.Visible && !t.IsEnded);
-                        double duration = active.Any() ? active.Max(t => t.MinutesLeft) : 0;
+                        var limit = startDate.AddMinutes(-30);
+                        var now   = DateTime.Now;
 
-                        var limit = TimeSpan.FromMinutes(30 + duration); // tillad 30 min. forsinkelse
-                        var diff  = DateTime.Now - startTime;
+                        if (now >= startDate
+                        &&  now <= limit)
+                            return now;
 
-                        if (startTime == DateTime.MinValue
-                        ||  diff      >  _zeroTime
-                        &&  diff      <  limit)
-                            return DateTime.Now;
-                        else
-                            return startTime;
+                        return startDate;
                     }
 
                     set
                     {
-                        if (Set(ref startTime, value))
+                        if (Set(ref startDate, value))
                             setEndTime();
+                    }
+                }
+
+                [JsonIgnore]
+                public TimeOnly StartTime
+                {
+                    get
+                    {
+                        return TimeOnly.FromDateTime(startDate);
+                    }
+
+                    set
+                    {
+                        if (value != TimeOnly.FromDateTime(startDate))
+                            StartDate = new(startDate.Year, startDate.Month, startDate.Day, value.Hour, value.Minute, 0);
                     }
                 }
 
@@ -118,22 +129,22 @@ namespace DBF.DataModel
                 }
 
                 public BindableCollection<Preset> Presets { get; set; } = new()
-                                                {
-                                                      new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                                                    , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                                                    , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                                                    , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                                };
+                                                                                {
+                                                                                      new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                                                                    , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                                                                                    , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                                                                                    , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                                                                                };
 
                 [JsonIgnore]
                 public ObservableCollection<CustomColor> BackgroundColors = new()
-                                                {
-                                                      new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
-                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
-                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
-                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
-                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
-                                                };
+                                                                                {
+                                                                                      new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
+                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
+                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
+                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
+                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
+                                                                                };
 
                 private string bc3Path = @"C:\BC3\";
 
@@ -273,10 +284,7 @@ namespace DBF.DataModel
                     var timer = BridgeTimers[i];
 
                     if (timer.Visibility != Visibility.Visible)
-                    {
-                        BridgeTimers.Remove(timer);
-                        BridgeTimers.Add(timer);
-                    }
+                        BridgeTimers.Move(i, BridgeTimers.Count - 1);
                     else
                         timer.CanClose = visibleTimerCount >  1;
                 }
@@ -389,7 +397,6 @@ namespace DBF.DataModel
                     timer.Reset(false);
                     timer.Visibility = Visibility.Collapsed;
 
-                  
                     // Move the collapsed timer to the end of the list
                     //var idx = BridgeTimers.IndexOf(timer);
                     //BridgeTimers.Add(timer);
@@ -449,7 +456,7 @@ namespace DBF.DataModel
                 if (active.Count() == 0)
                     EndTime = new();
                 else
-                    EndTime = active.Max(t => t.EndTime);
+                    EndTime = active.Max(t => t.EndTime ?? TimeOnly.MinValue);
             }
 
             private void SetUpDownVisibility()

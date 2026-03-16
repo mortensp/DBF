@@ -21,7 +21,7 @@ namespace DBF.DataModel
                      , int transitionMinutes = 1
                      , int breakMinutes = 12
                      , int warningMinutes = 5
-                     , TimeOnly? startTime = null
+                     
                      )
         {
             Name              = name?.ToString();
@@ -30,7 +30,7 @@ namespace DBF.DataModel
             Rounds            = rounds;
             BoardsPerRound    = boardsPerRound;
             BreakAfterRound   = breakAfterRound;
-            StartTime = startTime;
+            //StartTime = startTime;
             Hours             = hours;
             Minutes           = minutes;
             Seconds           = seconds;
@@ -47,7 +47,7 @@ namespace DBF.DataModel
             Rounds            = other.Rounds;
             BoardsPerRound    = other.BoardsPerRound;
             BreakAfterRound   = other.BreakAfterRound;
-            StartTime = other.StartTime;
+            //StartTime = other.StartTime;
             Hours             = other.Hours;
             Minutes           = other.Minutes;
             Seconds           = other.Seconds;
@@ -64,7 +64,6 @@ namespace DBF.DataModel
                 if (name != value)
                 {
                     name = value?.ToString();
-                    //NotifyOfPropertyChange(nameof(Name));
                 }
             }
         }
@@ -77,7 +76,6 @@ namespace DBF.DataModel
                 if (customPreset != value)
                 {
                     customPreset = value;
-                    //NotifyOfPropertyChange(nameof(customPreset));
                 }
             }
         }
@@ -86,8 +84,7 @@ namespace DBF.DataModel
         public int       Rounds            { get; set; }
         public int       BoardsPerRound    { get; set; }
         public int       BreakAfterRound   { get; set; }
-        
-        public TimeOnly? StartTime         { get; set; }
+ 
 
         public int       Hours             { get; set; }
         public int       Minutes           { get; set; }
@@ -108,7 +105,6 @@ namespace DBF.DataModel
                  &&  Rounds            == other.Rounds
                  &&  BoardsPerRound    == other.BoardsPerRound
                  &&  BreakAfterRound   == other.BreakAfterRound
-                 &&  StartTime== other.StartTime
                  &&  Hours             == other.Hours
                  &&  Minutes           == other.Minutes
                  &&  Seconds           == other.Seconds
@@ -126,7 +122,6 @@ namespace DBF.DataModel
             Rounds            = other.Rounds;
             BoardsPerRound    = other.BoardsPerRound;
             BreakAfterRound   = other.BreakAfterRound;
-            StartTime = other.StartTime;
             Hours             = other.Hours;
             Minutes           = other.Minutes;
             Seconds           = other.Seconds;

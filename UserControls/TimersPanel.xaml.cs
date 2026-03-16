@@ -29,7 +29,7 @@ namespace DBF.UserControls
             if (Design.IsInDesignMode())
             {
                 Visibility = Visibility.Visible;
-                Configuration = new Configuration() { StartTime = DateTime.Now };
+                Configuration = new Configuration() { StartDate=DateTime.Now };
                 Configuration.Load();
             }
         }

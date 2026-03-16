@@ -31,7 +31,7 @@ public class DesignTimeData : PropertyChangedBase
             WarningVisiblity = Visibility.Visible
         };
 
-        Configuration = new Configuration() { StartTime = DateTime.Now };
+        Configuration = new Configuration() { StartDate=DateTime.Now };
         Configuration.Load();
 
     }

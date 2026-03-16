@@ -5,10 +5,10 @@ using System.Windows.Controls;
 
 namespace DBF.UserControls
 {
-    public partial class TimePicker15 : UserControl
+    public partial class TimePicker : UserControl
     {
         #region Constructors
-            public TimePicker15()
+            public TimePicker()
             {
                 InitializeComponent();
                 GenerateTimes();
@@ -22,7 +22,7 @@ namespace DBF.UserControls
         #region Dependency Properties
             #region Dependency Properties - SelectedTime 
                 public static readonly DependencyProperty SelectedTimeProperty = 
-                                       DependencyProperty.Register( nameof(SelectedTime), typeof(TimeOnly?), typeof(TimePicker15)
+                                       DependencyProperty.Register( nameof(SelectedTime), typeof(TimeOnly?), typeof(TimePicker)
                                                                   , new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedTimeChanged));
 
                 public TimeOnly? SelectedTime
@@ -34,7 +34,7 @@ namespace DBF.UserControls
 
             #region Dependency Properties - IntervalMinutes
                 public static readonly DependencyProperty IntervalMinutesProperty = 
-                                       DependencyProperty.Register( nameof(IntervalMinutes), typeof(int), typeof(TimePicker15)
+                                       DependencyProperty.Register( nameof(IntervalMinutes), typeof(int), typeof(TimePicker)
                                                                   , new PropertyMetadata(15, OnIntervalChanged));
 
                 public int IntervalMinutes
@@ -48,7 +48,7 @@ namespace DBF.UserControls
         #region Private methods
             private static void OnIntervalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
             {
-                if (d is TimePicker15 tp)
+                if (d is TimePicker tp)
                     tp.GenerateTimes();
             }
 
@@ -80,7 +80,7 @@ namespace DBF.UserControls
 
             private static void OnSelectedTimeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
             {
-                if (d is TimePicker15 tp)
+                if (d is TimePicker tp)
                     if (e.NewValue is TimeOnly newTime)
                     {
                         var snapped = tp.SnapToInterval(newTime);

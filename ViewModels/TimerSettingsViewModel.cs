@@ -58,9 +58,9 @@ namespace DBF.ViewModels
             public        Color                             BackgroundColor    { get; set; }
             public        Color                             ForegroundColor    { get; set; }
 
-            public        TimeOnly                          StartTime          => NewSetting.StartTime ?? TimeOnly.FromDateTime(Configuration.StartTime);
+            //public        TimeOnly                          StartTime          => Configuration.StartTime;
 
-            public        TimeOnly                          EndTime            => StartTime.AddMinutes(NewSetting.Duration);
+            public        TimeOnly                          EndTime            => Configuration.StartTime.AddMinutes(NewSetting.Duration);
 
             public Preset SelectedPreset
             {
@@ -86,12 +86,11 @@ namespace DBF.ViewModels
                         onOpen = true;
                         NewSetting.Update(value);
 
-                        if (Configuration.StartTime >  DateTime.MinValue)
-                            NewSetting.StartTime = null;
+                        //if (NewSetting.StartTime==null)
+                        //    NewSetting.StartTime = Configuration.StartTime;
 
                         SelectedPreset = FindPreset(NewSetting);
-                        onOpen         = false;
-                    }
+                        onOpen         = false;                    }
                 }
             }
         #endregion
@@ -175,10 +174,9 @@ namespace DBF.ViewModels
             {
                 // When the duration or the start time of the new setting changes,
                 // notify that EndTime has changed. Also notify StartTime so bindings update.
-                if (e.PropertyName == nameof(NewSetting.Duration)
-                ||  e.PropertyName == nameof(NewSetting.StartTime))
+                if (e.PropertyName == nameof(NewSetting.Duration))
                 {
-                    NotifyOfPropertyChange(nameof(StartTime));
+                    //NotifyOfPropertyChange(nameof(StartTime));
                     NotifyOfPropertyChange(nameof(EndTime));
                 }
             }

@@ -29,33 +29,61 @@
 
             <ComboBox Name="cmbClubNo"
                 ItemsSource="{Binding MainClubs}"
+                SelectedItem="{Binding SelectedMainClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Width="Auto"
                 MinWidth="100"
+                MaxHeight="20"
+                Padding="4,1"
                 HorizontalAlignment="Left"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectedMainClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                DisplayMemberPath="Name" />
 
-            <!--  Under kubben navn  -->
-            <Label Content="Hold:" FontWeight="Bold" />
-
-            <ComboBox Name="cmbClub"
-                ItemsSource="{Binding Clubs}"
-                Width="Auto"
-                MinWidth="100"
+            <StackPanel
                 HorizontalAlignment="Left"
-                SelectedItem="{Binding SelectedClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                Orientation="Horizontal"
+                Visibility="{Binding BC3Available, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <!--  Under kubben navn  -->
+                <Label Content="Hold:" FontWeight="Bold" />
 
-            <!--  Spilledato og tid  -->
-            <Label Grid.Row="0" Grid.Column="0"
-                Content="Dato:"
-                FontWeight="Bold" />
+                <ComboBox Name="cmbClub"
+                    ItemsSource="{Binding Clubs}"
+                    SelectedItem="{Binding SelectedClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Width="Auto"
+                    MinWidth="100"
+                    MaxHeight="20"
+                    Padding="4,1"
+                    HorizontalAlignment="Left" />
 
-            <ComboBox Name="cmbDate" Grid.Row="0" Grid.Column="1"
-                ItemsSource="{Binding PlayingTimes}"
-                Width="Auto"
-                MinWidth="100"
+                <!--  Spilledato og tid  -->
+                <Label Grid.Row="0" Grid.Column="0"
+                    Content="Dato:"
+                    FontWeight="Bold" />
+
+                <ComboBox Name="cmbDate" Grid.Row="0" Grid.Column="1"
+                    ItemsSource="{Binding PlayingTimes}"
+                    SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Width="Auto"
+                    MinWidth="100"
+                    MaxHeight="20"
+                    Padding="4,1"
+                    HorizontalAlignment="Left" />
+            </StackPanel>
+
+            <StackPanel
                 HorizontalAlignment="Left"
-                SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                Orientation="Horizontal"
+                Visibility="{Binding BC3Available, Converter={StaticResource VisibilityInvertConverter}}">
+
+                <!--  Start tid  -->
+                <TextBlock
+                    Margin="10,5,5,0"
+                    HorizontalAlignment="Left"
+                    FontWeight="Bold"
+                    Text="Start kl.:" />
+
+
+                <ctl:TimePicker SelectedTime="{Binding Configuration.StartTime, Mode=TwoWay}" />
+
+            </StackPanel>
 
             <!--  Beregnet Slut tid  -->
             <TextBlock
@@ -119,7 +147,8 @@
         </TabControl>
 
         <Label Grid.Row="3" Grid.Column="0"
-            FontWeight="Bold" Content="Projektor:"/>
+            Content="Projektor:"
+            FontWeight="Bold" />
 
         <WrapPanel Grid.Row="3" Grid.Column="1"
             Margin="10,0,10,0"

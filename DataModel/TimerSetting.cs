@@ -34,8 +34,8 @@ namespace DBF.DataModel
                                , string pauseMessage = null
                                , string endGreetingTop = null
                                , string endGreetingBottom = null
-                               , TimeOnly? startTime = null
-                               ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes, startTime)
+                               //, TimeOnly? startTime = null
+                               ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
             {
                 Groups            = groups;
                 Info              = info;
@@ -47,6 +47,7 @@ namespace DBF.DataModel
                 PauseMessage      = pauseMessage;
                 EndGreetingTop    = endGreetingTop;
                 EndGreetingBottom = endGreetingBottom;
+                //StartTime         = startTime;
             }
         #endregion
 
@@ -81,6 +82,8 @@ namespace DBF.DataModel
         public              int        Volume     { get; set; }
         public              Visibility Visibility { get; set; }
         public              string     GroupStr   { get => Groups.ToFriendlyString(); }
+        //[JsonIgnore] public TimeOnly?  StartTime  { get; set; }
+
         public string PauseMessage
         {
             get => field;
@@ -122,13 +125,13 @@ namespace DBF.DataModel
 
         public new void Update(Preset preset)
         {
-            Name              = preset.Name;
-            CustomPreset      = preset.CustomPreset;
-            TeamMatch         = preset.TeamMatch;
-            Rounds            = preset.Rounds;
-            BoardsPerRound    = preset.BoardsPerRound;
-            BreakAfterRound   = preset.BreakAfterRound;
-            StartTime = preset.StartTime;
+            Name            = preset.Name;
+            CustomPreset    = preset.CustomPreset;
+            TeamMatch       = preset.TeamMatch;
+            Rounds          = preset.Rounds;
+            BoardsPerRound  = preset.BoardsPerRound;
+            BreakAfterRound = preset.BreakAfterRound;
+
             Hours             = preset.Hours;
             Minutes           = preset.Minutes;
             Seconds           = preset.Seconds;
@@ -149,6 +152,7 @@ namespace DBF.DataModel
                 PauseMessage      = tSetting.PauseMessage;
                 EndGreetingTop    = tSetting.EndGreetingTop;
                 EndGreetingBottom = tSetting.EndGreetingBottom;
+                //StartTime         = tSetting.StartTime;
             }
         }
 

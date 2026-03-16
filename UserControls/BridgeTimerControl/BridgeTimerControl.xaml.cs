@@ -37,7 +37,7 @@ public partial class BridgeTimerControl : UserControl
                       , WarningVisiblity = Visibility.Visible
                     };
 
-            Configuration = new Configuration() { StartTime = DateTime.Now };
+            Configuration = new Configuration() { StartDate = DateTime.Now };
         }
     }
 
