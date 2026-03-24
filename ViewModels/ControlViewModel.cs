@@ -16,6 +16,7 @@ using DBF.UserControls;
 using DBF.Views;
 
 using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.Charts;
 
 namespace DBF.ViewModels
 {
@@ -143,7 +144,6 @@ namespace DBF.ViewModels
                             }
                         }
                     }
-
                     catch (Exception ex)
                     {
                         throw ex;
@@ -282,11 +282,26 @@ namespace DBF.ViewModels
                     if (Configuration.TimersActive
                     &&  Window.GetWindow(CurrentView)?.GetType().Name != "ProjectorView")
                     {
-                        var result = MessageBox.Show("Hvis du lukker vinduet, så nulstilles alle aktive ure. Vil du fortsætte?", "Bekræft", MessageBoxButton.YesNo);
-                        return await Task.FromResult(result == MessageBoxResult.Yes);
+                        // show custom dialog with three choices
+                        var owner = Window.GetWindow(CurrentView) ?? Application.Current.MainWindow;
+                        var dlg = new DBF.Views.ConfirmCloseDialog("Hvis du lukker vinduet, så nulstilles alle aktive ure. Hvad vil du gøre?");
+                        dlg.Owner = owner;
+                        dlg.ShowDialog();
+
+                        switch (dlg.Choice)
+                        {
+                            case DBF.Views.ConfirmCloseChoice.ContinueClose:
+                                return await Task.FromResult(true);
+
+                            case DBF.Views.ConfirmCloseChoice.CancelClose:
+                                return await Task.FromResult(false);
+
+                            case DBF.Views.ConfirmCloseChoice.SaveTime:
+                                Configuration.SaveState();
+                                return await Task.FromResult(true);
+                        }
                     }
                 }
-
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
@@ -302,17 +317,7 @@ namespace DBF.ViewModels
                 if (string.IsNullOrWhiteSpace(Configuration.HomepagePath)
                 || !Directory.Exists(Configuration.HomepagePath))
                 {
-                    ErrorMessage = $"Mappen: '{Configuration.HomepagePath}' findes ikke";
-                    // Clear the error message after 10 seconds without blocking the UI thread
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(10000).ConfigureAwait(false);
-                        await Execute.OnUIThreadAsync(() =>
-                        {
-                            ErrorMessage = string.Empty;
-                            return Task.CompletedTask;
-                        }).ConfigureAwait(false);
-                    });
+                    ShowMessageAFewSeconds($"Mappen: '{Configuration.HomepagePath}' findes ikke");
                     //
                     watcher.EnableRaisingEvents   = false;
                     watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.DirectoryName;
@@ -341,12 +346,29 @@ namespace DBF.ViewModels
 
                 if (MainClubs.Count == 0)
                 {
-                    MessageBox.Show($"Kan ikke finde Resultater i mappen: {Configuration.HomepagePath}", "Fejl");
+                    //MessageBox.Show(
+                                            
+                    ShowMessageAFewSeconds($"Kan ikke finde Resultater i mappen: {Configuration.HomepagePath}");
                     return;
                 }
 
                 MainClubs        = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
                 SelectedMainClub = MainClubs[0];
+            }
+
+            private void ShowMessageAFewSeconds(string msg)
+            {
+                ErrorMessage = msg;
+                // Clear the error message after 10 seconds without blocking the UI thread
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(10000).ConfigureAwait(false);
+                    await Execute.OnUIThreadAsync(() =>
+                    {
+                        ErrorMessage = string.Empty;
+                        return Task.CompletedTask;
+                    }).ConfigureAwait(false);
+                });
             }
 
             private void FetchPlayingTimes()
@@ -369,6 +391,7 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
+
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -541,7 +564,6 @@ namespace DBF.ViewModels
                         }
                     }
                 }
-
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -601,6 +623,7 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -687,7 +710,6 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -846,7 +868,6 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(        reader);
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -867,11 +888,13 @@ namespace DBF.ViewModels
                             using var sr = new StreamReader(fs,   encoding);
                             return sr.ReadToEnd();
                         }
+
                         catch (IOException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
                             delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
                         }
+
                         catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
@@ -912,7 +935,6 @@ namespace DBF.ViewModels
                             _latestEvents[path] = e;
                         }
                     }
-
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"folderUpdated error: {ex.Message}");
@@ -951,7 +973,6 @@ namespace DBF.ViewModels
                                         var fi = new FileInfo(path);
                                         len    = fi.Exists ? fi.Length : 0;
                                     }
-
                                     catch
                                     {
                                         len = -1;
@@ -993,7 +1014,6 @@ namespace DBF.ViewModels
                                     return;
                                 });
                             }
-
                             catch (Exception ex)
                             {
                                 Debug.WriteLine($"Error processing queued file event: {ex.Message}");
@@ -1044,7 +1064,6 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
-
 #endif
                 }
                 else

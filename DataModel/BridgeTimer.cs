@@ -20,7 +20,7 @@ namespace DBF.DataModel
         private                 DispatcherTimer _timer;
         private static readonly TimeSpan        _oneHour    = new TimeSpan(1, 0,  0);
         private static readonly TimeSpan        _twoMinutes = new TimeSpan(0, 2,  0);
-        private static readonly TimeSpan        _threshold  = new TimeSpan(0, 0,  1);
+        private static readonly TimeSpan        _threshold  = new TimeSpan(0, 0,  0);
         //
         private TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
         private TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
@@ -62,8 +62,6 @@ namespace DBF.DataModel
 
                     //if (start == TimeOnly.MinValue)
                     //    return TimeOnly.MinValue;
-
-                    
                     return start.AddMinutes(Math.Max(MinutesLeft, 0));
                 }
             }
@@ -170,7 +168,7 @@ namespace DBF.DataModel
                 //if (_remainingTime <= _twoSeconds)
                 //    Debugger.Break();    
                 if (!_isPaused)
-                    if (_remainingTime == _warningTime && !_isAtBreak )
+                    if (_remainingTime == _warningTime && !_isAtBreak)
                         _player.Play(Sound, Volume);                            // Warning before end of Round
                     else
                         if (_isAtBreak && _remainingTime == _twoMinutes)
@@ -188,8 +186,9 @@ namespace DBF.DataModel
                                     if (Round >= Rounds)
                                     {
                                         _player.Play(Sound, Volume);            // End of game                                        
-                                        Round++;
                                         _timer.Stop();
+                                        Round     = Rounds + 1;
+                                        _isPaused = true;
                                     }
                                     else
                                         if (_isAtTransition || _isAtBreak)
@@ -302,6 +301,8 @@ namespace DBF.DataModel
 
             public void Back()
             {
+                Pause(true);
+
                 if (Round == 1)
                 {
                     //_isStarted     = false;
@@ -341,10 +342,10 @@ namespace DBF.DataModel
                 UpdateDisplay();
             }
 
-            public void Pause()
+            public void Pause(bool force = false)
             {
                 if (_isStarted)
-                    if (_isPaused)
+                    if (_isPaused && !force)
                         Start();
                     else
                     {
@@ -355,7 +356,10 @@ namespace DBF.DataModel
 
             public void Forward()
             {
-                if (Round <= Rounds)
+                Pause(true);
+
+                if (Round
+                <= Rounds)
                 {
                     if (_isAtBreak)
                     {
@@ -433,7 +437,7 @@ namespace DBF.DataModel
                 StopCountdown();
 
                 _isStarted      = state.IsStarted;
-                _isPaused       = true;
+                //_isPaused       = true;
                 _isAtBreak      = state.IsAtBreak;
                 _isAtTransition = state.IsAtTransition;
                 _remainingTime  = state.RemainingTime;

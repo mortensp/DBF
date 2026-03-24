@@ -58,12 +58,16 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />   <!-- fylder resten af højden -->
-                    <RowDefinition Height="Auto" /><!-- knapper i bunden -->
+                    <RowDefinition Height="*" />   
+                    <!--  fylder resten af højden  -->
+                    <RowDefinition Height="Auto" />
+                    <!--  knapper i bunden  -->
                 </Grid.RowDefinitions>
 
-                <!--  Timer Display i row 0 -->
-                <Border Grid.Row="0" Padding="0" CornerRadius="6">
+                <!--  Timer Display i row 0  -->
+                <Border Grid.Row="0"
+                    Padding="0"
+                    CornerRadius="6">
                     <Grid Name="display"
                         Background="{Binding Timer.Background}"
                         TextBlock.FontSize="20">
@@ -152,12 +156,12 @@
                     </Grid>
                 </Border>
 
-                <!--  Timer Control Buttons i row 1 -->
+                <!--  Timer Control Buttons i row 1  -->
                 <StackPanel Grid.Row="1"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Bottom"
-                            Orientation="Horizontal"
-                            Visibility="{Binding ButtonsVisibility}">
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Orientation="Horizontal"
+                    Visibility="{Binding ButtonsVisibility}">
                     <Button x:Name="btnSetting"
                         Margin="2,0,20,2"
                         Click="BtnSetting_Click"

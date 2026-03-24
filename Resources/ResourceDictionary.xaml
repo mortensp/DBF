@@ -10,7 +10,7 @@
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <conv:BooleanInvertConverter x:Key="BooleanInvertConverter" />
-    <conv:VisibilityInvertConverter x:Key="VisibilityInvertConverter"/>
+    <conv:VisibilityInvertConverter x:Key="VisibilityInvertConverter" />
 
     <conv:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" />
     <conv:HideEmptyConverter x:Key="HideEmptyConverter" />
