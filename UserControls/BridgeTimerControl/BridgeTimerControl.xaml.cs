@@ -105,7 +105,7 @@ public partial class BridgeTimerControl : UserControl
                 set => SetValue(ButtonsVisibilityProperty, value);
             }
 
-    public static readonly DependencyProperty ButtonsVisibilityProperty =
+            public static readonly DependencyProperty ButtonsVisibilityProperty = 
                                    DependencyProperty.Register( nameof(ButtonsVisibility)
                                                               , typeof(Visibility)
                                                               , typeof(BridgeTimerControl)
@@ -123,30 +123,29 @@ public partial class BridgeTimerControl : UserControl
     #region Public Properties
         public Visibility UpButtonVisibility   { get; private set; }
         public Visibility DownButtonVisibility { get; private set; }
-
     #endregion
 
     #region Private Methods        
-        private void BtnBack_Click(    object sender, RoutedEventArgs e)     => Timer.Back();
+        private void BtnBack_Click(object sender, RoutedEventArgs e)     => Timer.Back();
 
-        private void btnClose_Click(   object sender, RoutedEventArgs e)    => Configuration.CloseTimer(Timer);
+        private void btnClose_Click(object sender, RoutedEventArgs e)    => Configuration.CloseTimer(Timer);
 
-        private void BtnForward_Click( object sender, RoutedEventArgs e)  => Timer.Forward();
+        private void BtnForward_Click(object sender, RoutedEventArgs e)  => Timer.Forward();
 
         private void BtnLessTime_Click(object sender, RoutedEventArgs e) => Timer.LessTime();
 
         private void BtnMoreTime_Click(object sender, RoutedEventArgs e) => Timer.MoreTime();
 
-        private void BtnPause_Click(   object sender, RoutedEventArgs e)    => Timer.Pause();
+        private void BtnPause_Click(object sender, RoutedEventArgs e)    => Timer.Pause();
 
-        private void BtnReset_Click(   object sender, RoutedEventArgs e)    => Timer.Reset();
+        private void BtnReset_Click(object sender, RoutedEventArgs e)    => Timer.Reset();
 
-        private void BtnSetting_Click( object sender, RoutedEventArgs e)  => Timer.OpenSetting();
+        private void BtnSetting_Click(object sender, RoutedEventArgs e)  => Timer.OpenSetting();
 
-        private void BtnStart_Click(   object sender, RoutedEventArgs e)    => Timer.Start();
+        private void BtnStart_Click(object sender, RoutedEventArgs e)    => Timer.Start();
 
-        private void BtnUp_Click(      object sender, RoutedEventArgs e)       => Configuration.TimerUp(Timer);
+        private void BtnUp_Click(object sender, RoutedEventArgs e)       => Configuration.TimerUp(Timer);
 
-        private void BtnDown_Click(    object sender, RoutedEventArgs e)     => Configuration.TimerDown(Timer);
+        private void BtnDown_Click(object sender, RoutedEventArgs e)     => Configuration.TimerDown(Timer);
     #endregion
 }

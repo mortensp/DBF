@@ -129,22 +129,22 @@ namespace DBF.DataModel
                 }
 
                 public BindableCollection<Preset> Presets { get; set; } = new()
-                                                                                {
-                                                                                      new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                                                                                    , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                                                                                    , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                                                                                    , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                                                                };
+                                                                                                                        {
+                                                                                                                              new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                                                                                                            , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                                                                                                                            , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                                                                                                                            , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                                                                                                                        };
 
                 [JsonIgnore]
                 public ObservableCollection<CustomColor> BackgroundColors = new()
-                                                                                {
-                                                                                      new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
-                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
-                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
-                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
-                                                                                    , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
-                                                                                };
+                                                                                                                        {
+                                                                                                                              new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
+                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
+                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
+                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
+                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
+                                                                                                                        };
 
                 private string bc3Path = @"C:\BC3\";
 
@@ -299,6 +299,12 @@ namespace DBF.DataModel
                 setEndTime();
             }
 
+            public void DeleteState()
+            {
+                if (File.Exists(statePath))
+                    File.Delete(statePath);
+            }
+
             public void SaveState()
             {
                 var controlViewModel = IoC.Get<ControlViewModel>();
@@ -308,12 +314,26 @@ namespace DBF.DataModel
                                          , SubClubName    = controlViewModel.SelectedClub?.Name
                                          , PlayingTimeStr = controlViewModel.SelectedPlayingTime?.DateStr
                                          , TimerStates    = BridgeTimers.Select(t => t.CurrentState).ToList()
+                                         , BridgeTimers   =BridgeTimers.ToList()
                                        };
 
                 //var states = BridgeTimers.Select(t => t.CurrentState)
                 //                             .ToList();
                 string json = JsonSerializer.Serialize(state, SerializerOptions);
                 File.WriteAllText(statePath, json);
+            }
+
+            public void OpenSettings()
+            {
+                if (File.Exists(path))
+                    Process.Start("notepad.exe", path);
+
+                SaveState();
+
+                //if (!File.Exists(statePath))
+                    Process.Start("notepad.exe", statePath);
+
+                
             }
 
             public void RestoreState()
@@ -344,9 +364,6 @@ namespace DBF.DataModel
                         //catch (Exception) { /* Ignore */ }
                         finally { /* Ignore */ }
                 }
-
-                if (File.Exists(statePath))
-                    File.Delete(statePath);
             }
 
             public void Update(Configuration newConfiguration)

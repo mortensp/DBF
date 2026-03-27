@@ -41,6 +41,11 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         var window = new TimersHelpWindow();
         window.ShowDialog();
     }
+        public void OpenSettingFiles()
+    {
+        Configuration.OpenSettings();
+    }
+
 
     public void Install()
     {

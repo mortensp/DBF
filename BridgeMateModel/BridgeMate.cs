@@ -42,10 +42,13 @@ namespace DBF
             if (Directory.Exists(configuration.BridgeMatePath))
             {
                 watcher = new FileSystemWatcher(configuration.BridgeMatePath);
-                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.CreationTime;
-                watcher.Filter = "*.bws";
+                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.CreationTime | NotifyFilters.LastWrite;
+                //watcher.Filter = "*.bws";
+                watcher.Filter = "*.*";
                 watcher.IncludeSubdirectories = true;
-                watcher.Created += fileCreated;
+                watcher.Created += folderUpdated;
+                watcher.Changed += folderUpdated;
+                        watcher.EnableRaisingEvents = true;
             }
                 //
                 timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(7) };
@@ -97,8 +100,7 @@ namespace DBF
                                         Rounds = new(db.RoundData);
                                     }
 
-                                    watcher.EnableRaisingEvents = false;
-                                }
+                                    watcher.EnableRaisingEvents = false;                               }
 
                                 return;
                             }
@@ -129,7 +131,7 @@ namespace DBF
             Received.Clear();
         }
 
-        private void fileCreated(object sender, FileSystemEventArgs e)
+        private void folderUpdated(object sender, FileSystemEventArgs e)
         {
             // Debounce: Ignorer events for samme fil inden for 500 ms
             try

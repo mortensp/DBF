@@ -85,11 +85,11 @@ namespace DBF.ViewModels
                 Teams.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Teams);
 
                 LoadMainClubs();
-#if DEBUG
-                // For at gøre test nemmere
-                SelectedMainClub    = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
-                SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
-#endif
+//#if DEBUG
+//                // For at gøre test nemmere
+//                SelectedMainClub    = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
+//                SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
+//#endif
             }
         #endregion
 
@@ -144,6 +144,7 @@ namespace DBF.ViewModels
                             }
                         }
                     }
+
                     catch (Exception ex)
                     {
                         throw ex;
@@ -178,9 +179,13 @@ namespace DBF.ViewModels
                 get => spilleDage;
                 set
                 {
+                    var before = DateTime.Now.Date.AddDays(1);
+                    var after  = DateTime.Now.Date.AddDays(-6);
+
                     if (Set(ref spilleDage, value))
-                        SelectedPlayingTime = PlayingTimes.Where(pt => pt.Date <= DateTime.Now.Date).FirstOrDefault()
-                                           ?? PlayingTimes.Where(pt => pt.Date >  DateTime.Now.Date).LastOrDefault();
+                        SelectedPlayingTime = PlayingTimes.Where(pt => pt.Date <= before && pt.Date >  after).FirstOrDefault()
+                                           ?? PlayingTimes.Where(pt => pt.Date >  DateTime.Now.Date).LastOrDefault()
+                                           ?? PlayingTimes.LastOrDefault();
                 }
             }
 
@@ -284,13 +289,14 @@ namespace DBF.ViewModels
                     {
                         // show custom dialog with three choices
                         var owner = Window.GetWindow(CurrentView) ?? Application.Current.MainWindow;
-                        var dlg = new DBF.Views.ConfirmCloseDialog("Hvis du lukker vinduet, så nulstilles alle aktive ure. Hvad vil du gøre?");
+                        var dlg   = new DBF.Views.ConfirmCloseDialog("Hvis du lukker vinduet, så nulstilles alle aktive ure. Hvad vil du gøre?");
                         dlg.Owner = owner;
                         dlg.ShowDialog();
 
                         switch (dlg.Choice)
                         {
                             case DBF.Views.ConfirmCloseChoice.ContinueClose:
+                                Configuration.DeleteState();
                                 return await Task.FromResult(true);
 
                             case DBF.Views.ConfirmCloseChoice.CancelClose:
@@ -302,6 +308,7 @@ namespace DBF.ViewModels
                         }
                     }
                 }
+
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
@@ -347,13 +354,12 @@ namespace DBF.ViewModels
                 if (MainClubs.Count == 0)
                 {
                     //MessageBox.Show(
-                                            
-                    ShowMessageAFewSeconds($"Kan ikke finde Resultater i mappen: {Configuration.HomepagePath}");
+                    ShowMessageAFewSeconds($"Kan ikke finde Startliste i mappen: {Configuration.HomepagePath}");
                     return;
                 }
 
                 MainClubs        = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
-                SelectedMainClub = MainClubs[0];
+                SelectedMainClub = MainClubs.FirstOrDefault(c => c.No != 9999) ?? MainClubs.First();
             }
 
             private void ShowMessageAFewSeconds(string msg)
@@ -391,7 +397,6 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
-
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -564,6 +569,7 @@ namespace DBF.ViewModels
                         }
                     }
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -623,7 +629,6 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -710,6 +715,7 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -854,20 +860,21 @@ namespace DBF.ViewModels
                             string xml = ReadAllTextWithRetry(fullPath, iso_8859_1);
 
                             // Erstat Fjern tag værdier, som kun består af blanke og - tegn
-                            xml = Regex.Replace(                     xml,       @">(-|\s)+<",                 "><");
+                            xml = Regex.Replace(xml, @">(-|\s)+<", "><");
 
                             // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komma mellem tal
-                            xml = Regex.Replace(                     xml,       @"(?<=\d),(?=\d)",            ".");
+                            xml = Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
 
                             // Remove empty tags
-                            xml = Regex.Replace(                     xml,       @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
-                            xml = Regex.Replace(                     xml,       @"<\w+\s*(/>|/>\s*</\1*s>)",  string.Empty); //<TagName/>
+                            xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
+                            xml = Regex.Replace(xml, @"<\w+\s*(/>|/>\s*</\1*s>)", string.Empty); //<TagName/>
 
                             var       serializer = new XmlSerializer(typeof(T));
                             using var reader     = new StringReader( xml);
-                            return (T)serializer.Deserialize(        reader);
+                            return (T)serializer.Deserialize(reader);
                         }
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -888,13 +895,11 @@ namespace DBF.ViewModels
                             using var sr = new StreamReader(fs,   encoding);
                             return sr.ReadToEnd();
                         }
-
                         catch (IOException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
                             delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
                         }
-
                         catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
@@ -935,6 +940,7 @@ namespace DBF.ViewModels
                             _latestEvents[path] = e;
                         }
                     }
+
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"folderUpdated error: {ex.Message}");
@@ -973,6 +979,7 @@ namespace DBF.ViewModels
                                         var fi = new FileInfo(path);
                                         len    = fi.Exists ? fi.Length : 0;
                                     }
+
                                     catch
                                     {
                                         len = -1;
@@ -1014,6 +1021,7 @@ namespace DBF.ViewModels
                                     return;
                                 });
                             }
+
                             catch (Exception ex)
                             {
                                 Debug.WriteLine($"Error processing queued file event: {ex.Message}");
@@ -1064,6 +1072,7 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
+
 #endif
                 }
                 else
