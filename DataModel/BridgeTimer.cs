@@ -22,21 +22,22 @@ namespace DBF.DataModel
         private static readonly TimeSpan        _twoMinutes = new TimeSpan(0, 2,  0);
         private static readonly TimeSpan        _threshold  = new TimeSpan(0, 0,  0);
         //
-        private TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
-        private TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
-        private TimeSpan _breakTime      = new TimeSpan(                   0, 12, 0);
-        private TimeSpan _warningTime    = new TimeSpan(                   0, 5,  0);
-        private TimeSpan _remainingTime  = TimeSpan.MinValue;
-        private bool     _isStarted;
-        private bool     _isAtBreak;
-        private bool     _isAtTransition;
-        private bool     _isPaused;
+        private          TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
+        private          TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
+        private          TimeSpan _breakTime      = new TimeSpan(                   0, 12, 0);
+        private          TimeSpan _warningTime    = new TimeSpan(                   0, 5,  0);
+        private          TimeSpan _remainingTime  = TimeSpan.MinValue;
+        private          bool     _isStarted;
+        private          bool     _isAtBreak;
+        private          bool     _isAtTransition;
+        private          bool     _isPaused;
+        private readonly object   _sync           = new object();
 
         public BridgeTimer()
         {
             _timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick+= Timer_Tick;
-            //UpdateDisplay();
+            //updateDisplay();
         }
 
         #region Public Properties
@@ -80,7 +81,7 @@ namespace DBF.DataModel
                     for (var r = Round + 1; r <= BreakAfterRound; r++)
                     {
                         time = time.AddTimeSpan(new TimeSpan(Hours, Minutes, Seconds));
-                        time = time.AddMinutes( TransitionMinutes);
+                        time = time.AddMinutes(TransitionMinutes);
                     }
 
                     if (_isAtBreak)
@@ -95,8 +96,7 @@ namespace DBF.DataModel
             {
                 get
                 {
-                    _isStarted = true; // test
-
+                    //_isStarted = true; // test
                     if (Round >  Rounds
                     || !_isStarted)
                         return null;
@@ -120,6 +120,16 @@ namespace DBF.DataModel
                     return time;
                 }
             }
+
+            [JsonIgnore]
+            public BridgeTimerState CurrentState => new BridgeTimerState()
+                                                    {
+                                                        IsStarted = _isStarted
+                                                      , IsAtBreak = _isAtBreak
+                                                      , IsAtTransition = _isAtTransition
+                                                      , RemainingTime = _remainingTime
+                                                      , Round = this.Round
+                                                    };
 
             [JsonIgnore]
             public bool IsPaused
@@ -152,26 +162,229 @@ namespace DBF.DataModel
                 await windowManager.ShowDialogAsync(screen);
 
                 // If the dialog was enden with save, then our Settings was updated
-                _startTime      = new TimeSpan(     Hours,  Minutes,           Seconds);
-                _breakTime      = new TimeSpan(     0,      BreakMinutes,      0);
-                _transitionTime = new TimeSpan(     0,      TransitionMinutes, 0);
-                _warningTime    = new TimeSpan(     0,      WarningMinutes,    0);
+                _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                _breakTime      = new TimeSpan(0, BreakMinutes, 0);
+                _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                _warningTime    = new TimeSpan(0, WarningMinutes, 0);
 
                 if (!IsStarted)
                     _remainingTime = _startTime;
 
-                UpdateDisplay();
+                updateDisplay();
             }
 
             public void UpdateDisplay()
             {
-                //if (_remainingTime <= _twoSeconds)
-                //    Debugger.Break();    
+                lock (_sync)
+                {
+                    updateDisplay();
+                }
+            }
+
+            public void Close()
+            {
+                lock (_sync)
+                {
+                    var result = MessageBox.Show("Hvis du lukker uret, så nulstilles det. Vil du lukke uret?", "Bekræftelse", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.OK)
+                    {
+                        stopTimer();
+                        Visibility = Visibility.Collapsed;
+                        Configuration.Save();
+                    }
+                }
+            }
+
+            public void Start()
+            {
+                lock (_sync)
+                {
+                    _isStarted = true;
+                    _isPaused  = false;
+
+                    //if (!_timer.IsEnabled)
+                    _timer.Start();
+                }
+            }
+
+            public void Back()
+            {
+                lock (_sync)
+                {
+                    _isPaused = true;
+                    _timer.Stop();
+
+                    if (Round == 1)
+                    {
+                        //_isStarted     = false;
+                        _remainingTime = _startTime;
+                    }
+                    else
+                        if (_isAtBreak)
+                            if (_remainingTime == _breakTime)
+                            {
+                                _isAtBreak     = false;
+                                _remainingTime = _startTime;
+                            }
+                            else
+                                _remainingTime = _breakTime;
+                        else
+                            if (_isAtTransition)
+                            {
+                                _isAtTransition = false;
+                                _remainingTime  = _startTime;
+                            }
+                            else
+                                if (Round <= Rounds
+                                &&  _startTime.Subtract(_remainingTime) >  _threshold)
+                                    _remainingTime = _startTime;
+                                else
+                                {
+                                    Round--;
+
+                                    if (Round == BreakAfterRound)
+                                    {
+                                        _remainingTime = _breakTime;
+                                        _isAtBreak     = true;
+                                    }
+                                    else
+                                        _remainingTime = _startTime;
+                                }
+
+                    updateDisplay();
+                }
+            }
+
+            public void Pause(bool force = false)
+            {
+                lock (_sync)
+                {
+                    if (_isStarted)
+                        if (_isPaused && !force)
+                            Start();
+                        else
+                        {
+                            _isPaused = true;
+                            _timer.Stop();
+                        }
+                }
+            }
+
+            public void Forward()
+            {
+                lock (_sync)
+                {
+                    _isPaused = true;
+                    _timer.Stop();
+
+                    if (Round
+                    <= Rounds)
+                    {
+                        if (_isAtBreak)
+                        {
+                            _isAtBreak = false;
+                            Round++;
+                            _remainingTime = _startTime;
+                        }
+                        else
+                            if (_remainingTime >  TimeSpan.Zero)
+                                if (!_isAtBreak && Round == BreakAfterRound)
+                                {
+                                    _remainingTime = _breakTime;
+                                    _isAtBreak     = true;
+                                }
+                                else
+                                {
+                                    Round++;
+                                    _remainingTime  = _startTime;
+                                    _isAtTransition = false;
+                                }
+                    }
+
+                    updateDisplay();
+                }
+            }
+
+            public void LessTime()
+            {
+                lock (_sync)
+                {
+                    _remainingTime = DBFMath.Max(TimeSpan.Zero, _remainingTime.Add(TimeSpan.FromSeconds(-30)));
+                    updateDisplay();
+                }
+            }
+
+            public void MoreTime()
+            {
+                lock (_sync)
+                {
+                    _remainingTime = _remainingTime.Add(TimeSpan.FromSeconds(60));
+                    updateDisplay();
+                }
+            }
+
+            public void Reset(bool ask = true)
+            {
+                lock (_sync)
+                {
+                    if (!ask
+                    ||  MessageBoxResult.OK == MessageBox.Show( "Hvis du nulstiller uret, indlæses indstillingerne på ny. Vil du fortsætte?"
+                                                              , "Bekræftelse"
+                                                              , MessageBoxButton.OKCancel
+                                                              , MessageBoxImage.Question))
+                    {
+                        stopTimer();
+
+                        _isAtBreak      = false;
+                        _isAtTransition = false;
+                        _isPaused       = true;
+                        _isStarted      = false;
+                        _remainingTime  = _startTime;
+                        _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                        _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                        _breakTime      = new TimeSpan(0, BreakMinutes, 0);
+                        Round           = 1;
+
+                        updateDisplay();
+                    }
+                }
+            }
+
+            public void Restart(BridgeTimerState state)
+            {
+                lock (_sync)
+                {
+                    stopTimer();
+
+                    _isStarted = state.IsStarted;
+                    //_isPaused       = true;
+                    _isAtBreak      = state.IsAtBreak;
+                    _isAtTransition = state.IsAtTransition;
+                    _remainingTime  = state.RemainingTime;
+                    Round           = state.Round;
+                    //
+                    _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                    _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                    _breakTime      = new TimeSpan(0, BreakMinutes, 0);
+
+                    updateDisplay();
+                }
+            }
+        #endregion
+
+        #region Private Methods
+            private void updateDisplay()
+            {
                 if (!_isPaused)
-                    if (_remainingTime == _warningTime && !_isAtBreak)
+                    if (!_isAtBreak
+                    &&  _startTime     >  _warningTime
+                    &&  _remainingTime == _warningTime)
                         _player.Play(Sound, Volume);                            // Warning before end of Round
                     else
-                        if (_isAtBreak && _remainingTime == _twoMinutes)
+                        if (_isAtBreak
+                        &&  _startTime     >  _twoMinutes
+                        &&  _remainingTime == _twoMinutes)
                             _player.Play(Sound, Volume);                        // Warning two minutes before end of Break
                         else
                             if (_remainingTime == TimeSpan.Zero)
@@ -214,17 +427,24 @@ namespace DBF.DataModel
                                             }
 
                 if (_remainingTime == TimeSpan.MinValue)
-                    _remainingTime =  _startTime = new TimeSpan(Hours,                                                 Minutes, Seconds);
+                    _remainingTime =  _startTime = new TimeSpan(Hours, Minutes, Seconds);
 
-                Time = _remainingTime.ToString(                _remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
+                Time = _remainingTime.ToString(_remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
 
-                if (Round >  Rounds)
+                if (Round          >  Rounds
+                ||  _remainingTime <= TimeSpan.Zero)
                     WarningVisiblity = Visibility.Collapsed;
                 else
                     if (_isAtBreak)
-                        WarningVisiblity = (_remainingTime >  TimeSpan.Zero && _remainingTime <  _twoMinutes && _breakTime >= _twoMinutes) ? Visibility.Visible : Visibility.Collapsed;
+                        WarningVisiblity = ( _remainingTime <= _twoMinutes
+                                         &&  _breakTime >  _twoMinutes)
+                                         ? Visibility.Visible
+                                         : Visibility.Collapsed;
                     else
-                        WarningVisiblity = (_remainingTime >  TimeSpan.Zero && _remainingTime <  _warningTime) ? Visibility.Visible : Visibility.Collapsed;
+                        WarningVisiblity = ( _remainingTime <= _warningTime
+                                         &&  _startTime >  _warningTime)
+                                         ? Visibility.Visible : 
+                                         Visibility.Collapsed;
 
                 Info = $"Vi spiller {Rounds} {getRoundsText} af {BoardsPerRound} spil";
 
@@ -242,7 +462,8 @@ namespace DBF.DataModel
                         }
                         else
                         {
-                            if (Round <= BreakAfterRound)
+                            if (Round        <= BreakAfterRound
+                            &&  BreakMinutes >  0)
                                 Info += Environment.NewLine
                                       + $"{BreakMinutes} minutters pause efter {BreakAfterRound}. {getRoundText}";
 
@@ -277,203 +498,30 @@ namespace DBF.DataModel
                 MinutesLeft = Math.Ceiling(left); // rundet op
             }
 
-            public void Close()
-            {
-                var result = MessageBox.Show("Hvis du lukker uret, så nulstilles det. Vil du lukke uret?", "Bekræftelse", MessageBoxButton.OKCancel, MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.OK)
+            #region Private Timer Events         
+                private void stopTimer()
                 {
-                    StopCountdown();
-                    Visibility = Visibility.Collapsed;
-                    Configuration.Save();
+                    _timer.Stop();
+                    _isPaused = true;
+                    updateDisplay();
                 }
-            }
 
-            public void Start()
-            {
-                if (!_isStarted || _isPaused)
+                private void Timer_Tick(object sender, EventArgs e)
                 {
-                    _isStarted = true;
-                    _isPaused  = false;
-                    _timer.Start();
-                }
-            }
-
-            public void Back()
-            {
-                Pause(true);
-
-                if (Round == 1)
-                {
-                    //_isStarted     = false;
-                    _remainingTime = _startTime;
-                }
-                else
-                    if (_isAtBreak)
-                        if (_remainingTime == _breakTime)
-                        {
-                            _isAtBreak     = false;
-                            _remainingTime = _startTime;
-                        }
-                        else
-                            _remainingTime = _breakTime;
-                    else
-                        if (_isAtTransition)
-                        {
-                            _isAtTransition = false;
-                            _remainingTime  = _startTime;
-                        }
-                        else
-                            if (_startTime.Subtract(_remainingTime) >  _threshold)
-                                _remainingTime = _startTime;
-                            else
-                            {
-                                Round--;
-
-                                if (Round == BreakAfterRound)
-                                {
-                                    _remainingTime = _breakTime;
-                                    _isAtBreak     = true;
-                                }
-                                else
-                                    _remainingTime = _startTime;
-                            }
-
-                UpdateDisplay();
-            }
-
-            public void Pause(bool force = false)
-            {
-                if (_isStarted)
-                    if (_isPaused && !force)
-                        Start();
-                    else
+                    if (!_isPaused && _remainingTime.TotalSeconds >  0)
                     {
-                        _isPaused = true;
-                        _timer.Stop();
-                    }
-            }
+                        _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
 
-            public void Forward()
-            {
-                Pause(true);
-
-                if (Round
-                <= Rounds)
-                {
-                    if (_isAtBreak)
-                    {
-                        _isAtBreak = false;
-                        Round++;
-                        _remainingTime = _startTime;
+                        updateDisplay();
                     }
                     else
-                        if (_remainingTime >  TimeSpan.Zero)
-                            if (!_isAtBreak && Round == BreakAfterRound)
-                            {
-                                _remainingTime = _breakTime;
-                                _isAtBreak     = true;
-                            }
-                            else
-                            {
-                                Round++;
-                                _remainingTime  = _startTime;
-                                _isAtTransition = false;
-                            }
+                        if (_remainingTime.TotalSeconds <= 0)
+                            stopTimer();
                 }
 
-                UpdateDisplay();
-            }
-
-            public void LessTime()
-            {
-                _remainingTime = DBFMath.Max(TimeSpan.Zero, _remainingTime.Add(TimeSpan.FromSeconds(-30)));
-                UpdateDisplay();
-            }
-
-            public void MoreTime()
-            {
-                _remainingTime = _remainingTime.Add(TimeSpan.FromSeconds(60));
-                UpdateDisplay();
-            }
-
-            public void Reset(bool ask = true)
-            {
-                if (!ask
-                ||  MessageBoxResult.OK == MessageBox.Show( "Hvis du nulstiller uret, indlæses indstillingerne på ny. Vil du fortsætte?"
-                                                          , "Bekræftelse"
-                                                          , MessageBoxButton.OKCancel
-                                                          , MessageBoxImage.Question))
-                {
-                    StopCountdown();
-
-                    _isAtBreak      = false;
-                    _isAtTransition = false;
-                    _isPaused       = true;
-                    _isStarted      = false;
-                    _remainingTime  = _startTime;
-                    _startTime      = new TimeSpan(Hours, Minutes,           Seconds);
-                    _transitionTime = new TimeSpan(0,     TransitionMinutes, 0);
-                    _breakTime      = new TimeSpan(0,     BreakMinutes,      0);
-                    Round           = 1;
-
-                    UpdateDisplay();
-                }
-            }
-
-            [JsonIgnore]
-            public BridgeTimerState CurrentState =>
-                    new BridgeTimerState()
-                    {
-                        IsStarted = _isStarted
-                      , IsAtBreak = _isAtBreak
-                      , IsAtTransition = _isAtTransition
-                      , RemainingTime = _remainingTime
-                      , Round = this.Round
-                    };
-
-            public void Restart(BridgeTimerState state)
-            {
-                StopCountdown();
-
-                _isStarted      = state.IsStarted;
-                //_isPaused       = true;
-                _isAtBreak      = state.IsAtBreak;
-                _isAtTransition = state.IsAtTransition;
-                _remainingTime  = state.RemainingTime;
-                Round           = state.Round;
-                //
-                _startTime      = new TimeSpan(Hours, Minutes,           Seconds);
-                _transitionTime = new TimeSpan(0,     TransitionMinutes, 0);
-                _breakTime      = new TimeSpan(0,     BreakMinutes,      0);
-
-                UpdateDisplay();
-            }
-        #endregion
-
-        #region Private Timer Events         
-            private void StopCountdown()
-            {
-                _timer.Stop();
-                _isPaused = true;
-                UpdateDisplay();
-            }
-
-            private void Timer_Tick(object sender, EventArgs e)
-            {
-                if (!_isPaused && _remainingTime.TotalSeconds >  0)
-                {
-                    _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
-
-                    UpdateDisplay();
-                }
-                else
-                    if (_remainingTime.TotalSeconds <= 0)
-                        _timer.Stop();
-            }
-
-            private string getRoundText  => TeamMatch ? "halvleg" : "runde";
-            private string getRoundsText => TeamMatch ? "halvlege" : "runder";
+                private string getRoundText  => TeamMatch ? "halvleg" : "runde";
+                private string getRoundsText => TeamMatch ? "halvlege" : "runder";
+            #endregion
         #endregion
     }
 }

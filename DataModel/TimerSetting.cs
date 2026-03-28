@@ -56,7 +56,7 @@ namespace DBF.DataModel
             get => fgColor;
             set
             {
-                if (Set(                             ref fgColor,                                 value))
+                if (Set(ref fgColor, value))
                     Foreground = new SolidColorBrush(value is null ? Colors.Black : (Color)value);
             }
         }
@@ -83,7 +83,6 @@ namespace DBF.DataModel
         public              Visibility Visibility { get; set; }
         public              string     GroupStr   { get => Groups.ToFriendlyString(); }
         //[JsonIgnore] public TimeOnly?  StartTime  { get; set; }
-
         public string PauseMessage
         {
             get => field;
@@ -125,19 +124,18 @@ namespace DBF.DataModel
 
         public new void Update(Preset preset)
         {
-            Name            = preset.Name;
-            CustomPreset    = preset.CustomPreset;
-            TeamMatch       = preset.TeamMatch;
-            Rounds          = preset.Rounds;
-            BoardsPerRound  = preset.BoardsPerRound;
-            BreakAfterRound = preset.BreakAfterRound;
-
+            Name              = preset.Name;
+            CustomPreset      = preset.CustomPreset;
+            TeamMatch         = preset.TeamMatch;
+            Rounds            = preset.Rounds;
+            BoardsPerRound    = preset.BoardsPerRound;
             Hours             = preset.Hours;
             Minutes           = preset.Minutes;
             Seconds           = preset.Seconds;
             TransitionMinutes = preset.TransitionMinutes;
-            BreakMinutes      = preset.BreakMinutes;
             WarningMinutes    = preset.WarningMinutes;
+
+            setBreak(preset.BreakAfterRound, preset.BreakMinutes);
 
             if (preset is TimerSetting tSetting)
             {

@@ -67,9 +67,9 @@ namespace DBF.ViewModels
         private          int                                                                             _processingEventLoop;
 
         #region Constructors
-            public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
+            public ControlViewModel(IWindowManager windowManager, Configuration configuration)//, BridgeMate bridgeMate)
             {
-                BridgeMate                          = bridgeMate;
+                //BridgeMate                          = bridgeMate;
                 Configuration                       = configuration;
                 this.windowManager                  = windowManager;
                 Thread.CurrentThread.CurrentCulture = Global.DkCulture;
@@ -589,11 +589,11 @@ namespace DBF.ViewModels
 
 #if DEBUG
                 // BridgeMate lookup
-                if (newSession)
-                    //if (string.IsNullOrEmpty(ErrorMessage))
-                    //    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
-                    //else
-                    BridgeMate.Close();
+                //if (newSession)
+                //    //if (string.IsNullOrEmpty(ErrorMessage))
+                //    //    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
+                //    //else
+                //    BridgeMate.Close();
 #endif
                 // Restore Taskbar Icon.
                 //Execute.OnUIThread(() =>

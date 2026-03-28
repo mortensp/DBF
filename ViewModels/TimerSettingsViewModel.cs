@@ -57,9 +57,7 @@ namespace DBF.ViewModels
             public        TimerSetting                      NewSetting         { get; set; } = new();
             public        Color                             BackgroundColor    { get; set; }
             public        Color                             ForegroundColor    { get; set; }
-
-            //public        TimeOnly                          StartTime          => Configuration.StartTime;
-
+         
             public        TimeOnly                          EndTime            => Configuration.StartTime.AddMinutes(NewSetting.Duration);
 
             public Preset SelectedPreset
@@ -103,10 +101,13 @@ namespace DBF.ViewModels
 
             public async void AcceptSetting()
             {
+                Setting.Update(NewSetting);
+            
+            
                 if (selectedPreset is not null && !selectedPreset.Matches(NewSetting))
                     if (selectedPreset.CustomPreset)
                     {
-                        var result = MessageBox.Show("Vil du gemme dine ændringer i din forudstilling?", "Bekræftelse", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                        var result = MessageBox.Show("Vil du også gemme ændringerne i din forudstilling?", "Bekræftelse", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                         if (result == MessageBoxResult.Cancel)
                             return;
@@ -115,7 +116,6 @@ namespace DBF.ViewModels
                             SavePreset();
                     }
 
-                Setting.Update(NewSetting);
                 await TryCloseAsync();
                 Configuration.Save();
             }

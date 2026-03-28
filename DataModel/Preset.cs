@@ -9,7 +9,7 @@ namespace DBF.DataModel
         private bool   customPreset;
 
         [JsonConstructorAttribute]
-        public Preset(string name = null
+        public Preset( string name = null
                      , bool customPreset = true
                      , bool teamMatch = false
                      , int rounds = 9
@@ -21,7 +21,6 @@ namespace DBF.DataModel
                      , int transitionMinutes = 1
                      , int breakMinutes = 12
                      , int warningMinutes = 5
-                     
                      )
         {
             Name              = name?.ToString();
@@ -29,14 +28,13 @@ namespace DBF.DataModel
             TeamMatch         = teamMatch;
             Rounds            = rounds;
             BoardsPerRound    = boardsPerRound;
-            BreakAfterRound   = breakAfterRound;
-            //StartTime = startTime;
             Hours             = hours;
             Minutes           = minutes;
             Seconds           = seconds;
             TransitionMinutes = transitionMinutes;
-            BreakMinutes      = breakMinutes;
             WarningMinutes    = warningMinutes;
+
+            setBreak(breakAfterRound, breakMinutes);
         }
 
         public Preset(Preset other)
@@ -46,14 +44,13 @@ namespace DBF.DataModel
             TeamMatch         = other.TeamMatch;
             Rounds            = other.Rounds;
             BoardsPerRound    = other.BoardsPerRound;
-            BreakAfterRound   = other.BreakAfterRound;
-            //StartTime = other.StartTime;
             Hours             = other.Hours;
             Minutes           = other.Minutes;
             Seconds           = other.Seconds;
             TransitionMinutes = other.TransitionMinutes;
-            BreakMinutes      = other.BreakMinutes;
             WarningMinutes    = other.WarningMinutes;
+
+            setBreak(other.BreakAfterRound, other.BreakMinutes);
         }
 
         public string Name
@@ -62,9 +59,7 @@ namespace DBF.DataModel
             set
             {
                 if (name != value)
-                {
-                    name = value?.ToString();
-                }
+                    name =  value?.ToString();
             }
         }
 
@@ -74,29 +69,26 @@ namespace DBF.DataModel
             set
             {
                 if (customPreset != value)
-                {
-                    customPreset = value;
-                }
+                    customPreset =  value;
             }
         }
 
-        public bool      TeamMatch         { get; set; }
-        public int       Rounds            { get; set; }
-        public int       BoardsPerRound    { get; set; }
-        public int       BreakAfterRound   { get; set; }
- 
+        public bool   TeamMatch         { get; set; }
+        public int    Rounds            { get; set; }
+        public int    BoardsPerRound    { get; set; }
+        public int    BreakAfterRound   { get; set; }
 
-        public int       Hours             { get; set; }
-        public int       Minutes           { get; set; }
-        public int       Seconds           { get; set; }
-        public int       TransitionMinutes { get; set; }
-        public int       BreakMinutes      { get; set; }
-        public int       WarningMinutes    { get; set; }
+        public int    Hours             { get; set; }
+        public int    Minutes           { get; set; }
+        public int    Seconds           { get; set; }
+        public int    TransitionMinutes { get; set; }
+        public int    BreakMinutes      { get; set; }
+        public int    WarningMinutes    { get; set; }
 
-        public double    Duration          => BreakMinutes
-                                            + Rounds * (Hours * 60 + Minutes + Seconds / 60d)
-                                            + (BreakAfterRound >  0 && BreakAfterRound <  Rounds ? Rounds - 2 : Rounds - 1)
-                                            * Math.Max(0, TransitionMinutes);
+        public double Duration          => BreakMinutes
+                                         + Rounds * (Hours * 60 + Minutes + Seconds / 60d)
+                                         + (BreakAfterRound >  0 && BreakAfterRound <  Rounds ? Rounds - 2 : Rounds - 1)
+                                         * Math.Max(0, TransitionMinutes);
 
         public bool Matches(Preset other)
         {
@@ -121,13 +113,28 @@ namespace DBF.DataModel
             TeamMatch         = other.TeamMatch;
             Rounds            = other.Rounds;
             BoardsPerRound    = other.BoardsPerRound;
-            BreakAfterRound   = other.BreakAfterRound;
             Hours             = other.Hours;
             Minutes           = other.Minutes;
             Seconds           = other.Seconds;
             TransitionMinutes = other.TransitionMinutes;
-            BreakMinutes      = other.BreakMinutes;
             WarningMinutes    = other.WarningMinutes;
+
+            setBreak(other.BreakAfterRound, other.BreakMinutes);
+        }
+
+        internal void setBreak(int breakAfterRound, int breakMinutes)
+        {
+            if (breakAfterRound >  0
+            &&  breakMinutes    >  0)
+            {
+                BreakAfterRound = breakAfterRound;
+                BreakMinutes    = breakMinutes;
+            }
+            else
+            {
+                BreakAfterRound = 0;
+                BreakMinutes    = 0;
+            }
         }
     }
 }
