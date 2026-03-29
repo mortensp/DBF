@@ -22,7 +22,6 @@ public class TestViewModel : Screen
     }
 
     public Configuration Configuration { get; set; } = new();
-    //public SelectableFlag SelectedFlags { get; set; } 
     public GroupFlags    Groups        { get; set; }
 }
 

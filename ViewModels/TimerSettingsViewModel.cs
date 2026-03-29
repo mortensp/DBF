@@ -58,7 +58,7 @@ namespace DBF.ViewModels
             public        Color                             BackgroundColor    { get; set; }
             public        Color                             ForegroundColor    { get; set; }
          
-            public        TimeOnly                          EndTime            => Configuration.StartTime.AddMinutes(NewSetting.Duration);
+            public        TimeOnly?                          EndTime            => Configuration.StartTime?.AddMinutes(NewSetting.Duration);
 
             public Preset SelectedPreset
             {

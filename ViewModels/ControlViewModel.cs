@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -12,21 +13,17 @@ using System.Xml.Serialization;
 using Caliburn.Micro;
 using DBF.Converters;
 using DBF.DataModel;
+using DBF.Helpers;
 using DBF.UserControls;
 using DBF.Views;
 
 using Syncfusion.Data.Extensions;
+using Syncfusion.Pdf.Parsing;
 using Syncfusion.UI.Xaml.Charts;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DBF.ViewModels
 {
-    public static class MovementPlans
-    {
-        public const string InterWovenHowell = "1";
-        public const string Howell           = "1";
-        public const string Mitchell         = "4";
-    }
-
     public class ControlViewModel : Screen
     {
         private readonly IWindowManager windowManager;
@@ -44,27 +41,14 @@ namespace DBF.ViewModels
         private List<Tournament>      tournaments;
         private JsonSerializerOptions JsonOptions    = new JsonSerializerOptions
                                                        {
-                                                           Converters = 
-                                                           {
-                                                                      new DecimalCommaConverter()
-                                                                      }
+                                                           Converters = {new DecimalCommaConverter()}
                                                        };
 
-        private Encoding                          iso_8859_1 = System.Text.Encoding.GetEncoding("iso-8859-1");
-        private ObservableCollection<PlayingTime> spilleDage = [];
-        private FileSystemWatcher                 watcher;
-
-        private int  sectionNo;
-        private bool showAsOneGroup = true;
-
-        // Nyttige felter øverst i klassen - bruges til at undgå af XML filerne er i brug
-
-        // Queue to ensure file system events are processed sequentially in the order received
-        // We keep only the latest event per path so near-duplicate events are grouped.
-        private readonly System.Collections.Concurrent.ConcurrentQueue<string>                           _eventQueue   = new();
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, FileSystemEventArgs> _latestEvents = new();
-        private readonly System.Threading.SemaphoreSlim                                                  _queueSignal  = new(0);
-        private          int                                                                             _processingEventLoop;
+        private Encoding                          iso_8859_1     = System.Text.Encoding.GetEncoding("iso-8859-1");
+        private ObservableCollection<PlayingTime> spilleDage     = [];
+        private SeriliazedFileSystemWatcher       watcher;
+        private int                               sectionNo;
+        private bool                              showAsOneGroup = true;
 
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration)//, BridgeMate bridgeMate)
@@ -74,22 +58,18 @@ namespace DBF.ViewModels
                 this.windowManager                  = windowManager;
                 Thread.CurrentThread.CurrentCulture = Global.DkCulture;
 
-                watcher                       = new FileSystemWatcher();
-                watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size;
-                watcher.IncludeSubdirectories = false;
-
-                watcher.Changed+= folderUpdated;
-                watcher.Created+= folderUpdated;
+                watcher              = new SeriliazedFileSystemWatcher();
+                watcher.UpdatedAsync+= handleFileEventAsync;
 
                 Pairs.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Pairs);
                 Teams.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Teams);
 
-                LoadMainClubs();
-//#if DEBUG
-//                // For at gøre test nemmere
-//                SelectedMainClub    = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
-//                SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
-//#endif
+                loadMainClubs();
+                //#if DEBUG
+                //                // For at gøre test nemmere
+                //                SelectedMainClub    = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
+                //                SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
+                //#endif
             }
         #endregion
 
@@ -133,7 +113,9 @@ namespace DBF.ViewModels
                             {
                                 watcher.Path = value.Path;
                                 watcher.Filters.Add("Main.XML");
-                                watcher.EnableRaisingEvents = true;
+
+                                if (Configuration.ReadBC3)
+                                    watcher.EnableRaisingEvents = true;
 
                                 Clubs    = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
                                                                   .ToObservableCollection();
@@ -169,7 +151,7 @@ namespace DBF.ViewModels
                             SelectedPlayingTime = null;
                         }
                         else
-                            FetchPlayingTimes();
+                            fetchPlayingTimes();
                 }
             }
 
@@ -196,7 +178,7 @@ namespace DBF.ViewModels
                 {
                     if (Set(ref playingTime, value))
                         if (value is not null)
-                            FetchPlayingTime();
+                            fetchPlayingTime();
                 }
             }
 
@@ -250,7 +232,7 @@ namespace DBF.ViewModels
                 if (CurrentView is not StartListControl)
                     CurrentView = startListControl;
 
-                await ShowProjector();
+                await showProjector();
             }
 
             public async void ShowBridgeTimers()
@@ -258,7 +240,7 @@ namespace DBF.ViewModels
                 if (CurrentView is not TimersPanel)
                     CurrentView = timersPanel;
 
-                await ShowProjector();
+                await showProjector();
             }
 
             public async void ShowResults()
@@ -266,7 +248,7 @@ namespace DBF.ViewModels
                 if (CurrentView is not ResultsControl)
                     CurrentView = resultsControl;
 
-                await ShowProjector();
+                await showProjector();
             }
 
             public void CloseProjector()
@@ -295,17 +277,22 @@ namespace DBF.ViewModels
 
                         switch (dlg.Choice)
                         {
-                            case DBF.Views.ConfirmCloseChoice.ContinueClose:
+                            case DBF.Views.ConfirmCloseChoice.Close:
                                 Configuration.DeleteState();
                                 return await Task.FromResult(true);
 
-                            case DBF.Views.ConfirmCloseChoice.CancelClose:
+                            case DBF.Views.ConfirmCloseChoice.Cancel:
                                 return await Task.FromResult(false);
 
-                            case DBF.Views.ConfirmCloseChoice.SaveTime:
+                            case DBF.Views.ConfirmCloseChoice.SaveState:
                                 Configuration.SaveState();
                                 return await Task.FromResult(true);
                         }
+                    }
+                    else
+                    {
+                        Configuration.DeleteState();
+                        return await Task.FromResult(true);
                     }
                 }
 
@@ -319,21 +306,26 @@ namespace DBF.ViewModels
         #endregion
 
         #region Private Method
-            private void LoadMainClubs()
+            private void loadMainClubs()
             {
+                if (!Configuration.ReadBC3)
+                    return;
+
                 if (string.IsNullOrWhiteSpace(Configuration.HomepagePath)
                 || !Directory.Exists(Configuration.HomepagePath))
                 {
-                    ShowMessageAFewSeconds($"Mappen: '{Configuration.HomepagePath}' findes ikke");
-                    //
+                    showMessageAFewSeconds($"Mappen: '{Configuration.HomepagePath}' findes ikke");
+
+                    // Look for folder creation and updates
                     watcher.EnableRaisingEvents   = false;
                     watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.DirectoryName;
                     watcher.IncludeSubdirectories = true;
                     watcher.Filters.Clear();
-
                     watcher.Path = @"c:\";
                     watcher.Filters.Add("Resultater_*");
-                    watcher.EnableRaisingEvents = true;
+
+                    if (Configuration.ReadBC3)
+                        watcher.EnableRaisingEvents = true;
 
                     return;
                 }
@@ -353,8 +345,7 @@ namespace DBF.ViewModels
 
                 if (MainClubs.Count == 0)
                 {
-                    //MessageBox.Show(
-                    ShowMessageAFewSeconds($"Kan ikke finde Startliste i mappen: {Configuration.HomepagePath}");
+                    showMessageAFewSeconds($"Kan ikke finde Startliste i mappen: {Configuration.HomepagePath}");
                     return;
                 }
 
@@ -362,7 +353,7 @@ namespace DBF.ViewModels
                 SelectedMainClub = MainClubs.FirstOrDefault(c => c.No != 9999) ?? MainClubs.First();
             }
 
-            private void ShowMessageAFewSeconds(string msg)
+            private void showMessageAFewSeconds(string msg)
             {
                 ErrorMessage = msg;
                 // Clear the error message after 10 seconds without blocking the UI thread
@@ -377,7 +368,7 @@ namespace DBF.ViewModels
                 });
             }
 
-            private void FetchPlayingTimes()
+            private void fetchPlayingTimes()
             {
                 try
                 {
@@ -406,7 +397,7 @@ namespace DBF.ViewModels
             /// <summary>
             /// Henter XML data for den valgte Spille dag og klokkeslet
             /// </summary>
-            private void FetchPlayingTime(bool newSession = true)
+            private void fetchPlayingTime(bool newSession = true)
             {
                 ShowAsOneGroup                 = true;
                 HideHacGrp                     = true;
@@ -827,7 +818,7 @@ namespace DBF.ViewModels
                     return sections;
                 }
 
-                private GroupSection getGroupSection(String fileName, Tournament tournament)
+                private GroupSection getGroupSection(string fileName, Tournament tournament)
                 {
                     var path    = SelectedMainClub.Path + fileName;
                     var section = deserialize<GroupSection>(path);
@@ -850,14 +841,14 @@ namespace DBF.ViewModels
                         if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
                         {
                             //string json = File.ReadAllText(fullPath, iso_8859_1);
-                            string json = ReadAllTextWithRetry(fullPath, iso_8859_1);
+                            string json = readAllTextWithRetry(fullPath, iso_8859_1);
                             return JsonSerializer.Deserialize<T>(json, JsonOptions);
                         }
                         else // XML
                         {
                             // Hvis filen ikke findes, returner null
                             //string xml = File.ReadAllText(fullPath, iso_8859_1);
-                            string xml = ReadAllTextWithRetry(fullPath, iso_8859_1);
+                            string xml = readAllTextWithRetry(fullPath, iso_8859_1);
 
                             // Erstat Fjern tag værdier, som kun består af blanke og - tegn
                             xml = Regex.Replace(xml, @">(-|\s)+<", "><");
@@ -883,7 +874,7 @@ namespace DBF.ViewModels
                 }
 
                 // Tilføj denne private helper-metode i samme klasse (f.eks. nederst i filen)
-                private string ReadAllTextWithRetry(string path, Encoding encoding, int maxAttempts = 10, int initialDelayMs = 100)
+                private string readAllTextWithRetry(string path, Encoding encoding, int maxAttempts = 10, int initialDelayMs = 100)
                 {
                     var delay = initialDelayMs;
 
@@ -913,131 +904,7 @@ namespace DBF.ViewModels
                 }
             #endregion
 
-            #region Look for Folder or file updates
-                // Erstat din eksisterende folderUpdated-metode med denne
-                // Denne version sikrer at events ikke springes over og behandles sekventielt
-                private void folderUpdated(object sender, FileSystemEventArgs e)
-                {
-                    try
-                    {
-                        var path = e.FullPath;
-
-                        // Store/update the latest event for this path. If this is the first event for the path,
-                        // enqueue the path so the processor will handle it. This collapses near-duplicate events
-                        // for the same file into a single processing run (we keep the latest event).
-                        if (_latestEvents.TryAdd(path, e))
-                        {
-                            _eventQueue.Enqueue(path);
-                            _queueSignal.Release();
-
-                            // Ensure single processor is running
-                            if (System.Threading.Interlocked.CompareExchange(ref _processingEventLoop, 1, 0) == 0)
-                                _ = Task.Run(ProcessEventQueueAsync);
-                        }
-                        else
-                        {
-                            // Already queued; update latest event
-                            _latestEvents[path] = e;
-                        }
-                    }
-
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"folderUpdated error: {ex.Message}");
-                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
-                    }
-                }
-
-                // Processor loop that handles queued FileSystem events one-by-one in order
-                private async Task ProcessEventQueueAsync()
-                {
-                    try
-                    {
-                        while (true)
-                        {
-                            await _queueSignal.WaitAsync();
-
-                            if (!_eventQueue.TryDequeue(out var path))
-                                continue; // spurious signal
-
-                            try
-                            {
-                                // Try to get and remove latest event for this path
-                                if (!_latestEvents.TryRemove(path, out var ev))
-                                    continue; // nothing to process
-
-                                // Wait a short time for the writer to finish and wait for size-stability
-                                await Task.Delay(200);
-
-                                long lastLength = -1;
-
-                                for (int i = 0; i <  6; i++)
-                                {
-                                    long len = 0;
-                                    try
-                                    {
-                                        var fi = new FileInfo(path);
-                                        len    = fi.Exists ? fi.Length : 0;
-                                    }
-
-                                    catch
-                                    {
-                                        len = -1;
-                                    }
-
-                                    if (lastLength != -1 && lastLength == len)
-                                        break;
-
-                                    lastLength = len;
-                                    await Task.Delay(150);
-                                }
-
-                                // Execute handling on UI thread (same behaviour as tidligere)
-                                await Execute.OnUIThreadAsync(async () =>
-                                {
-                                    try
-                                    {
-                                        if (ev.ChangeType == WatcherChangeTypes.Changed)
-                                            if (ev.Name == "Main.XML")
-                                                reloadMain();
-                                            else
-                                                FetchPlayingTime(false);
-                                        else
-                                            if (ev.ChangeType == WatcherChangeTypes.Created)
-                                                if (ev.FullPath.StartsWith(Configuration.HomepagePath))
-                                                {
-                                                    await Task.Delay(7000); // 7 seconds delay to allow file to be fully written and stable before processing (especially important for Main.xml which triggers a full reload)
-                                                    LoadMainClubs();
-                                                }
-                                                else
-                                                    Debug.WriteLine($"File Created: {ev.Name}");
-                                            else
-                                                Debug.WriteLine($"File {ev.ChangeType}: {ev.Name}");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
-                                    }
-                                    return;
-                                });
-                            }
-
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"Error processing queued file event: {ex.Message}");
-                            }
-                        }
-                    }
-
-                    finally
-                    {
-                        // We never exit the loop in normal operation; ensure flag cleared if we do
-                        System.Threading.Interlocked.Exchange(ref _processingEventLoop, 0);
-                    }
-                }
-            #endregion
-
-            private async Task ShowProjector()
+            private async Task showProjector()
             {
                 var projectorScreen = WpfScreenHelper.Screen.AllScreens
                                                             .Where(s => !s.Primary)
@@ -1057,7 +924,7 @@ namespace DBF.ViewModels
                     {
                         await windowManager.ShowWindowAsync(this, "ProjectorView");
 
-                        // erstat kaldet der viser vinduet (i din eksisterende ShowProjector-metode)
+                        // erstat kaldet der viser vinduet (i din eksisterende showProjector-metode)
                         //var projectorViewModel = new ProjectorViewModel(this);
                         //await windowManager.ShowWindowAsync(projectorViewModel, "ProjectorView");
                         projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
@@ -1072,7 +939,6 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
-
 #endif
                 }
                 else
@@ -1105,6 +971,65 @@ namespace DBF.ViewModels
                     shellView.Topmost = false;
                     shellView.Focus();
                 }
+            }
+
+            private async Task handleFileEventAsync(FileSystemEventArgs ev)
+            {
+                try
+                {
+                    if (ev.ChangeType == WatcherChangeTypes.Changed)
+                        if (ev.Name == "Main.XML")
+                            reloadMain();
+                        else
+                            fetchPlayingTime(false);
+                    else
+                        if (ev.ChangeType == WatcherChangeTypes.Created)
+                            if (ev.FullPath.StartsWith(Configuration.HomepagePath))
+                            {
+                                await Task.Delay(7000); // give filen tid til at blive skrevet færdig
+                                loadMainClubs();
+                            }
+                            else
+                                Debug.WriteLine($"File Created: {ev.Name}");
+                        else
+                            Debug.WriteLine($"File {ev.ChangeType}: {ev.Name}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
+                    ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                }
+            }
+
+            //private FileSystemWatcher _watcher;
+
+            //private void clearWatcher()
+            //{
+            //    if (_watcher == null)
+            //        return;
+
+            //    // Stop overvågning
+            //    _watcher.EnableRaisingEvents = false;
+
+            //    // Fjern event handlers
+            //    //_watcher.Changed -= OnChanged;
+            //    //_watcher.Created -= OnCreated;
+            //    //_watcher.Deleted -= OnDeleted;
+            //    //_watcher.Renamed -= OnRenamed;
+            //    //_watcher.Error   -= OnError;
+
+            //    // Frigiv ressourcer
+            //    _watcher.Dispose();
+            //    _watcher = null;
+            //}
+            internal void SetWatcher(bool enable)
+            {
+                if (enable)
+                    loadMainClubs();
+                else
+                    SelectedMainClub = null;
+
+                watcher.EnableRaisingEvents = enable;
             }
         #endregion
     }

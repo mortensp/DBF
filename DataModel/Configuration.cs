@@ -29,8 +29,7 @@ namespace DBF.DataModel
         private                 int                   visibleTimerCount;
         private static readonly TimeSpan              _fiveHours        = new TimeSpan(5, 0, 0);
         private static readonly TimeSpan              _zeroTime         = new TimeSpan(0, 0, 0);
-        private                 DateTime              startDate         = new(2026,1,1,16,0,0);
-
+        private                 DateTime              startDate         = new(2026,1,1,18,30,0);
         #region Constructors
             static Configuration()
             {
@@ -51,28 +50,57 @@ namespace DBF.DataModel
 
         #region Public Properties
             #region Public Properties - Serilizable
-                public string AppVersion { get; private set; } = currentversion;
+                public string AppVersion     { get; private set; } = currentversion;
+                public bool   ReadBC3        { get; set; } = true;
+                public bool   ReadBridgeMate { get; set; } = false;
+
                 public string BC3Path
                 {
-                    get => bc3Path;
+                    get => field;
                     set
                     {
-                        bc3Path = value.Trim();
+                        field = value.Trim();
 
-                        if (string.IsNullOrWhiteSpace(bc3Path))
-                            bc3Path = @"C:\BC3\";
+                        if (string.IsNullOrWhiteSpace(field))
+                            field = @"C:\BC3\";
                         else
-                            if (!bc3Path.EndsWith('/'))
-                                bc3Path += '/';
+                            if (!field.EndsWith('/'))
+                                field += '/';
                     }
+                } = @"C:\BC3\";
+
+                public int    ProjectorInterval { get; set; } = 20;
+                public int    ProjectorMaxRows  { get; set; } = 40;
+
+                public string HomepagePath      => BC3Path + @"Hjemmeside\";
+                public string BridgeMatePath    => BC3Path + @"BridgeMate\";
+                public TimeOnly? StartTime
+        {
+            get => field ?? TimeOnly.FromDateTime(startDate);
+
+            set
+            {
+                if (Set(ref field, value))
+                {
+                    StartDate = new(startDate.Year
+                                   , startDate.Month
+                                   , startDate.Day
+                                   , value?.Hour ?? 18
+                                   , value?.Minute ?? 30
+                                   , 0);
+                    Save();
                 }
+            }
+        }
 
-                public int                               ProjectorInterval { get; set; } = 20;
-                public int                               ProjectorMaxRows  { get; set; } = 40;
+        public BindableCollection<Preset>        Presets      { get; set; } =
+                    new() {     new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                              , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                              , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                              , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                          };
 
-                public string                            HomepagePath      => bc3Path + @"Hjemmeside\";
-                public string                            BridgeMatePath    => bc3Path + @"BridgeMate\";
-                public ObservableCollection<BridgeTimer> BridgeTimers      { get; set; } = new();
+                public ObservableCollection<BridgeTimer> BridgeTimers { get; set; } = new();
             #endregion
 
             #region Public Properties - JsonIgore
@@ -99,23 +127,10 @@ namespace DBF.DataModel
                 }
 
                 [JsonIgnore]
-                public TimeOnly StartTime
-                {
-                    get
-                    {
-                        return TimeOnly.FromDateTime(startDate);
-                    }
+                public TimeOnly EndTime          { get; set; }
 
-                    set
-                    {
-                        if (value != TimeOnly.FromDateTime(startDate))
-                            StartDate = new(startDate.Year, startDate.Month, startDate.Day, value.Hour, value.Minute, 0);
-                    }
-                }
-
-                [JsonIgnore] public TimeOnly EndTime          { get; set; }
-
-                [JsonIgnore] public bool     TimersCanBeAdded { get; set; }
+                [JsonIgnore]
+                public bool     TimersCanBeAdded { get; set; }
 
                 [JsonIgnore]
                 public int VisibleTimerCount
@@ -128,25 +143,14 @@ namespace DBF.DataModel
                     }
                 }
 
-                public BindableCollection<Preset> Presets { get; set; } = new()
-                                                                                                                        {
-                                                                                                                              new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                                                                                                                            , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                                                                                                                            , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                                                                                                                            , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                                                                                                        };
-
                 [JsonIgnore]
-                public ObservableCollection<CustomColor> BackgroundColors = new()
-                                                                                                                        {
-                                                                                                                              new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
-                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
-                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
-                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
-                                                                                                                            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
-                                                                                                                        };
-
-                private string bc3Path = @"C:\BC3\";
+                public ObservableCollection<CustomColor> BackgroundColors = 
+                                                         new() {     new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
+                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
+                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
+                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
+                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
+                                                               };
 
                 [JsonIgnore]
                 public bool TimersActive
@@ -313,8 +317,7 @@ namespace DBF.DataModel
                                            MainClubName   = controlViewModel.SelectedMainClub?.Name
                                          , SubClubName    = controlViewModel.SelectedClub?.Name
                                          , PlayingTimeStr = controlViewModel.SelectedPlayingTime?.DateStr
-                                         , TimerStates    = BridgeTimers.Select(t => t.CurrentState).ToList()
-                                         , BridgeTimers   =BridgeTimers.ToList()
+                                         , TimerStates    = BridgeTimers.Where(t=>t.IsStarted).Select(t => t.CurrentState).ToList()
                                        };
 
                 //var states = BridgeTimers.Select(t => t.CurrentState)
@@ -323,7 +326,7 @@ namespace DBF.DataModel
                 File.WriteAllText(statePath, json);
             }
 
-            public void OpenSettings()
+            public void OpenJSONFiles()
             {
                 if (File.Exists(path))
                     Process.Start("notepad.exe", path);
@@ -331,9 +334,7 @@ namespace DBF.DataModel
                 SaveState();
 
                 //if (!File.Exists(statePath))
-                    Process.Start("notepad.exe", statePath);
-
-                
+                Process.Start("notepad.exe", statePath);
             }
 
             public void RestoreState()
@@ -358,7 +359,8 @@ namespace DBF.DataModel
                                 controlViewModel.SelectedPlayingTime = controlViewModel.PlayingTimes.FirstOrDefault(mc => mc.DateStr == state.PlayingTimeStr);
 
                             for (int i = 0; i <  state.TimerStates.Count && i <  state.TimerStates.Count; i++)
-                                BridgeTimers[i].Restart(state.TimerStates[i]);
+                                if (state.TimerStates[i].IsStarted)
+                                    BridgeTimers[i].Restore(state.TimerStates[i]);
                         }
 
                         //catch (Exception) { /* Ignore */ }
@@ -368,9 +370,12 @@ namespace DBF.DataModel
 
             public void Update(Configuration newConfiguration)
             {
+                ReadBridgeMate    = newConfiguration.ReadBridgeMate;
+                ReadBC3           = newConfiguration.ReadBC3;
                 BC3Path           = newConfiguration.BC3Path;
                 ProjectorInterval = newConfiguration.ProjectorInterval;
                 ProjectorMaxRows  = newConfiguration.ProjectorMaxRows;
+                StartTime         = newConfiguration.StartTime;
 
                 if (newConfiguration.hasUserValues)
                 {

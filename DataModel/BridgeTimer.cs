@@ -37,7 +37,6 @@ namespace DBF.DataModel
         {
             _timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick+= Timer_Tick;
-            //updateDisplay();
         }
 
         #region Public Properties
@@ -55,15 +54,7 @@ namespace DBF.DataModel
             {
                 get
                 {
-                    var start =Configuration.StartTime;
-
-                    //if (start     == TimeOnly.MinValue
-                    //&&  StartTime is TimeOnly to)
-                    //    start = to;
-
-                    //if (start == TimeOnly.MinValue)
-                    //    return TimeOnly.MinValue;
-                    return start.AddMinutes(Math.Max(MinutesLeft, 0));
+                    return Configuration.StartTime?.AddMinutes(Math.Max(MinutesLeft, 0));
                 }
             }
 
@@ -351,14 +342,13 @@ namespace DBF.DataModel
                 }
             }
 
-            public void Restart(BridgeTimerState state)
+            public void Restore(BridgeTimerState state)
             {
                 lock (_sync)
                 {
                     stopTimer();
 
                     _isStarted = state.IsStarted;
-                    //_isPaused       = true;
                     _isAtBreak      = state.IsAtBreak;
                     _isAtTransition = state.IsAtTransition;
                     _remainingTime  = state.RemainingTime;

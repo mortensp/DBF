@@ -9,12 +9,11 @@ using System.Windows.Threading;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
 //using Microsoft.DotNet.DesignTools.Protocol.Values;
-
 namespace DBF
 {
     public class BridgeMate : INotifyPropertyChanged
     {
-        private          FileSystemWatcher                      watcher = new();
+        private          FileSystemWatcher                      watcher       = new();
         private readonly DispatcherTimer                        timer;
         private readonly ConcurrentDictionary<string, DateTime> lastFileEvent = new();
         private          ReceivedData                           last          = new();
@@ -38,18 +37,22 @@ namespace DBF
             public BridgeMate(Configuration _configuration)
             {
                 configuration = _configuration;
-            //
-            if (Directory.Exists(configuration.BridgeMatePath))
-            {
-                watcher = new FileSystemWatcher(configuration.BridgeMatePath);
-                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.CreationTime | NotifyFilters.LastWrite;
-                //watcher.Filter = "*.bws";
-                watcher.Filter = "*.*";
-                watcher.IncludeSubdirectories = true;
-                watcher.Created += folderUpdated;
-                watcher.Changed += folderUpdated;
-                        watcher.EnableRaisingEvents = true;
-            }
+
+                //
+                if (configuration.ReadBridgeMate
+                &&  Directory.Exists(configuration.BridgeMatePath))
+                {
+                    watcher                       = new FileSystemWatcher(configuration.BridgeMatePath);
+                    watcher.NotifyFilter          = NotifyFilters.FileName | NotifyFilters.CreationTime | NotifyFilters.LastWrite;
+                    watcher.Filter                = "*.bws";
+                    watcher.IncludeSubdirectories = true;
+                    watcher.Created              += folderUpdated;
+                    watcher.Changed              += folderUpdated;
+                    watcher.EnableRaisingEvents   = true;
+                }
+                else
+                    watcher = null;
+
                 //
                 timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(7) };
                 timer.Tick+= Timer_Tick;
@@ -58,7 +61,8 @@ namespace DBF
 
         public void CheckOrOpen(DateTime date, int clubNo)
         {
-            if (clubNo <  0)
+            if (clubNo <  0
+            ||  configuration.ReadBridgeMate == false)
                 return;
 
             if (date   == Session?.Date
@@ -100,12 +104,12 @@ namespace DBF
                                         Rounds = new(db.RoundData);
                                     }
 
-                                    watcher.EnableRaisingEvents = false;                               }
+                                    watcher.EnableRaisingEvents = false;
+                                }
 
                                 return;
                             }
                     }
-
                     catch (Exception)
                     {
                         continue;
@@ -119,10 +123,11 @@ namespace DBF
             watcher.EnableRaisingEvents = true;
         }
 
-    
         public void Close()
         {
-            watcher.EnableRaisingEvents = false;
+            if (watcher is not null)
+                watcher.EnableRaisingEvents = false;
+
             timer.Stop();
             bmFile   = null;
             bmClubNo = -1;
@@ -151,6 +156,7 @@ namespace DBF
                 else
                     Debug.WriteLine($"Unhandled update: {e.Name} - {e.ChangeType}");
             }
+
             catch (Exception)
             {
                 MessageBox.Show($"Fejl ved læsning af BridgeMate mappen", "Fejl");
@@ -187,15 +193,15 @@ namespace DBF
                 OnPropertyChanged(nameof(Received));
 
             var rnds = Rounds
-                        .GroupBy(o => (o.Section, o.Round))
-                        .OrderBy(o => o.Key)
-                        .Select(g => new
-                        {
-                            Section = g.Key.Section,
-                            Round = g.Key.Round,
-                            Done = g.Count(g => g.Done) == Tables.Count(t => t.Section == g.Key.Section)
-                        })
-                        .ToList();
+                      .GroupBy(o => (o.Section, o.Round))
+                      .OrderBy(o => o.Key)
+                      .Select(g => new
+                      {
+                          Section = g.Key.Section,
+                          Round = g.Key.Round,
+                          Done = g.Count(g => g.Done) == Tables.Count(t => t.Section == g.Key.Section)
+                      })
+                      .ToList();
         }
 
         protected void OnPropertyChanged(string propertyName)

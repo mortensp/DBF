@@ -4,14 +4,14 @@ namespace DBF.Views
 {
     public enum ConfirmCloseChoice
     {
-        ContinueClose, // user chose to continue/close (Ja)
-        CancelClose,   // user chose not to close (Nej)
-        SaveTime       // user chose "Gem Tiden"
+          Close     // user chose to continue/close (Ja)
+        , Cancel    // user chose not to close (Nej)
+        , SaveState // user chose "Gem Tiden"
     }
 
     public partial class ConfirmCloseDialog : Window
     {
-        public ConfirmCloseChoice Choice { get; private set; } = ConfirmCloseChoice.CancelClose;
+        public ConfirmCloseChoice Choice { get; private set; } = ConfirmCloseChoice.Cancel;
 
         public ConfirmCloseDialog(string message)
         {
@@ -21,21 +21,21 @@ namespace DBF.Views
 
         private void BtnYes_Click(object sender, RoutedEventArgs e)
         {
-            Choice = ConfirmCloseChoice.ContinueClose;
+            Choice       = ConfirmCloseChoice.Close;
             DialogResult = true;
             Close();
         }
 
-        private void BtnNo_Click(object sender, RoutedEventArgs e)
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-            Choice = ConfirmCloseChoice.CancelClose;
+            Choice       = ConfirmCloseChoice.Cancel;
             DialogResult = false;
             Close();
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            Choice = ConfirmCloseChoice.SaveTime;
+            Choice       = ConfirmCloseChoice.SaveState;
             DialogResult = true;
             Close();
         }

@@ -43,7 +43,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     }
         public void OpenSettingFiles()
     {
-        Configuration.OpenSettings();
+        Configuration.OpenJSONFiles();
     }
 
 

@@ -11,12 +11,16 @@ namespace DBF.ViewModels
             public ConfigurationViewModel(Configuration configuration)
             {
                 this.configuration = configuration;
+                NewConfiguration   = new();
                 NewConfiguration.Update(configuration);
+
+                //if (NewConfiguration.StartTime is null)
+                //NewConfiguration.StartTime = new TimeOnly(19, 0, 0);
             }
         #endregion
 
         #region public Properties  
-            public Configuration NewConfiguration { get; set; } = new();
+            public Configuration NewConfiguration { get; set; }
         #endregion
 
         #region Public Methods
@@ -27,9 +31,16 @@ namespace DBF.ViewModels
 
             public async void AcceptSetting()
             {
+                var old =configuration.ReadBC3 ;
+
                 await TryCloseAsync();
+
                 configuration.Update(NewConfiguration);
                 configuration.Save();
+
+                if (old != NewConfiguration.ReadBC3)
+                    IoC.Get<ControlViewModel>()
+                       .SetWatcher(NewConfiguration.ReadBC3);
             }
         #endregion
     }

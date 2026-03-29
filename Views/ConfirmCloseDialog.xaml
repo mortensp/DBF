@@ -1,8 +1,8 @@
 <Window
     x:Class="DBF.Views.ConfirmCloseDialog"
-    Title="Bekræft"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Bekræft"
     MinWidth="380"
     ResizeMode="NoResize"
     SizeToContent="WidthAndHeight"
@@ -14,30 +14,32 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="MessageText"
+        <TextBlock
+            x:Name="MessageText"
             Margin="0,0,0,12"
             FontSize="14"
             TextWrapping="Wrap" />
 
-        <StackPanel Grid.Row="1"
+        <StackPanel
+            Grid.Row="1"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
-            <Button x:Name="BtnSave"
+            <Button
+                Margin="0,0,8,0"
+                Padding="10,4"
+                Click="BtnCancel_Click"
+                Content="Annuller" />
+
+            <Button
                 Margin="0,0,8,0"
                 Padding="10,4"
                 Click="BtnSave_Click"
                 Content="Luk, men gem status" />
 
-            <Button x:Name="BtnYes"
-                Margin="0,0,8,0"
+            <Button
                 Padding="10,4"
                 Click="BtnYes_Click"
                 Content="Luk og nulstil" />
-
-            <Button x:Name="BtnNo"
-                Padding="10,4"
-                Click="BtnNo_Click"
-                Content="Annuller" />
         </StackPanel>
     </Grid>
 </Window>   
