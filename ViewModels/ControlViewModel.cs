@@ -29,24 +29,18 @@ namespace DBF.ViewModels
         private readonly IWindowManager windowManager;
         private          Club           selectedClub;
         private          UserControl    startListControl = new StartListControl();
-        private          UserControl    timersPanel      = new TimersPanel()
-                                                           {
-                                                               ButtonsVisibility = Visibility.Collapsed
-                                                           };
+        private          TimersPanel    timersPanel      = new (Visibility.Collapsed);
 
         private UserControl           resultsControl = new ResultsControl();
         private UserControl           currentView;
         private MainClub              selectedMainClub;
         private PlayingTime           playingTime;
         private List<Tournament>      tournaments;
-        private JsonSerializerOptions JsonOptions    = new JsonSerializerOptions
-                                                       {
-                                                           Converters = {new DecimalCommaConverter()}
-                                                       };
+        private JsonSerializerOptions JsonOptions    = new() { Converters = {new DecimalCommaConverter()}};
 
         private Encoding                          iso_8859_1     = System.Text.Encoding.GetEncoding("iso-8859-1");
         private ObservableCollection<PlayingTime> spilleDage     = [];
-        private SeriliazedFileSystemWatcher       watcher;
+        private SerializedFileSystemWatcher       watcher;
         private int                               sectionNo;
         private bool                              showAsOneGroup = true;
 
@@ -58,7 +52,7 @@ namespace DBF.ViewModels
                 this.windowManager                  = windowManager;
                 Thread.CurrentThread.CurrentCulture = Global.DkCulture;
 
-                watcher              = new SeriliazedFileSystemWatcher();
+                watcher              = new SerializedFileSystemWatcher();
                 watcher.UpdatedAsync+= handleFileEventAsync;
 
                 Pairs.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Pairs);
@@ -220,8 +214,9 @@ namespace DBF.ViewModels
                 }
             }
 
-            public bool       BC3Available             => SelectedPlayingTime != null;
-            public Visibility ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
+            public bool                  BC3Available             => SelectedPlayingTime != null;
+            public Visibility            ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
+            public JsonSerializerOptions JsonOptions1             { get => JsonOptions; set => JsonOptions = value; }
         #endregion
 
         #region Public Methods
@@ -842,7 +837,7 @@ namespace DBF.ViewModels
                         {
                             //string json = File.ReadAllText(fullPath, iso_8859_1);
                             string json = readAllTextWithRetry(fullPath, iso_8859_1);
-                            return JsonSerializer.Deserialize<T>(json, JsonOptions);
+                            return JsonSerializer.Deserialize<T>(json, JsonOptions1);
                         }
                         else // XML
                         {
@@ -1001,27 +996,6 @@ namespace DBF.ViewModels
                 }
             }
 
-            //private FileSystemWatcher _watcher;
-
-            //private void clearWatcher()
-            //{
-            //    if (_watcher == null)
-            //        return;
-
-            //    // Stop overvågning
-            //    _watcher.EnableRaisingEvents = false;
-
-            //    // Fjern event handlers
-            //    //_watcher.Changed -= OnChanged;
-            //    //_watcher.Created -= OnCreated;
-            //    //_watcher.Deleted -= OnDeleted;
-            //    //_watcher.Renamed -= OnRenamed;
-            //    //_watcher.Error   -= OnError;
-
-            //    // Frigiv ressourcer
-            //    _watcher.Dispose();
-            //    _watcher = null;
-            //}
             internal void SetWatcher(bool enable)
             {
                 if (enable)

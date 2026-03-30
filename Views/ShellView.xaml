@@ -25,8 +25,8 @@
                 <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="_Bridgeure" />
                 <MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="_Genstart og bevar urenes status" />
                 <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="_Skift program version" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="_Open Settings" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="Om" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="_Åbn JSON indstillinger" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="_Om" />
             </MenuItem>
         </Menu>
 

@@ -39,6 +39,7 @@
 		<Compile Remove="AudioFiles\AudioServices\LibVlcAudioService.cs" />
 		<Compile Remove="BridgeMateModel\AccessContext.cs" />
 		<Compile Remove="Helpers\CrashDetector.cs" />
+		<Compile Remove="Helpers\SerializedFileSystemWatcher2.cs" />
 		<Compile Remove="ViewModels\ProjectorViewModel.cs" />
 	</ItemGroup>
 

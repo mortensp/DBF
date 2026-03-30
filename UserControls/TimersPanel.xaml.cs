@@ -28,10 +28,24 @@ namespace DBF.UserControls
 
             if (Design.IsInDesignMode())
             {
-                Visibility = Visibility.Visible;
-                Configuration = new Configuration() { StartDate=DateTime.Now };
+                Visibility    = Visibility.Visible;
+                Configuration = new Configuration() { StartDate = DateTime.Now };
                 Configuration.Load();
             }
+        }
+
+        public TimersPanel(Visibility buttonsVisibility)
+        {
+            InitializeComponent();
+
+            if (Design.IsInDesignMode())
+            {
+                Visibility    = Visibility.Visible;
+                Configuration = new Configuration() { StartDate = DateTime.Now };
+                Configuration.Load();
+            }
+
+            ButtonsVisibility = buttonsVisibility;
         }
 
         #region Dependency Properties
