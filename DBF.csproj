@@ -13,7 +13,7 @@
 		<Product>DBF Tools</Product>
 		<Copyright>Copyright © 2025</Copyright>	
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<TargetFramework>net9.0-windows7.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWindowsForms>false</UseWindowsForms>
@@ -38,6 +38,7 @@
 		<Compile Remove="AudioFiles\AudioPlayer.cs" />
 		<Compile Remove="AudioFiles\AudioServices\LibVlcAudioService.cs" />
 		<Compile Remove="BridgeMateModel\AccessContext.cs" />
+		<Compile Remove="BridgeMateModel\EfReloadExtensions.cs" />
 		<Compile Remove="Helpers\CrashDetector.cs" />
 		<Compile Remove="Helpers\SerializedFileSystemWatcher2.cs" />
 		<Compile Remove="ViewModels\ProjectorViewModel.cs" />
@@ -63,13 +64,8 @@
 
 
 	<ItemGroup>
-		<!--<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Core\Caliburn.Micro.Core.csproj" />
-			<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform.Core\Caliburn.Micro.Platform.Core.csproj" />
-			<ProjectReference Include="..\..\Common Libs\Caliburn.Micro4\src\Caliburn.Micro.Platform\Caliburn.Micro.Platform.csproj" />-->
-
 		<PackageReference Include="Caliburn.Micro" Version="4.0.230" />
 		<PackageReference Include="Caliburn.Micro.Core" Version="4.0.230" />
-	
 	</ItemGroup>
 
 	<ItemGroup>	
@@ -94,29 +90,30 @@
 
 		<PackageReference Include="CData.Access" Version="24.0.9175" />
 		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />
+		<PackageReference Include="Dapper" Version="2.1.72" />
 	</ItemGroup>
 
 
 	<ItemGroup>
 		<!--<PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.4" />-->
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.5" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="NetCoreAudio" Version="2.0.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
 		<PackageReference Include="System.Management" Version="9.0.9" /> <!--Must match the version in Github Updater-->
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.5" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
@@ -185,6 +182,8 @@
 		<None Include="FodyWeavers.xsd" />
 
 		<ProjectReference Include="..\..\Common Libs\AppArguments\AppArguments.csproj" />
+
+	
 
 		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
 		

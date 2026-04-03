@@ -30,6 +30,7 @@ namespace DBF.DataModel
         private static readonly TimeSpan              _fiveHours        = new TimeSpan(5, 0, 0);
         private static readonly TimeSpan              _zeroTime         = new TimeSpan(0, 0, 0);
         private                 DateTime              startDate         = new(2026,1,1,18,30,0);
+
         #region Constructors
             static Configuration()
             {
@@ -42,9 +43,16 @@ namespace DBF.DataModel
                     Directory.CreateDirectory(configDir);
             }
 
+            private static void presets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                if (e.Action is NotifyCollectionChangedAction.Replace or NotifyCollectionChangedAction.Reset)
+                    Debugger.Break();
+            }
+
             public Configuration()
             {
                 BridgeTimers.CollectionChanged+= BridgeTimers_CollectionChanged;
+                Presets.CollectionChanged     += presets_CollectionChanged;
             }
         #endregion
 
@@ -75,30 +83,30 @@ namespace DBF.DataModel
                 public string HomepagePath      => BC3Path + @"Hjemmeside\";
                 public string BridgeMatePath    => BC3Path + @"BridgeMate\";
                 public TimeOnly? StartTime
-        {
-            get => field ?? TimeOnly.FromDateTime(startDate);
-
-            set
-            {
-                if (Set(ref field, value))
                 {
-                    StartDate = new(startDate.Year
-                                   , startDate.Month
-                                   , startDate.Day
-                                   , value?.Hour ?? 18
-                                   , value?.Minute ?? 30
-                                   , 0);
-                    Save();
-                }
-            }
-        }
+                    get => field ?? TimeOnly.FromDateTime(startDate);
 
-        public BindableCollection<Preset>        Presets      { get; set; } =
-                    new() {     new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                              , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                              , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                              , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                          };
+                    set
+                    {
+                        if (Set(ref field, value))
+                        {
+                            StartDate = new( startDate.Year
+                                           , startDate.Month
+                                           , startDate.Day
+                                           , value?.Hour ?? 18
+                                           , value?.Minute ?? 30
+                                           , 0);
+                            //Save();
+                        }
+                    }
+                }
+
+                public BindableCollection<Preset>        Presets      { get; set; } =
+                            new() {     new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                      , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                                      , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                                      , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                                  };
 
                 public ObservableCollection<BridgeTimer> BridgeTimers { get; set; } = new();
             #endregion
@@ -197,7 +205,7 @@ namespace DBF.DataModel
                     var jsonData = File.ReadAllText(path);
 
                     //TODO: kan fjernes senere
-                    if (jsonData.IndexOf("\"BackgroundColor\":") == -1)
+                    if (jsonData.IndexOf("\"Color\":") >  -1)
                         jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
 
                     loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, SerializerOptions);
@@ -217,7 +225,8 @@ namespace DBF.DataModel
                 {
                     BridgeTimer timer;
 
-                    if (loadedConfig?.BridgeTimers is null || loadedConfig.BridgeTimers.Count == 0)
+                    if (loadedConfig?.BridgeTimers      is null
+                    ||  loadedConfig.BridgeTimers.Count == 0)
                     {
                         timer = new BridgeTimer();
                         timer.Update(Presets[i]);
@@ -237,6 +246,10 @@ namespace DBF.DataModel
                             timer.Update(Presets[i]);
                             timer.Visibility = System.Windows.Visibility.Collapsed;
                         }
+
+                    if (timer.BreakAfterRound == 0
+                    ||  timer.BreakMinutes    == 0)
+                        timer.BreakAfterRound = timer.BreakMinutes = 0;
 
                     if (string.IsNullOrEmpty(timer.Sound))
                         timer.Sound = AudioResources.Sounds[i];
@@ -303,69 +316,72 @@ namespace DBF.DataModel
                 setEndTime();
             }
 
-            public void DeleteState()
-            {
-                if (File.Exists(statePath))
-                    File.Delete(statePath);
-            }
+            #region State Serializing 
+                public void DeleteState()
+                {
+                    if (File.Exists(statePath))
+                        File.Delete(statePath);
+                }
 
-            public void SaveState()
-            {
-                var controlViewModel = IoC.Get<ControlViewModel>();
-                var state            = new State()
-                                       {
-                                           MainClubName   = controlViewModel.SelectedMainClub?.Name
-                                         , SubClubName    = controlViewModel.SelectedClub?.Name
-                                         , PlayingTimeStr = controlViewModel.SelectedPlayingTime?.DateStr
-                                         , TimerStates    = BridgeTimers.Where(t=>t.IsStarted).Select(t => t.CurrentState).ToList()
-                                       };
+                public void SaveState()
+                {
+                    var controlViewModel = IoC.Get<ControlViewModel>();
+                    var state            = new State()
+                                           {
+                                               MainClubName   = controlViewModel.SelectedMainClub?.Name
+                                             , SubClubName    = controlViewModel.SelectedClub?.Name
+                                             , PlayingTimeStr = controlViewModel.SelectedPlayingTime?.DateStr
+                                             , TimerStates    = BridgeTimers.Where(t=>t.IsStarted).Select(t => t.CurrentState).ToList()
+                                           };
 
-                //var states = BridgeTimers.Select(t => t.CurrentState)
-                //                             .ToList();
-                string json = JsonSerializer.Serialize(state, SerializerOptions);
-                File.WriteAllText(statePath, json);
-            }
+                    //var states = BridgeTimers.Select(t => t.CurrentState)
+                    //                             .ToList();
+                    string json = JsonSerializer.Serialize(state, SerializerOptions);
+                    File.WriteAllText(statePath, json);
+                }
+
+                public void RestoreState()
+                {
+                    if (Arguments.Values.Lookup("mode") == "restart")
+                    {
+                        if (File.Exists(statePath))
+                            try
+                            {
+                                var jsonData = File.ReadAllText(statePath);
+                                var state    = JsonSerializer.Deserialize<State>(jsonData, SerializerOptions);
+
+                                var controlViewModel = IoC.Get<ControlViewModel>();
+
+                                if (state.MainClubName != null)
+                                    controlViewModel.SelectedMainClub = controlViewModel.MainClubs.FirstOrDefault(mc => mc.Name == state.MainClubName);
+
+                                if (state.SubClubName != null)
+                                    controlViewModel.SelectedClub = controlViewModel.Clubs.FirstOrDefault(mc => mc.Name == state.SubClubName);
+
+                                if (string.IsNullOrWhiteSpace(state.PlayingTimeStr) == false)
+                                    controlViewModel.SelectedPlayingTime = controlViewModel.PlayingTimes.FirstOrDefault(mc => mc.DateStr == state.PlayingTimeStr);
+
+                                for (int i = 0; i <  state.TimerStates.Count && i <  state.TimerStates.Count; i++)
+                                    if (state.TimerStates[i].IsStarted)
+                                        BridgeTimers[i].Restore(state.TimerStates[i]);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Fejl ved genskabelse af state: " + ex.Message);
+                                Debugger.Break();
+                            }
+
+                            finally { /* Ignore */ }
+                    }
+                }
+            #endregion
 
             public void OpenJSONFiles()
             {
-                if (File.Exists(path))
-                    Process.Start("notepad.exe", path);
+                tryOpenFile(path);
 
                 SaveState();
-
-                //if (!File.Exists(statePath))
-                Process.Start("notepad.exe", statePath);
-            }
-
-            public void RestoreState()
-            {
-                if (Arguments.Values.Lookup("mode") == "restart")
-                {
-                    if (File.Exists(statePath))
-                        try
-                        {
-                            var jsonData = File.ReadAllText(statePath);
-                            var state    = JsonSerializer.Deserialize<State>(jsonData, SerializerOptions);
-
-                            var controlViewModel = IoC.Get<ControlViewModel>();
-
-                            if (state.MainClubName != null)
-                                controlViewModel.SelectedMainClub = controlViewModel.MainClubs.FirstOrDefault(mc => mc.Name == state.MainClubName);
-
-                            if (state.SubClubName != null)
-                                controlViewModel.SelectedClub = controlViewModel.Clubs.FirstOrDefault(mc => mc.Name == state.SubClubName);
-
-                            if (string.IsNullOrWhiteSpace(state.PlayingTimeStr) == false)
-                                controlViewModel.SelectedPlayingTime = controlViewModel.PlayingTimes.FirstOrDefault(mc => mc.DateStr == state.PlayingTimeStr);
-
-                            for (int i = 0; i <  state.TimerStates.Count && i <  state.TimerStates.Count; i++)
-                                if (state.TimerStates[i].IsStarted)
-                                    BridgeTimers[i].Restore(state.TimerStates[i]);
-                        }
-
-                        //catch (Exception) { /* Ignore */ }
-                        finally { /* Ignore */ }
-                }
+                tryOpenFile(statePath);
             }
 
             public void Update(Configuration newConfiguration)
@@ -419,12 +435,7 @@ namespace DBF.DataModel
                     timer.Reset(false);
                     timer.Visibility = Visibility.Collapsed;
 
-                    // Move the collapsed timer to the end of the list
-                    //var idx = BridgeTimers.IndexOf(timer);
-                    //BridgeTimers.Add(timer);
-                    //BridgeTimers.RemoveAt(idx);
                     arrangeTimers();
-
                     Save();
                     SetUpDownVisibility();
                 }
@@ -460,6 +471,20 @@ namespace DBF.DataModel
         #endregion
 
         #region Private Methods
+            private void tryOpenFile(string path)
+            {
+                if (File.Exists(path))
+                    try
+                    {
+                        Process.Start("notepad++.exe", path);
+                    }
+
+                    catch
+                    {
+                        Process.Start("notepad.exe", path);
+                    }
+            }
+
             private bool hasUserValues
             {
                 get

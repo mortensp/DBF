@@ -45,25 +45,25 @@ namespace DBF.ViewModels
         private bool                              showAsOneGroup = true;
 
         #region Constructors
-            public ControlViewModel(IWindowManager windowManager, Configuration configuration)//, BridgeMate bridgeMate)
+            public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
             {
-                //BridgeMate                          = bridgeMate;
+                BridgeMate                          = bridgeMate;
                 Configuration                       = configuration;
                 this.windowManager                  = windowManager;
                 Thread.CurrentThread.CurrentCulture = Global.DkCulture;
 
-                watcher              = new SerializedFileSystemWatcher();
+                watcher              = new();
                 watcher.UpdatedAsync+= handleFileEventAsync;
 
                 Pairs.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Pairs);
                 Teams.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Teams);
 
                 loadMainClubs();
-                //#if DEBUG
-                //                // For at gøre test nemmere
-                //                SelectedMainClub    = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
-                //                SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
-                //#endif
+#if TEST
+                // For at gøre test nemmere
+                SelectedMainClub    = MainClubs.FirstOrDefault(m => m.Name.Contains("Young Sharks"));
+                SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
+#endif
             }
         #endregion
 
@@ -105,7 +105,7 @@ namespace DBF.ViewModels
                             }
                             else
                             {
-                                watcher.Path = value.Path;
+                                watcher.Path = selectedMainClub.Path;
                                 watcher.Filters.Add("Main.XML");
 
                                 if (Configuration.ReadBC3)
@@ -120,7 +120,6 @@ namespace DBF.ViewModels
                             }
                         }
                     }
-
                     catch (Exception ex)
                     {
                         throw ex;
@@ -290,7 +289,6 @@ namespace DBF.ViewModels
                         return await Task.FromResult(true);
                     }
                 }
-
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
@@ -310,18 +308,7 @@ namespace DBF.ViewModels
                 || !Directory.Exists(Configuration.HomepagePath))
                 {
                     showMessageAFewSeconds($"Mappen: '{Configuration.HomepagePath}' findes ikke");
-
-                    // Look for folder creation and updates
-                    watcher.EnableRaisingEvents   = false;
-                    watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.DirectoryName;
-                    watcher.IncludeSubdirectories = true;
-                    watcher.Filters.Clear();
-                    watcher.Path = @"c:\";
-                    watcher.Filters.Add("Resultater_*");
-
-                    if (Configuration.ReadBC3)
-                        watcher.EnableRaisingEvents = true;
-
+                    watchForNewHomepageFolder();
                     return;
                 }
 
@@ -346,6 +333,31 @@ namespace DBF.ViewModels
 
                 MainClubs        = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
                 SelectedMainClub = MainClubs.FirstOrDefault(c => c.No != 9999) ?? MainClubs.First();
+            }
+
+            private void watchForNewHomepageFolder(string fullPath = null)
+            {
+                watcher.EnableRaisingEvents   = false;
+                watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.DirectoryName;
+                watcher.IncludeSubdirectories = true;
+                watcher.Filters.Clear();
+
+                if (Directory.Exists(Configuration.HomepagePath))
+                    loadMainClubs();
+                else
+                    if (Directory.Exists(Configuration.BC3Path))
+                    {
+                        watcher.Path = Configuration.BC3Path;
+                        watcher.Filters.Add("Resultater");
+                    }
+                    else
+                    {
+                        watcher.Path = @"c:\";
+                        watcher.Filters.Add("BC3");
+                    }
+
+                if (Configuration.ReadBC3)
+                    watcher.EnableRaisingEvents = true;
             }
 
             private void showMessageAFewSeconds(string msg)
@@ -383,6 +395,7 @@ namespace DBF.ViewModels
 
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
+
                 catch (Exception)
                 {
                     PlayingTimes.Clear();
@@ -555,7 +568,6 @@ namespace DBF.ViewModels
                         }
                     }
                 }
-
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -575,11 +587,8 @@ namespace DBF.ViewModels
 
 #if DEBUG
                 // BridgeMate lookup
-                //if (newSession)
-                //    //if (string.IsNullOrEmpty(ErrorMessage))
-                //    //    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
-                //    //else
-                //    BridgeMate.Close();
+                if (newSession)
+                    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
 #endif
                 // Restore Taskbar Icon.
                 //Execute.OnUIThread(() =>
@@ -615,6 +624,7 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
+
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -701,7 +711,6 @@ namespace DBF.ViewModels
                                 }
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -860,7 +869,6 @@ namespace DBF.ViewModels
                             return (T)serializer.Deserialize(reader);
                         }
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -881,11 +889,13 @@ namespace DBF.ViewModels
                             using var sr = new StreamReader(fs,   encoding);
                             return sr.ReadToEnd();
                         }
+
                         catch (IOException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
                             delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
                         }
+
                         catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
@@ -934,6 +944,7 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
+
 #endif
                 }
                 else
@@ -978,17 +989,16 @@ namespace DBF.ViewModels
                         else
                             fetchPlayingTime(false);
                     else
-                        if (ev.ChangeType == WatcherChangeTypes.Created)
+                        if (ev.ChangeType is  WatcherChangeTypes.Created
+                                          or  WatcherChangeTypes.Renamed)
                             if (ev.FullPath.StartsWith(Configuration.HomepagePath))
-                            {
-                                await Task.Delay(7000); // give filen tid til at blive skrevet færdig
                                 loadMainClubs();
-                            }
                             else
-                                Debug.WriteLine($"File Created: {ev.Name}");
+                                watchForNewHomepageFolder(ev.FullPath);
                         else
                             Debug.WriteLine($"File {ev.ChangeType}: {ev.Name}");
                 }
+
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
@@ -996,12 +1006,22 @@ namespace DBF.ViewModels
                 }
             }
 
-            internal void SetWatcher(bool enable)
+            internal void SetBC3Watcher(bool enable)
             {
                 if (enable)
                     loadMainClubs();
                 else
                     SelectedMainClub = null;
+
+                watcher.EnableRaisingEvents = enable;
+            }
+
+            internal void SetBridgeMateWatcher(bool enable)
+            {
+                if (enable)
+                    BridgeMate.CheckOrOpen(SelectedPlayingTime?.Date, SelectedMainClub?.No);
+                else
+                    BridgeMate.Close();
 
                 watcher.EnableRaisingEvents = enable;
             }

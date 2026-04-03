@@ -123,7 +123,7 @@
                         VerticalAlignment="Center"
                         IsChecked="{Binding ReadBridgeMate, Mode=TwoWay}" />
 
-                    <TextBlock
+                    <!--<TextBlock
                         Grid.Row="4"
                         Grid.Column="0"
                         Margin="8,3,4,0"
@@ -138,7 +138,7 @@
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        Text="{Binding BC3Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding BC3Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />-->
 
                     <!--  Projector  -->
                     <TextBlock

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
@@ -19,19 +20,27 @@ namespace DBF.DataModel
         //
         private                 DispatcherTimer _timer;
         private static readonly TimeSpan        _oneHour    = new TimeSpan(1, 0,  0);
+        private static readonly TimeSpan        _oneMinute  = new TimeSpan(0, 1,  0);
         private static readonly TimeSpan        _twoMinutes = new TimeSpan(0, 2,  0);
         private static readonly TimeSpan        _threshold  = new TimeSpan(0, 0,  0);
         //
-        private          TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
-        private          TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
-        private          TimeSpan _breakTime      = new TimeSpan(                   0, 12, 0);
-        private          TimeSpan _warningTime    = new TimeSpan(                   0, 5,  0);
-        private          TimeSpan _remainingTime  = TimeSpan.MinValue;
-        private          bool     _isStarted;
-        private          bool     _isAtBreak;
-        private          bool     _isAtTransition;
-        private          bool     _isPaused;
-        private readonly object   _sync           = new object();
+        private TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
+        private TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
+        private TimeSpan _breakTime      = new TimeSpan(                   0, 12, 0);
+        private TimeSpan _warningTime    = new TimeSpan(                   0, 5,  0);
+        //private int      _round;
+        private bool _isAtBreak;
+        private bool _isAtTransition;
+        //
+        private readonly object _sync = new object();
+        private TimeSpan _remainingTime
+        {
+            get => field;
+            set
+            {
+                Set(ref field, value);
+            }
+        } = TimeSpan.MinValue;
 
         public BridgeTimer()
         {
@@ -40,6 +49,13 @@ namespace DBF.DataModel
         }
 
         #region Public Properties
+            [JsonIgnore]
+            public bool          IsStarted        => Round >  0;
+            [JsonIgnore]
+            public bool          IsActive         => Round >  0 && Round <= Rounds;
+            [JsonIgnore]
+            public bool          IsEnded          => Round >  Rounds;
+            //
             [JsonIgnore] public Configuration Configuration    { get => field ??= IoC.Get<Configuration>(); set => field = value; }
             [JsonIgnore] public string        Time             { get; set; }
             [JsonIgnore] public bool          CanClose         { get; set; }
@@ -48,7 +64,13 @@ namespace DBF.DataModel
             [JsonIgnore] public Visibility    ShowUpButton     { get; set; }
             [JsonIgnore] public Visibility    ShowDownButton   { get; set; }
             [JsonIgnore] public double        MinutesLeft      { get; set; }
-            [JsonIgnore] public int           Round            { get; set; } = 1;
+            [JsonIgnore]
+            public int Round
+            {
+                get => field;
+                set => Set(ref field, Math.Max(0, value));
+            }
+
             [JsonIgnore]
             public TimeOnly? EndTime
             {
@@ -63,8 +85,8 @@ namespace DBF.DataModel
             {
                 get
                 {
-                    if (Round >  BreakAfterRound
-                    || !_isStarted)
+                    if (Round <  1
+                    ||  Round >  BreakAfterRound)
                         return null;
 
                     var time = DateTime.Now.AddTimeSpan(_remainingTime);
@@ -87,9 +109,7 @@ namespace DBF.DataModel
             {
                 get
                 {
-                    //_isStarted = true; // test
-                    if (Round >  Rounds
-                    || !_isStarted)
+                    if (IsEnded)
                         return null;
 
                     var time = PauseEndTime
@@ -115,33 +135,13 @@ namespace DBF.DataModel
             [JsonIgnore]
             public BridgeTimerState CurrentState => new BridgeTimerState()
                                                     {
-                                                        IsStarted = _isStarted
+                                                        IsStarted = IsStarted
                                                       , IsAtBreak = _isAtBreak
+                                                      , IsPaused = _timer.IsEnabled
                                                       , IsAtTransition = _isAtTransition
                                                       , RemainingTime = _remainingTime
-                                                      , Round = this.Round
+                                                      , Round = Round
                                                     };
-
-            [JsonIgnore]
-            public bool IsPaused
-            {
-                get => _isPaused;
-                set => Set(ref _isPaused, value);
-            }
-
-            [JsonIgnore]
-            public bool IsStarted
-            {
-                get => _isStarted;
-                set
-                {
-                    if (_isStarted != value)
-                        _isStarted =  value;
-                }
-            }
-
-            [JsonIgnore] public bool IsActive => IsStarted && Round <= Rounds && Round >  0;
-            [JsonIgnore] public bool IsEnded => Round >  Rounds;
         #endregion
 
         #region Public Methods
@@ -153,14 +153,7 @@ namespace DBF.DataModel
                 await windowManager.ShowDialogAsync(screen);
 
                 // If the dialog was enden with save, then our Settings was updated
-                _startTime      = new TimeSpan(Hours, Minutes, Seconds);
-                _breakTime      = new TimeSpan(0, BreakMinutes, 0);
-                _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
-                _warningTime    = new TimeSpan(0, WarningMinutes, 0);
-
-                if (!IsStarted)
-                    _remainingTime = _startTime;
-
+                initTimeSettings();
                 updateDisplay();
             }
 
@@ -191,11 +184,22 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    _isStarted = true;
-                    _isPaused  = false;
+                    if (Round <  1)
+                        Round =  1;
 
-                    //if (!_timer.IsEnabled)
-                    _timer.Start();
+                    if (!IsEnded)
+                    {
+                        if (!_timer.IsEnabled
+                        && !_isAtBreak
+                        && !_isAtTransition
+                        &&  _remainingTime == _startTime
+                        && !_isAtBreak
+                        && !_isAtTransition)
+                            //_player.Play("Ding Ding", Volume);  // Start next round
+                            _player.Play(Sound, Volume);    // End of round
+
+                        _timer.Start();
+                    }
                 }
             }
 
@@ -203,45 +207,42 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    _isPaused = true;
+                    var enaled =_timer.IsEnabled;
                     _timer.Stop();
 
-                    if (Round == 1)
-                    {
-                        //_isStarted     = false;
-                        _remainingTime = _startTime;
-                    }
-                    else
-                        if (_isAtBreak)
-                            if (_remainingTime == _breakTime)
-                            {
-                                _isAtBreak     = false;
-                                _remainingTime = _startTime;
-                            }
-                            else
-                                _remainingTime = _breakTime;
+                    if (_isAtBreak)
+                        if (_remainingTime == _breakTime)
+                        {
+                            _isAtBreak     = false;
+                            _remainingTime = _startTime;
+                        }
                         else
-                            if (_isAtTransition)
-                            {
-                                _isAtTransition = false;
-                                _remainingTime  = _startTime;
-                            }
+                            _remainingTime = _breakTime;
+                    else
+                        if (_isAtTransition)
+                        {
+                            _isAtTransition = false;
+                            _remainingTime  = _startTime;
+                        }
+                        else
+                            if (Round <= Rounds
+                            &&  _startTime.Subtract(_remainingTime) >  _threshold)
+                                _remainingTime = _startTime;
                             else
-                                if (Round <= Rounds
-                                &&  _startTime.Subtract(_remainingTime) >  _threshold)
-                                    _remainingTime = _startTime;
-                                else
-                                {
-                                    Round--;
+                            {
+                                Round--;
 
-                                    if (Round == BreakAfterRound)
-                                    {
-                                        _remainingTime = _breakTime;
-                                        _isAtBreak     = true;
-                                    }
-                                    else
-                                        _remainingTime = _startTime;
+                                if (Round == BreakAfterRound)
+                                {
+                                    _remainingTime = _breakTime;
+                                    _isAtBreak     = true;
                                 }
+                                else
+                                    _remainingTime = _startTime;
+                            }
+
+                    if (Round == 1)
+                        Round =  0;
 
                     updateDisplay();
                 }
@@ -251,14 +252,13 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    if (_isStarted)
-                        if (_isPaused && !force)
-                            Start();
-                        else
-                        {
-                            _isPaused = true;
+                    if (IsStarted)
+                        if (force
+                        ||  _timer.IsEnabled
+                        ||  IsEnded)
                             _timer.Stop();
-                        }
+                        else
+                            Start();
                 }
             }
 
@@ -266,28 +266,26 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    _isPaused = true;
                     _timer.Stop();
 
-                    if (Round
-                    <= Rounds)
+                    if (Round <= Rounds)
                     {
                         if (_isAtBreak)
                         {
                             _isAtBreak = false;
-                            Round++;
+                            IncremetRound();
                             _remainingTime = _startTime;
                         }
                         else
                             if (_remainingTime >  TimeSpan.Zero)
-                                if (!_isAtBreak && Round == BreakAfterRound)
+                                if (!_isAtBreak && Round == BreakAfterRound && BreakAfterRound >  0)
                                 {
                                     _remainingTime = _breakTime;
                                     _isAtBreak     = true;
                                 }
                                 else
                                 {
-                                    Round++;
+                                    IncremetRound();
                                     _remainingTime  = _startTime;
                                     _isAtTransition = false;
                                 }
@@ -295,6 +293,11 @@ namespace DBF.DataModel
 
                     updateDisplay();
                 }
+            }
+
+            private void IncremetRound()
+            {
+                Round = Math.Max(2, Round + 1);
             }
 
             public void LessTime()
@@ -319,23 +322,18 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    if (!ask
+                    if (ask == false
+                    ||  IsStarted           == false
                     ||  MessageBoxResult.OK == MessageBox.Show( "Hvis du nulstiller uret, indlæses indstillingerne på ny. Vil du fortsætte?"
                                                               , "Bekræftelse"
                                                               , MessageBoxButton.OKCancel
                                                               , MessageBoxImage.Question))
                     {
                         stopTimer();
-
                         _isAtBreak      = false;
                         _isAtTransition = false;
-                        _isPaused       = true;
-                        _isStarted      = false;
-                        _remainingTime  = _startTime;
-                        _startTime      = new TimeSpan(Hours, Minutes, Seconds);
-                        _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
-                        _breakTime      = new TimeSpan(0, BreakMinutes, 0);
-                        Round           = 1;
+                        Round           = 0;
+                        initTimeSettings();
 
                         updateDisplay();
                     }
@@ -348,7 +346,6 @@ namespace DBF.DataModel
                 {
                     stopTimer();
 
-                    _isStarted = state.IsStarted;
                     _isAtBreak      = state.IsAtBreak;
                     _isAtTransition = state.IsAtTransition;
                     _remainingTime  = state.RemainingTime;
@@ -366,19 +363,22 @@ namespace DBF.DataModel
         #region Private Methods
             private void updateDisplay()
             {
-                if (!_isPaused)
+                if (_timer.IsEnabled)
                     if (!_isAtBreak
-                    &&  _startTime     >  _warningTime
-                    &&  _remainingTime == _warningTime)
-                        _player.Play(Sound, Volume);                            // Warning before end of Round
+                    &&  _warningTime == _remainingTime
+                    &&  _warningTime >  TimeSpan.Zero
+                    &&  _warningTime <  _startTime)
+                        _player.Play(Sound, Volume);                            // Warning before end of round
                     else
                         if (_isAtBreak
                         &&  _startTime     >  _twoMinutes
                         &&  _remainingTime == _twoMinutes)
                             _player.Play(Sound, Volume);                        // Warning two minutes before end of Break
                         else
-                            if (_remainingTime == TimeSpan.Zero)
-                                if (!_isAtBreak && Round == BreakAfterRound)
+                            if (_remainingTime <= TimeSpan.Zero)
+                                if (!_isAtBreak
+                                &&  Round           == BreakAfterRound
+                                &&  BreakAfterRound >  0)
                                 {
                                     _player.Play("Ding Ding", Volume);          // Break
                                     _remainingTime  = _breakTime;
@@ -390,34 +390,34 @@ namespace DBF.DataModel
                                     {
                                         _player.Play(Sound, Volume);            // End of game                                        
                                         _timer.Stop();
-                                        Round     = Rounds + 1;
-                                        _isPaused = true;
+                                        Round = Rounds + 1;
                                     }
                                     else
-                                        if (_isAtTransition || _isAtBreak)
+                                        if (_isAtTransition
+                                        ||  _isAtBreak)
                                         {
                                             _player.Play("Ding Ding", Volume);  // Start next round
                                             _remainingTime  = _startTime;
                                             _isAtTransition = false;
                                             _isAtBreak      = false;
-                                            Round++;
+                                            IncremetRound();
                                         }
                                         else
-                                            if (_transitionTime == TimeSpan.Zero)
-                                            {
-                                                _player.Play(Sound, Volume);    // End of round
-                                                _remainingTime = _startTime;
-                                                Round++;
-                                            }
-                                            else
+                                            if (_transitionTime >  TimeSpan.Zero)
                                             {
                                                 _player.Play(Sound, Volume);    // Transition
                                                 _isAtTransition = true;
                                                 _remainingTime  = _transitionTime;
                                             }
+                                            else
+                                            {
+                                                _player.Play(Sound, Volume);    // End of round
+                                                _remainingTime = _startTime;
+                                                IncremetRound();
+                                            }
 
                 if (_remainingTime == TimeSpan.MinValue)
-                    _remainingTime =  _startTime = new TimeSpan(Hours, Minutes, Seconds);
+                    initTimeSettings();
 
                 Time = _remainingTime.ToString(_remainingTime <  _oneHour ? @"mm\:ss" : @"hh\:mm\:ss");
 
@@ -452,15 +452,16 @@ namespace DBF.DataModel
                         }
                         else
                         {
-                            if (Round        <= BreakAfterRound
-                            &&  BreakMinutes >  0)
+                            if (Round           <= BreakAfterRound
+                            &&  BreakAfterRound >  0
+                            &&  BreakMinutes    >  0)
                                 Info += Environment.NewLine
                                       + $"{BreakMinutes} minutters pause efter {BreakAfterRound}. {getRoundText}";
 
                             if (_isAtTransition)
-                                RoundText = $"Der skiftes til {Round + 1}. {getRoundText}";
+                                RoundText = $"Der skiftes til {Math.Max(2, Round + 1)}. {getRoundText}";
                             else
-                                RoundText = $"{Round}. {getRoundText}";
+                                RoundText = $"{Math.Max(1, Round)}. {getRoundText}";
                         }
                     else
                     {
@@ -488,25 +489,37 @@ namespace DBF.DataModel
                 MinutesLeft = Math.Ceiling(left); // rundet op
             }
 
+            private void initTimeSettings()
+            {
+                _startTime      = new TimeSpan(Hours, Minutes, Seconds);
+                _breakTime      = new TimeSpan(0, BreakMinutes, 0);
+                _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
+                _warningTime    = new TimeSpan(0, WarningMinutes, 0);
+
+                if (!IsStarted)
+                    _remainingTime = _startTime;
+            }
+
             #region Private Timer Events         
                 private void stopTimer()
                 {
                     _timer.Stop();
-                    _isPaused = true;
                     updateDisplay();
                 }
 
                 private void Timer_Tick(object sender, EventArgs e)
                 {
-                    if (!_isPaused && _remainingTime.TotalSeconds >  0)
+                    //if (_remainingTime.TotalSeconds <= 0)
+                    //    stopTimer();
+                    //else
+                    if (_timer.IsEnabled)
                     {
                         _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
 
+                        //if (_remainingTime.TotalSeconds <  0)
+                        //    _remainingTime = TimeSpan.Zero;
                         updateDisplay();
                     }
-                    else
-                        if (_remainingTime.TotalSeconds <= 0)
-                            stopTimer();
                 }
 
                 private string getRoundText  => TeamMatch ? "halvleg" : "runde";

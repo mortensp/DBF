@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Documents;
 using Caliburn.Micro;
 
 namespace DBF.Helpers
@@ -22,12 +23,34 @@ namespace DBF.Helpers
         #endregion
 
         #region Constructors
+            /// <devdoc>
+            ///    Initializes a new instance of the <see cref='System.IO.FileSystemWatcher'/> class.
+            /// </devdoc>
             public SerializedFileSystemWatcher()
             {
                 base.Changed+= HandleBaseEvent;
                 base.Created+= HandleBaseEvent;
                 base.Deleted+= HandleBaseEvent;
                 base.Renamed+= HandleBaseEvent;
+            }
+
+            /// <devdoc>
+            ///    Initializes a new instance of the <see cref='System.IO.FileSystemWatcher'/> class,
+            ///    given the specified directory to monitor.
+            /// </devdoc>
+            public SerializedFileSystemWatcher(string path) : this()
+            {
+                Path = path;
+            }
+
+            /// <devdoc>
+            ///    Initializes a new instance of the <see cref='System.IO.FileSystemWatcher'/> class,
+            ///    given the specified directory and type of files to monitor.
+            /// </devdoc>
+            public SerializedFileSystemWatcher(string path, string filter) : this()
+            {
+                Path   = Path;
+                Filter = filter;
             }
         #endregion
 
@@ -51,6 +74,28 @@ namespace DBF.Helpers
                     {
                         _updatedHandlers-= value;
                     }
+                }
+            }
+        #endregion
+
+        #region Public Methods
+            public bool WatchForNewFolder(string dir, string fileFilter, bool enable = true)
+            {
+                if (Directory.Exists(dir))
+                {
+                    this.Path                  = dir;
+                    this.Filter                = fileFilter;
+                    this.IncludeSubdirectories = false;
+                    this.EnableRaisingEvents   = enable;
+                    return true;
+                }
+                else
+                {
+                    this.Path                  = dir.FindDeepestExistingDirectory();
+                    this.Filter                = dir.FirstNonSharedDirectory(this.Path) ?? fileFilter;
+                    this.IncludeSubdirectories = true;
+                    this.EnableRaisingEvents   = enable;
+                    return false;
                 }
             }
         #endregion

@@ -31,16 +31,20 @@ namespace DBF.ViewModels
 
             public async void AcceptSetting()
             {
-                var old =configuration.ReadBC3 ;
+                var readBC3        =configuration.ReadBC3 ;
+                var readBridgeMate =configuration.ReadBridgeMate ;
+                var vm             =IoC.Get<ControlViewModel>();
 
                 await TryCloseAsync();
 
                 configuration.Update(NewConfiguration);
                 configuration.Save();
 
-                if (old != NewConfiguration.ReadBC3)
-                    IoC.Get<ControlViewModel>()
-                       .SetWatcher(NewConfiguration.ReadBC3);
+                if (readBC3 != NewConfiguration.ReadBC3)
+                    vm?.SetBC3Watcher(NewConfiguration.ReadBC3);
+
+                if (readBridgeMate != NewConfiguration.ReadBridgeMate)
+                    vm?.SetBridgeMateWatcher(NewConfiguration.ReadBridgeMate);
             }
         #endregion
     }
