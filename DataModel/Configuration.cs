@@ -473,15 +473,24 @@ namespace DBF.DataModel
         #region Private Methods
             private void tryOpenFile(string path)
             {
+                var psi = new ProcessStartInfo
+                          {
+                              Arguments        = $"\"{path}\""
+                            , WorkingDirectory = Path.GetDirectoryName(path)
+                            , UseShellExecute  = true
+                          };
+
                 if (File.Exists(path))
                     try
                     {
-                        Process.Start("notepad++.exe", path);
+                        psi.FileName = "notepad++.exe";
+                        Process.Start(psi);
                     }
 
                     catch
                     {
-                        Process.Start("notepad.exe", path);
+                        psi.FileName = "notepad.exe";
+                        Process.Start(psi);
                     }
             }
 
