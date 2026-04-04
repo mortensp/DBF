@@ -3,16 +3,25 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media.Media3D;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Views;
 using GithubTools;
+using Syncfusion.DocIO.DLS;
 
 namespace DBF.ViewModels;
 
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
 {
     private IWindowManager windowManager;
+    private bool           _isFullscreen;
+    private WindowState    _previousWindowState;
+    private WindowStyle    _previousWindowStyle;
+    private ResizeMode     _previousResizeMode;
+    private Rect           _previousBounds;
+
     public Configuration Configuration { get; set; }
 
     public ShellViewModel(Configuration configuration, IWindowManager windowManager)
@@ -35,25 +44,73 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         var viewModel = IoC.Get<ConfigurationViewModel>();
         await windowManager.ShowDialogAsync(viewModel);
     }
-
+    }
     public void TimersHelp()
     {
         var window = new TimersHelpWindow();
         window.ShowDialog();
     }
-        public void OpenSettingFiles()
+        
+    public void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.F11)
+        //||  e.Key == Key.Escape && _isFullscreen)
+            ToggleFullscreen();
+    }
+
+    public void ToggleFullscreen()
+    {
+        var vindow = Application.Current.MainWindow;
+
+        //var vindow = (Window)e.Source;
+        if (!_isFullscreen)
+        {
+            // Gem nuværende tilstand
+            _previousWindowState = vindow.WindowState;
+            _previousWindowStyle = vindow.WindowStyle;
+            _previousResizeMode  = vindow.ResizeMode;
+            _previousBounds      = new Rect(vindow.Left, vindow.Top, vindow.Width, vindow.Height);
+
+            // Gå i fullscreen
+            vindow.WindowStyle = WindowStyle.None;
+            vindow.ResizeMode  = ResizeMode.NoResize;
+            vindow.WindowState = WindowState.Normal; // vigtigt for korrekt max
+            vindow.WindowState = WindowState.Maximized;
+
+            _isFullscreen = true;
+        }
+        else
+        {
+            // Gendan tidligere tilstand
+            vindow.WindowStyle = _previousWindowStyle;
+            vindow.ResizeMode  = _previousResizeMode;
+
+            vindow.WindowState = WindowState.Normal;
+            vindow.Left        = _previousBounds.Left;
+            vindow.Top         = _previousBounds.Top;
+            vindow.Width       = _previousBounds.Width;
+            vindow.Height      = _previousBounds.Height;
+
+            vindow.WindowState = _previousWindowState;
+
+            _isFullscreen = false;
+        }
+    }
+
+
+    public void OpenSettingFiles()
     {
         Configuration.OpenJSONFiles();
     }
-
 
     public void Install()
     {
         try
         {
             Github _github = new Github("DBF");
-            _github.Update(             "install");
+            _github.Update("install");
         }
+
         catch (Exception ex)
         {
             MessageBox.Show($"Updater Error: {ex.Message}", "Updater Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -80,7 +137,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             {
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
-
             catch { /* adgang/permission kan fejle i visse miljøer */ }
 
             if (string.IsNullOrEmpty(exePath))
@@ -107,8 +163,8 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
                         , UseShellExecute  = false
                         , WorkingDirectory = Environment.CurrentDirectory
                       };
-                            
-            var process=Process.Start(psi);
+
+            var process =Process.Start(psi);
             //process.WaitForExit();
 
             //var text= $"FileName         : {psi.FileName}\r\n"
@@ -119,7 +175,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             //File.WriteAllText(@"c:\DBFtools.log", text);
         }
-
         catch (Exception ex)
         {
             MessageBox.Show($"Genstart mislykkedes: {ex.Message}", "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);
