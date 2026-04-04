@@ -16,12 +16,13 @@ namespace DBF.ViewModels;
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
 {
     private IWindowManager windowManager;
-    private bool           _isFullscreen;
+    private bool _isFullscreen { get; set; }
     private WindowState    _previousWindowState;
     private WindowStyle    _previousWindowStyle;
     private ResizeMode     _previousResizeMode;
     private Rect           _previousBounds;
-
+       public Visibility    FullScreenMode => _isFullscreen ? Visibility.Collapsed : Visibility.Visible;
+ 
     public Configuration Configuration { get; set; }
 
     public ShellViewModel(Configuration configuration, IWindowManager windowManager)
@@ -44,17 +45,17 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         var viewModel = IoC.Get<ConfigurationViewModel>();
         await windowManager.ShowDialogAsync(viewModel);
     }
-    }
+    
     public void TimersHelp()
     {
         var window = new TimersHelpWindow();
         window.ShowDialog();
     }
-        
+
     public void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.F11)
-        //||  e.Key == Key.Escape && _isFullscreen)
+            //||  e.Key == Key.Escape && _isFullscreen)
             ToggleFullscreen();
     }
 
@@ -63,7 +64,23 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         var vindow = Application.Current.MainWindow;
 
         //var vindow = (Window)e.Source;
-        if (!_isFullscreen)
+        if (_isFullscreen)
+        {
+            // Gendan tidligere tilstand
+            vindow.WindowStyle = _previousWindowStyle;
+            vindow.ResizeMode  = _previousResizeMode;
+
+            vindow.WindowState = WindowState.Normal;
+
+            vindow.Left        = _previousBounds.Left;
+            vindow.Top         = _previousBounds.Top;
+            vindow.Width       = _previousBounds.Width;
+            vindow.Height      = _previousBounds.Height;
+            vindow.WindowState = _previousWindowState;
+
+            _isFullscreen = false;
+        }
+        else
         {
             // Gem nuværende tilstand
             _previousWindowState = vindow.WindowState;
@@ -79,24 +96,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             _isFullscreen = true;
         }
-        else
-        {
-            // Gendan tidligere tilstand
-            vindow.WindowStyle = _previousWindowStyle;
-            vindow.ResizeMode  = _previousResizeMode;
-
-            vindow.WindowState = WindowState.Normal;
-            vindow.Left        = _previousBounds.Left;
-            vindow.Top         = _previousBounds.Top;
-            vindow.Width       = _previousBounds.Width;
-            vindow.Height      = _previousBounds.Height;
-
-            vindow.WindowState = _previousWindowState;
-
-            _isFullscreen = false;
-        }
     }
-
 
     public void OpenSettingFiles()
     {
@@ -110,7 +110,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             Github _github = new Github("DBF");
             _github.Update("install");
         }
-
         catch (Exception ex)
         {
             MessageBox.Show($"Updater Error: {ex.Message}", "Updater Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -137,6 +136,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             {
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
+
             catch { /* adgang/permission kan fejle i visse miljøer */ }
 
             if (string.IsNullOrEmpty(exePath))
@@ -175,6 +175,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             //File.WriteAllText(@"c:\DBFtools.log", text);
         }
+
         catch (Exception ex)
         {
             MessageBox.Show($"Genstart mislykkedes: {ex.Message}", "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);

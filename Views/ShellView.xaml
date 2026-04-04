@@ -23,6 +23,7 @@
 
         <Menu Grid.Row="0">
             <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="_Indstillinger" />
+           
             <MenuItem Header="Vis">
                 <MenuItem
                     cal:Message.Attach="[Event Click] = [ToggleFullscreen]"

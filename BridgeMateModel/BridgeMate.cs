@@ -51,8 +51,8 @@ public class BridgeMate : INotifyPropertyChanged
     {
         if (!configuration.ReadBridgeMate
         ||  playintTime is not DateTime date
-        ||  clubNumber is not int clubNo
-        ||  clubNo     <= 0)
+        ||  clubNumber  is not int clubNo
+        ||  clubNo      <= 0)
             return;
 
         if (date   == Session?.Date
@@ -100,7 +100,6 @@ public class BridgeMate : INotifyPropertyChanged
                             return;
                         }
                 }
-
                 catch (Exception)
                 {
                     continue;
@@ -150,6 +149,7 @@ public class BridgeMate : INotifyPropertyChanged
                     break;
             }
         }
+
         catch (Exception ex)
         {
             MessageBox.Show($"Fejl ved læsning af BridgeMate mappen: " + ex.Message, "Fejl");
