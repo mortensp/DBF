@@ -55,6 +55,8 @@ public class BridgeMate : INotifyPropertyChanged
         ||  clubNo      <= 0)
             return;
 
+        var test = "Tester";
+
         if (date   == Session?.Date
         &&  clubNo == bmClubNo
         &&  bmFile is not null)
