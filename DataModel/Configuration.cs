@@ -195,7 +195,8 @@ namespace DBF.DataModel
                         Directory.Delete(sourceFolder);
                 }
 
-                if (!File.Exists(path))
+                if (!File.Exists(path)
+                ||  Arguments.Values.Lookup("mode")=="reset")
                 {
                     AppVersion = currentversion;
                     Save();

@@ -22,6 +22,7 @@ namespace DBF
         {
             //Debugger.Break();
             Arguments.Parse(validArgs, requiredArgs, showHelp);
+            var mode =Arguments.Values.Lookup("mode");
 
 //#if (RELEASE || PRODTEST)
             if (Arguments.Values.Lookup("mode") == "restart")
@@ -41,7 +42,7 @@ namespace DBF
 
         #region Argument handling
             private static Dictionary<string, string[]> validArgs = new Dictionary<string, string[]>
-                                                {     {"mode",  new[] { "normal", "restart"}}
+                                                {     {"mode",  new[] { "normal", "restart", "reset"}}
                                                     , {"debug", new[] { "false", "true","" }}
                                                 };
 
@@ -56,7 +57,7 @@ namespace DBF
           DBF.exe [mode:MyMode]  
 
         Parameters:
-          mode    : normal | restart 
+          mode    : normal | restart | reset
                      normal  : Normal start of program               (default)
                      restart : Restart using last saved timer states
 
