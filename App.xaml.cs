@@ -20,13 +20,15 @@ namespace DBF
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            //Debugger.Break();
+
             Arguments.Parse(validArgs, requiredArgs, showHelp);
 
 #if (RELEASE || PRODTEST)
             if (Arguments.Values.Lookup("mode") == "restart")
                 _github.MarkAppStarted();
             else
-                _github.UpdateAndMarkAppStarted();
+                _github.UpdateAndMarkAppStarted(Arguments.DebugMode);
 #endif
             base.OnStartup(e);
         }
