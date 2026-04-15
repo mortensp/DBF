@@ -19,7 +19,7 @@ namespace DBF.DataModel
 {
     public partial class Configuration : PropertyChangedBase
     {
-        private static readonly string[]              audioExtensions   = new[] {                    ".wav",               ".mp3" };
+        private static readonly string[]              audioExtensions   = new[] {".wav",".mp3" };
         public static readonly  JsonSerializerOptions SerializerOptions = new JsonSerializerOptions {WriteIndented = true, };
         private static          string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
         private static          string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Mortensp\\DBF\\configuration.json";
@@ -96,7 +96,6 @@ namespace DBF.DataModel
                                            , value?.Hour ?? 18
                                            , value?.Minute ?? 30
                                            , 0);
-                            //Save();
                         }
                     }
                 }
