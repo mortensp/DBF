@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Odbc;
+using System.Data.OleDb;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DBF.BridgeMateModel;
@@ -37,16 +38,22 @@ public static class EfReloadExtensions
     {
         foreach (var entityType in db.Model.GetEntityTypes())
         {
-            var clrType = entityType.ClrType;
-            var table   = entityType.GetTableName();
+            var    clrType = entityType.ClrType;
+            var    table   = entityType.GetTableName();
+            string sql;
 
             if (table == null)
                 continue;
 
-            var sql     = $"SELECT * FROM {table}";
+            var columns    = GetAccessColumns((OdbcConnection)connection, table);
+            var selectList = string.Join( ", " , columns.Select(c => $"[{c}]"))
+                                   .Replace("[Table]","[Table] as [TableNo]");
+
+            sql = $"SELECT {selectList} FROM [{table}]";
+
             var newList = connection.Query(clrType, sql).ToList();
 
-            var oldList = GetLocalEntities(db, clrType);
+            var oldList = GetPersistedEntities(db, clrType);
 
             var keyProps = entityType.FindPrimaryKey()?.Properties;
 
@@ -57,6 +64,11 @@ public static class EfReloadExtensions
 
             MergeEntities(db, oldList, newList, buildKey);
         }
+
+        // Persist the added/updated entities into the in-memory EF store so that
+        // subsequent queries against DbSet<T> (e.g. db.Tables) will return the
+        // freshly loaded rows. We save once after processing all entity types.
+        db.SaveChanges();
     }
 
     // ------------------------------------------------------------
@@ -64,13 +76,41 @@ public static class EfReloadExtensions
     // ------------------------------------------------------------
     private static IList GetLocalEntities(DbContext db, Type clrType)
     {
-        //var set          = db.Set(clrType);
-          var set = GetQueryableSet(db, clrType);
+        //var set = db.Set(clrType);
+        var set = GetQueryableSet(db, clrType);
 
-        var localProp    = set.GetType().GetProperty("Local");
-        var localView    = localProp.GetValue(set);
-        var toListMethod = localView.GetType().GetMethod("ToList");
-        return (IList)toListMethod.Invoke(localView, null);
+        var localProp = set.GetType().GetProperty("Local");
+        var localView = localProp.GetValue(set) as IEnumerable;
+
+        // The Local view may not expose a concrete ToList() instance method (it's often
+        // an ObservableCollection<T> and ToList() is an extension). Enumerate it safely
+        // and return a non-generic IList containing the items.
+        var list = new ArrayList();
+
+        if (localView != null)
+            foreach (var item in localView)
+                list.Add(item);
+
+        return list;
+    }
+
+    // ------------------------------------------------------------
+    // GET Persisted ENTITIES
+    // ------------------------------------------------------------
+    public static IList GetPersistedEntities(DbContext db, Type clrType)
+    {
+        var set = GetQueryableSet(db, clrType); // from your file
+        // Execute query and materialize a List<clrType>
+        var toList  = typeof(Enumerable).GetMethod("ToList", BindingFlags.Static | BindingFlags.Public)
+                                        .MakeGenericMethod(clrType);
+        var listObj = toList.Invoke(null, new object[] { set });
+        // Normalize to non-generic IList
+        var result = new ArrayList();
+
+        foreach (var item in (System.Collections.IEnumerable)listObj)
+            result.Add(item);
+
+        return result;
     }
 
     // ------------------------------------------------------------
@@ -135,5 +175,17 @@ public static class EfReloadExtensions
 
         var generic = method.MakeGenericMethod(clrType);
         return (IQueryable)generic.Invoke(db, null);
+    }
+
+    public static List<string> GetAccessColumns(this OdbcConnection connection, string table)
+    {
+      //DataTable schema = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, new object[] {null, null, table, null });
+
+        DataTable schema = connection.GetSchema("Columns", new string[] {null, null, table, null });
+        
+        return schema.Rows
+                     .Cast<DataRow>()
+                     .Select(r => r["COLUMN_NAME"].ToString())
+                     .ToList();
     }
 }

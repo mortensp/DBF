@@ -1,8 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Documents;
 using Caliburn.Micro;
+using NAudio.MediaFoundation;
 
 namespace DBF.Helpers
 {
@@ -58,6 +60,9 @@ namespace DBF.Helpers
             /// <devdoc>
             ///    Occurs when a file or directory in the specified <see cref='System.IO.FileSystemWatcher.Path'/> is changed or crerated.
             /// </devdoc>
+            public string               DirectoryFilter { get; set; }
+            public LikeFilterCollection LikeFilters     { get; set; } = new();
+
             public event Func<FileSystemEventArgs, Task> UpdatedAsync
             {
                 add
@@ -79,25 +84,27 @@ namespace DBF.Helpers
         #endregion
 
         #region Public Methods
-            public bool WatchForNewFolder(string dir, string fileFilter, bool enable = true)
-            {
-                if (Directory.Exists(dir))
-                {
-                    this.Path                  = dir;
-                    this.Filter                = fileFilter;
-                    this.IncludeSubdirectories = false;
-                    this.EnableRaisingEvents   = enable;
-                    return true;
-                }
-                else
-                {
-                    this.Path                  = dir.FindDeepestExistingDirectory();
-                    this.Filter                = dir.FirstNonSharedDirectory(this.Path) ?? fileFilter;
-                    this.IncludeSubdirectories = true;
-                    this.EnableRaisingEvents   = enable;
-                    return false;
-                }
-            }
+            //public bool WatchForNewFolder(string dir, string fileFilter, bool enable = true)
+            //{
+            //    if (Directory.Exists(dir))
+            //    {
+            //        this.Path                  = dir;
+            //        this.Filter                = fileFilter;
+            //        this.IncludeSubdirectories = false;
+            //        this.EnableRaisingEvents   = enable;
+            //        return true;
+            //    }
+            //    else
+            //    {
+            //        this.Path                  = dir.FindDeepestExistingDirectory();
+            //        this.Filter                = dir.FirstNonSharedDirectory(this.Path) ?? fileFilter;
+            //        this.IncludeSubdirectories = true;
+            //        this.EnableRaisingEvents   = enable;
+            //        _waitFolderPath            = dir;
+            //        _waitFileFilter            = fileFilter;
+            //        return false;
+            //    }
+            //}
         #endregion
 
         #region Private methods
@@ -107,8 +114,23 @@ namespace DBF.Helpers
                 {
                     var path = e.FullPath;
 
-                    // Store/update the latest event for this path. If this is the first event for the path,
-                    // enqueue the path so the processor will handle it. This collapses near-duplicate events
+                    if (LikeFilters.Count() >  0
+                    && !LikeFilters.Matches(e.Name))
+                        return;
+
+                    //// Store/update the latest event for this path. If this is the first event for the path,
+                    //// enqueue the path so the processor will handle it. This collapses near-duplicate events
+                    var dirFilter = DirectoryFilter;
+
+                    if (!string.IsNullOrEmpty(dirFilter))
+                    {
+                        var leaf = path.GetLeafDirectoryName();
+
+                        if (!leaf.WildcardMatch(dirFilter))
+                            //if (!string.Equals(dirFilter, leaf, StringComparison.OrdinalIgnoreCase))
+                            return;
+                    }
+
                     // for the same file into a single processing run (we keep the latest event).
                     if (_latestEvents.TryAdd(path, e))
                     {
@@ -125,7 +147,6 @@ namespace DBF.Helpers
                         _latestEvents[path] = e;
                     }
                 }
-
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"SerializedFileSystemWatcher.HandleBaseEvent error: {ex.Message}");
@@ -165,7 +186,6 @@ namespace DBF.Helpers
                                 var fi = new FileInfo(path);
                                 len    = fi.Exists ? fi.Length : 0;
                             }
-
                             catch
                             {
                                 len = -1;
@@ -187,34 +207,34 @@ namespace DBF.Helpers
                         if (handlers == null)
                             continue;
 
-                        // invoke all handlers sequentially on UI thread and await them
-                        try
+                    // invoke all handlers sequentially on UI thread and await them
+                    try
+                    {
+
+
+                        await Execute.OnUIThreadAsync(async () =>
                         {
-                            await Execute.OnUIThreadAsync(async () =>
-                            {
-                                var list = handlers.GetInvocationList()
+                            var list = handlers.GetInvocationList()
                                                    .Cast<Func<FileSystemEventArgs, Task>>()
                                                    .Select(h => SafeInvokeHandlerAsync(h, ev));
-                                await Task.WhenAll(list).ConfigureAwait(false);
-                            }).ConfigureAwait(false);
-                        }
-
-                        catch (OperationCanceledException)
-                        {
-                            /* shutting down */
-                        }
-
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"SerializedFileSystemWatcher: handler execution failed: {ex.Message}");
-                        }
+                            await Task.WhenAll(list).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        /* shutting down */
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"SerializedFileSystemWatcher: handler execution failed: {ex.Message}");
+                    }
                     }
                 }
+
                 catch (OperationCanceledException)
                 {
                     /* normal on dispose */
                 }
-
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"SerializedFileSystemWatcher.ProcessEventQueueAsync error: {ex.Message}");
@@ -232,6 +252,7 @@ namespace DBF.Helpers
                 {
                     await handler(ev).ConfigureAwait(false);
                 }
+
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"SerializedFileSystemWatcher handler threw: {ex.Message}");
@@ -254,7 +275,6 @@ namespace DBF.Helpers
                 {
                     _cts.Cancel();
                 }
-
                 catch { }
 
                 // release signal to unblock queue waiter(s)
@@ -262,7 +282,6 @@ namespace DBF.Helpers
                 {
                     _queueSignal.Release();
                 }
-
                 catch { }
 
                 _queueSignal.Dispose();

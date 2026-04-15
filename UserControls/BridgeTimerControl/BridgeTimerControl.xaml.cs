@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Caliburn.Micro;
@@ -126,26 +127,80 @@ public partial class BridgeTimerControl : UserControl
     #endregion
 
     #region Private Methods        
-        private void BtnBack_Click(object sender, RoutedEventArgs e)     => Timer.Back();
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.BackAll();
+            else
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)    => Configuration.CloseTimer(Timer);
+                Timer.Back();
+        }
 
-        private void BtnForward_Click(object sender, RoutedEventArgs e)  => Timer.Forward();
+        private void btnClose_Click(object sender, RoutedEventArgs e) => Configuration.CloseTimer(Timer);
 
-        private void BtnLessTime_Click(object sender, RoutedEventArgs e) => Timer.LessTime();
+        private void BtnForward_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.ForwardAll();
+            else
 
-        private void BtnMoreTime_Click(object sender, RoutedEventArgs e) => Timer.MoreTime();
+                Timer.Forward();
+        }
 
-        private void BtnPause_Click(object sender, RoutedEventArgs e)    => Timer.Pause();
+        private void BtnLessTime_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.LessTimeAll();
+            else
 
-        private void BtnReset_Click(object sender, RoutedEventArgs e)    => Timer.Reset();
+                Timer.LessTime();
+        }
 
-        private void BtnSetting_Click(object sender, RoutedEventArgs e)  => Timer.OpenSetting();
+        private void BtnMoreTime_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.MoreTimeAll();
+            else
+                Timer.MoreTime();
+        }
 
-        private void BtnStart_Click(object sender, RoutedEventArgs e)    => Timer.Start();
+        private void BtnPause_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.PauseAll();
+            else
 
-        private void BtnUp_Click(object sender, RoutedEventArgs e)       => Configuration.TimerUp(Timer);
+                Timer.Pause();
+        }
 
-        private void BtnDown_Click(object sender, RoutedEventArgs e)     => Configuration.TimerDown(Timer);
+        private void BtnReset_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.ResetAll();
+            else
+
+                Timer.Reset();
+        }
+
+        private void BtnSetting_Click(object sender, RoutedEventArgs e) => Timer.OpenSetting();
+
+        private void BtnStart_Click(object sender, RoutedEventArgs e)
+        {
+            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                Configuration.StartAll();
+            else
+                Timer.Start();
+        }
+
+        private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(Timer);
+
+        private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(Timer);
     #endregion
 }

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyVersion>0.9.9.22</AssemblyVersion>
-		<FileVersion>0.9.9.22</FileVersion>
-		<Version>0.9.9.22</Version>
-		<ProductVersion>0.9.9.22</ProductVersion>
+		<AssemblyVersion>0.9.9.21</AssemblyVersion>
+		<FileVersion>0.9.9.21</FileVersion>
+		<Version>0.9.9.21</Version>
+		<ProductVersion>0.9.9.21</ProductVersion>
 		<AssemblyTitle>DBF</AssemblyTitle>
 		<AssemblyName>DBF</AssemblyName>
 		<Description>DBF Tools - Viser Start og resultatlister og 1-4 bruidgeure</Description>
@@ -13,13 +13,14 @@
 		<Product>DBF Tools</Product>
 		<Copyright>Copyright © 2025</Copyright>	
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net9.0-windows7.0</TargetFramework>
+		<TargetFramework>net10.0-windows7.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWindowsForms>false</UseWindowsForms>
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Platforms>AnyCPU;x64</Platforms>
+		<DefineConstants>$(DefineConstants);TEST</DefineConstants>
 		<ApplicationIcon>Images\DBF_Tools.ico</ApplicationIcon>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<ComVisible>false</ComVisible>
@@ -41,7 +42,22 @@
 		<Compile Remove="AudioFiles\AudioPlayer.cs" />
 		<Compile Remove="AudioFiles\AudioServices\LibVlcAudioService.cs" />
 		<Compile Remove="BridgeMateModel\AccessContext.cs" />
+		<Compile Remove="BridgeMateModel\BridgeMateContextOld.cs" />
+		<Compile Remove="BridgeMateModel\BridgeMateContextReload.cs" />
 		<Compile Remove="BridgeMateModel\EfReloadExtensions.cs" />
+		<Compile Remove="BridgeMateModel\EfReloadExtensionsIL.cs" />
+		<Compile Remove="BridgeMateModel\BiddingData.cs" />
+		<Compile Remove="BridgeMateModel\HandEvaluation.cs" />
+		<Compile Remove="BridgeMateModel\HandRecord.cs" />
+		<Compile Remove="BridgeMateModel\LastEntryId.cs" />
+		<Compile Remove="BridgeMateModel\OleDbDataReaderExtensions.cs" />
+		<Compile Remove="BridgeMateModel\PlayData.cs" />
+		<Compile Remove="BridgeMateModel\ReceivedDataCount.cs" />
+		<Compile Remove="BridgeMateModel\ReceivedDataGrouped.cs" />
+		<Compile Remove="BridgeMateModel\ResultCountBoard.cs" />
+		<Compile Remove="BridgeMateModel\ResultCountRound.cs" />
+		<Compile Remove="BridgeMateModel\ScoreUpload.cs" />
+		<Compile Remove="BridgeMateModel\Setting.cs" />
 		<Compile Remove="Helpers\CrashDetector.cs" />
 		<Compile Remove="Helpers\SerializedFileSystemWatcher2.cs" />
 		<Compile Remove="ViewModels\ProjectorViewModel.cs" />
@@ -65,6 +81,12 @@
 		</SplashScreen>
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="EntityFrameworkCore.Jet" Version="10.0.0" />
+		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="10.0.0" />
+		<PackageReference Include="System.Data.Odbc" Version="10.0.5" />
+		<!--<PackageReference Include="Dapper" Version="2.1.72" />-->
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Caliburn.Micro" Version="4.0.230" />
@@ -82,36 +104,25 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<!--Bemærk, at CDATA ADO.Net her kun virker med entity framework 6 og åbenbart også 8:-) -->
-		<!--<Reference Include="CData.EntityFrameworkCore.Access">
-			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\EFCORE80\CData.EntityFrameworkCore.Access.dll</HintPath>
-		</Reference>
-
-		<Reference Include="System.Data.CData.Access">
-			<HintPath>C:\Program Files\CData\CData ADO.NET Provider for Microsoft Access 2024\lib\net8.0\System.Data.CData.Access.dll</HintPath>
-		</Reference>-->
-
-		<PackageReference Include="CData.Access" Version="24.0.9175" />
-		<PackageReference Include="CData.Access.EntityFrameworkCore" Version="24.0.9175" />
-		<PackageReference Include="Dapper" Version="2.1.72" />
+		<PackageReference Include="NAudio" Version="2.3.0" />
+		<PackageReference Include="NetCoreAudio" Version="2.0.1" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-		<!--<PackageReference Include="Baksteen.Extensions.DeepCopy" Version="1.0.4" />-->
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
+		<!--<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />-->
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.5" />
-		<PackageReference Include="NAudio" Version="2.2.1" />
-		<PackageReference Include="NetCoreAudio" Version="2.0.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-		<PackageReference Include="System.Management" Version="9.0.9" /> <!--Must match the version in Github Updater-->
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.5" />
+		<!--<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />-->
+		<PackageReference Include="System.Management" Version="10.0.5" />
+		<!--Must match the version in Github Updater-->
+		<!--<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.5" />-->
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 	</ItemGroup>
 
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -119,7 +130,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-	</ItemGroup>
+	</ItemGroup>-->
 
 	<ItemGroup>
 		<PackageReference Include="syncfusion.ui.wpf.net" Version="31.1.19" />
@@ -178,16 +189,20 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 
-		<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
+		<!--<None Include="..\..\System.Data.CData.Access.lic" Link="System.Data.CData.Access.lic">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+		</None>-->
 
 		<None Include="FodyWeavers.xsd" />
 
 		<ProjectReference Include="..\..\Common Libs\AppArguments\AppArguments.csproj" />
+		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
 
 	
 
-		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
+		<None Update="InstallerFiles\AccessDatabaseEngine_2010_x86.exe">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</None>
 	</ItemGroup>
 </Project>

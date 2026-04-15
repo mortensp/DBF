@@ -546,6 +546,54 @@ namespace DBF.DataModel
                     setEndTime();
             }
         #endregion
+            internal void StartAll()
+            {
+                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    timer.Start();
+            }
+
+            internal void PauseAll()
+            {
+                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    timer.Pause();
+            }
+
+            internal void MoreTimeAll()
+            {
+                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    timer.MoreTime();
+            }
+
+            internal void LessTimeAll()
+            {
+                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    timer.LessTime();
+            }
+
+            internal void ForwardAll()
+            {
+                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    timer.Forward();
+            }
+
+            internal void BackAll()
+            {
+                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    timer.Back();
+            }
+
+            internal void ResetAll()
+            {
+                var timers = BridgeTimers.Where(t => t.Visibility == Visibility.Visible);
+                var first  = true;
+                var plural = timers.Count()>1;
+
+                foreach (var timer in timers)
+                {
+                    timer.Reset(first, plural);
+                    first = false;
+                }
+            }
     }
 }
 

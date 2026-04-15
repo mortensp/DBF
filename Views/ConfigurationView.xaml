@@ -107,7 +107,7 @@
                         VerticalAlignment="Center"
                         IsChecked="{Binding ReadBC3, Mode=TwoWay}" />
 
-                    <!--<TextBlock
+                    <TextBlock
                         Grid.Row="3"
                         Grid.Column="0"
                         Margin="8,5,4,0"
@@ -121,7 +121,7 @@
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding ReadBridgeMate, Mode=TwoWay}" />-->
+                        IsChecked="{Binding ReadBridgeMate, Mode=TwoWay}" />
 
                     <!--<TextBlock
                         Grid.Row="4"

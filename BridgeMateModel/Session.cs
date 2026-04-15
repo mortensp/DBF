@@ -1,8 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
+
+using Microsoft.EntityFrameworkCore;
+
 namespace DBF.BridgeMateModel
 {
+         [PrimaryKey(nameof(Id))]
     public partial class Session
     {
         public DateTime Date => date is DateTime d && time is DateTime t ? new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, t.Second) : default;
@@ -15,5 +20,7 @@ namespace DBF.BridgeMateModel
         [Column("GUID", TypeName = "varchar(40)")] public string   Guid      { get; set; }
         [Column(TypeName = "smallint")]            public short?    Status    { get; set; }
         [Column(TypeName = "bool")]                public bool?     ShowInApp { get; set; }
+
+        override public string ToString() => $"Id:{Id}, Name:{Name}, Date:{Date}, Guid:{Guid}, Status:{Status}, ShowInApp:{ShowInApp}";
     }
 }

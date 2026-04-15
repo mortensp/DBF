@@ -28,8 +28,9 @@ namespace DBF
             if (Arguments.Values.Lookup("mode") == "restart")
                 _github.MarkAppStarted();
             else
+            #endif
                 _github.UpdateAndMarkAppStarted(Arguments.DebugMode);
-#endif
+
             base.OnStartup(e);
         }
 

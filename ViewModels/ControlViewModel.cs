@@ -48,6 +48,12 @@ namespace DBF.ViewModels
             public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
             {
                 BridgeMate                          = bridgeMate;
+                  // Subscribe to BridgeMate RoundStatus changes so we can be notified when a round becomes Done
+                if (BridgeMate?.RoundStatus is not null)
+                {
+                    SubscribeToBridgeMateRoundStatus(BridgeMate.RoundStatus);
+                    BridgeMate.RoundStatus.CollectionChanged+= BridgeMateRoundStatus_CollectionChanged;
+                }
                 Configuration                       = configuration;
                 this.windowManager                  = windowManager;
                 Thread.CurrentThread.CurrentCulture = Global.DkCulture;
@@ -55,6 +61,7 @@ namespace DBF.ViewModels
                 watcher              = new();
                 watcher.UpdatedAsync+= handleFileEventAsync;
 
+                initWatcher();
                 Pairs.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Pairs);
                 Teams.CollectionChanged+= (s, e) => NotifyOfPropertyChange(() => Teams);
 
@@ -81,6 +88,49 @@ namespace DBF.ViewModels
             public Configuration                  Configuration { get; set; }
             public BridgeMate                     BridgeMate    { get; set; }
 
+  #region Handle BridgeMate RoundStatus changes
+                private void SubscribeToBridgeMateRoundStatus(System.Collections.Generic.IEnumerable<DBF.RoundStatus> statuses)
+                {
+                    foreach (var status in statuses)
+                    {
+                        if (status is System.ComponentModel.INotifyPropertyChanged inpc)
+                            inpc.PropertyChanged += RoundStatus_PropertyChanged;
+                    }
+                }
+
+                private void UnsubscribeFromBridgeMateRoundStatus(System.Collections.Generic.IEnumerable<DBF.RoundStatus> statuses)
+                {
+                    foreach (var status in statuses)
+                    {
+                        if (status is System.ComponentModel.INotifyPropertyChanged inpc)
+                            inpc.PropertyChanged -= RoundStatus_PropertyChanged;
+                    }
+                }
+
+                private void RoundStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+                {
+                    if (sender is DBF.RoundStatus rs && e.PropertyName == nameof(DBF.RoundStatus.Done))
+                    {
+                        if (rs.Done)
+                        {
+                            // Notify user a round became done
+                            showMessageAFewSeconds($"Runde færdig: Sektion {rs.Section}, Runde {rs.Round}");
+                        }
+                    }
+                }
+
+                private void BridgeMateRoundStatus_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+                {
+                    if (e.NewItems is not null)
+                        foreach (var item in e.NewItems.OfType<DBF.RoundStatus>())
+                            item.PropertyChanged += RoundStatus_PropertyChanged;
+
+                    if (e.OldItems is not null)
+                        foreach (var item in e.OldItems.OfType<DBF.RoundStatus>())
+                            item.PropertyChanged -= RoundStatus_PropertyChanged;
+                }
+            #endregion
+
             // MainClubs
             public ObservableCollection<MainClub> MainClubs     { get; set; } = [];
 
@@ -94,9 +144,6 @@ namespace DBF.ViewModels
                         ErrorMessage = "";
 
                         if (Set(ref selectedMainClub, value))
-                        {
-                            watcher.EnableRaisingEvents = false;
-                            watcher.Filters.Clear();
 
                             if (value == null)
                             {
@@ -105,19 +152,12 @@ namespace DBF.ViewModels
                             }
                             else
                             {
-                                watcher.Path = selectedMainClub.Path;
-                                watcher.Filters.Add("Main.XML");
-
-                                if (Configuration.ReadBC3)
-                                    watcher.EnableRaisingEvents = true;
 
                                 Clubs    = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
                                                                   .ToObservableCollection();
-                                var club = Clubs?.FirstOrDefault();
 
                                 SelectedClub = null; // nødvendig, da club og SelectedClub kun sammenlignes på feltet Id, dvs. kan væe ens.
-                                SelectedClub = club;
-                            }
+                                SelectedClub = Clubs?.FirstOrDefault();
                         }
                     }
                     catch (Exception ex)
@@ -219,6 +259,7 @@ namespace DBF.ViewModels
         #endregion
 
         #region Public Methods
+            public void Test()     => Debugger.Break();
             public void AddTimer() => Configuration.AddTimer();
 
             public async void ShowStartList()
@@ -299,6 +340,23 @@ namespace DBF.ViewModels
         #endregion
 
         #region Private Method
+            void initWatcher()
+            {
+                watcher.Path = Configuration.HomepagePath.FindDeepestExistingDirectory();
+
+                if (watcher.Path + "\\" == Configuration.HomepagePath)
+                {
+                    watcher.Filters.Clear();
+                    watcher.LikeFilters.Add(@"Resultater_????*");
+                    watcher.Filters.Add("Main.XML");
+                    watcher.IncludeSubdirectories = Configuration.ReadBC3;
+                }
+                else
+                {
+                    watcher.Filter                = Configuration.HomepagePath.FirstNonSharedDirectory(watcher.Path);
+                    watcher.IncludeSubdirectories = true;
+                }
+            }
             private void loadMainClubs()
             {
                 if (!Configuration.ReadBC3)
@@ -308,7 +366,7 @@ namespace DBF.ViewModels
                 || !Directory.Exists(Configuration.HomepagePath))
                 {
                     showMessageAFewSeconds($"Mappen: '{Configuration.HomepagePath}' findes ikke");
-                    watchForNewHomepageFolder();
+                    watcher.EnableRaisingEvents = Configuration.ReadBC3;
                     return;
                 }
 
@@ -316,14 +374,12 @@ namespace DBF.ViewModels
                                               .Select(dir => Path.GetFileName(dir))
                                               .Where(name => name.StartsWith("Resultater_", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (int.TryParse(path.Substring(11), out int no))
-                    {
-                        var mainClub = loadMainClub(no);
+                    var mainClub = loadMainClub(path);
 
-                        if (mainClub is not null)
+                    if (mainClub is not null
+                    && !MainClubs.Any(m => m.No == mainClub.No))
                             MainClubs.Add(mainClub);
                     }
-                }
 
                 if (MainClubs.Count == 0)
                 {
@@ -332,33 +388,19 @@ namespace DBF.ViewModels
                 }
 
                 MainClubs        = MainClubs.OrderBy(mc => mc.Name).ToObservableCollection();
-                SelectedMainClub = MainClubs.FirstOrDefault(c => c.No != 9999) ?? MainClubs.First();
-            }
 
-            private void watchForNewHomepageFolder(string fullPath = null)
+                if (selectedMainClub is null)
             {
-                watcher.EnableRaisingEvents   = false;
-                watcher.NotifyFilter          = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.DirectoryName;
-                watcher.IncludeSubdirectories = true;
-                watcher.Filters.Clear();
+#if TEST
 
-                if (Directory.Exists(Configuration.HomepagePath))
-                    loadMainClubs();
-                else
-                    if (Directory.Exists(Configuration.BC3Path))
-                    {
-                        watcher.Path = Configuration.BC3Path;
-                        watcher.Filters.Add("Resultater");
+                    SelectedMainClub = MainClubs.FirstOrDefault(c => c.No == 9999) ?? MainClubs.First();
+                    //SelectedPlayingTime = PlayingTimes.FirstOrDefault(p => p.DateStr.StartsWith("02-03-2026"));
+#else
+                    SelectedMainClub = MainClubs.FirstOrDefault(c => c.No != 9999) ?? MainClubs.First();
+#endif
                     }
-                    else
-                    {
-                        watcher.Path = @"c:\";
-                        watcher.Filters.Add("BC3");
                     }
 
-                if (Configuration.ReadBC3)
-                    watcher.EnableRaisingEvents = true;
-            }
 
             private void showMessageAFewSeconds(string msg)
             {
@@ -396,8 +438,9 @@ namespace DBF.ViewModels
                     PlayingTimes = playingtimes.OrderByDescending(s => s.Date).ToObservableCollection();
                 }
 
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Debug.WriteLine("Fejl: " + ex.Message);
                     PlayingTimes.Clear();
                 }
             }
@@ -584,6 +627,7 @@ namespace DBF.ViewModels
                 initSubgroups(pairs);
                 Pairs = pairs;
                 Teams = teams;
+                watcher.EnableRaisingEvents = Configuration.ReadBC3;
 
 #if DEBUG
                 // BridgeMate lookup
@@ -598,6 +642,18 @@ namespace DBF.ViewModels
             }
 
             #region Load and Reload MainClub
+                private MainClub loadMainClub(string path)
+                {
+                    if (path.Contains('\\') || path.Contains('/'))
+                        path = path.GetLeafDirectoryName();
+                    else
+                        path = Path.GetFileName(path);
+
+                    if (int.TryParse(path.Substring(11), out int no))
+                        return loadMainClub(no);
+
+                    return null;
+                }
                 private MainClub loadMainClub(int no)
                 {
                     var path     = Configuration.HomepagePath + @$"Resultater_{no}\";
@@ -607,15 +663,14 @@ namespace DBF.ViewModels
                     {
                         var mainclub = deserialize<MainClub>(filename);
 
-                        if (mainclub.Clubs is null)
+                        if (mainclub?.Clubs is null)
                         {
                             System.Threading.Thread.Sleep(1000);
                             mainclub = deserialize<MainClub>(filename);
                         }
 
-                        if (mainclub.Clubs is null)
+                        if (mainclub?.Clubs is null)
                         {
-                            ErrorMessage = $"Fejl ved læsning af Main.xml";
                             return null;
                         }
 
@@ -632,16 +687,14 @@ namespace DBF.ViewModels
                     }
                 }
 
-                private void reloadMain()
+                private void reloadSelectedClub(string mainPath)
                 {
                     try
                     {
-                        if (SelectedMainClub is not null)
-                        {
-                            var main = loadMainClub(SelectedMainClub.No);
+                        var mainNew = loadMainClub(mainPath);
 
-                            if (main?.Clubs is not null)
-                                foreach (var clubNew in main.Clubs)
+                        if (mainNew?.Clubs is not null)
+                            foreach (var clubNew in mainNew.Clubs)
                                 {
                                     var clubOld = Clubs.FirstOrDefault(c => c.Id == clubNew.Id);
 
@@ -655,17 +708,10 @@ namespace DBF.ViewModels
                                             }
                                         }
                                     else
-                                        if (clubNew.Id == SelectedClub?.Id)
-                                        //if (clubNew.Id == clubOld.Id)
-                                        {
-                                            // Update PlayingTimes for current club
-                                            //var playingTimesNew = (SelectedClub is null
-                                            //                             ? main.Clubs.SelectMany(club => club.MainTournaments) // rammes aldrig
-                                            //                             : main.Clubs.FirstOrDefault(c => c.Id == SelectedClub.Id)?.MainTournaments)
-                                            //                            .SelectMany(mt => mt.PlayingTime);
-                                            var playingTimesNew = SelectedClub.MainTournaments.SelectMany(mt => mt.PlayingTime);
-
-                                            foreach (var playingTimeNew in playingTimesNew)
+                                    if (mainNew.No == selectedMainClub.No
+                                    &&  clubNew.Id == SelectedClub?.Id)
+                                        foreach (var mt in clubNew.MainTournaments)
+                                            foreach (var playingTimeNew in mt.PlayingTime)
                                             {
                                                 var playingTimeOld = PlayingTimes.FirstOrDefault(pt => pt.Date == playingTimeNew.Date);
 
@@ -674,6 +720,7 @@ namespace DBF.ViewModels
                                                     {
                                                         if (PlayingTimes[i].Date <  playingTimeNew.Date)
                                                         {
+                                                            playingTimeNew.MainTournament = mt;
                                                             Execute.OnUIThread(() => PlayingTimes.Insert(i, playingTimeNew));
                                                             break;
                                                         }
@@ -687,8 +734,6 @@ namespace DBF.ViewModels
 
                                                             if (fileOld is null)
                                                             {
-                                                                foreach (var file in playingTimeOld.TournamentFiles)
-                                                                    watcher.Filters.Remove(file.FileName);
 
                                                                 Execute.OnUIThread(() => playingTimeOld.TournamentFiles = playingTimeNew.TournamentFiles);
                                                                 SelectedPlayingTime = null;
@@ -709,8 +754,6 @@ namespace DBF.ViewModels
                                             }
                                         }
                                 }
-                        }
-                    }
                     catch (Exception)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -827,7 +870,6 @@ namespace DBF.ViewModels
                     var path    = SelectedMainClub.Path + fileName;
                     var section = deserialize<GroupSection>(path);
 
-                    watcher.Filters.Add(fileName);
 
                     if (section != null)
                         section.Tournament = tournament;
@@ -983,20 +1025,10 @@ namespace DBF.ViewModels
             {
                 try
                 {
-                    if (ev.ChangeType == WatcherChangeTypes.Changed)
-                        if (ev.Name == "Main.XML")
-                            reloadMain();
-                        else
-                            fetchPlayingTime(false);
-                    else
-                        if (ev.ChangeType is  WatcherChangeTypes.Created
-                                          or  WatcherChangeTypes.Renamed)
                             if (ev.FullPath.StartsWith(Configuration.HomepagePath))
-                                loadMainClubs();
-                            else
-                                watchForNewHomepageFolder(ev.FullPath);
+                        reloadSelectedClub(ev.FullPath);
                         else
-                            Debug.WriteLine($"File {ev.ChangeType}: {ev.Name}");
+                        initWatcher();
                 }
 
                 catch (Exception ex)
@@ -1013,7 +1045,7 @@ namespace DBF.ViewModels
                 else
                     SelectedMainClub = null;
 
-                watcher.EnableRaisingEvents = enable;
+                watcher.EnableRaisingEvents = Configuration.ReadBC3;
             }
 
             internal void SetBridgeMateWatcher(bool enable)
@@ -1023,7 +1055,7 @@ namespace DBF.ViewModels
                 else
                     BridgeMate.Close();
 
-                watcher.EnableRaisingEvents = enable;
+                watcher.EnableRaisingEvents = Configuration.ReadBridgeMate;
             }
         #endregion
     }

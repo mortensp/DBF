@@ -318,13 +318,15 @@ namespace DBF.DataModel
                 }
             }
 
-            public void Reset(bool ask = true)
+            public void Reset(bool ask = true,bool plural=false)
             {
                 lock (_sync)
                 {
                     if (ask == false
                     ||  IsStarted           == false
-                    ||  MessageBoxResult.OK == MessageBox.Show( "Hvis du nulstiller uret, indlæses indstillingerne på ny. Vil du fortsætte?"
+                    ||  MessageBoxResult.OK == MessageBox.Show( plural
+                                                              ? "Hvis du nulstiller urene, indlæses alle indstillingerne på ny. Vil du fortsætte?"
+                                                              : "Hvis du nulstiller uret, indlæses indstillingerne på ny. Vil du fortsætte?"
                                                               , "Bekræftelse"
                                                               , MessageBoxButton.OKCancel
                                                               , MessageBoxImage.Question))

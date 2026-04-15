@@ -195,7 +195,7 @@
                         Click="BtnStart_Click"
                         Content="▶"
                         IsEnabled="{Binding Timer.IsEnded, Converter={StaticResource BooleanInvertConverter}}"
-                        ToolTip="Start uret" />
+                        ToolTip="Start uret. Hold Shift nede for at starte alle urene" />
 
                     <Button
                         x:Name="btnBack"
@@ -203,7 +203,7 @@
                         Click="BtnBack_Click"
                         Content="⏮"
                         IsEnabled="{Binding Timer.IsStarted}"
-                        ToolTip="Genstart Runden" />
+                        ToolTip="Genstart Runden. Hold Shift nede for at Genstarts Runden på alle urene" />
 
                     <Button
                         x:Name="btnPause"
@@ -211,7 +211,7 @@
                         Click="BtnPause_Click"
                         Content="⏸"
                         IsEnabled="{Binding Timer.IsEnded, Converter={StaticResource BooleanInvertConverter}}"
-                        ToolTip="Sæt uret på Pause" />
+                        ToolTip="Sæt uret på Pause. Hold Shift nede for at Pause alle urene" />
 
                     <Button
                         x:Name="btnForward"
@@ -219,14 +219,14 @@
                         Click="BtnForward_Click"
                         Content="⏭"
                         IsEnabled="{Binding Timer.IsEnded, Converter={StaticResource BooleanInvertConverter}}"
-                        ToolTip="Næste Runden" />
+                        ToolTip="Næste Runden. Hold Shift nedGå Tilbage på alle urene" />
 
                     <Button
-                        x:Name="btnStop"
+                        x:Name="btnLessTime"
                         Margin="2"
                         Click="BtnLessTime_Click"
                         IsEnabled="{Binding Timer.IsEnded, Converter={StaticResource BooleanInvertConverter}}"
-                        ToolTip="Afkort Runden">
+                        ToolTip="Afkort Runden. Hold Shift nede for at Afkorte tiden på alle urene">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🕒" />
                             <TextBlock Margin="2,0,0,0" Text="↓" />
@@ -238,7 +238,7 @@
                         Margin="2"
                         Click="BtnMoreTime_Click"
                         IsEnabled="{Binding Timer.IsEnded, Converter={StaticResource BooleanInvertConverter}}"
-                        ToolTip="Give mere tid i Runden">
+                        ToolTip="Give mere tid i Runden. Hold Shift nede for at Mere tid på alle urene">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🕒" />
                             <TextBlock Margin="2,0,0,0" Text="↑" />
@@ -270,7 +270,7 @@
                         Click="BtnReset_Click"
                         Content="&#81;"
                         FontFamily="Wingdings 3"
-                        ToolTip="Indlæs valgte indstillinger" />
+                        ToolTip="Indlæs valgte indstillinger. Hold Shift nede for at Indlæse indstillinger for alle urene" />
                 </StackPanel>
             </Grid>
         </Border>

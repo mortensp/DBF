@@ -1,13 +1,21 @@
-﻿using System.Windows.Controls;
+﻿using System.IO;
+using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using System.Windows.Data;
-using Syncfusion.Data;
+using Group = Syncfusion.Data.Group;
 
-using System;
-using System.IO;
 namespace DBF.Helpers;
 
 public static class ExtentionMethods
 {
+    public static bool WildcardMatch(this string input, string pattern)
+    {
+        string regex = "^" + Regex.Escape(pattern)
+                                  .Replace("\\*", ".*")
+                                  .Replace("\\?", ".") + "$";
+
+        return Regex.IsMatch(input, regex, RegexOptions.IgnoreCase);
+    }
     public static int LineCount(this Group group)
     {
         return group.Records.Count() + 1 + (group.Groups?.Count ?? 0);
@@ -82,5 +90,33 @@ public static class ExtentionMethods
         return null; // B er ikke længere end A, eller de er identiske
     }
 
+    public static string GetLeafDirectoryName(this string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return string.Empty;
+
+        // Trim any trailing separators
+        var trimmed = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+
+        try
+        {
+            // If the path points to an existing directory, return its last segment
+            if (Directory.Exists(trimmed))
+                return System.IO.Path.GetFileName(trimmed) ?? string.Empty;
+
+            // Otherwise assume it's a file (or non-existing path) and return the containing folder's last segment
+            var dir = System.IO.Path.GetDirectoryName(trimmed);
+
+            if (string.IsNullOrEmpty(dir))
+                return string.Empty;
+
+            return System.IO.Path.GetFileName(dir.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar)) ?? string.Empty;
+        }
+
+        catch
+        {
+            return string.Empty;
+        }
+    }
 }
 

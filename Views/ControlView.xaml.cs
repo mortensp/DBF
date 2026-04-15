@@ -13,6 +13,21 @@ namespace DBF.Views
         public ControlView()
         {
             InitializeComponent();
+            try
+            {
+                   // Only show the test button when running under a debugger
+                if (Debugger.IsAttached)
+                {
+                    var btn = this.FindName("btnTest") as UIElement;
+
+                    if (btn != null)
+                        btn.Visibility = Visibility.Visible;
+                }
+            }
+            catch
+            {
+                // ignore any lookup failures
+            }
         }
     }
 }

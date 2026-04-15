@@ -147,6 +147,12 @@
                             IsEnabled="{Binding Configuration.TimersCanBeAdded}"
                             Visibility="{Binding DataContext.FullScreenMode, RelativeSource={RelativeSource AncestorType=Window}}" />
 
+                        <Button
+                            x:Name="btnTest"
+                            Width="70"
+                            cal:Message.Attach="[Event Click] = [Action Test]"
+                            Content="Test"
+                            Visibility="Collapsed" />
                     </WrapPanel>
 
                     <Viewbox>
