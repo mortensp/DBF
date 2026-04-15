@@ -21,14 +21,13 @@ namespace DBF
         protected override void OnStartup(StartupEventArgs e)
         {
             //Debugger.Break();
-
             Arguments.Parse(validArgs, requiredArgs, showHelp);
 
-#if (RELEASE || PRODTEST)
+//#if (RELEASE || PRODTEST)
             if (Arguments.Values.Lookup("mode") == "restart")
                 _github.MarkAppStarted();
             else
-            #endif
+//#endif
                 _github.UpdateAndMarkAppStarted(Arguments.DebugMode);
 
             base.OnStartup(e);
@@ -42,16 +41,16 @@ namespace DBF
 
         #region Argument handling
             private static Dictionary<string, string[]> validArgs = new Dictionary<string, string[]>
-                                            {     {"mode",  new[] { "normal", "restart"}}
-                                                , {"debug", new[] { "false", "true","" }}
-                                            };
+                                                {     {"mode",  new[] { "normal", "restart"}}
+                                                    , {"debug", new[] { "false", "true","" }}
+                                                };
 
             private static string[] requiredArgs = new string[0];
 
             private static void showHelp(string msg, bool exitProgram)
             {
                 string helpText = @"
-                                                    🔧 DBF Tools Help
+                                                        🔧 DBF Tools Help
         ====================
         Usages:
           DBF.exe [mode:MyMode]  
@@ -67,7 +66,7 @@ namespace DBF
             DBF.exe mode:restart debug=true";
 
                 if (string.IsNullOrWhiteSpace(msg))
-                    new MessageWindow(        helpText).ShowDialog();
+                    new MessageWindow(helpText).ShowDialog();
                 else
                     new MessageWindow(msg + "\n\n" + helpText).ShowDialog();
 
