@@ -4,9 +4,9 @@ using System.Xml.Serialization;
 namespace DBF.DataModel
 {
     /// <summary>
-    /// En GroupTournament svarer til en række - f.eks. B-Rækken
-    /// Denne indeholder bl.a. beskrivelse og filnavn. Den fil der peges på indeholder
-    /// Tournament, som er en yderligere beskrivelse af Rækken på den pågældende spille dag
+    /// A GroupTournament corresponds to a Group - e.g. Group B
+    /// This contains, among other things, a description and filename. The file it points to contains
+    /// a Tournament, which is a further description of the section on the given play day
     /// </summary>
     [XmlRoot(ElementName = "GroupTournament")]     
     public class GroupTournament : IEquatable<GroupTournament>
@@ -39,7 +39,7 @@ namespace DBF.DataModel
 
         public override int GetHashCode()
         {
-            // Brug de samme properties som i Equals
+            // Use the same properties as in Equals
             return HashCode.Combine(Id);
         }
 

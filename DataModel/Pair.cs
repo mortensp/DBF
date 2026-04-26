@@ -59,7 +59,7 @@ namespace DBF.DataModel
         [XmlElement(ElementName = "PairResultButler")] public     string       PairResultButler      { get; set; }
         [XmlElement(ElementName = "HACDelta")] public             string       HACDelta              { get; set; }
 
-        // Håndtering af afvigende navne i XML
+        // Handling of deviant names in XML
         [XmlAttribute(AttributeName = "Direction")]
         public string DirectionStr
         {
@@ -125,7 +125,7 @@ namespace DBF.DataModel
 
         public override int GetHashCode()
         {
-            // Brug de samme properties som i Equals
+            // Use the same properties as in Equals
             return HashCode.Combine(PairNo);
         }
     }

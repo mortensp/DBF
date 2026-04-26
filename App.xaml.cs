@@ -20,7 +20,6 @@ namespace DBF
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            //Debugger.Break();
             Arguments.Parse(validArgs, requiredArgs, showHelp);
             Logger.Info($"Application arguments: {Arguments.Values.ToFormattedString()}");
 

@@ -45,7 +45,6 @@ namespace DBF.ViewModels
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
             {
-                //CurrentView = timersPanel;
                 BridgeMate = bridgeMate;
 
                 if (BridgeMate?.RoundStatus is not null)
@@ -132,8 +131,6 @@ namespace DBF.ViewModels
                         ErrorMessage = "";
 
                         if (Set(ref selectedMainClub, value))
-                        {
-                            //BridgeMate.Close();
                             if (value == null)
                             {
                                 PlayingTimes.Clear();
@@ -146,10 +143,9 @@ namespace DBF.ViewModels
 
                                 Logger.Info($"SectedMainClub changed: {value}");
 
-                                SelectedClub = null; // nødvendigt, da club og SelectedClub kun sammenlignes på feltet Id, dvs. kan væe ens.
+                                SelectedClub = null; // Needed as club and SelectedClub are only compared by the Id field, so they can be the same.
                                 SelectedClub = Clubs?.FirstOrDefault();
                             }
-                        }
                     }
                 }
             #endregion
@@ -166,14 +162,10 @@ namespace DBF.ViewModels
 
                         if (Set(ref selectedClub, value))
                         {
-                            //BridgeMate.Close();
                             Logger.Debug($"SectedClub changed: {value?.ToString() ?? "Null"}");
 
                             if (value is null)
-                            {
                                 PlayingTimes.Clear();
-                                //SelectedPlayingTime = null;
-                            }
                             else
                                 fetchPlayingTimes();
                         }
@@ -216,12 +208,11 @@ namespace DBF.ViewModels
                                 {
                                     BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
 
-                                    //if (Configuration.ReadBridgeMate)
                                     if (File.Exists(Configuration.StatePath))
                                         Configuration.DeleteState();
                                     else
                                     {
-                                        // Liste af RoundStatus entries som er Done og som har det højeste Round-nummer pr. Section
+                                        // List of RoundStatus entries that's Done and only with enties that have the highest Roundnumber for each Section
                                         var highestDonePerSection = BridgeMate.RoundStatus
                                                                               .Where(r => r.Done )
                                                                               .GroupBy(r => r.Section)
@@ -237,13 +228,9 @@ namespace DBF.ViewModels
 
                                         foreach (var rs in highestDonePerSection)
                                             foreach (var timer in Configuration.GetRelatedTimers(rs, threshold))
-                                            {
-                                                //if (timer.Rounds >  rs.Round)
-                                                    timer.SetRound(rs.Round + 1);
-                                            }
+                                                timer.SetRound(rs.Round + 1);
                                     }
                                 }
-
 #endif
                             }
                         }
@@ -327,6 +314,7 @@ namespace DBF.ViewModels
                         return await Task.FromResult(true);
                     }
                 }
+
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Fejl ved lukning af ControlViewModel: {ex.Message}");
@@ -379,19 +367,10 @@ namespace DBF.ViewModels
             {
                 try
                 {
-                    //ObservableCollection<PlayingTime> playingtimes = [];
                     var mainTournaments = SelectedClub is null
                                         ? SelectedMainClub.Clubs.SelectMany(club => club.MainTournaments)
                                         : SelectedClub.MainTournaments;
 
-                    //foreach (var mt in mainTournaments)
-                    //    foreach (var pt in mt.PlayingTimes)
-                    //    {
-                    //        pt.MainTournament = mt;
-                    //        playingtimes.Add(pt);
-                    //    }
-
-                    //PlayingTimes = new BindableCollection<PlayingTime>(playingtimes.OrderByDescending(s => s.Date));
                     PlayingTimes = new BindableCollection<PlayingTime>(
                                  mainTournaments.SelectMany(mt => mt.PlayingTimes, (mt, pt) =>
                                  {
@@ -400,7 +379,6 @@ namespace DBF.ViewModels
                                  })
                                                 .OrderByDescending(pt => pt.Date));
                 }
-
                 catch (Exception ex)
                 {
                     Logger.Exception(ex);
@@ -447,6 +425,7 @@ namespace DBF.ViewModels
                             buildTeams(teams, grpNo, grp);
                     }
                 }
+
                 catch (Exception)
                 {
                     ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
@@ -682,7 +661,6 @@ namespace DBF.ViewModels
 
                         return mainclub;
                     }
-
                     catch (Exception)
                     {
                         ErrorMessage = $"Fejl ved læsning af Main.xml";
@@ -795,6 +773,7 @@ namespace DBF.ViewModels
                                     }
                             }
                     }
+
                     catch (Exception ex)
                     {
                         ErrorMessage = "Fejl ved læsning af Main.xml";
@@ -956,33 +935,30 @@ namespace DBF.ViewModels
 
                         if (Path.GetExtension(fullPath).ToLowerInvariant() == ".json")
                         {
-                            //string json = File.ReadAllText(fullPath, iso_8859_1);
                             string json = readAllTextWithRetry(fullPath, iso_8859_1);
                             return JsonSerializer.Deserialize<T>(json, JsonOptions);
                         }
                         else // XML
                         {
-                            // Hvis filen ikke findes, returner null
-                            //string xml = File.ReadAllText(fullPath, iso_8859_1);
+                            // Return nulle when the file doesn't exsist
                             string xml = readAllTextWithRetry(fullPath, iso_8859_1);
 
-                            // Erstat Fjern tag værdier, som kun består af blanke og - tegn
+                            // Remove tags only containing blanks and hyphens
                             xml = Regex.Replace(xml, @">(-|\s)+<", "><");
 
-                            // Erstat kun komma med punkt i decimaltal (fx 123,45 -> 123.45) - erstatter alle komaer mellem tal
+                            // Replace commas with dots in decimalnumbers like (fx 123,45 -> 123.45) 
                             xml = Regex.Replace(xml, @"(?<=\d),(?=\d)", ".");
 
                             // Remove empty tags
-                            xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty); //<TagName></TagName>
-
-                            //xml2 = Regex.Replace(xml, @"<\w+\s*(/>|/>\s*</\1*s>)", string.Empty); //<TagName/>
-                            xml = Regex.Replace(xml, @"<[A-Za-z_][A-Za-z0-9_.:-]*\s*/>", string.Empty); // removes self-closing tags like <Tag/>
+                            xml = Regex.Replace(xml, @"<(\w+)(\s[^>]*)?>\s*</\1>", string.Empty);       // Remove <TagName></TagName>
+                            xml = Regex.Replace(xml, @"<[A-Za-z_][A-Za-z0-9_.:-]*\s*/>", string.Empty); // Removes self-closing tags like <Tag/>
 
                             var       serializer = new XmlSerializer(typeof(T));
                             using var reader     = new StringReader( xml);
                             return (T)serializer.Deserialize(reader);
                         }
                     }
+
                     catch (Exception)
                     {
                         Logger.Info($"Fejl ved deserialisering af fil: {fullPath}");
@@ -991,7 +967,6 @@ namespace DBF.ViewModels
                     }
                 }
 
-                // Tilføj denne private helper-metode i samme klasse (f.eks. nederst i filen)
                 private string readAllTextWithRetry(string path, Encoding encoding, int maxAttempts = 10, int initialDelayMs = 100)
                 {
                     var delay = initialDelayMs;
@@ -999,25 +974,23 @@ namespace DBF.ViewModels
                     for (int attempt = 1; attempt <= maxAttempts; attempt++)
                         try
                         {
-                            // Åbn med ReadWrite sharing så vi kan læse selvom anden proces skriver (hvis den tillader deling).
+                            // Open in ReadWrite mode with sharing (if allowed).
                             using var fs = new FileStream(  path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
                             using var sr = new StreamReader(fs,   encoding);
                             return sr.ReadToEnd();
                         }
-
                         catch (IOException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
-                            delay = Math.Min(1000, delay * 2); // eksponentiel backoff, cap ved 1s
+                            delay = Math.Min(1000, delay * 2); // exponential backoff, cap at 1s
                         }
-
                         catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                         {
                             Thread.Sleep(delay);
                             delay = Math.Min(1000, delay * 2);
                         }
 
-                    // Sidste forsøg (lader exception boble op hvis det fejler)
+                    // Last attempt (lets exception bubble up if it fails)
                     using var fsFinal = new FileStream(  path,    FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
                     using var srFinal = new StreamReader(fsFinal, encoding);
                     return srFinal.ReadToEnd();
@@ -1046,9 +1019,6 @@ namespace DBF.ViewModels
                     {
                         await windowManager.ShowWindowAsync(this, "ProjectorView");
 
-                        // erstat kaldet der viser vinduet (i din eksisterende showProjector-metode)
-                        //var projectorViewModel = new ProjectorViewModel(this);
-                        //await windowManager.ShowWindowAsync(projectorViewModel, "ProjectorView");
                         projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
                         projectorView.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -1061,7 +1031,6 @@ namespace DBF.ViewModels
                                            + primaryScreen.WpfBounds.Width
                                            - projectorView.Width;
                     }
-
 #endif
                 }
                 else
@@ -1101,7 +1070,6 @@ namespace DBF.ViewModels
                 }
             }
 
-            // og tilføj disse private metoder (placer dem f.eks. under andre private helpers)
             private void pairsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
                 NotifyOfPropertyChange(() => Pairs);
@@ -1123,7 +1091,6 @@ namespace DBF.ViewModels
                         else
                             initWatcher();
                     }
-
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
@@ -1148,22 +1115,10 @@ namespace DBF.ViewModels
                     else
                         BridgeMate.Close();
 
-                    //watcher.EnableRaisingEvents = Configuration.ReadBridgeMate;
                 }
             #endregion
 
             #region Handle BridgeMate RoundStatus changes
-                //private void roundStatus_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-                //{
-                //    if (e.NewItems?[0] is RoundStatus roundStatus
-                //    &&  roundStatus.Done)
-                //    {
-                //        List<BridgeTimer> timers = Configuration.GetRelatedTimers(roundStatus);
-
-                //        foreach (var timer in timers)
-                //            timer.Round = roundStatus.Round;
-                //    }
-                //}
                 private void roundStatusItemChanged(object sender, ItemPropertyChangedEventArgs<RoundStatus> e)
                 {
                     if (e.PropertyName == nameof(RoundStatus.Done))

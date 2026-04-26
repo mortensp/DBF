@@ -49,14 +49,14 @@ namespace DBF.DataModel
 
                 if (value != null && !value.Equals(defaultValue))
                 {
-                    // Håndter collections
+                    // Handle collections
                     if (typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)
                     &&  prop.PropertyType != typeof(string))
                     {
                         var targetCollection = prop.GetValue(target) as IEnumerable;
                         var otherCollection  = value as IEnumerable;
 
-                        // Hvis det er en generisk collection og kan tilføje elementer
+                        // If it is a generic collection and can add elements
                         var addMethod = prop.PropertyType.GetMethod("Add");
 
                         if (addMethod != null && targetCollection != null && otherCollection != null)
@@ -84,7 +84,7 @@ namespace DBF.DataModel
                         continue;
                     }
 
-                    // Hvis property er en kompleks type (og ikke string eller collection), kopier rekursivt
+                    // If property is a complex type (and not string or collection), copy recursively
                     if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
                     {
                         var targetValue = prop.GetValue(target);

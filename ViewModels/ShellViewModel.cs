@@ -60,7 +60,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     public void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.F11)
-            //||  e.Key == Key.Escape && _isFullscreen)
             ToggleFullscreen();
     }
 
@@ -68,7 +67,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     {
         var vindow = Application.Current.MainWindow;
 
-        //var vindow = (Window)e.Source;
         if (_isFullscreen)
         {
             // Gendan tidligere tilstand

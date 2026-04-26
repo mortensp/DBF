@@ -58,7 +58,7 @@ public class BridgeMate : PropertyChangedBase
         lastDate = date;
 
         var path  = $"{Configuration.BridgeMatePath}{clubNo}\\";
-        var after = DateTime.Now.AddDays(-14); //TODO: rettes ned til 14 dage;
+        var after = DateTime.Now.AddDays(-14); //TODO: change to 14 days;
 
         if (!Directory.Exists(path))
         {
@@ -68,7 +68,7 @@ public class BridgeMate : PropertyChangedBase
         else
             foreach (var found in Directory.GetFiles(path, $"*.{SearchExt}")
                                            .Where(f => File.GetLastWriteTime(f) >= after)
-                                           .OrderByDescending(f => File.GetLastWriteTime(f))) //TODO: skal det være oprettelses datetime?
+                                           .OrderByDescending(f => File.GetLastWriteTime(f))) //TODO: should it be creation datetime?
             {
                 var file = Path.ChangeExtension(found, ".bws");
 
@@ -79,7 +79,7 @@ public class BridgeMate : PropertyChangedBase
                     foreach (var session in db.Sessions)
                         if (session.Date == date)
                         {
-                            // Ingen events, mens vi indlæser row og åbner filen
+                            // No events while we load rows and open the file
                             stopPolling();
                             bwsFile  = file;
                             bmClubNo = clubNo;
@@ -104,7 +104,6 @@ public class BridgeMate : PropertyChangedBase
                                 startPolling();
                             }
 
-                            //initWatcher(file);
                             return;
                         }
                 }
@@ -115,7 +114,7 @@ public class BridgeMate : PropertyChangedBase
                 }
             }
 
-        // BridgeMate er fil ikke fundet
+        // BridgeMate file not found
         Logger.Info($"BridgeMate: file not found for date {lastDate} in path {path}");
         Close();
 
@@ -125,7 +124,6 @@ public class BridgeMate : PropertyChangedBase
 
     public void Close()
     {
-        //var gem =bmClubNo;
         stopPolling();
 
         if (watcher?.EnableRaisingEvents == true)
@@ -192,7 +190,7 @@ public class BridgeMate : PropertyChangedBase
 
                 var now = DateTime.UtcNow;
 
-                //Todo: Her skal jeg tjekke om, der er lavet en ny bws fil 
+                //Todo: Here we need to check if a new bws file has been created
                 switch (ev.ChangeType)
                 {
                     case WatcherChangeTypes.Changed:
@@ -350,8 +348,8 @@ public class BridgeMate : PropertyChangedBase
 
                 catch (OperationCanceledException)
                 {
+            // Normal shutdown
                     Logger.Debug("Stop polling");
-                    // Normal shutdown
                 }
             }
         #endregion

@@ -9,26 +9,26 @@ namespace DBF.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var tekst = value?.ToString().ToLower();
+            var Text = value?.ToString().ToLower();
 
-            // Vælg farve baseret på indhold
-            if (tekst?.ToLower().Contains(" rød ") == true)
+             // Select color based on content
+          
+            if (Text?.ToLower().Contains(" rød ") == true)
                 return Brushes.Red;
 
-            if (tekst?.ToLower().Contains(" grøn ") == true)
+            if (Text?.ToLower().Contains(" grøn ") == true)
                 return Brushes.Green;
 
-            if (tekst?.ToLower().Contains(" gul ") == true)
+            if (Text?.ToLower().Contains(" gul ") == true)
                 return Brushes.Orange;
 
-            if (tekst?.ToLower().Contains(" blå ") == true)
+            if (Text?.ToLower().Contains(" blå ") == true)
                 return Brushes.Blue;
 
             
-                return Brushes.Black; // Standardfarve
+                return Brushes.Black; // Default color
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
-
 }
