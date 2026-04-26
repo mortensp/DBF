@@ -8,5 +8,7 @@ namespace DBF.DataModel
         [XmlElement("Club")]                   public List<Club> Clubs { get; set; }
         [XmlIgnore]                            public int        No    { get; set; }
         [XmlIgnore]                            public string     Path  { get; set; }
+
+        public override string ToString() => Name;
     }
 }

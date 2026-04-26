@@ -7,34 +7,41 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 using AppArguments;
 using Caliburn.Micro;
 using DBF.AudioServices;
+using DBF.Helpers;
 using DBF.ViewModels;
 using Syncfusion.Data.Extensions;
+using Syncfusion.DocIO.DLS;
+using Syncfusion.UI.Xaml.ImageEditor;
 using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.DataModel
 {
     public partial class Configuration : PropertyChangedBase
     {
-        private static readonly string[]              audioExtensions   = new[] {".wav",".mp3" };
-        public static readonly  JsonSerializerOptions SerializerOptions = new JsonSerializerOptions {WriteIndented = true, };
+        private static readonly string[]              audioExtensions   = new[] {                    ".wav",               ".mp3" };
+        private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {WriteIndented = true, };
         private static          string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
         private static          string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Mortensp\\DBF\\configuration.json";
         private static          string                oldPath           = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
-        private static          string                statePath         = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\state.json";
         private                 Configuration         loadedConfig;
+        private                 string                configVersion     = "v01";
         private                 int                   visibleTimerCount;
         private static readonly TimeSpan              _fiveHours        = new TimeSpan(5, 0, 0);
         private static readonly TimeSpan              _zeroTime         = new TimeSpan(0, 0, 0);
         private                 DateTime              startDate         = new(2026,1,1,18,30,0);
 
+        private IWindowManager  windowManager = IoC.Get<IWindowManager>();
+        private ICollectionView _presetsView;
+
         #region Constructors
             static Configuration()
             {
-                SerializerOptions.Converters.Add(new PresetCollectionConverter());
+                serializerOptions.Converters.Add(new PresetCollectionConverter());
 
                 // Make sure that Roaming folder exists
                 var configDir = Path.GetDirectoryName(path);
@@ -43,25 +50,17 @@ namespace DBF.DataModel
                     Directory.CreateDirectory(configDir);
             }
 
-            private static void presets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                if (e.Action is NotifyCollectionChangedAction.Replace or NotifyCollectionChangedAction.Reset)
-                    Debugger.Break();
-            }
-
             public Configuration()
             {
-                BridgeTimers.CollectionChanged+= BridgeTimers_CollectionChanged;
+                BridgeTimers.CollectionChanged+= bridgeTimers_CollectionChanged;
                 Presets.CollectionChanged     += presets_CollectionChanged;
+                Presets.ItemChanged           += presets_ItemChanged;
             }
         #endregion
 
         #region Public Properties
             #region Public Properties - Serilizable
-                public string AppVersion     { get; private set; } = currentversion;
-                public bool   ReadBC3        { get; set; } = true;
-                public bool   ReadBridgeMate { get; set; } = false;
-
+                public static readonly string StatePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\state.json";
                 public string BC3Path
                 {
                     get => field;
@@ -77,6 +76,11 @@ namespace DBF.DataModel
                     }
                 } = @"C:\BC3\";
 
+                public string AppVersion        { get; private set; } = currentversion;
+                public string ConfigVersion     { get; set; }
+                public bool   IsLoaded          { get; private set; }
+                public bool   ReadBC3           { get; set; } = true;
+                public bool   ReadBridgeMate    { get; set; } = false;
                 public int    ProjectorInterval { get; set; } = 20;
                 public int    ProjectorMaxRows  { get; set; } = 40;
 
@@ -89,25 +93,69 @@ namespace DBF.DataModel
                     set
                     {
                         if (Set(ref field, value))
-                        {
                             StartDate = new( startDate.Year
                                            , startDate.Month
                                            , startDate.Day
                                            , value?.Hour ?? 18
                                            , value?.Minute ?? 30
                                            , 0);
-                        }
                     }
                 }
 
-                public BindableCollection<Preset>        Presets      { get; set; } =
+                public BindableCollectionExt<Preset> Presets { get; set; } =
                             new() {     new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                      , new Preset("Par - 8 runder af 4 spil",  false, false, 8,  4,  4, 0, 27, 0, 1, 10, 5)
                                       , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
                                       , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
                                       , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
                                   };
 
+                [JsonIgnore]
+                public ICollectionView PresetsView
+                {
+                    get
+                    {
+                        if (_presetsView == null)
+                        {
+                            // Sørg for at dette kaldes fra UI-tråden
+                            _presetsView        = CollectionViewSource.GetDefaultView(Presets);
+                            _presetsView.Filter = o => o is Preset p && !p.IsHidden;
+
+                            // Hook collection / item change handlers so view refreshes when items or their IsHidden flag change
+                            Presets.CollectionChanged+= presets_CollectionChanged;
+                            Presets.ItemChanged      += presets_ItemChanged;
+
+                            // Ensure UI shows filtered list immediately
+                            Application.Current?.Dispatcher?.Invoke(() => _presetsView.Refresh());
+                        }
+
+                        return _presetsView;
+                    }
+                }
+
                 public ObservableCollection<BridgeTimer> BridgeTimers { get; set; } = new();
+
+                public List<BridgeTimer> GetRelatedTimers(RoundStatus roundStatus, TimeSpan? threshold = null)
+                {
+                    TimeSpan timeLimit = threshold?? TimeSpan.Zero;
+
+                    return BridgeTimers.Where(t =>  t.Visibility    == Visibility.Visible
+                                                &&  t.RemainingTime >= timeLimit
+                                                //&&  t.Round         <= roundStatus.Round
+                                                &&  t.GroupList.Contains(roundStatus.Letter))
+                                       .ToList();
+                }
+
+                public List<BridgeTimer> GetRelatedTimers(string sectionLetter, TimeSpan? threshold = null)
+                {
+                    TimeSpan timeLimit = threshold?? TimeSpan.Zero;
+
+                    return BridgeTimers.Where(t =>  t.Visibility    == Visibility.Visible
+                                                &&  t.RemainingTime >  timeLimit
+                                                //&&  t.Round         <= round
+                                                &&  t.GroupList.Contains(sectionLetter))
+                                       .ToList();
+                }
             #endregion
 
             #region Public Properties - JsonIgore
@@ -175,123 +223,157 @@ namespace DBF.DataModel
         #endregion
 
         #region Public Methods
-            public void Load()
-            {
-                if (!File.Exists(path)
-                &&  File.Exists(oldPath))
+            #region Save / Load Configuration
+                public void Save()
                 {
-                    // Sørg for at destination-mappen eksisterer
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                    ConfigVersion = configVersion;
 
-                    // Flyt gammel config fil
-                    File.Move(oldPath, path);
+                    foreach (var preset in Presets.Where(p => p.CustomPreset == false))
+                        preset.IsHidden = Presets.Any(p => p.CustomPreset == true && p.Name == preset.Name);
 
-                    // Slet evt. gammel tom mappe
-                    string sourceFolder = Path.GetDirectoryName(oldPath)!;
+                    // Only Custom Presets are saved due to PresetCollectionConverter
+                    string json = JsonSerializer.Serialize(this, serializerOptions);
+                    File.WriteAllText(path, json);
 
-                    if (Directory.GetFiles(sourceFolder).Length       == 0
-                    &&  Directory.GetDirectories(sourceFolder).Length == 0)
-                        Directory.Delete(sourceFolder);
+                    setEndTime();
                 }
 
-                if (!File.Exists(path)
-                ||  Arguments.Values.Lookup("mode")=="reset")
+                public async Task LoadAsync()
                 {
-                    AppVersion = currentversion;
-                    Save();
-                }
-                else
-                {
-                    var jsonData = File.ReadAllText(path);
-
-                    //TODO: kan fjernes senere
-                    if (jsonData.IndexOf("\"Color\":") >  -1)
-                        jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
-
-                    loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, SerializerOptions);
-
-                    Update(loadedConfig);
-                }
-
-                loadTimers();
-            }
-
-            private void loadTimers()
-            {
-                int i;
-                BridgeTimers.Clear();
-
-                for (i = 0; i <  4; i++)
-                {
-                    BridgeTimer timer;
-
-                    if (loadedConfig?.BridgeTimers      is null
-                    ||  loadedConfig.BridgeTimers.Count == 0)
+                    if (!File.Exists(path)
+                    &&  File.Exists(oldPath))
                     {
-                        timer = new BridgeTimer();
+                        // Sørg for at destination-mappen eksisterer
+                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+                        // Flyt gammel config fil
+                        File.Move(oldPath, path);
+
+                        // Slet evt. gammel tom mappe
+                        string sourceFolder = Path.GetDirectoryName(oldPath)!;
+
+                        if (Directory.GetFiles(sourceFolder).Length       == 0
+                        &&  Directory.GetDirectories(sourceFolder).Length == 0)
+                            Directory.Delete(sourceFolder);
+                    }
+
+                    //var shell = IoC.Get<ShellViewModel>();
+                    if (!File.Exists(path)
+                    ||  Arguments.Values.Lookup("mode") == "reset")
+                    {
+                        AppVersion    = currentversion;
+                        ConfigVersion = configVersion;
+                        Save();
+                        await OpenSettingsAsync();
+                    }
+                    else
+                    {
+                        var jsonData = File.ReadAllText(path);
+
+                        if (string.IsNullOrWhiteSpace(jsonData))
+                        {
+                            AppVersion = currentversion;
+                            await OpenSettingsAsync();
+                            Save();
+                        }
+                        else
+                        {
+                            Logger.Info("Reading Configuration file");
+
+                            //TODO: kan fjernes senere
+                            if (jsonData.IndexOf("\"Color\":") >  -1)
+                                jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
+
+                            loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, serializerOptions);
+
+                            Update(loadedConfig);
+
+                            if (loadedConfig.ConfigVersion                          is null
+                            ||  loadedConfig.ConfigVersion.CompareTo(configVersion) <  0)
+                                await OpenSettingsAsync();
+                        }
+                    }
+
+                    loadTimers();
+                    IsLoaded = true;
+                }
+
+                private void loadTimers()
+                {
+                    int i;
+                    BridgeTimers.Clear();
+
+                    for (i = 0; i <  4; i++)
+                    {
+                        BridgeTimer timer;
+
+                        if (loadedConfig?.BridgeTimers      is null
+                        ||  loadedConfig.BridgeTimers.Count == 0)
+                        {
+                            timer = new BridgeTimer();
+                            timer.Update(Presets[i]);
+                            timer.Name            = null;
+                            timer.BackgroundColor = BackgroundColors[i].Color;
+                            timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
+
+                            if (visibleTimerCount >  1) // Lad som standard de to første være visible
+                                timer.Visibility = System.Windows.Visibility.Collapsed;
+                        }
+                        else
+                            if (loadedConfig.BridgeTimers.Count >  i)
+                                timer = loadedConfig.BridgeTimers[i];
+                            else
+                            {
+                                timer = new();
+                                timer.Update(Presets[i]);
+                                timer.Visibility = System.Windows.Visibility.Collapsed;
+                            }
+
+                        if (timer.BreakAfterRound == 0
+                        ||  timer.BreakMinutes    == 0)
+                            timer.BreakAfterRound = timer.BreakMinutes = 0;
+
+                        if (string.IsNullOrEmpty(timer.Sound))
+                            timer.Sound = AudioResources.Sounds[i];
+
+                        BridgeTimers.Add(timer);
+
+                        if (timer.Visibility == Visibility.Visible)
+                        {
+                            timer.UpdateDisplay();
+                            VisibleTimerCount++;
+                        }
+                    }
+
+                    for (; i <  4; i++)
+                    {
+                        var timer = new BridgeTimer();
                         timer.Update(Presets[i]);
                         timer.Name            = null;
                         timer.BackgroundColor = BackgroundColors[i].Color;
                         timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
+                        timer.Visibility      = Visibility.Collapsed;
+                        timer.Sound           = AudioResources.Sounds[i];
 
-                        if (visibleTimerCount >  1) // Lad som standard de to første være visible
-                            timer.Visibility = System.Windows.Visibility.Collapsed;
+                        BridgeTimers.Add(timer);
+
+                        if (timer.Visibility == Visibility.Visible)
+                            VisibleTimerCount++;
                     }
-                    else
-                        if (loadedConfig.BridgeTimers.Count >  i)
-                            timer = loadedConfig.BridgeTimers[i];
-                        else
-                        {
-                            timer = new();
-                            timer.Update(Presets[i]);
-                            timer.Visibility = System.Windows.Visibility.Collapsed;
-                        }
 
-                    if (timer.BreakAfterRound == 0
-                    ||  timer.BreakMinutes    == 0)
-                        timer.BreakAfterRound = timer.BreakMinutes = 0;
-
-                    if (string.IsNullOrEmpty(timer.Sound))
-                        timer.Sound = AudioResources.Sounds[i];
-
-                    BridgeTimers.Add(timer);
-
-                    if (timer.Visibility == Visibility.Visible)
+                    if (visibleTimerCount == 0)
                     {
-                        timer.UpdateDisplay();
-                        VisibleTimerCount++;
+                        BridgeTimers[0].Visibility = Visibility.Visible;
+                        BridgeTimers[0].UpdateDisplay();
+                        visibleTimerCount = 1;
+                        Save();
                     }
+
+                    arrangeTimers();
+                    SetUpDownVisibility();
+                    RestoreState();
                 }
-
-                for (; i <  4; i++)
-                {
-                    var timer = new BridgeTimer();
-                    timer.Update(Presets[i]);
-                    timer.Name            = null;
-                    timer.BackgroundColor = BackgroundColors[i].Color;
-                    timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
-                    timer.Visibility      = Visibility.Collapsed;
-                    timer.Sound           = AudioResources.Sounds[i];
-
-                    BridgeTimers.Add(timer);
-
-                    if (timer.Visibility == Visibility.Visible)
-                        VisibleTimerCount++;
-                }
-
-                if (visibleTimerCount == 0)
-                {
-                    BridgeTimers[0].Visibility = Visibility.Visible;
-                    BridgeTimers[0].UpdateDisplay();
-                    visibleTimerCount = 1;
-                    Save();
-                }
-
-                arrangeTimers();
-
-                SetUpDownVisibility();
-                RestoreState();
-            }
+            #endregion
 
             private void arrangeTimers()
             {
@@ -307,20 +389,11 @@ namespace DBF.DataModel
                 }
             }
 
-            public void Save()
-            {
-                // Only Custom Presets are saved due to PresetCollectionConverter
-                string json = JsonSerializer.Serialize(this, SerializerOptions);
-                File.WriteAllText(path, json);
-
-                setEndTime();
-            }
-
             #region State Serializing 
                 public void DeleteState()
                 {
-                    if (File.Exists(statePath))
-                        File.Delete(statePath);
+                    if (File.Exists(StatePath))
+                        File.Delete(StatePath);
                 }
 
                 public void SaveState()
@@ -336,52 +409,66 @@ namespace DBF.DataModel
 
                     //var states = BridgeTimers.Select(t => t.CurrentState)
                     //                             .ToList();
-                    string json = JsonSerializer.Serialize(state, SerializerOptions);
-                    File.WriteAllText(statePath, json);
+                    string json = JsonSerializer.Serialize(state, serializerOptions);
+                    File.WriteAllText(StatePath, json);
                 }
 
                 public void RestoreState()
                 {
-                    if (Arguments.Values.Lookup("mode") == "restart")
-                    {
-                        if (File.Exists(statePath))
-                            try
-                            {
-                                var jsonData = File.ReadAllText(statePath);
-                                var state    = JsonSerializer.Deserialize<State>(jsonData, SerializerOptions);
+                    //if (Arguments.Values.Lookup("mode") == "restart")
+                {
+                    if (File.Exists(StatePath))
+                        try
+                        {
+                            Logger.Info("Restoring Timers");
+                            ; //todo: Empty Statement!! 
+                            var jsonData = File.ReadAllText(StatePath);
+                            var state    = JsonSerializer.Deserialize<State>(jsonData, serializerOptions);
 
-                                var controlViewModel = IoC.Get<ControlViewModel>();
+                            var controlViewModel = IoC.Get<ControlViewModel>();
 
-                                if (state.MainClubName != null)
-                                    controlViewModel.SelectedMainClub = controlViewModel.MainClubs.FirstOrDefault(mc => mc.Name == state.MainClubName);
+                            if (state.MainClubName != null)
+                                controlViewModel.SelectedMainClub = controlViewModel.MainClubs.FirstOrDefault(mc => mc.Name == state.MainClubName);
 
-                                if (state.SubClubName != null)
-                                    controlViewModel.SelectedClub = controlViewModel.Clubs.FirstOrDefault(mc => mc.Name == state.SubClubName);
+                            if (state.SubClubName != null)
+                                controlViewModel.SelectedClub = controlViewModel.Clubs.FirstOrDefault(mc => mc.Name == state.SubClubName);
 
-                                if (string.IsNullOrWhiteSpace(state.PlayingTimeStr) == false)
-                                    controlViewModel.SelectedPlayingTime = controlViewModel.PlayingTimes.FirstOrDefault(mc => mc.DateStr == state.PlayingTimeStr);
+                            if (string.IsNullOrWhiteSpace(state.PlayingTimeStr) == false)
+                                controlViewModel.SelectedPlayingTime = controlViewModel.PlayingTimes.FirstOrDefault(mc => mc.DateStr == state.PlayingTimeStr);
 
-                                for (int i = 0; i <  state.TimerStates.Count && i <  state.TimerStates.Count; i++)
-                                    if (state.TimerStates[i].IsStarted)
-                                        BridgeTimers[i].Restore(state.TimerStates[i]);
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("Fejl ved genskabelse af state: " + ex.Message);
-                                Debugger.Break();
-                            }
+                            for (int i = 0; i <  state.TimerStates.Count && i <  state.TimerStates.Count; i++)
+                                if (state.TimerStates[i].IsStarted)
+                                    BridgeTimers[i].Restore(state.TimerStates[i]);
+                        }
 
-                            finally { /* Ignore */ }
-                    }
+                        catch (Exception ex)
+                        {
+                            Logger.Exception(ex, "Fejl ved genskabelse af state");
+                            Debugger.Break();
+                        }
+
+                        finally { /* Ignore */ }
+                }
                 }
             #endregion
+
+            public async Task OpenSettingsAsync()
+            {
+                var viewModel = IoC.Get<ConfigurationViewModel>();
+                await windowManager.ShowDialogAsync(viewModel);
+            }
 
             public void OpenJSONFiles()
             {
                 tryOpenFile(path);
 
                 SaveState();
-                tryOpenFile(statePath);
+                tryOpenFile(StatePath);
+            }
+
+            public void OpenLogFile()
+            {
+                tryOpenFile(Logger.LogFilePath);
             }
 
             public void Update(Configuration newConfiguration)
@@ -400,9 +487,18 @@ namespace DBF.DataModel
                 }
 
                 // Keep built-in Presets
-                foreach (var preset in newConfiguration.Presets)
-                    if (Presets.FirstOrDefault(p => p.Name == preset.Name) == null)
-                        Presets.Add(preset);
+                foreach (var preset in newConfiguration.Presets.Where(p => p.CustomPreset))
+                {
+                    var buitlin = Presets.FirstOrDefault(p => p.Name == preset.Name && p.CustomPreset==false);
+
+                    if (buitlin is not null)
+                        buitlin.IsHidden = true;
+
+                    preset.CustomPreset = true;
+                    preset.IsHidden     = false;
+
+                    Presets.Add(preset);
+                }
             }
         #endregion
 
@@ -486,7 +582,6 @@ namespace DBF.DataModel
                         psi.FileName = "notepad++.exe";
                         Process.Start(psi);
                     }
-
                     catch
                     {
                         psi.FileName = "notepad.exe";
@@ -529,7 +624,7 @@ namespace DBF.DataModel
         #endregion
 
         #region private BridgeTimer Collection Change Handling
-            private void BridgeTimers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            private void bridgeTimers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
                 if (e.NewItems != null)
                     foreach (BridgeTimer timer in e.NewItems)
@@ -546,54 +641,69 @@ namespace DBF.DataModel
                     setEndTime();
             }
         #endregion
-            internal void StartAll()
+
+        internal void StartAll()
+        {
+            foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                timer.Start();
+        }
+
+        internal void PauseAll()
+        {
+            foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                timer.Pause();
+        }
+
+        internal void MoreTimeAll()
+        {
+            foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                timer.MoreTime();
+        }
+
+        internal void LessTimeAll()
+        {
+            foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                timer.LessTime();
+        }
+
+        internal void ForwardAll()
+        {
+            foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                timer.Forward();
+        }
+
+        internal void BackAll()
+        {
+            foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                timer.Back();
+        }
+
+        internal void ResetAll()
+        {
+            var timers = BridgeTimers.Where(t => t.Visibility == Visibility.Visible);
+            var first  = true;
+            var plural = timers.Count()>1;
+
+            foreach (var timer in timers)
             {
-                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                    timer.Start();
+                timer.Reset(first, plural);
+                first = false;
+            }
+        }
+
+        #region Handel PresetsView 
+            private void presets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                //Application.Current?.Dispatcher?.Invoke(() => _presetsView?.Refresh());
+                _presetsView?.Refresh();
             }
 
-            internal void PauseAll()
+            private void presets_ItemChanged(object sender, ItemPropertyChangedEventArgs<Preset> e)
             {
-                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                    timer.Pause();
+                //Application.Current?.Dispatcher?.Invoke(() => _presetsView?.Refresh());
+                _presetsView?.Refresh();
             }
-
-            internal void MoreTimeAll()
-            {
-                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                    timer.MoreTime();
-            }
-
-            internal void LessTimeAll()
-            {
-                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                    timer.LessTime();
-            }
-
-            internal void ForwardAll()
-            {
-                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                    timer.Forward();
-            }
-
-            internal void BackAll()
-            {
-                foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                    timer.Back();
-            }
-
-            internal void ResetAll()
-            {
-                var timers = BridgeTimers.Where(t => t.Visibility == Visibility.Visible);
-                var first  = true;
-                var plural = timers.Count()>1;
-
-                foreach (var timer in timers)
-                {
-                    timer.Reset(first, plural);
-                    first = false;
-                }
-            }
+        #endregion
     }
 }
 

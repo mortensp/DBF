@@ -22,14 +22,26 @@ namespace DBF
         {
             //Debugger.Break();
             Arguments.Parse(validArgs, requiredArgs, showHelp);
+            Logger.Info($"Application arguments: {Arguments.Values.ToFormattedString()}");
+
             var mode =Arguments.Values.Lookup("mode");
 
-//#if (RELEASE || PRODTEST)
+#if (RELEASE || PRODTEST)
             if (Arguments.Values.Lookup("mode") == "restart")
+            {
+            Logger.Info("Performing a Restart");
                 _github.MarkAppStarted();
+                }
+
             else
-//#endif
+            {
+            
+            Logger.Info("Looking for new version online");
                 _github.UpdateAndMarkAppStarted(Arguments.DebugMode);
+                }
+#else
+            _github.MarkAppStarted();
+#endif
 
             base.OnStartup(e);
         }
@@ -42,16 +54,16 @@ namespace DBF
 
         #region Argument handling
             private static Dictionary<string, string[]> validArgs = new Dictionary<string, string[]>
-                                                {     {"mode",  new[] { "normal", "restart", "reset"}}
-                                                    , {"debug", new[] { "false", "true","" }}
-                                                };
+                                                        {     {"mode",  new[] { "normal", "restart", "reset"}}
+                                                            , {"debug", new[] { "false", "true","" }}
+                                                        };
 
             private static string[] requiredArgs = new string[0];
 
             private static void showHelp(string msg, bool exitProgram)
             {
                 string helpText = @"
-                                                        🔧 DBF Tools Help
+                                                                🔧 DBF Tools Help
         ====================
         Usages:
           DBF.exe [mode:MyMode]  
@@ -60,6 +72,7 @@ namespace DBF
           mode    : normal | restart | reset
                      normal  : Normal start of program               (default)
                      restart : Restart using last saved timer states
+                     reset   : Clear all settings and make a fresh restart
 
           debug   : true | false (default=false)                    - Only for testing, so debugger can be attached
 

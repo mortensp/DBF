@@ -33,7 +33,7 @@ public class DesignTimeData : PropertyChangedBase
 
         Configuration           = IoC.Get<Configuration>();
         Configuration.StartDate = DateTime.Now;
-        Configuration.Load();
+        _=Configuration.LoadAsync();
     }
 
     public string        RoundText     { get; set; } = "Design-time: Round 2";

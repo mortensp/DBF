@@ -23,6 +23,7 @@ namespace DBF
     {
         public Bootstrapper()
         {
+            Logger.Debug("Bootstrapper initialising");
             Encoding.RegisterProvider(                                       CodePagesEncodingProvider.Instance);
 
             FrameworkElement.LanguageProperty
@@ -30,14 +31,11 @@ namespace DBF
                                              , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
             Thread.CurrentThread.CurrentCulture = Global.DkCulture;
-            //setupLogging();
             Initialize();
+            Logger.Debug("Bootstrapper initialised");
         }
 
-        //[Conditional("DEBUG")]         //private static void setupLogging()
-        //{
-        //    Console.SetOut(new ToDebugWriter());
-        //}
+    
         #region SimpleContainer Overrides and Configuration.
             private readonly SimpleContainer _container = new();
 
@@ -52,16 +50,22 @@ namespace DBF
                 _container.Singleton<BridgeMate>();
                 _container.Singleton<IAudioService, WindowsAudioService>();
 
-                foreach (var viewModel in SelectViewModels())
-                    if (_container.HasHandler(viewModel, null) == false)
-                        if (viewModel.Name == "ConfigurationViewModel"
-                        ||  viewModel.Name == "TimerSettingsViewModel"
-                        ||  viewModel.Name == "PresetNameViewModel")
-                            _container.RegisterPerRequest(viewModel, null, viewModel);
-                        else
-                            _container.RegisterSingleton(viewModel, null, viewModel);
+            foreach (var viewModel in SelectViewModels())
+                if (_container.HasHandler(viewModel, null) == false)
+                    if (viewModel.Name == "ConfigurationViewModel"
+                    || viewModel.Name == "TimerSettingsViewModel"
+                    || viewModel.Name == "PresetNameViewModel")
+                    {
+                        _container.RegisterPerRequest(viewModel, null, viewModel);
+                        Logger.Debug($"Registered {viewModel.Name} as PerRequest");
+                    }
+                    else
+                    {
+                        _container.RegisterSingleton(viewModel, null, viewModel);
+                        Logger.Debug($"Registered {viewModel.Name} as Singleton");
+                    }
 
-                var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
+                        var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
 
                 ViewLocator.LocateTypeForModelType = FindTypeForModelType(defaultLocateTypeForModelType);
             }

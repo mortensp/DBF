@@ -3,14 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Caliburn.Micro;
+using DBF.Helpers;
 
 namespace DBF.AudioServices
 {
     public class WindowsAudioService : IAudioService, IDisposable
     {
-        private static NetCoreAudio.Player  _player = new();
-        private static List <string> _tempFilePaths = new();
-        private int _volume;
+        private static   NetCoreAudio.Player _player        = new();
+        private static   List <string>       _tempFilePaths = new();
+        private          int                 _volume;
+        private readonly object              _sync          = new object();
 
         public bool IsPlaying => _player.Playing;
 
@@ -40,52 +42,57 @@ namespace DBF.AudioServices
         {
             try
             {
-                string tempFilePath = null;
+                string filePath = "";
 
                 if (IsValidFilePath(soundName))
                     if (File.Exists(soundName))
-                        tempFilePath = soundName;
+                        filePath = soundName;
                     else
                     {
-                        Console.WriteLine($"sound file doesn't exist: '{soundName}'");
+                        Logger.Error($"sound file doesn't exist: '{soundName}'");
                         return;
                     }
                 else
-                {
-                    var resourcesObject = Properties.Resources.ResourceManager.GetObject(soundName);
-                    var filePath        = "";
-
-                    if (resourcesObject is byte[] filebytes)
+                    lock (_sync)
                     {
-                        filePath     = Path.Combine(Path.GetTempPath(), $"{soundName}.mp3");
-                        tempFilePath = filePath;
-                        File.WriteAllBytes(filePath, filebytes);
-                    }
-                    else
-                        if (resourcesObject is Stream)
-                            using (System.IO.Stream stream = (System.IO.Stream)resourcesObject)
+                        var resourcesObject = Properties.Resources.ResourceManager.GetObject(soundName);
+
+                        if (resourcesObject is byte[] filebytes)
+                        {
+                            filePath = Path.Combine(Path.GetTempPath(), $"{soundName}.mp3");
+
+                            if (!_tempFilePaths.Contains(filePath))
                             {
-                                filePath     = Path.Combine(Path.GetTempPath(), $"{soundName}.{GetAudioFormat(stream).ToLowerInvariant()}");
-                                tempFilePath = filePath;
-
-                                using (var memoryStream = new MemoryStream())
-                                {
-                                    stream.CopyTo(memoryStream);
-                                    File.WriteAllBytes(filePath, memoryStream.ToArray());
-                                }
+                                File.WriteAllBytes(filePath, filebytes);
+                                _tempFilePaths.Add(filePath);
                             }
+                        }
+                        else
+                            if (resourcesObject is Stream)
+                                using (System.IO.Stream stream = (System.IO.Stream)resourcesObject)
+                                {
+                                    filePath = Path.Combine(Path.GetTempPath(), $"{soundName}.{GetAudioFormat(stream).ToLowerInvariant()}");
 
-                    if (!_tempFilePaths.Contains(filePath))
-                        _tempFilePaths.Add(filePath);
-                }
+                                    if (!_tempFilePaths.Contains(filePath))
+                                    {
+                                        using (var memoryStream = new MemoryStream())
+                                        {
+                                            stream.CopyTo(memoryStream);
+                                            File.WriteAllBytes(filePath, memoryStream.ToArray());
+                                        }
+
+                                        _tempFilePaths.Add(filePath);
+                                    }
+                                }
+                    }
 
                 _player.Stop();
                 Volume = volume;
-                _player.Play(tempFilePath);
+                _player.Play(filePath);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error playing sound '{soundName}': {ex.Message}");
+                Logger.Exception(ex,$"Error playing sound:'{soundName}'");
                 return;
             }
         }
@@ -116,7 +123,7 @@ namespace DBF.AudioServices
                 stream.Position = 0;
 
                 if (header.StartsWith("49-44-33")
-                ||  header.StartsWith( "FF")) // ID3-tag for MP3
+                ||  header.StartsWith("FF")) // ID3-tag for MP3
                     return "MP3";
                 else
                     if (header.StartsWith("52-49-46-46")) // RIFF-header for WAV

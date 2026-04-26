@@ -1,6 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized; // <-- tilføjet
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
+using DBF.Helpers;
 using Brush = System.Windows.Media.Brush;
 
 namespace DBF.DataModel
@@ -48,6 +51,8 @@ namespace DBF.DataModel
                 EndGreetingTop    = endGreetingTop;
                 EndGreetingBottom = endGreetingBottom;
                 //StartTime         = startTime;
+                
+      
             }
         #endregion
 
@@ -74,15 +79,26 @@ namespace DBF.DataModel
             }
         }
 
-        public              GroupFlags Groups     { get; set; }
-        public              string     Info       { get; set; }
-        [JsonIgnore] public Brush      Foreground { get; set; }
-        [JsonIgnore] public Brush      Background { get; set; }
-        public              string     Sound      { get; set; }
-        public              int        Volume     { get; set; }
-        public              Visibility Visibility { get; set; }
-        public              string     GroupStr   { get => Groups.ToFriendlyString(); }
-        //[JsonIgnore] public TimeOnly?  StartTime  { get; set; }
+        public GroupFlags Groups
+        {
+            get => field;
+            set
+            {
+                if (Set(ref field, value))
+                    GroupList = value.GetFlagNames();
+            }
+        }
+
+        public              List<string>                 GroupList         { get; set; }
+        public              string                       Info              { get; set; }
+        [JsonIgnore] public Brush                        Foreground        { get; set; }
+        [JsonIgnore] public Brush                        Background        { get; set; }
+        public              string                       Sound             { get; set; }
+        public              int                          Volume            { get; set; }
+        public              Visibility                   Visibility        { get; set; }
+        public              string                       GroupStr          { get => Groups.ToFriendlyString(); }
+
+        [JsonIgnore] public ObservableCollection<string> ChangedProperties { get; private set; } = new();
         public string PauseMessage
         {
             get => field;
@@ -122,6 +138,8 @@ namespace DBF.DataModel
             }
         }
 
+        public bool IsPropertyChanged(string propertyName) => ChangedProperties.Contains(propertyName);
+
         public new void Update(Preset preset)
         {
             Name              = preset.Name;
@@ -152,6 +170,44 @@ namespace DBF.DataModel
                 EndGreetingBottom = tSetting.EndGreetingBottom;
                 //StartTime         = tSetting.StartTime;
             }
+        }
+
+        public void MarkChanged(Preset BMSettings)
+        {
+            ChangedProperties.Clear();
+
+            if (BMSettings is null)
+                return;
+
+            if (TeamMatch != BMSettings.TeamMatch)
+                ChangedProperties.Add(nameof(TeamMatch));
+
+            if (Rounds != BMSettings.Rounds)
+                ChangedProperties.Add(nameof(Rounds));
+
+            if (BoardsPerRound != BMSettings.BoardsPerRound)
+                ChangedProperties.Add(nameof(BoardsPerRound));
+
+            if (BreakAfterRound != BMSettings.BreakAfterRound)
+                ChangedProperties.Add(nameof(BreakAfterRound));
+
+            if (Hours != BMSettings.Hours)
+                ChangedProperties.Add(nameof(Hours));
+
+            if (Minutes != BMSettings.Minutes)
+                ChangedProperties.Add(nameof(Minutes));
+
+            if (Seconds != BMSettings.Seconds)
+                ChangedProperties.Add(nameof(Seconds));
+
+            if (TransitionMinutes != BMSettings.TransitionMinutes)
+                ChangedProperties.Add(nameof(TransitionMinutes));
+
+            if (WarningMinutes != BMSettings.WarningMinutes)
+                ChangedProperties.Add(nameof(WarningMinutes));
+
+            if (ChangedProperties.Count == 0)
+                BMSettings = null;
         }
 
         private static Color getContrastingColor(Color bgColor)

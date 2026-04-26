@@ -30,7 +30,7 @@ namespace DBF.UserControls
             {
                 Visibility    = Visibility.Visible;
                 Configuration = new Configuration() { StartDate = DateTime.Now };
-                Configuration.Load();
+                _=Configuration.LoadAsync();
             }
         }
 
@@ -42,7 +42,7 @@ namespace DBF.UserControls
             {
                 Visibility    = Visibility.Visible;
                 Configuration = new Configuration() { StartDate = DateTime.Now };
-                Configuration.Load();
+                _=Configuration.LoadAsync();
             }
 
             ButtonsVisibility = buttonsVisibility;

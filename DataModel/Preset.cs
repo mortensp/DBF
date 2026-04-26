@@ -73,14 +73,44 @@ namespace DBF.DataModel
             }
         }
 
-        public bool   TeamMatch         { get; set; }
-        public int    Rounds            { get; set; }
-        public int    BoardsPerRound    { get; set; }
-        public int    BreakAfterRound   { get; set; }
+        public bool IsHidden        { get; set; }
 
-        public int    Hours             { get; set; }
-        public int    Minutes           { get; set; }
-        public int    Seconds           { get; set; }
+        public bool TeamMatch       { get; set; }
+        public int  Rounds          { get; set; }
+        public int  BoardsPerRound  { get; set; }
+        public int  BreakAfterRound { get; set; }
+
+        public int  Hours           { get; set; }
+        public int Minutes
+        {
+            get => field;
+            set
+            {
+                if (value >  60)
+                {
+                    Hours = value / 60;
+                    field = value % 60;
+                }
+                else
+                    field = value;
+            }
+        }
+
+        public int Seconds
+        {
+            get => field;
+            set
+            {
+                if (value >  60)
+                {
+                    Minutes = value / 60;
+                    field   = value % 60;
+                }
+                else
+                    field = value;
+            }
+        }
+
         public int    TransitionMinutes { get; set; }
         public int    BreakMinutes      { get; set; }
         public int    WarningMinutes    { get; set; }
@@ -90,9 +120,12 @@ namespace DBF.DataModel
                                          + (BreakAfterRound >  0 && BreakAfterRound <  Rounds ? Rounds - 2 : Rounds - 1)
                                          * Math.Max(0, TransitionMinutes);
 
-        public bool Matches(Preset other)
+        public bool Matches(Preset other, bool withoutName = false)
         {
-            return  (other.Name        is null || Name is null || Name == other.Name)
+            return  (withoutName
+                  || other.Name        is null
+                  || Name              is null
+                  || Name              == other.Name)
                  &&  TeamMatch         == other.TeamMatch
                  &&  Rounds            == other.Rounds
                  &&  BoardsPerRound    == other.BoardsPerRound

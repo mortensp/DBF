@@ -36,6 +36,7 @@
                 <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="_Genstart og bevar urenes status" />-->
                 <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="_Skift program version" />
                 <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="_Åbn JSON indstillinger" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="Åbn _Logfil" />
                 <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="_Om" />
             </MenuItem>
         </Menu>

@@ -60,8 +60,14 @@ namespace DBF.Helpers
             /// <devdoc>
             ///    Occurs when a file or directory in the specified <see cref='System.IO.FileSystemWatcher.Path'/> is changed or crerated.
             /// </devdoc>
-            public string               DirectoryFilter { get; set; }
-            public LikeFilterCollection LikeFilters     { get; set; } = new();
+            public string               DirectoryFilter    { get; set; }
+            public LikeFilterCollection LikeFilters        { get; set; } = new();
+
+            /// <summary>
+            /// Time to wait after the first event arrives before processing the current batch of events.
+            /// This allows grouping multiple near-simultaneous file events into a single processing run.
+            /// </summary>
+            public TimeSpan             EventGroupingDelay { get; set; } = TimeSpan.FromMilliseconds(500);
 
             public event Func<FileSystemEventArgs, Task> UpdatedAsync
             {
@@ -147,10 +153,13 @@ namespace DBF.Helpers
                         _latestEvents[path] = e;
                     }
                 }
+
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"SerializedFileSystemWatcher.HandleBaseEvent error: {ex.Message}");
                     Debug.WriteLine($"folderUpdated error: {ex.Message}");
+
+                    Logger.Exception(ex, "SerializedFileSystemWatcher.HandleBaseEvent");
                 }
             }
 
@@ -166,68 +175,100 @@ namespace DBF.Helpers
                         if (_cts.IsCancellationRequested)
                             break;
 
-                        if (!_eventQueue.TryDequeue(out var path))
-                            continue; // spurious signal
-
-                        // Try to get and remove latest event for this path
-                        if (!_latestEvents.TryRemove(path, out var ev))
-                            continue; // nothing to process
-
-                        // Wait a short time for the writer to finish and wait for size-stability
-                        await Task.Delay(200, _cts.Token).ConfigureAwait(false);
-
-                        long lastLength = -1;
-
-                        for (int i = 0; i <  6 && !_cts.IsCancellationRequested; i++)
+                        // if (!_eventQueue.TryDequeue(out var path))
+                        //     continue; // spurious signal
+                        //
+                        // Wait a short grouping interval to allow additional events to be queued
+                        try
                         {
-                            long len = 0;
-                            try
-                            {
-                                var fi = new FileInfo(path);
-                                len    = fi.Exists ? fi.Length : 0;
-                            }
-                            catch
-                            {
-                                len = -1;
-                            }
-
-                            if (lastLength != -1 && lastLength == len)
-                                break;
-
-                            lastLength = len;
-                            await Task.Delay(150, _cts.Token).ConfigureAwait(false);
+                            await Task.Delay(EventGroupingDelay, _cts.Token).ConfigureAwait(false);
                         }
 
-                        // Execute handling on UI thread 
-                        Func<FileSystemEventArgs, Task> handlers;
-
-                        lock (_handlersLock)
-                            handlers = _updatedHandlers;
-
-                        if (handlers == null)
-                            continue;
-
-                    // invoke all handlers sequentially on UI thread and await them
-                    try
-                    {
-
-
-                        await Execute.OnUIThreadAsync(async () =>
+                        catch (OperationCanceledException)
                         {
-                            var list = handlers.GetInvocationList()
-                                                   .Cast<Func<FileSystemEventArgs, Task>>()
-                                                   .Select(h => SafeInvokeHandlerAsync(h, ev));
-                            await Task.WhenAll(list).ConfigureAwait(false);
-                        }).ConfigureAwait(false);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        /* shutting down */
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"SerializedFileSystemWatcher: handler execution failed: {ex.Message}");
-                    }
+                            break;
+                        }
+
+                        // Drain the queue into a distinct list of paths to process
+                        var pathsToProcess = new List<string>();
+
+                        while (_eventQueue.TryDequeue(out var queuedPath))
+                        {
+                            // Avoid duplicates; keep order of first occurrence
+                            if (!pathsToProcess.Contains(queuedPath))
+                                pathsToProcess.Add(queuedPath);
+                        }
+
+                        if (pathsToProcess.Count == 0)
+                            continue; // nothing to do
+
+                        foreach (var path in pathsToProcess)
+                        {
+                            if (_cts.IsCancellationRequested)
+                                break;
+
+                            // Try to get and remove latest event for this path
+                            if (!_latestEvents.TryRemove(path, out var ev))
+                                continue; // nothing to process for this path
+
+                            // Wait a short time for the writer to finish and wait for size-stability
+                            await Task.Delay(200, _cts.Token).ConfigureAwait(false);
+
+                            long lastLength = -1;
+
+                            for (int i = 0; i <  6 && !_cts.IsCancellationRequested; i++)
+                            {
+                                long len = 0;
+                                try
+                                {
+                                    var fi = new FileInfo(path);
+                                    len    = fi.Exists ? fi.Length : 0;
+                                }
+
+                                catch
+                                {
+                                    len = -1;
+                                }
+
+                                if (lastLength != -1 && lastLength == len)
+                                    break;
+
+                                lastLength = len;
+                                await Task.Delay(150, _cts.Token).ConfigureAwait(false);
+                            }
+
+                            // Execute handling on UI thread 
+                            Func<FileSystemEventArgs, Task> handlers;
+
+                            lock (_handlersLock)
+                                handlers = _updatedHandlers;
+
+                            if (handlers == null)
+                                continue;
+
+                            // invoke all handlers sequentially on UI thread and await them
+                            try
+                            {
+                                await Execute.OnUIThreadAsync(async () =>
+                                {
+                                    var list = handlers.GetInvocationList()
+                                                       .Cast<Func<FileSystemEventArgs, Task>>()
+                                                       .Select(h => SafeInvokeHandlerAsync(h, ev));
+                                    await Task.WhenAll(list).ConfigureAwait(false);
+                                }).ConfigureAwait(false);
+                            }
+
+                            catch (OperationCanceledException)
+                            {
+                                /* shutting down */
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"SerializedFileSystemWatcher: handler execution failed: {ex.Message}");
+                                Logger.Exception(ex, "SerializedFileSystemWatcher: handler execution failed");
+                            }
+                        }
                     }
                 }
 
@@ -235,9 +276,11 @@ namespace DBF.Helpers
                 {
                     /* normal on dispose */
                 }
+
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"SerializedFileSystemWatcher.ProcessEventQueueAsync error: {ex.Message}");
+                    Logger.Exception(ex, "SerializedFileSystemWatcher.ProcessEventQueueAsync");
                 }
 
                 finally
@@ -252,10 +295,10 @@ namespace DBF.Helpers
                 {
                     await handler(ev).ConfigureAwait(false);
                 }
-
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"SerializedFileSystemWatcher handler threw: {ex.Message}");
+                    Logger.Exception(ex, "SerializedFileSystemWatcher handler threw");
                 }
             }
 
@@ -275,6 +318,7 @@ namespace DBF.Helpers
                 {
                     _cts.Cancel();
                 }
+
                 catch { }
 
                 // release signal to unblock queue waiter(s)
@@ -282,6 +326,7 @@ namespace DBF.Helpers
                 {
                     _queueSignal.Release();
                 }
+
                 catch { }
 
                 _queueSignal.Dispose();

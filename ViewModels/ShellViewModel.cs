@@ -8,6 +8,7 @@ using System.Windows.Media.Media3D;
 using AppArguments;
 using Caliburn.Micro;
 using DBF.DataModel;
+using DBF.Helpers;
 using DBF.Views;
 using GithubTools;
 using Syncfusion.DocIO.DLS;
@@ -18,24 +19,27 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 {
     private IWindowManager windowManager;
     private bool _isFullscreen { get; set; }
-    private WindowState    _previousWindowState;
-    private WindowStyle    _previousWindowStyle;
-    private ResizeMode     _previousResizeMode;
-    private Rect           _previousBounds;
-       public Visibility    FullScreenMode => _isFullscreen ? Visibility.Collapsed : Visibility.Visible;
- 
-    public Configuration Configuration { get; set; }
+    private WindowState _previousWindowState;
+    private WindowStyle _previousWindowStyle;
+    private ResizeMode  _previousResizeMode;
+    private Rect        _previousBounds;
+    public Visibility    FullScreenMode => _isFullscreen ? Visibility.Collapsed : Visibility.Visible;
+
+    public Configuration Configuration  { get; set; }
 
     public ShellViewModel(Configuration configuration, IWindowManager windowManager)
     {
-        Configuration = configuration;
-        configuration.Load();
         this.windowManager = windowManager;
+        Configuration = configuration;
+        
+        
     }
 
     #region Show Screens
         public async void OpenControlView()
         {
+            await Configuration.LoadAsync();
+            Logger.Info("Opening ControlViewModel");
             var viewModel = IoC.Get<ControlViewModel>();
             await ActivateItemAsync(viewModel);
         }
@@ -46,7 +50,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         var viewModel = IoC.Get<ConfigurationViewModel>();
         await windowManager.ShowDialogAsync(viewModel);
     }
-    
+
     public void TimersHelp()
     {
         var window = new TimersHelpWindow();
@@ -104,13 +108,20 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         Configuration.OpenJSONFiles();
     }
 
+    public void OpenLogFile()
+    {
+        Configuration.OpenLogFile();
+    }
+
     public void Install()
     {
         try
         {
+            Logger.Info("Running Githup Updater");
             Github _github = new Github("DBF");
             _github.Update(Arguments.DebugMode, "install");
         }
+
         catch (Exception ex)
         {
             MessageBox.Show($"Updater Error: {ex.Message}", "Updater Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -137,7 +148,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             {
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
-
             catch { /* adgang/permission kan fejle i visse miljøer */ }
 
             if (string.IsNullOrEmpty(exePath))
@@ -166,9 +176,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
                       };
 
             var process =Process.Start(psi);
-          
         }
-
         catch (Exception ex)
         {
             MessageBox.Show($"Genstart mislykkedes: {ex.Message}", "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);

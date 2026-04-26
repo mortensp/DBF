@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
+using Syncfusion.Windows.Controls.Notification;
+using Syncfusion.Windows.Tools.Controls;
 using Configuration = DBF.DataModel.Configuration;
 
 namespace DBF.UserControls;
@@ -18,6 +21,9 @@ public partial class BridgeTimerControl : UserControl
     public BridgeTimerControl()
     {
         InitializeComponent();
+
+        // Ensure the badge reads from this control's Timer regardless of adorner layer DataContext
+        badge.SetBinding(SfBadge.ContentProperty, new Binding("Timer.BadgeText") { Source = this, Mode = BindingMode.OneWay });
 
         if (this.IsInDesignMode())
         {
@@ -32,7 +38,6 @@ public partial class BridgeTimerControl : UserControl
                       , RoundText        = "3. Runde"
                       , Info             = "Vi spiller 7 runder af 24 spil"
                                          + Environment.NewLine +
-                                         //, MoreInfo         = 
                                          "Pause efter 4. Runde"
                       , MinutesLeft      = 13d
                       , WarningVisiblity = Visibility.Visible
@@ -65,10 +70,7 @@ public partial class BridgeTimerControl : UserControl
                         oldValue.PropertyChanged -= ctl.Timer_PropertyChanged;
 
                     if (e.NewValue is BridgeTimer newValue)
-                    {
-                        newValue.PropertyChanged+= ctl.Timer_PropertyChanged;
                         ctl.UpdateText(ctl.Timer);
-                    }
                 }
             }
 
@@ -114,11 +116,25 @@ public partial class BridgeTimerControl : UserControl
 
             //private static void onButtonsVisibilityPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
             //{
-            //    //if (d is BridgeTimerControl ctl)
-            //    //    // ctl.CanClose =
-            //    //ctl.ButtonsVisibility == Visibility.Visible;
+            //    if (d is BridgeTimerControl ctl)
+            //      ctl.CanClose =
+            //          ctl.ButtonsVisibility == Visibility.Visible;
             //}
         #endregion
+
+        //#region Dependency Property BMSettings
+        //    public Preset BMSettings
+        //    {
+        //        get => (Preset)GetValue(BMSettingsProperty);
+        //        set => SetValue(BMSettingsProperty, value);
+        //    }
+
+        //    public static readonly DependencyProperty BMSettingsProperty = 
+        //                           DependencyProperty.Register( nameof(BMSettings)
+        //                                                      , typeof(Preset)
+        //                                                      , typeof(BridgeTimerControl)
+        //                                                      , new FrameworkPropertyMetadata(null));
+        //#endregion
     #endregion
 
     #region Public Properties

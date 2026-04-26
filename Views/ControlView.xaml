@@ -28,7 +28,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="0,0,0,8"
-            Visibility="{Binding DataContext.FullScreenMode, RelativeSource={RelativeSource AncestorType=Window}}">
+            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}">
 
             <!--  Bridge Center eller Hoveklub  -->
             <Label Content="Klub:" FontWeight="Bold" />
@@ -145,7 +145,7 @@
                             cal:Message.Attach="[Event Click] = [Action AddTimer]"
                             Content="Tilføj ur"
                             IsEnabled="{Binding Configuration.TimersCanBeAdded}"
-                            Visibility="{Binding DataContext.FullScreenMode, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}" />
 
                         <Button
                             x:Name="btnTest"
@@ -179,14 +179,14 @@
             Grid.Column="0"
             Content="Projektor:"
             FontWeight="Bold"
-            Visibility="{Binding DataContext.FullScreenMode, RelativeSource={RelativeSource AncestorType=Window}}" />
+            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}" />
 
         <WrapPanel
             Grid.Row="3"
             Grid.Column="1"
             Margin="10,0,10,0"
             HorizontalAlignment="Center"
-            Visibility="{Binding DataContext.FullScreenMode, RelativeSource={RelativeSource AncestorType=Window}}">
+            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}">
             <Button
                 Width="100"
                 Margin="5"

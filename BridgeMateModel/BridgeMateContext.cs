@@ -23,7 +23,7 @@ public class BridgeMateContext : DbContext
     public virtual DbSet<PlayerName>       PlayerNames      { get; set; }
     public virtual DbSet<PlayerNumber>     PlayerNumbers    { get; set; }
     public virtual DbSet<ReceivedData>     ReceivedData     { get; set; }
-    public virtual DbSet<RoundData>        RoundData        { get; set; }
+    public virtual DbSet<BMRound>        BMRounds        { get; set; }
     public virtual DbSet<Section>          Sections         { get; set; }
     public virtual DbSet<Session>          Sessions         { get; set; }
     public virtual DbSet<Table>            Tables           { get; set; }
@@ -45,13 +45,13 @@ public class BridgeMateContext : DbContext
         modelBuilder.Entity<PlayerName>(entity => { });
         modelBuilder.Entity<PlayerNumber>(entity => { });
         modelBuilder.Entity<ReceivedData>(entity => { });
-            modelBuilder.Entity<RoundData>(entity =>
+            modelBuilder.Entity<BMRound>(entity =>
             {
                 entity.Property(e => e.TableNo).HasColumnType("smallint");
 
                 // Configure foreign key relationship to Section based on Section.Id
                 entity.HasOne(rd => rd.SectionEntity)
-                      .WithMany(s => s.Rounds)
+                      .WithMany(s => s.RoundData)
                       .HasForeignKey(rd => rd.Section)
                       .HasPrincipalKey(s => s.Id)
                       .OnDelete(DeleteBehavior.ClientSetNull);

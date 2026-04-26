@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dm="clr-namespace:DBF.DataModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sf="http://schemas.syncfusion.com/wpf"
     xmlns:userctls="clr-namespace:DBF.UserControls"
     x:Name="root"
     d:Background="white"
@@ -182,12 +183,22 @@
                     VerticalAlignment="Bottom"
                     Orientation="Horizontal"
                     Visibility="{Binding ButtonsVisibility}">
+
                     <Button
                         x:Name="btnSetting"
-                        Margin="2,0,20,2"
+                        Margin="2,0,30,2"
                         Click="BtnSetting_Click"
                         Content="⚙"
-                        ToolTip="Indstil uret" />
+                        ToolTip="Indstil uret">
+                        <sf:SfBadge.Badge>
+                            <sf:SfBadge
+                                x:Name="badge"
+                                Background="LightBlue"
+                                Foreground="Black"
+                                HorizontalAnchor="Outside"
+                                HorizontalPosition="0.55" />
+                        </sf:SfBadge.Badge>
+                    </Button>
 
                     <Button
                         x:Name="btnStart"

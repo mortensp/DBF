@@ -17,7 +17,7 @@ public class TestViewModel : Screen
 {
     public TestViewModel()
     {
-        Configuration.Load();
+        _=Configuration.LoadAsync();
         Groups = GroupFlags.A | GroupFlags.C;
     }
 

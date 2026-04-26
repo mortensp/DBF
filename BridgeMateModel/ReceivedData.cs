@@ -60,6 +60,7 @@ public partial class ReceivedData
 
     override public string ToString()
     {
-        return $"ReceivedData: Id:{Id}, Section:{Section}, TableNo:{TableNo}, Round:{Round}, Board:{Board}, PairNs:{PairNs}, PairEw:{PairEw}, Declarer:{Declarer}, NsEw:{NsEw}, Contract:{Contract}, Result:{Result}, LeadCard:{LeadCard}, Remarks:{Remarks}, DateLog:{DateLog}, TimeLog:{TimeLog}, Processed:{Processed}, Processed1:{Processed1}, Processed2:{Processed2}, Processed3:{Processed3}, Processed4:{Processed4}, Erased:{Erased}, ExternalUpdate:{ExternalUpdate}, SuspiciousContract:{SuspiciousContract}";
+    //    return $"ReceivedData: Id:{Id}, Section:{Section}, TableNo:{TableNo}, Round:{Round}, Board:{Board}, PairNs:{PairNs}, PairEw:{PairEw}, Declarer:{Declarer}, NsEw:{NsEw}, Contract:{Contract}, Result:{Result}, LeadCard:{LeadCard}, Remarks:{Remarks}, DateLog:{DateLog}, TimeLog:{TimeLog}, Processed:{Processed}, Processed1:{Processed1}, Processed2:{Processed2}, Processed3:{Processed3}, Processed4:{Processed4}, Erased:{Erased}, ExternalUpdate:{ExternalUpdate}, SuspiciousContract:{SuspiciousContract}";
+         return $"Id: {Id} Section: {Section}, TableNo:{TableNo}, Round:{Round},Board: {Board},  Pairs:{PairNs}-{PairEw}, Declarer:{{NsEw}}, Contract:{Contract}{Result}, Processed4:{Processed4}, Erased:{Erased}";
     }
 }

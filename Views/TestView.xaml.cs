@@ -19,7 +19,7 @@ using PropertyChanged;
 using Configuration = DBF.DataModel.Configuration;
 
 namespace DBF.Views;
-  
+
 public partial class TestView : Window
 {
     public TestView()
@@ -30,13 +30,11 @@ public partial class TestView : Window
 
         // Only create/load runtime data when not in designer
         if (Design.IsInDesignMode(this))
-        {
-            Configuration.Load();
-        }
-            BridgeTimer = new() { BackgroundColor = (Color)ColorConverter.ConvertFromString("#F2460D") };
-        
+            _ = Configuration.LoadAsync();
+
+        BridgeTimer = new() { BackgroundColor = (Color)ColorConverter.ConvertFromString("#F2460D") };
     }
 
     public Configuration Configuration { get; set; } = new();
-    public BridgeTimer BridgeTimer { get; set; }
+    public BridgeTimer   BridgeTimer   { get; set; }
 }

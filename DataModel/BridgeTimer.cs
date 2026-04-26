@@ -1,7 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Security;
 using System.Text.Json.Serialization;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -10,6 +14,7 @@ using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.Helpers;
 using DBF.ViewModels;
+using NAudio.MediaFoundation;
 using Syncfusion.UI.Xaml.Schedule;
 
 namespace DBF.DataModel
@@ -19,20 +24,20 @@ namespace DBF.DataModel
         private IAudioService _player { get => field ??= IoC.Get<IAudioService>(); set => field = value; }
         //
         private                 DispatcherTimer _timer;
-        private static readonly TimeSpan        _oneHour    = new TimeSpan(1, 0,  0);
-        private static readonly TimeSpan        _oneMinute  = new TimeSpan(0, 1,  0);
-        private static readonly TimeSpan        _twoMinutes = new TimeSpan(0, 2,  0);
-        private static readonly TimeSpan        _threshold  = new TimeSpan(0, 0,  0);
-        //
-        private TimeSpan _startTime      = new TimeSpan(                   0, 21, 0);
-        private TimeSpan _transitionTime = new TimeSpan(                   0, 1,  0);
-        private TimeSpan _breakTime      = new TimeSpan(                   0, 12, 0);
-        private TimeSpan _warningTime    = new TimeSpan(                   0, 5,  0);
-        //private int      _round;
-        private bool _isAtBreak;
-        private bool _isAtTransition;
+        private static readonly TimeSpan        _oneHour        = new TimeSpan(1, 0,  0);
+        private static readonly TimeSpan        _oneMinute      = new TimeSpan(0, 1,  0);
+        private static readonly TimeSpan        _twoMinutes     = new TimeSpan(0, 2,  0);
+        private static readonly TimeSpan        _threshold      = new TimeSpan(0, 0,  0);
+        private                 TimeSpan        _startTime      = new TimeSpan(                   0, 21, 0);
+        private                 TimeSpan        _transitionTime = new TimeSpan(                   0, 1,  0);
+        private                 TimeSpan        _breakTime      = new TimeSpan(                   0, 12, 0);
+        private                 TimeSpan        _warningTime    = new TimeSpan(                   0, 5,  0);
+        private                 bool            _isAtBreak;
+        private                 bool            _isAtTransition;
+        private Preset BMSettings { get => field; set => field = value; }
         //
         private readonly object _sync = new object();
+
         private TimeSpan _remainingTime
         {
             get => field;
@@ -44,18 +49,18 @@ namespace DBF.DataModel
 
         public BridgeTimer()
         {
-            _timer      = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _timer.Tick+= Timer_Tick;
+            _timer                              = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer.Tick                        += Timer_Tick;
+            ChangedProperties.CollectionChanged+= ChangedProperties_CollectionChanged;
         }
 
         #region Public Properties
-            [JsonIgnore]
-            public bool          IsStarted        => Round >  0;
-            [JsonIgnore]
-            public bool          IsActive         => Round >  0 && Round <= Rounds;
-            [JsonIgnore]
-            public bool          IsEnded          => Round >  Rounds;
-            //
+            [JsonIgnore] public TimeSpan RemainingTime => _remainingTime;
+            [JsonIgnore] public bool IsStarted    => Round >  0;
+            [JsonIgnore] public bool IsActive     => Round >  0 && Round <= Rounds;
+            [JsonIgnore] public bool IsEnded      => Round >  Rounds;
+            [JsonIgnore] public bool IsRunning    => _timer.IsEnabled;
+
             [JsonIgnore] public Configuration Configuration    { get => field ??= IoC.Get<Configuration>(); set => field = value; }
             [JsonIgnore] public string        Time             { get; set; }
             [JsonIgnore] public bool          CanClose         { get; set; }
@@ -64,6 +69,7 @@ namespace DBF.DataModel
             [JsonIgnore] public Visibility    ShowUpButton     { get; set; }
             [JsonIgnore] public Visibility    ShowDownButton   { get; set; }
             [JsonIgnore] public double        MinutesLeft      { get; set; }
+
             [JsonIgnore]
             public int Round
             {
@@ -142,17 +148,38 @@ namespace DBF.DataModel
                                                       , RemainingTime = _remainingTime
                                                       , Round = Round
                                                     };
+
+            [JsonIgnore]
+            public string BadgeText
+            {
+                get => Visibility == Visibility.Visible
+                   &&  ChangedProperties?.Count >  0
+                     ? field
+                     : string.Empty;
+                private set => field = value;
+            } = "Nb";
         #endregion
 
         #region Public Methods
+            public void UpdateBMSettings(Preset preset)
+            {
+                BMSettings = preset;
+
+                MarkChanged(preset);
+            }
+
             public async void OpenSetting()
             {
                 var screen        = IoC.Get<TimerSettingsViewModel>();
                 var windowManager = IoC.Get<IWindowManager>();
                 screen.Setting    = this;
+                //screen.Message    = message;
+                screen.SuggestedSettings(BMSettings);
                 await windowManager.ShowDialogAsync(screen);
 
-                // If the dialog was enden with save, then our Settings was updated
+                // If the dialog was enden with save, then our Settings was been updated
+                ChangedProperties.Clear();
+                BMSettings = null;
                 initTimeSettings();
                 updateDisplay();
             }
@@ -195,9 +222,9 @@ namespace DBF.DataModel
                         &&  _remainingTime == _startTime
                         && !_isAtBreak
                         && !_isAtTransition)
-                            //_player.Play("Ding Ding", Volume);  // Start next round
-                            _player.Play(Sound, Volume);    // End of round
+                            _player.Play("Ding Ding", Volume);  // Start next round
 
+                        //_player.Play(Sound, Volume);    // End of round
                         _timer.Start();
                     }
                 }
@@ -318,7 +345,48 @@ namespace DBF.DataModel
                 }
             }
 
-            public void Reset(bool ask = true,bool plural=false)
+            public void FinishRound(int round)
+            {
+                lock (_sync)
+                {
+                    if (round <  Round
+                    ||  round == Round && (_isAtBreak || _isAtTransition))
+                        return;
+
+                    if (IsActive
+                    &&  _timer.IsEnabled)
+                    {
+                        if (_isAtTransition)
+                            Debugger.Break();
+
+                        if (_isAtBreak)
+                            Debugger.Break();
+
+                        _remainingTime = TimeSpan.Zero;
+                        Round          = round;
+                        updateDisplay();
+                    }
+                    else
+                    {
+                        Round = round;
+                        Forward();
+                    }
+                }
+            }
+
+            public void SetRound(int round)
+            {
+                lock (_sync)
+                {
+                    Round = round;
+
+                    //if (Round == BMRounds && !TeamMatch)
+                    //    _remainingTime += _transitionTime;
+                    updateDisplay();
+                }
+            }
+
+            public void Reset(bool ask = true, bool plural = false)
             {
                 lock (_sync)
                 {
@@ -399,7 +467,10 @@ namespace DBF.DataModel
                                         ||  _isAtBreak)
                                         {
                                             _player.Play("Ding Ding", Volume);  // Start next round
-                                            _remainingTime  = _startTime;
+                                            _remainingTime = _startTime;
+
+                                            //if (Round + 1 == BMRounds && !TeamMatch)
+                                            //    _remainingTime += _transitionTime;
                                             _isAtTransition = false;
                                             _isAtBreak      = false;
                                             IncremetRound();
@@ -407,7 +478,7 @@ namespace DBF.DataModel
                                         else
                                             if (_transitionTime >  TimeSpan.Zero)
                                             {
-                                                _player.Play(Sound, Volume);    // Transition
+                                                _player.Play(Sound, Volume);    // FinishRound
                                                 _isAtTransition = true;
                                                 _remainingTime  = _transitionTime;
                                             }
@@ -502,6 +573,11 @@ namespace DBF.DataModel
                     _remainingTime = _startTime;
             }
 
+            private void ChangedProperties_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                NotifyOfPropertyChange(nameof(BadgeText));
+            }
+
             #region Private Timer Events         
                 private void stopTimer()
                 {
@@ -521,6 +597,39 @@ namespace DBF.DataModel
                         //if (_remainingTime.TotalSeconds <  0)
                         //    _remainingTime = TimeSpan.Zero;
                         updateDisplay();
+                    }
+                }
+
+                public void UpdateBMSettings(bool teams, int rounds, int boardsPerRound)
+                {
+                    if (Rounds         != rounds
+                    ||  BoardsPerRound != boardsPerRound)
+                    {
+                        var preset = Configuration.Presets
+                                                  .FirstOrDefault(p=>  p.TeamMatch      ==teams
+                                                                   &&  p.Rounds         == rounds
+                                                                   &&  p.BoardsPerRound == boardsPerRound);
+
+                        if (preset != null)
+                        {
+                            //this.Update(preset);
+                            Logger.Info($"Timer settings syncronized with BridgeMate Server - Preset: {preset.Name}");
+                        }
+                        else
+                        {
+                            preset                   = new(this);
+                            preset.Name              = null;
+                            preset.Rounds            = rounds;
+                            preset.BoardsPerRound    = boardsPerRound;
+                            preset.Minutes           = boardsPerRound * 7;
+                            preset.TransitionMinutes = 0;
+                            preset.BreakAfterRound   = (rounds + 1) / 2;
+
+                            //Logger.Info($"Timer settings syncronized with BridgeMate Server");
+                        }
+
+                        UpdateBMSettings(preset);
+                        //OpenSetting();
                     }
                 }
 

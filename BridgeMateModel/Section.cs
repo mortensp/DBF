@@ -22,8 +22,8 @@ namespace DBF.BridgeMateModel
         [NotMapped]                                         public string OnlineEventGuid          { get; set; }
         [NotMapped]                                         public short?  OnlineEventRoundDuration { get; set; }
 
-        // Navigation property - one Section has many RoundData
-        public virtual ICollection<RoundData> Rounds { get; set; } = new List<RoundData>();
+        // Navigation property - one Section has many BMRounds
+        public virtual ICollection<BMRound> RoundData { get; set; } = new List<BMRound>();
 
         override public string ToString() => $"Id:{Id}, Letter:{Letter}, Tables:{Tables}, MissingPair:{MissingPair}, EwmoveBeforePlay:{EwmoveBeforePlay}, Session:{Session}, ScoringType:{ScoringType}, Winners:{Winners}, OnlineEventGuid:{OnlineEventGuid}, OnlineEventRoundDuration:{OnlineEventRoundDuration}"; 
     }

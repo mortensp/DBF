@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using DBF.DataModel;
+using DBF.Helpers;
 
 namespace DBF.ViewModels
 {
@@ -13,9 +14,6 @@ namespace DBF.ViewModels
                 this.configuration = configuration;
                 NewConfiguration   = new();
                 NewConfiguration.Update(configuration);
-
-                //if (NewConfiguration.StartTime is null)
-                //NewConfiguration.StartTime = new TimeOnly(19, 0, 0);
             }
         #endregion
 
@@ -26,6 +24,7 @@ namespace DBF.ViewModels
         #region Public Methods
             public async void Cancel()
             {
+                configuration.Save();
                 await TryCloseAsync();
             }
 
@@ -33,18 +32,24 @@ namespace DBF.ViewModels
             {
                 var readBC3        =configuration.ReadBC3 ;
                 var readBridgeMate =configuration.ReadBridgeMate ;
-                var vm             =IoC.Get<ControlViewModel>();
-
-                await TryCloseAsync();
 
                 configuration.Update(NewConfiguration);
                 configuration.Save();
 
-                if (readBC3 != NewConfiguration.ReadBC3)
-                    vm?.SetBC3Watcher(NewConfiguration.ReadBC3);
+                Logger.Debug("App settings changed");
 
-                if (readBridgeMate != NewConfiguration.ReadBridgeMate)
-                    vm?.SetBridgeMateWatcher(NewConfiguration.ReadBridgeMate);
+                if (configuration.IsLoaded)
+                {
+                    var vm =IoC.Get<ControlViewModel>();
+
+                    if (readBC3 != NewConfiguration.ReadBC3)
+                        vm?.SetBC3Watcher(NewConfiguration.ReadBC3);
+
+                    if (readBridgeMate != NewConfiguration.ReadBridgeMate)
+                        vm?.SetBridgeMateWatcher(NewConfiguration.ReadBridgeMate);
+                }
+
+                await TryCloseAsync();
             }
         #endregion
     }
