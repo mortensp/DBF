@@ -5,12 +5,16 @@
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
     Title="DBF Tools"
     cal:Message.Attach="[Event KeyDown] = [OnKeyDown($eventArgs)]"
     d:Height="800"
     d:Width="1100"
+    lex:LocalizeDictionary.DesignCulture="en"
+    lex:ResxLocalizationProvider.DefaultAssembly="DBF"
+    lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     FontSize="14"
     WindowState="Normal"
     mc:Ignorable="d">
@@ -22,23 +26,26 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="_Indstillinger" />
-           
-            <MenuItem Header="Vis">
+            <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="{lex:Loc mnuSettings}" />
+
+            <MenuItem Header="{lex:Loc mnuView}">
                 <MenuItem
                     cal:Message.Attach="[Event Click] = [ToggleFullscreen]"
-                    Header="_Fuld skærm tilstand"
+                    Header="{lex:Loc mnuFullscreen}"
                     InputGestureText="F11" />
             </MenuItem>
-            
-            <MenuItem Header="Hjælp">
-                <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="_Bridgeure" />
-                <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="_Genstart og bevar urenes status" />-->
-                <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="_Skift program version" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="_Åbn JSON indstillinger" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="Åbn _Logfil" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="_Om" />
+
+            <MenuItem Header="{lex:Loc mnuHelp}">
+                <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuBridgeTimers}" />
+                <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />-->
+                <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="{lex:Loc mnuOpenJsonSettings}" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="{lex:Loc mnuAbout}" />
             </MenuItem>
+            
+            <MenuItem Name="toggleLanguage"  cal:Message.Attach="[Event Click] = [Action ToggleLanguageAsync]" Header="{lex:Loc mnuToggleLanguage}" />
+
         </Menu>
 
         <ContentControl x:Name="ActiveItem" Grid.Row="1" />

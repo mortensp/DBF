@@ -6,13 +6,17 @@
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dbf="clr-namespace:DBF"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:DBF.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
-    Title="Indstillinger"
+    Title="{lex:Loc appSettings}"
     Width="400"
     Height="350"
+    lex:LocalizeDictionary.DesignCulture="en"
+    lex:ResxLocalizationProvider.DefaultAssembly="DBF"
+    lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
@@ -66,16 +70,16 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  Generelt  -->
+                    <!--  General  -->
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="0"
-                        Margin="0,0,0,0"
+                        Margin="0,3,171,18"
                         FontSize="16"
                         FontWeight="Bold"
-                        Text="Generelt:" />
+                        Text="{lex:Loc General}" Grid.ColumnSpan="2" Grid.RowSpan="3" />
 
-                    <!--  Start tid  -->
+                    <!--  Start time  -->
                     <!--<TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -96,7 +100,7 @@
                         Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
-                        Text="Indlæs Start- og Resultatliste:" />
+                        Text="{lex:Loc ReadBC3}" />
 
                     <CheckBox
                         Grid.Row="2"
@@ -112,7 +116,7 @@
                         Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
-                        Text="Indlæs BridgeMate status:" />
+                        Text="{lex:Loc ReadBM}" />
 
                     <CheckBox
                         Grid.Row="3"
@@ -146,7 +150,7 @@
                         Grid.Column="0"
                         FontSize="16"
                         FontWeight="Bold"
-                        Text="Projektor:" />
+                        Text="{lex:Loc Projector}" />
 
                     <!--  Projector Interval:  -->
                     <TextBlock
@@ -154,7 +158,7 @@
                         Grid.Column="0"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
-                        Text="Bladringsinterval på projektor:" />
+                        Text="{lex:Loc ProjectorInterval}" />
 
                     <StackPanel
                         Grid.Row="6"
@@ -168,7 +172,7 @@
                         <TextBlock
                             Margin="4,0,4,0"
                             VerticalAlignment="Center"
-                            Text="sekunder" />
+                            Text="{lex:Loc Seconds}" />
 
                     </StackPanel>
 
@@ -179,7 +183,7 @@
                         Grid.Column="0"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
-                        Text="Max linjer af gangen:" />
+                        Text="{lex:Loc MaxRows}" />
 
                     <TextBox
                         Grid.Row="7"
@@ -202,12 +206,12 @@
                 Width="80"
                 Margin="0,0,8,0"
                 cal:Message.Attach="[Event Click] = [Action Cancel]"
-                Content="Annuller"
+                Content="{lex:Loc btnCancel}"
                 IsCancel="True" />
             <Button
                 Width="80"
                 cal:Message.Attach="[Event Click] = [Action AcceptSetting]"
-                Content="Anvend"
+                Content="{lex:Loc btnAccept}"
                 IsDefault="True" />
         </StackPanel>
     </Grid>

@@ -1,15 +1,18 @@
-﻿using System.Xml.Serialization;
+﻿using System.Globalization;
+using System.Xml.Serialization;
 
 namespace DBF.DataModel
 {
     [XmlRoot(ElementName = "PlayingTime")]
     public class PlayingTime : IEquatable<PlayingTime>
     {
+        private static readonly CultureInfo DkCulture = new("da-DK");
+
         [XmlAttribute(AttributeName = "Date")] public string                DateStr         { get; set; }
         [XmlElement("GroupTournament")] public        List<GroupTournament> TournamentFiles { get; set; }
 
         //-----
-        public DateTime              Date=> DateTime.Parse(DateStr);
+        public DateTime              Date=> DateTime.Parse(DateStr, DkCulture);
 
         //-----
         [XmlIgnore]

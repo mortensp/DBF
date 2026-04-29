@@ -11,8 +11,8 @@ namespace DBF.Converters
         {
             var Text = value?.ToString().ToLower();
 
-             // Select color based on content
-          
+            // Select color based on content
+            //TODO: Use Localazation
             if (Text?.ToLower().Contains(" rød ") == true)
                 return Brushes.Red;
 

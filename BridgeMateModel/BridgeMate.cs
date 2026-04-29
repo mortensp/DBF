@@ -63,7 +63,7 @@ public class BridgeMate : PropertyChangedBase
         if (!Directory.Exists(path))
         {
             Logger.Info($"BridgeMate: Directory not found: {path}");
-            MessageBox.Show($"Mappen: '{path}' findes ikke. Så oplysningerne fra terminalerne kan ikke indlæses", "Fejl");
+            MessageBox.Show($"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}", Lex.Error);
         }
         else
             foreach (var found in Directory.GetFiles(path, $"*.{SearchExt}")
@@ -96,9 +96,7 @@ public class BridgeMate : PropertyChangedBase
                                     var cntBoards = BMRounds.First().BoardsPerRound;
 
                                     foreach (var timer in Configuration.GetRelatedTimers(section.Letter))
-                                        //if (timer.Rounds != cntRounds
-                                        //||  BMRounds.Any(r => r.Done == false && r.Section == section.Id))
-                                            timer.UpdateBMSettings(section.ScoringType == 4, cntRounds, cntBoards);
+                                        timer.UpdateBMSettings(section.ScoringType == 4, cntRounds, cntBoards);
                                 }
 
                                 startPolling();
@@ -107,6 +105,7 @@ public class BridgeMate : PropertyChangedBase
                             return;
                         }
                 }
+
                 catch (Exception ex)
                 {
                     Logger.Exception(ex, $"BridgeMate: error opening/handling the file {file}");
@@ -202,15 +201,14 @@ public class BridgeMate : PropertyChangedBase
 
                     default:
                         Logger.Info($"BridgeMate: unhandled file event {ev.ChangeType} for file {ev.FullPath}");
-                        Debug.WriteLine($"File {ev.ChangeType}: {ev.Name}");
+                        Logger.Debug($"File {ev.ChangeType}: {ev.Name}");
                         break;
                 }
             }
-
             catch (Exception ex)
             {
                 Logger.Exception(ex, "BridgeMate.handleFileEventAsync");
-                MessageBox.Show($"Fejl ved læsning af BridgeMate mappen: " + ex.Message, "Fejl");
+                MessageBox.Show($"{Lex.ErrorReadingBrideMateFolder}: " + ex.Message, Lex.Error);
             }
         }
 
@@ -345,10 +343,9 @@ public class BridgeMate : PropertyChangedBase
                         updatePlayedBoards();
                     }
                 }
-
                 catch (OperationCanceledException)
                 {
-            // Normal shutdown
+                    // Normal shutdown
                     Logger.Debug("Stop polling");
                 }
             }

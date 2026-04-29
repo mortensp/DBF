@@ -1,7 +1,8 @@
-﻿using DBF.ViewModels;
-using Caliburn.Micro;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using Caliburn.Micro;
+using DBF.ViewModels;
 
 namespace DBF.Views
 {
@@ -17,8 +18,19 @@ namespace DBF.Views
             if (this.WindowState == System.Windows.WindowState.Maximized)
                 this.WindowState =  System.Windows.WindowState.Normal;
 
-            Loaded  += ShellView_Loaded;
-            Closing += ShellView_Closing;
+            Loaded += ShellView_Loaded;
+            Closing+= ShellView_Closing;
+
+            // Only show the test button when running under a debugger
+            if (Debugger.IsAttached)
+            {
+                var btn = this.FindName("toggleLanguage") as UIElement;
+
+                if (btn != null)
+                    btn.Visibility = Visibility.Visible;
+                else
+                    btn.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void ShellView_Loaded(object sender, RoutedEventArgs e)

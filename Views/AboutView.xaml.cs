@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using DBF.Resources;
 
 namespace DBF.Views
 {
@@ -22,6 +23,7 @@ namespace DBF.Views
     {
              public AboutView()
         {
+            //Title=Lex.AboutTitle;
             InitializeComponent();
         }
     }

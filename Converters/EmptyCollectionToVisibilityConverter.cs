@@ -19,10 +19,10 @@ namespace DBF.Converters
                 isEmpty        = !enumerator.MoveNext();
             }
             else
-if (value == null)
-   isEmpty = true;
-else
-   isEmpty = false;
+                if (value == null)
+                    isEmpty = true;
+                else
+                    isEmpty = false;
 
             if (Invert)
                 isEmpty = !isEmpty;

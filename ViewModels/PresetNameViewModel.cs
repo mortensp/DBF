@@ -25,10 +25,10 @@ namespace DBF.ViewModels
         public async Task ConfirmInput()
         {
             if (string.IsNullOrEmpty(PresetName))
-                MessageBox.Show("Du skal angive et navn til de nye indstillinger!", "Indstillinger", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Lex.NameIt+"!", Lex.Settings, MessageBoxButton.OK, MessageBoxImage.Information);
             else
                 if (Configuration.Presets.FirstOrDefault(p => p.Name == PresetName) != null)
-                    MessageBox.Show("Der findes allerede en indstilling med det navn!", "Indstillinger", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Lex.PresetAlreadyExists, Lex.Settings, MessageBoxButton.OK, MessageBoxImage.Information);
                 else
                     await TryCloseAsync();
         }

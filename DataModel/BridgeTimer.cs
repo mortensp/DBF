@@ -196,7 +196,7 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    var result = MessageBox.Show("Hvis du lukker uret, så nulstilles det. Vil du lukke uret?", "Bekræftelse", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                    var result = MessageBox.Show(Lex.CloseAndResetWarning, Lex.Confirmation, MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
                     if (result == MessageBoxResult.OK)
                     {
@@ -393,9 +393,9 @@ namespace DBF.DataModel
                     if (ask == false
                     ||  IsStarted           == false
                     ||  MessageBoxResult.OK == MessageBox.Show( plural
-                                                              ? "Hvis du nulstiller urene, indlæses alle indstillingerne på ny. Vil du fortsætte?"
-                                                              : "Hvis du nulstiller uret, indlæses indstillingerne på ny. Vil du fortsætte?"
-                                                              , "Bekræftelse"
+                                                              ? $"{Lex.ResetTimersPlural} {Lex.ContinueQuestion}"
+                                                              : $"{Lex.ResetTimers} {Lex.ContinueQuestion}"
+                                                              , Lex.Confirmation
                                                               , MessageBoxButton.OKCancel
                                                               , MessageBoxImage.Question))
                     {
@@ -468,10 +468,7 @@ namespace DBF.DataModel
                                         {
                                             _player.Play("Ding Ding", Volume);  // Start next round
                                             _remainingTime = _startTime;
-
-                                            //if (Round + 1 == BMRounds && !TeamMatch)
-                                            //    _remainingTime += _transitionTime;
-                                            _isAtTransition = false;
+                                                                                    _isAtTransition = false;
                                             _isAtBreak      = false;
                                             IncremetRound();
                                         }
@@ -509,18 +506,18 @@ namespace DBF.DataModel
                                          ? Visibility.Visible : 
                                          Visibility.Collapsed;
 
-                Info = $"Vi spiller {Rounds} {getRoundsText} af {BoardsPerRound} spil";
+                Info = $"{Lex.WeArePlaying} {Rounds} {getRoundsText} {Lex.Of} {BoardsPerRound} {Lex.Boards}";
 
                 if (Round == Rounds && !TeamMatch)
                 {
-                    RoundText = $"Sidste runde!";
+                    RoundText = Lex.LastRound;
                     Info      = string.Empty;
                 }
                 else
                     if (Round <= Rounds)
                         if (_isAtBreak)
                         {
-                            RoundText = $"Pause til kl: " + PauseEndTime?.ToString("HH:mm");
+                            RoundText = $"{Lex.PauseUntil}: " + PauseEndTime?.ToString("HH:mm");
                             Info      = PauseMessage;
                         }
                         else
@@ -529,21 +526,19 @@ namespace DBF.DataModel
                             &&  BreakAfterRound >  0
                             &&  BreakMinutes    >  0)
                                 Info += Environment.NewLine
-                                      + $"{BreakMinutes} minutters pause efter {BreakAfterRound}. {getRoundText}";
+                                      + $"{BreakMinutes} {Lex.MinutesBreakAfter} {BreakAfterRound}. {getRoundText}";
 
                             if (_isAtTransition)
-                                RoundText = $"Der skiftes til {Math.Max(2, Round + 1)}. {getRoundText}";
+                                RoundText = $"{Lex.TransitioningTo} {Math.Max(2, Round + 1)}. {getRoundText}";
                             else
                                 RoundText = $"{Math.Max(1, Round)}. {getRoundText}";
                         }
                     else
                     {
                         RoundText = EndGreetingTop
-                                 ?? $"Tak for god ro og orden.";
+                                 ?? Lex.ThanksForNow;
                         Info      = EndGreetingBottom
-                                 ?? "Husk at rydde op på og "
-                                  //+ Environment.NewLine
-                                  + "omkring bordet";
+                                 ?? Lex.RememberToCleanUp;
                         Time      = string.Empty;
                     }
 
@@ -587,15 +582,10 @@ namespace DBF.DataModel
 
                 private void Timer_Tick(object sender, EventArgs e)
                 {
-                    //if (_remainingTime.TotalSeconds <= 0)
-                    //    stopTimer();
-                    //else
                     if (_timer.IsEnabled)
                     {
                         _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
 
-                        //if (_remainingTime.TotalSeconds <  0)
-                        //    _remainingTime = TimeSpan.Zero;
                         updateDisplay();
                     }
                 }
@@ -612,7 +602,6 @@ namespace DBF.DataModel
 
                         if (preset != null)
                         {
-                            //this.Update(preset);
                             Logger.Info($"Timer settings syncronized with BridgeMate Server - Preset: {preset.Name}");
                         }
                         else
@@ -625,16 +614,14 @@ namespace DBF.DataModel
                             preset.TransitionMinutes = 0;
                             preset.BreakAfterRound   = (rounds + 1) / 2;
 
-                            //Logger.Info($"Timer settings syncronized with BridgeMate Server");
                         }
 
                         UpdateBMSettings(preset);
-                        //OpenSetting();
                     }
                 }
 
-                private string getRoundText  => TeamMatch ? "halvleg" : "runde";
-                private string getRoundsText => TeamMatch ? "halvlege" : "runder";
+                private string getRoundText  => TeamMatch ? Lex.Half : Lex.Round;
+                private string getRoundsText => TeamMatch ? Lex.Halfs : Lex.Rounds   ;
             #endregion
         #endregion
     }

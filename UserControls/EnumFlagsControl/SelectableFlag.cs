@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using WPFLocalizeExtension.Engine;
+using WPFLocalizeExtension.Providers;
 
 namespace DBF.UserControls
 {
@@ -38,3 +40,4 @@ namespace DBF.UserControls
            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
     }
 }
+

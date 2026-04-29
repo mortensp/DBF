@@ -49,7 +49,7 @@ namespace DBF.AudioServices
                         filePath = soundName;
                     else
                     {
-                        Logger.Error($"sound file doesn't exist: '{soundName}'");
+                        Logger.Error($"{Lex.MissingSoundFile}: '{soundName}'");
                         return;
                     }
                 else
@@ -92,7 +92,7 @@ namespace DBF.AudioServices
             }
             catch (Exception ex)
             {
-                Logger.Exception(ex,$"Error playing sound:'{soundName}'");
+                Logger.Exception(ex,$"{Lex.ErrorPlayingSound}:'{soundName}'");
                 return;
             }
         }

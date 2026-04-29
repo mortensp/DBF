@@ -1,0 +1,585 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>Om DBF Tools</value>
+  </data>
+  <data name="AddTimer" xml:space="preserve">
+    <value>Tilføj Ur</value>
+  </data>
+  <data name="BridgeTimers" xml:space="preserve">
+    <value>Bridge Ure</value>
+  </data>
+  <data name="btnAccept" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="btnCancel" xml:space="preserve">
+    <value>Annuller</value>
+  </data>
+  <data name="btnClose" xml:space="preserve">
+    <value>Luk</value>
+  </data>
+  <data name="btnSaveAndClose" xml:space="preserve">
+    <value>Gem status og Luk</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Resultater</value>
+  </data>
+  <data name="btnYesAndReset" xml:space="preserve">
+    <value>Nulstil og Luk</value>
+  </data>
+  <data name="Club" xml:space="preserve">
+    <value>Klub</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Bekræft</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Dato</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Dette er et simpelt hjælpe program, som arbejder samme med BC3's output. Dvs. at Start og Resultatlister hentes fra de data, som er sendt eller sendes til hjemmesiden.&amp;#10; Bridgeurene er dog uafhængige af BC3. </value>
+  </data>
+  <data name="ExpectedEndTime" xml:space="preserve">
+    <value>Forventet slut</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>Generalt</value>
+  </data>
+  <data name="MaxRows" xml:space="preserve">
+    <value>Max linjer af gangen:</value>
+  </data>
+  <data name="Projector" xml:space="preserve">
+    <value>Projektor</value>
+  </data>
+  <data name="ProjectorInterval" xml:space="preserve">
+    <value>Bladringsinterval på projektor:</value>
+  </data>
+  <data name="ReadBC3" xml:space="preserve">
+    <value>Indlæs Start- og Resultatliste:</value>
+  </data>
+  <data name="ReadBM" xml:space="preserve">
+    <value>Indlæs BridgeMate status:</value>
+  </data>
+  <data name="Vis Start" xml:space="preserve">
+    <value>Resultater</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>sekunder</value>
+  </data>
+  <data name="Startlist" xml:space="preserve">
+    <value>Startliste</value>
+  </data>
+  <data name="StartTime" xml:space="preserve">
+    <value>Start kl.</value>
+  </data>
+  <data name="Subclub" xml:space="preserve">
+    <value>Hold</value>
+  </data>
+  <data name="btnShowStartLists" xml:space="preserve">
+    <value>Vis Startlister</value>
+  </data>
+  <data name="btnShowResults" xml:space="preserve">
+    <value>Vis Resultater</value>
+  </data>
+  <data name="btnShowBridgeTimers" xml:space="preserve">
+    <value>Vis Urene</value>
+  </data>
+  <data name="NewSetting" xml:space="preserve">
+    <value>Ny Instilling</value>
+  </data>
+  <data name="NameIt" xml:space="preserve">
+    <value>Navngiv den</value>
+  </data>
+  <data name="DBFProjector" xml:space="preserve">
+    <value>DBF Projektor</value>
+  </data>
+  <data name="mnuSettings" xml:space="preserve">
+    <value>_Indstillinger</value>
+  </data>
+  <data name="mnuView" xml:space="preserve">
+    <value>Vis</value>
+  </data>
+  <data name="mnuFullscreen" xml:space="preserve">
+    <value>Fuldskærm tilstand</value>
+  </data>
+  <data name="mnuHelp" xml:space="preserve">
+    <value>Hjælp</value>
+  </data>
+  <data name="mnuBridgeTimers" xml:space="preserve">
+    <value>Bridge Ure</value>
+  </data>
+  <data name="mnuChangeProgramVersion" xml:space="preserve">
+    <value>_Skift Program Version</value>
+  </data>
+  <data name="mnuOpenJsonSettings" xml:space="preserve">
+    <value>Åben JSON Indstillinger</value>
+  </data>
+  <data name="mnuOpenLogFile" xml:space="preserve">
+    <value>Åben Logfile</value>
+  </data>
+  <data name="mnuAbout" xml:space="preserve">
+    <value>Om</value>
+  </data>
+  <data name="TimerSettings" xml:space="preserve">
+    <value>Ur Indstillinger</value>
+  </data>
+  <data name="Groups" xml:space="preserve">
+    <value>Rækker</value>
+  </data>
+  <data name="SetClock" xml:space="preserve">
+    <value>Indstil Uret</value>
+  </data>
+  <data name="Background" xml:space="preserve">
+    <value>Baggrunds farve</value>
+  </data>
+  <data name="Foreground" xml:space="preserve">
+    <value>Tekst farve</value>
+  </data>
+  <data name="Sound" xml:space="preserve">
+    <value>Lyd</value>
+  </data>
+  <data name="CreateNewPreset" xml:space="preserve">
+    <value>Brug Gemt Indstilling</value>
+  </data>
+  <data name="UsePreset" xml:space="preserve">
+    <value>Brug forudindstilling</value>
+  </data>
+  <data name="SavePreset" xml:space="preserve">
+    <value>Gem Forudindstilling</value>
+  </data>
+  <data name="DeletePreset" xml:space="preserve">
+    <value>Slet Forudindstilling</value>
+  </data>
+  <data name="TeamMatch" xml:space="preserve">
+    <value>Holdkamp</value>
+  </data>
+  <data name="Rounds" xml:space="preserve">
+    <value>Runder</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>af</value>
+  </data>
+  <data name="BreakAfterRound" xml:space="preserve">
+    <value>Pause efter Runde</value>
+  </data>
+  <data name="TimePerRound" xml:space="preserve">
+    <value>Tid pr. Runde</value>
+  </data>
+  <data name="WarningDoNotStartNewGames" xml:space="preserve">
+    <value>Start ikke nye spil advarsel</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutter</value>
+  </data>
+  <data name="TransitionTime" xml:space="preserve">
+    <value>Tid til Rundeskifte</value>
+  </data>
+  <data name="BreakMinutes" xml:space="preserve">
+    <value>Pause længde</value>
+  </data>
+  <data name="BreakMessage" xml:space="preserve">
+    <value>Pause Meddelse</value>
+  </data>
+  <data name="EndGreetingTop" xml:space="preserve">
+    <value>Slut Hilsen Øverst</value>
+  </data>
+  <data name="EndGreetingBottom" xml:space="preserve">
+    <value>Slut Hilsen Nederst</value>
+  </data>
+  <data name="ExpectedPlayingTime" xml:space="preserve">
+    <value>Forventet spille tid</value>
+  </data>
+  <data name="appSettings" xml:space="preserve">
+    <value>Program Indstillinger</value>
+  </data>
+  <data name="MissingSoundFile" xml:space="preserve">
+    <value>Lyd filen blev ikke fundet</value>
+  </data>
+  <data name="ErrorPlayingSound" xml:space="preserve">
+    <value>Fejl ved afspilling af lyd</value>
+  </data>
+  <data name="Folder" xml:space="preserve">
+    <value>Mappen</value>
+  </data>
+  <data name="DoNotExist" xml:space="preserve">
+    <value>findes ikke</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Fejl</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>Filen blev ikke fundet</value>
+  </data>
+  <data name="InPath" xml:space="preserve">
+    <value>i stien</value>
+  </data>
+  <data name="ErrorReadingBrideMateFolder" xml:space="preserve">
+    <value>Fejl ved læsning af BridgeMate mappen</value>
+  </data>
+  <data name="CloseAndResetWarning" xml:space="preserve">
+    <value>Hvis du lukker uret, så nulstilles det. Vil du lukke uret?</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Bekræftelse</value>
+  </data>
+  <data name="ContinueQuestion" xml:space="preserve">
+    <value>Vil du fortsætte?</value>
+  </data>
+  <data name="ResetTimersPlural" xml:space="preserve">
+    <value>Hvis du nulstiller urene, indlæses alle indstillingerne på ny.</value>
+  </data>
+  <data name="ResetTimers" xml:space="preserve">
+    <value>Hvis du nulstiller uret, indlæses indstillingerne på ny.</value>
+  </data>
+  <data name="WeArePlaying" xml:space="preserve">
+    <value>Vi spiller</value>
+  </data>
+  <data name="Of" xml:space="preserve">
+    <value>af</value>
+  </data>
+  <data name="Boards" xml:space="preserve">
+    <value>spil</value>
+  </data>
+  <data name="LastRound" xml:space="preserve">
+    <value>Sidste Runde!</value>
+  </data>
+  <data name="PauseUntil" xml:space="preserve">
+    <value>Pause til kl</value>
+  </data>
+  <data name="MinutesBreakAfter" xml:space="preserve">
+    <value>minutters pause efter</value>
+  </data>
+  <data name="TransitioningTo" xml:space="preserve">
+    <value>Der skiftes til</value>
+  </data>
+  <data name="ThanksForNow" xml:space="preserve">
+    <value>Tak for god ro og orden.</value>
+  </data>
+  <data name="RememberToCleanUp" xml:space="preserve">
+    <value>Husk at rydde op på og omkring bordet</value>
+  </data>
+  <data name="Half" xml:space="preserve">
+    <value>Halvleg</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>runde</value>
+  </data>
+  <data name="Halfs" xml:space="preserve">
+    <value>Halvlege</value>
+  </data>
+  <data name="ThisWillResetTheTimer" xml:space="preserve">
+    <value>Dette vil nulstille uret.</value>
+  </data>
+  <data name="tipTimerSetup" xml:space="preserve">
+    <value>Indstil uret</value>
+  </data>
+  <data name="tipCloseTimer" xml:space="preserve">
+    <value>Luk og sluk uret</value>
+  </data>
+  <data name="tipStartTimer" xml:space="preserve">
+    <value>Start uret</value>
+  </data>
+  <data name="tipRestartTimer" xml:space="preserve">
+    <value>Genstart runden. Hold Shift nede for at genstarts runden på alle urene</value>
+  </data>
+  <data name="tipPauseTimer" xml:space="preserve">
+    <value>Sæt uret på Pause. Hold Shift nede for at Pause alle urene</value>
+  </data>
+  <data name="tipNextRound" xml:space="preserve">
+    <value>Gå til næste Runden. Hold shift nede for at gå til næste runde på alle urene</value>
+  </data>
+  <data name="tipLessTime" xml:space="preserve">
+    <value>Afkort Runden. Hold Shift nede for at Afkorte tiden på alle urene</value>
+  </data>
+  <data name="tipMoreTime" xml:space="preserve">
+    <value>Give mere tid i runden. Hold shift nede for at give mere tid på alle urene</value>
+  </data>
+  <data name="tipMoveTimerUp" xml:space="preserve">
+    <value>Flyt uret op</value>
+  </data>
+  <data name="tipMoveTimerDown" xml:space="preserve">
+    <value>Flyt uret ned</value>
+  </data>
+  <data name="tipResetTimer" xml:space="preserve">
+    <value>Indlæs valgte indstillinger. Hold Shift nede for at Indlæse indstillinger for alle urene</value>
+  </data>
+  <data name="chkShowAsOneGroup" xml:space="preserve">
+    <value>Vis som én række</value>
+  </data>
+  <data name="hdGroup" xml:space="preserve">
+    <value>Rk</value>
+  </data>
+  <data name="hdNo" xml:space="preserve">
+    <value>Nr</value>
+  </data>
+  <data name="hdTeam" xml:space="preserve">
+    <value>Hold</value>
+  </data>
+  <data name="hpKp" xml:space="preserve">
+    <value>KP</value>
+  </data>
+  <data name="hdImps" xml:space="preserve">
+    <value>Imps</value>
+  </data>
+  <data name="hdOpponentTeam" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="hdKPTotal" xml:space="preserve">
+    <value>KP Total</value>
+  </data>
+  <data name="hdSubGroup" xml:space="preserve">
+    <value>Led</value>
+  </data>
+  <data name="hdNames" xml:space="preserve">
+    <value>Navne</value>
+  </data>
+  <data name="hdHACRank" xml:space="preserve">
+    <value>Hac pos</value>
+  </data>
+  <data name="hdHACGroup" xml:space="preserve">
+    <value>Hac grp</value>
+  </data>
+  <data name="hdActualScore" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="hdScore" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="hdHAC" xml:space="preserve">
+    <value>Hac</value>
+  </data>
+  <data name="hdMP" xml:space="preserve">
+    <value>MP</value>
+  </data>
+  <data name="hdKP" xml:space="preserve">
+    <value>KP</value>
+  </data>
+  <data name="hdResult" xml:space="preserve">
+    <value>Resultat</value>
+  </data>
+  <data name="hdTournament" xml:space="preserve">
+    <value>Turnering</value>
+  </data>
+  <data name="hdTournamentScore" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="hdRanking" xml:space="preserve">
+    <value>Stilling</value>
+  </data>
+  <data name="hdPosition" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="hdActualPct" xml:space="preserve">
+    <value>Opnået %</value>
+  </data>
+  <data name="hdSection" xml:space="preserve">
+    <value>Sektion</value>
+  </data>
+  <data name="hdTournamentPos" xml:space="preserve">
+    <value>Pos</value>
+  </data>
+  <data name="hdPos" xml:space="preserve">
+    <value>Pos</value>
+  </data>
+  <data name="hdHacPos" xml:space="preserve">
+    <value>Hac pos</value>
+  </data>
+  <data name="hdStartPos" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="hdPlayers" xml:space="preserve">
+    <value>Spillere</value>
+  </data>
+  <data name="hdDeltaHac" xml:space="preserve">
+    <value>ΔHac</value>
+  </data>
+  <data name="hdExpectedScore" xml:space="preserve">
+    <value>Forventet</value>
+  </data>
+  <data name="UnfinishedSection" xml:space="preserve">
+    <value>er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!</value>
+  </data>
+  <data name="aPriorSection" xml:space="preserve">
+    <value>En tidligere runde</value>
+  </data>
+  <data name="theSectionDate" xml:space="preserve">
+    <value>Runden d.</value>
+  </data>
+  <data name="MissingStartlist" xml:space="preserve">
+    <value>Kan ikke finde Startliste i mappen</value>
+  </data>
+  <data name="FirstHalf" xml:space="preserve">
+    <value>1. halvdel</value>
+  </data>
+  <data name="SecondHalf" xml:space="preserve">
+    <value>2. halvdel</value>
+  </data>
+  <data name="EW" xml:space="preserve">
+    <value>ØV</value>
+  </data>
+  <data name="NS" xml:space="preserve">
+    <value>NS</value>
+  </data>
+  <data name="BC3NotUploaded" xml:space="preserve">
+    <value>BC3 data er ikke sendt til hjemmesiden</value>
+  </data>
+  <data name="BC3Data" xml:space="preserve">
+    <value>BC3 data</value>
+  </data>
+  <data name="NotUploaded" xml:space="preserve">
+    <value>er ikke sendt til hjemmesiden</value>
+  </data>
+  <data name="BC3DataFor" xml:space="preserve">
+    <value>BC3 data for</value>
+  </data>
+  <data name="ErrorReadingStartOrResultLists" xml:space="preserve">
+    <value>Fejl ved læsning af Start- eller Resultatlister</value>
+  </data>
+  <data name="ErrorFile" xml:space="preserve">
+    <value>fejl ved åbning/håndtering af filen</value>
+  </data>
+  <data name="ErrorMainXml" xml:space="preserve">
+    <value>Fejl ved læsning af Main.xml</value>
+  </data>
+  <data name="ErrorDeserializing" xml:space="preserve">
+    <value>Fejl ved deserialisering af fil</value>
+  </data>
+  <data name="BridgeMateError" xml:space="preserve">
+    <value>Så oplysningerne fra terminalerne kan ikke indlæses</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Indstillinger</value>
+  </data>
+  <data name="PresetAlreadyExists" xml:space="preserve">
+    <value>Der findes allerede en indstilling med samme navn</value>
+  </data>
+  <data name="ErrorExecutableFileMissing" xml:space="preserve">
+    <value>Kan ikke finde den eksekverbare fil</value>
+  </data>
+  <data name="ErrorRestart" xml:space="preserve">
+    <value>Genstart mislykkedes</value>
+  </data>
+  <data name="SaveSettingsQuestion" xml:space="preserve">
+    <value>Vil du også gemme ændringerne i din forudstilling</value>
+  </data>
+  <data name="mnuToggleLanguage" xml:space="preserve">
+    <value>English</value>
+  </data>
+</root>

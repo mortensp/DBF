@@ -20,7 +20,6 @@
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Platforms>AnyCPU;x64</Platforms>
-		<DefineConstants>$(DefineConstants);TEST</DefineConstants>
 		<ApplicationIcon>Images\DBF_Tools.ico</ApplicationIcon>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<ComVisible>false</ComVisible>
@@ -29,6 +28,9 @@
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<!--<DefineConstants>$(DefineConstants);TEST</DefineConstants>-->
+	</PropertyGroup>
 
 	<ItemGroup>
 		<Compile Remove="BridgeMateModel\BiddingData.cs" />
@@ -91,6 +93,7 @@
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.5" />
 		<PackageReference Include="System.Management" Version="10.0.5" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
+		<PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
 	</ItemGroup>
 
 
@@ -124,6 +127,18 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Settings.settings</DependentUpon>
 		</Compile>
+
+		<Compile Update="Resources\Strings.da.Designer.cs">
+		  <DependentUpon>Strings.da.resx</DependentUpon>
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		</Compile>
+
+		<Compile Update="Resources\Strings.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Strings.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -131,6 +146,23 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Strings.da.resx">
+		  <Generator></Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Strings.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		
+		<!--<EmbeddedResource Update="Resources\Strings.da.resx">
+		  <LastGenOutput>Strings.da.Designer.cs</LastGenOutput>
+		  <Generator>ResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		
+		<EmbeddedResource Update="Resources\Strings.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+		</EmbeddedResource>-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -155,6 +187,7 @@
 
 		<ProjectReference Include="..\..\Common Libs\AppArguments\AppArguments.csproj" />
 		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
+		<ProjectReference Include="..\..\Common Libs\Localization\Localization.csproj" />
 	</ItemGroup>
 
 </Project>

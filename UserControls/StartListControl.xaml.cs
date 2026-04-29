@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
+using DBF.ViewModels;
 using Syncfusion.Data;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
@@ -38,27 +39,28 @@ namespace DBF.UserControls
             public StartListControl()
             {
                 InitializeComponent();
-                this.Loaded+= UserControl_Loaded;
+                this.DataContextChanged+= StartlistControl_DataContextChanged;
+                this.Loaded            += UserControl_Loaded;
 
                 // Pairs
                 dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
-                dgPairs.GroupCollapsed                 += ( s, e) => dgPairs.RefreshSorting();
-                dgPairs.GroupExpanded                  += (  s, e) => dgPairs.RefreshSorting();
+                dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
+                dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
                 dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
-                dgPairs.GroupExpanding                 += ( s, e) => { e.Cancel = parentIsViewbox; };
+                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgPairs.ItemsSourceChanged             += onPairsChanged;
 
                 // Teams                
                 dgTeams.Columns["Names"].ColumnSizer = GridLengthUnitType.SizeToCells;
-                dgTeams.GroupCollapsed              += ( s, e) => dgTeams.RefreshSorting();
-                dgTeams.GroupExpanded               += (  s, e) => dgTeams.RefreshSorting();
+                dgTeams.GroupCollapsed              += (s, e) => dgTeams.RefreshSorting();
+                dgTeams.GroupExpanded               += (s, e) => dgTeams.RefreshSorting();
                 dgTeams.GroupCollapsing             += (s, e) => { e.Cancel = parentIsViewbox; };
-                dgTeams.GroupExpanding              += ( s, e) => { e.Cancel = parentIsViewbox; };
+                dgTeams.GroupExpanding              += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.ItemsSourceChanged          += onTeamsChanged;
 
                 // Initialiser timeren
                 groupTimer             = new DispatcherTimer();
-                groupTimer.Tick       += (       s, e) => showNextGroup();
+                groupTimer.Tick       += (s, e) => showNextGroup();
                 config.PropertyChanged+= (s, e) => setupPaging();
             }
         #endregion
@@ -155,7 +157,6 @@ namespace DBF.UserControls
             }
         }
 
-
         private void SfDataGrid_QueryRowHeight(object sender, QueryRowHeightEventArgs e)
         {
             var dataGrid = sender as SfDataGrid;
@@ -204,15 +205,6 @@ namespace DBF.UserControls
                                                      , TextFormattingMode.Display
                                                      , pixelsPerDip);
 
-                //var formattedText = new FormattedText(
-                //                                   value
-                //                                 , CultureInfo.CurrentCulture
-                //                                 , FlowDirection.LeftToRight
-                //                                 , new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal)   
-                //                                 , fontSize
-                //                                 , Brushes.Black
-                //                                 , new NumberSubstitution()
-                //                                 , TextFormattingMode.Display);
                 var padding = col.Padding.Left + col.Padding.Right;
 
                 if (formattedText.Width + padding >  col.ActualWidth)
@@ -270,7 +262,7 @@ namespace DBF.UserControls
                 {
                     var cnt     = Math.Min(rows, config.ProjectorMaxRows - linesAllocated - 1);
                     interval.To+= cnt;
-                    displayLines.Add(             interval);
+                    displayLines.Add(interval);
                     interval       = new Interval(interval.To, interval.To);
                     linesAllocated = 0;
                     rows          -= cnt;
@@ -280,7 +272,7 @@ namespace DBF.UserControls
             public void endInterval()
             {
                 if (interval.To >  interval.From)
-                    displayLines.Add(         interval);
+                    displayLines.Add(interval);
 
                 interval       = new Interval(interval.To, interval.To);
                 linesAllocated = 0;
@@ -295,6 +287,42 @@ namespace DBF.UserControls
                 dgTeams.View?.RefreshFilter();
             }
         #endregion
+
+        #region OnDatacontextChanged
+            private void StartlistControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+            {
+                UpdateColumnVisibility();
+
+                if (e.NewValue is ControlViewModel vm)
+                    vm.PropertyChanged += ViewModel_PropertyChanged;
+
+                if (e.OldValue is ControlViewModel oldVm)
+                    oldVm.PropertyChanged -= ViewModel_PropertyChanged;
+            }
+
+            private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName is  nameof(ControlViewModel.HideHac)
+                                   or  nameof(ControlViewModel.HideHacGrp)
+                                   or  nameof(ControlViewModel.ShowAsOneGroup)
+                                   or  nameof(ControlViewModel.HideTournamentSummery)
+                                   or  nameof(ControlViewModel.Pairs)
+                                   or  nameof(ControlViewModel.Teams))
+                    UpdateColumnVisibility();
+            }
+
+            private void UpdateColumnVisibility()
+            {
+                if (this.DataContext is ControlViewModel vm)
+                {
+                    // Hide or unhide columns
+                    dgPairs.Columns["HACRankSectionPart"]?.IsHidden = vm.HideHacGrp;
+                    dgPairs.Columns["ExpectedPct"]?.IsHidden = vm.ImpsPair || vm.HideHac;
+                    dgPairs.Columns["HACTotal"]?.IsHidden = vm.HideTournamentSummery || vm.HideHac;
+                    dgPairs.Columns["TournamentRank"]?.IsHidden = vm.HideTournamentSummery;
+                    dgPairs.Columns["TournamentResult"]?.IsHidden = vm.HideTournamentSummery;
+                }
+            }
+        #endregion
     }
 }
-

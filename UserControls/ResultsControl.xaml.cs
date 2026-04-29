@@ -33,31 +33,33 @@ namespace DBF.UserControls
         private List<Interval>    displayLines     = [];
         private DispatcherTimer   groupTimer;
 
-        public ResultsControl()
-        {
-            InitializeComponent();
-            this.DataContextChanged+= ResultsControl_DataContextChanged;
-            this.Loaded            += UserControl_Loaded;
+        #region Constructors
+            public ResultsControl()
+            {
+                InitializeComponent();
+                this.DataContextChanged+= ResultsControl_DataContextChanged;
+                this.Loaded            += UserControl_Loaded;
 
-            dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
-            dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
-            dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
-            dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
-            dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
-            dgPairs.ItemsSourceChanged             += onPairsChanged;
+                dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
+                dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
+                dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
+                dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgPairs.ItemsSourceChanged             += onPairsChanged;
 
-            dgTeams.Columns["TeamName"].ColumnSizer = GridLengthUnitType.SizeToCells;
-            dgTeams.GroupCollapsed                 += (s, e) => dgTeams.RefreshSorting();
-            dgTeams.GroupExpanded                  += (s, e) => dgTeams.RefreshSorting();
-            dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
-            dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
-            dgTeams.ItemsSourceChanged             += onTeamsChanged;
+                dgTeams.Columns["TeamName"].ColumnSizer = GridLengthUnitType.SizeToCells;
+                dgTeams.GroupCollapsed                 += (s, e) => dgTeams.RefreshSorting();
+                dgTeams.GroupExpanded                  += (s, e) => dgTeams.RefreshSorting();
+                dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgTeams.ItemsSourceChanged             += onTeamsChanged;
 
-            // Initialiser timeren
-            groupTimer             = new DispatcherTimer();
-            groupTimer.Tick       += (s, e) => showNextGroup();
-            config.PropertyChanged+= (s, e) => setupPaging();
-        }
+                // Initialiser timeren
+                groupTimer             = new DispatcherTimer();
+                groupTimer.Tick       += (s, e) => showNextGroup();
+                config.PropertyChanged+= (s, e) => setupPaging();
+            }
+        #endregion
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -96,7 +98,7 @@ namespace DBF.UserControls
                 // 
                 setupPaging();
 
-                dg.Visibility = pairs.Any(p => p.ResultStr == null) ? Visibility.Collapsed : Visibility.Visible;
+                //dg.Visibility = pairs.Any(p => p.ResultStr == null) ? Visibility.Collapsed : Visibility.Visible;
             }
         }
 
@@ -119,7 +121,7 @@ namespace DBF.UserControls
                 // 
                 setupPaging();
 
-                dg.Visibility = teams.Any(p => p.ImpScoreStr == null) ? Visibility.Collapsed : Visibility.Visible;
+                //dg.Visibility = teams.Any(p => p.ImpScoreStr == null) ? Visibility.Collapsed : Visibility.Visible;
             }
         }
 
@@ -201,7 +203,7 @@ namespace DBF.UserControls
                 {
                     var cnt     = Math.Min(rows, config.ProjectorMaxRows - linesAllocated - 1);
                     interval.To+= cnt;
-                    displayLines.Add(             interval);
+                    displayLines.Add(interval);
                     interval       = new Interval(interval.To, interval.To);
                     linesAllocated = 0;
                     rows          -= cnt;
@@ -211,7 +213,7 @@ namespace DBF.UserControls
             public void endInterval()
             {
                 if (interval.To >  interval.From)
-                    displayLines.Add(         interval);
+                    displayLines.Add(interval);
 
                 interval       = new Interval(interval.To, interval.To);
                 linesAllocated = 0;
@@ -241,9 +243,10 @@ namespace DBF.UserControls
 
             private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(ControlViewModel.HideHacGrp) || 
-                    e.PropertyName == nameof(ControlViewModel.ShowAsOneGroup) || 
-                    e.PropertyName == nameof(ControlViewModel.HideTournamentSummery))
+                if (e.PropertyName == nameof(ControlViewModel.HideHac)
+                ||  e.PropertyName == nameof(ControlViewModel.HideHacGrp)
+                ||  e.PropertyName == nameof(ControlViewModel.ShowAsOneGroup)
+                ||  e.PropertyName == nameof(ControlViewModel.HideTournamentSummery))
                     UpdateColumnVisibility();
             }
 
@@ -258,13 +261,18 @@ namespace DBF.UserControls
                         hacGrpColumn.IsHidden = vm.HideHacGrp;
 
                     // HideTournamentSummery
-                    var tournamentColumns = dgPairs.Columns.Where(c =>
-                                                                 c.MappingName == "TournamentRank" ||
-                        c.MappingName == "TournamentResult" ||
-                        c.MappingName == "HACTotal");
+                    //var tournamentColumns = dgPairs.Columns.Where(c =>  c.MappingName == "TournamentRank"
+                    //                                                ||  c.MappingName == "TournamentResult"
+                    //                                                ||  c.MappingName == "HACTotal");
 
-                    foreach (var col in tournamentColumns)
-                        col.IsHidden = vm.HideTournamentSummery;
+                    //foreach (var col in tournamentColumns)
+                    //    if (col.MappingName == "HACTotal")
+                    //        col.IsHidden = vm.HideTournamentSummery || vm.HideHac;
+                    //    else
+                    //        col.IsHidden = vm.HideTournamentSummery;
+                    dgPairs.Columns["HACTotal"]?.IsHidden = vm.HideTournamentSummery || vm.HideHac;
+                    dgPairs.Columns["TournamentRank"]?.IsHidden = vm.HideTournamentSummery;
+                    dgPairs.Columns["TournamentResult"]?.IsHidden = vm.HideTournamentSummery;
                 }
             }
         #endregion

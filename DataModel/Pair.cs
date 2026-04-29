@@ -15,7 +15,10 @@ namespace DBF.DataModel
         public int          TournamentRank    => TournamentRankStr.AsInt();
         public int          HACRankSection    => HACRankSectionStr.AsInt();
         public decimal      AvgHAC            => AvgHACStr.AsDecimal();
+        public decimal      ExpectedPct     => ExpectedScoreStr.AsDecimal();
+        
         public decimal      ExpectedScore     => ExpectedScoreStr.AsDecimal();
+          public decimal      ActualPct       => ActualScoreStr.AsDecimal();
         public decimal      ActualScore       => ActualScoreStr.AsDecimal();
         public decimal      Result            => ResultStr.AsDecimal();
         public int          Rank              => RankStr.AsInt();
@@ -70,7 +73,7 @@ namespace DBF.DataModel
             }
         }
 
-        [XmlIgnore] public                                        int          Placering             { get; set; }
+        [XmlIgnore] public                                        int          Position             { get; set; }
 
         [XmlIgnore] public                                        string       SubGroup              { get; set; } = "";
         [XmlIgnore] public                                        int          HACRankSectionPart    { get; set; }

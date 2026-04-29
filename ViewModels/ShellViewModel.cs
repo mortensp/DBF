@@ -9,8 +9,10 @@ using AppArguments;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
+using DBF.Resources;
 using DBF.Views;
 using GithubTools;
+using Localization;
 using Syncfusion.DocIO.DLS;
 
 namespace DBF.ViewModels;
@@ -30,9 +32,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     public ShellViewModel(Configuration configuration, IWindowManager windowManager)
     {
         this.windowManager = windowManager;
-        Configuration = configuration;
-        
-        
+        Configuration      = configuration;
     }
 
     #region Show Screens
@@ -49,6 +49,14 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     {
         var viewModel = IoC.Get<ConfigurationViewModel>();
         await windowManager.ShowDialogAsync(viewModel);
+    }
+
+    public async Task ToggleLanguageAsync()
+    {
+        if (Strings.Culture.Name != "da")
+            Strings.Culture = LanguageService.Instance.SetCulture("da");
+        else
+            Strings.Culture = LanguageService.Instance.SetCulture("en");
     }
 
     public void TimersHelp()
@@ -119,7 +127,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             Github _github = new Github("DBF");
             _github.Update(Arguments.DebugMode, "install");
         }
-
         catch (Exception ex)
         {
             MessageBox.Show($"Updater Error: {ex.Message}", "Updater Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -146,6 +153,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             {
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
+
             catch { /* adgang/permission kan fejle i visse miljøer */ }
 
             if (string.IsNullOrEmpty(exePath))
@@ -161,7 +169,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
             {
-                MessageBox.Show("Kan ikke finde applikationens eksekverbare fil til genstart.", "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{Lex.ErrorExecutableFileMissing}.", Lex.Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -175,9 +183,10 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             var process =Process.Start(psi);
         }
+
         catch (Exception ex)
         {
-            MessageBox.Show($"Genstart mislykkedes: {ex.Message}", "Fejl", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"{Lex.ErrorRestart}: {ex.Message}", Lex.Error, MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 

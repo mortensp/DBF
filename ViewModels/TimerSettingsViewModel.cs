@@ -105,7 +105,7 @@ public class TimerSettingsViewModel : Screen
             && !selectedPreset.Matches(NewSetting))
                 if (selectedPreset.CustomPreset)
                 {
-                    var result = MessageBox.Show("Vil du også gemme ændringerne i din forudstilling?", "Bekræftelse", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    var result = MessageBox.Show($"{Lex.SaveSettingsQuestion}?", Lex.Confirmation, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                     if (result == MessageBoxResult.Cancel)
                         return;

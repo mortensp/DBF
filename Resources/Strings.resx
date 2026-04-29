@@ -1,0 +1,585 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>About DBF Tools</value>
+  </data>
+  <data name="AddTimer" xml:space="preserve">
+    <value>Add Timer</value>
+  </data>
+  <data name="BridgeTimers" xml:space="preserve">
+    <value>Bridge Timers</value>
+  </data>
+  <data name="btnAccept" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="btnCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="btnClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="btnSaveAndClose" xml:space="preserve">
+    <value>Save and Close</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="btnYesAndReset" xml:space="preserve">
+    <value>Reset and Close</value>
+  </data>
+  <data name="Club" xml:space="preserve">
+    <value>Club</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>This is a simple app offers up to four bridge timers that can be controlled on the pc, at optional displayed on an second monitor or projector.&amp;#10; It can be read a corresponding BridgeMate database and update the timers accordantly and in Denmark it's also possible to Start and Result lists from BC3's output. </value>
+  </data>
+  <data name="ExpectedEndTime" xml:space="preserve">
+    <value>Expected end time</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="MaxRows" xml:space="preserve">
+    <value>Max rows in window:</value>
+  </data>
+  <data name="Projector" xml:space="preserve">
+    <value>Projector</value>
+  </data>
+  <data name="ProjectorInterval" xml:space="preserve">
+    <value>Scrolling frekvens on projector:</value>
+  </data>
+  <data name="ReadBC3" xml:space="preserve">
+    <value>Read Start- and Result list:</value>
+  </data>
+  <data name="ReadBM" xml:space="preserve">
+    <value>Read BridgeMate status:</value>
+  </data>
+  <data name="Vis Start" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>seconds</value>
+  </data>
+  <data name="Startlist" xml:space="preserve">
+    <value>Startlist</value>
+  </data>
+  <data name="StartTime" xml:space="preserve">
+    <value>Start time</value>
+  </data>
+  <data name="Subclub" xml:space="preserve">
+    <value>SubClub</value>
+  </data>
+  <data name="btnShowStartLists" xml:space="preserve">
+    <value>Show Startlists</value>
+  </data>
+  <data name="btnShowResults" xml:space="preserve">
+    <value>Show Results</value>
+  </data>
+  <data name="btnShowBridgeTimers" xml:space="preserve">
+    <value>Show Timers</value>
+  </data>
+  <data name="NewSetting" xml:space="preserve">
+    <value>New Setting</value>
+  </data>
+  <data name="NameIt" xml:space="preserve">
+    <value>Give it a name</value>
+  </data>
+  <data name="DBFProjector" xml:space="preserve">
+    <value>DBF Projector</value>
+  </data>
+  <data name="mnuSettings" xml:space="preserve">
+    <value>_Settings</value>
+  </data>
+  <data name="mnuView" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="mnuFullscreen" xml:space="preserve">
+    <value>Fullscreen mode</value>
+  </data>
+  <data name="mnuHelp" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="mnuBridgeTimers" xml:space="preserve">
+    <value>Bridge Timers</value>
+  </data>
+  <data name="mnuChangeProgramVersion" xml:space="preserve">
+    <value>Change Program Version</value>
+  </data>
+  <data name="mnuOpenJsonSettings" xml:space="preserve">
+    <value>Open JSON settings</value>
+  </data>
+  <data name="mnuOpenLogFile" xml:space="preserve">
+    <value>Open Logfile</value>
+  </data>
+  <data name="mnuAbout" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="TimerSettings" xml:space="preserve">
+    <value>Timer Settings</value>
+  </data>
+  <data name="Groups" xml:space="preserve">
+    <value>Groups</value>
+  </data>
+  <data name="SetClock" xml:space="preserve">
+    <value>Set Clock</value>
+  </data>
+  <data name="Background" xml:space="preserve">
+    <value>Background</value>
+  </data>
+  <data name="Foreground" xml:space="preserve">
+    <value>Foreground</value>
+  </data>
+  <data name="Sound" xml:space="preserve">
+    <value>Sound</value>
+  </data>
+  <data name="CreateNewPreset" xml:space="preserve">
+    <value>Create New Preset</value>
+  </data>
+  <data name="UsePreset" xml:space="preserve">
+    <value>Use Preset</value>
+  </data>
+  <data name="SavePreset" xml:space="preserve">
+    <value>Save Preset</value>
+  </data>
+  <data name="DeletePreset" xml:space="preserve">
+    <value>Delete Preset</value>
+  </data>
+  <data name="TeamMatch" xml:space="preserve">
+    <value>Team Match</value>
+  </data>
+  <data name="Rounds" xml:space="preserve">
+    <value>Rounds</value>
+  </data>
+  <data name="By" xml:space="preserve">
+    <value>by</value>
+  </data>
+  <data name="BreakAfterRound" xml:space="preserve">
+    <value>Break After Round</value>
+  </data>
+  <data name="TimePerRound" xml:space="preserve">
+    <value>Time Per Round</value>
+  </data>
+  <data name="WarningDoNotStartNewGames" xml:space="preserve">
+    <value>Do Not Start New Game Warning</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+  <data name="TransitionTime" xml:space="preserve">
+    <value>Transition Time</value>
+  </data>
+  <data name="BreakMinutes" xml:space="preserve">
+    <value>Break Minutes</value>
+  </data>
+  <data name="BreakMessage" xml:space="preserve">
+    <value>Break Message</value>
+  </data>
+  <data name="EndGreetingTop" xml:space="preserve">
+    <value>End Greeting Top</value>
+  </data>
+  <data name="EndGreetingBottom" xml:space="preserve">
+    <value>End Greeting Bottom</value>
+  </data>
+  <data name="ExpectedPlayingTime" xml:space="preserve">
+    <value>Expected Playing Time</value>
+  </data>
+  <data name="appSettings" xml:space="preserve">
+    <value>App Settings</value>
+  </data>
+  <data name="MissingSoundFile" xml:space="preserve">
+    <value>Sound file was not found</value>
+  </data>
+  <data name="ErrorPlayingSound" xml:space="preserve">
+    <value>Error playing sound</value>
+  </data>
+  <data name="Folder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="DoNotExist" xml:space="preserve">
+    <value>does not exist</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>file not found</value>
+  </data>
+  <data name="InPath" xml:space="preserve">
+    <value>in path</value>
+  </data>
+  <data name="ErrorReadingBrideMateFolder" xml:space="preserve">
+    <value>Error reading BridgeMate folder</value>
+  </data>
+  <data name="CloseAndResetWarning" xml:space="preserve">
+    <value>Closing the Timer will reset it. Do you want to continue?</value>
+  </data>
+  <data name="Confirmation" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="ContinueQuestion" xml:space="preserve">
+    <value>Do you want to continue?</value>
+  </data>
+  <data name="ResetTimersPlural" xml:space="preserve">
+    <value>Resetting the Timers will restore the saved settings</value>
+  </data>
+  <data name="ResetTimers" xml:space="preserve">
+    <value>Resetting the Timer will restore the saved setting</value>
+  </data>
+  <data name="WeArePlaying" xml:space="preserve">
+    <value>We are playing</value>
+  </data>
+  <data name="Of" xml:space="preserve">
+    <value>of</value>
+  </data>
+  <data name="Boards" xml:space="preserve">
+    <value>boards</value>
+  </data>
+  <data name="LastRound" xml:space="preserve">
+    <value>Last Round!</value>
+  </data>
+  <data name="PauseUntil" xml:space="preserve">
+    <value>Pause until</value>
+  </data>
+  <data name="MinutesBreakAfter" xml:space="preserve">
+    <value>minutes break after</value>
+  </data>
+  <data name="TransitioningTo" xml:space="preserve">
+    <value>Transition to</value>
+  </data>
+  <data name="ThanksForNow" xml:space="preserve">
+    <value>Thank you for the peace and order.</value>
+  </data>
+  <data name="RememberToCleanUp" xml:space="preserve">
+    <value>Please remember to clean up on and around the table</value>
+  </data>
+  <data name="Half" xml:space="preserve">
+    <value>Half</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>round</value>
+  </data>
+  <data name="Halfs" xml:space="preserve">
+    <value>Halfs</value>
+  </data>
+  <data name="ThisWillResetTheTimer" xml:space="preserve">
+    <value>This will reset the timer.</value>
+  </data>
+  <data name="tipTimerSetup" xml:space="preserve">
+    <value>Timer setup</value>
+  </data>
+  <data name="tipCloseTimer" xml:space="preserve">
+    <value>Close the timer</value>
+  </data>
+  <data name="tipStartTimer" xml:space="preserve">
+    <value>Start the timer</value>
+  </data>
+  <data name="tipRestartTimer" xml:space="preserve">
+    <value>Restart the round. Hold down the Shift key to restart the round on all timers</value>
+  </data>
+  <data name="tipPauseTimer" xml:space="preserve">
+    <value>Pause the timer. Hold down the shift key to pause all timers</value>
+  </data>
+  <data name="tipNextRound" xml:space="preserve">
+    <value>Go to next round. Hold down the shift key to go to next round on all the timers</value>
+  </data>
+  <data name="tipLessTime" xml:space="preserve">
+    <value>Reduce time for this round. Hold down the shift key to reduce time on all the watches</value>
+  </data>
+  <data name="tipMoreTime" xml:space="preserve">
+    <value>Increase the time for this round. Hold down the shift key to increase time on all the timers</value>
+  </data>
+  <data name="tipMoveTimerUp" xml:space="preserve">
+    <value>Move the timer up</value>
+  </data>
+  <data name="tipMoveTimerDown" xml:space="preserve">
+    <value>Move timer down</value>
+  </data>
+  <data name="tipResetTimer" xml:space="preserve">
+    <value>Reset the timer. Hold down the shift key to reset all the timers</value>
+  </data>
+  <data name="chkShowAsOneGroup" xml:space="preserve">
+    <value>Show as one group</value>
+  </data>
+  <data name="hdGroup" xml:space="preserve">
+    <value>Grp</value>
+  </data>
+  <data name="hdNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="hdTeam" xml:space="preserve">
+    <value>Team</value>
+  </data>
+  <data name="hpKp" xml:space="preserve">
+    <value>KP</value>
+  </data>
+  <data name="hdImps" xml:space="preserve">
+    <value>Imps</value>
+  </data>
+  <data name="hdOpponentTeam" xml:space="preserve">
+    <value>Opps.</value>
+  </data>
+  <data name="hdKPTotal" xml:space="preserve">
+    <value>KP Total</value>
+  </data>
+  <data name="hdSubGroup" xml:space="preserve">
+    <value>Sub group</value>
+  </data>
+  <data name="hdNames" xml:space="preserve">
+    <value>Names</value>
+  </data>
+  <data name="hdHACRank" xml:space="preserve">
+    <value>Hac #</value>
+  </data>
+  <data name="hdHACGroup" xml:space="preserve">
+    <value>Hac grp</value>
+  </data>
+  <data name="hdActualScore" xml:space="preserve">
+    <value>Imps</value>
+  </data>
+  <data name="hdScore" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="hdHAC" xml:space="preserve">
+    <value>Hac</value>
+  </data>
+  <data name="hdMP" xml:space="preserve">
+    <value>MP</value>
+  </data>
+  <data name="hdKP" xml:space="preserve">
+    <value>KP</value>
+  </data>
+  <data name="hdResult" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="hdTournament" xml:space="preserve">
+    <value>Tournament</value>
+  </data>
+  <data name="hdTournamentScore" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="hdRanking" xml:space="preserve">
+    <value>Ranking</value>
+  </data>
+  <data name="hdPosition" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="hdActualPct" xml:space="preserve">
+    <value>Obtained %</value>
+  </data>
+  <data name="hdSection" xml:space="preserve">
+    <value>Section</value>
+  </data>
+  <data name="hdTournamentPos" xml:space="preserve">
+    <value>Pos</value>
+  </data>
+  <data name="hdPos" xml:space="preserve">
+    <value>Pos</value>
+  </data>
+  <data name="hdHacPos" xml:space="preserve">
+    <value>Hac pos</value>
+  </data>
+  <data name="hdStartPos" xml:space="preserve">
+    <value>Seating</value>
+  </data>
+  <data name="hdPlayers" xml:space="preserve">
+    <value>Players</value>
+  </data>
+  <data name="hdDeltaHac" xml:space="preserve">
+    <value>ΔHac</value>
+  </data>
+  <data name="hdExpectedScore" xml:space="preserve">
+    <value>Expected</value>
+  </data>
+  <data name="UnfinishedSection" xml:space="preserve">
+    <value>is unfinished</value>
+  </data>
+  <data name="aPriorSection" xml:space="preserve">
+    <value>A prior section</value>
+  </data>
+  <data name="theSectionDate" xml:space="preserve">
+    <value>The section dated</value>
+  </data>
+  <data name="MissingStartlist" xml:space="preserve">
+    <value>Missing startlist in</value>
+  </data>
+  <data name="FirstHalf" xml:space="preserve">
+    <value>First Half</value>
+  </data>
+  <data name="SecondHalf" xml:space="preserve">
+    <value>Second Half</value>
+  </data>
+  <data name="EW" xml:space="preserve">
+    <value>E/W</value>
+  </data>
+  <data name="NS" xml:space="preserve">
+    <value>N/S</value>
+  </data>
+  <data name="BC3NotUploaded" xml:space="preserve">
+    <value>BC3 data not uploaded</value>
+  </data>
+  <data name="BC3Data" xml:space="preserve">
+    <value>BC3 data</value>
+  </data>
+  <data name="NotUploaded" xml:space="preserve">
+    <value>not uploaded</value>
+  </data>
+  <data name="BC3DataFor" xml:space="preserve">
+    <value>BC3 data for</value>
+  </data>
+  <data name="ErrorReadingStartOrResultLists" xml:space="preserve">
+    <value>Error reading start or result lists</value>
+  </data>
+  <data name="ErrorFile" xml:space="preserve">
+    <value>error opening/handling the file</value>
+  </data>
+  <data name="ErrorMainXml" xml:space="preserve">
+    <value>Error reading Main.xml file</value>
+  </data>
+  <data name="ErrorDeserializing" xml:space="preserve">
+    <value>Error deserializing file</value>
+  </data>
+  <data name="BridgeMateError" xml:space="preserve">
+    <value>Unable to get data from the terminals</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="PresetAlreadyExists" xml:space="preserve">
+    <value>A setting with the same name already exists</value>
+  </data>
+  <data name="ErrorExecutableFileMissing" xml:space="preserve">
+    <value>Unable to locate  executable file</value>
+  </data>
+  <data name="ErrorRestart" xml:space="preserve">
+    <value>Restart error</value>
+  </data>
+  <data name="SaveSettingsQuestion" xml:space="preserve">
+    <value>Do you want to save the settings</value>
+  </data>
+  <data name="mnuToggleLanguage" xml:space="preserve">
+    <value>Dansk</value>
+  </data>
+</root>

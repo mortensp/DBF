@@ -13,7 +13,9 @@ using AppArguments;
 using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.Helpers;
+using DBF.Resources;
 using DBF.ViewModels;
+using Localization;
 using Syncfusion.Data.Extensions;
 using Syncfusion.DocIO.DLS;
 using Syncfusion.UI.Xaml.ImageEditor;
@@ -440,7 +442,6 @@ namespace DBF.DataModel
                                 if (state.TimerStates[i].IsStarted)
                                     BridgeTimers[i].Restore(state.TimerStates[i]);
                         }
-
                         catch (Exception ex)
                         {
                             Logger.Exception(ex, "Fejl ved genskabelse af state");
@@ -457,6 +458,8 @@ namespace DBF.DataModel
                 var viewModel = IoC.Get<ConfigurationViewModel>();
                 await windowManager.ShowDialogAsync(viewModel);
             }
+
+    
 
             public void OpenJSONFiles()
             {
@@ -522,8 +525,8 @@ namespace DBF.DataModel
             internal void CloseTimer(BridgeTimer timer)
             {
                 if (!timer.IsStarted
-                ||  MessageBoxResult.OK == MessageBox.Show( "Dette nulstiller uret fuldtsændigt. Vil du nulstille uret?"
-                                                          , "Bekræftelse"
+                ||  MessageBoxResult.OK == MessageBox.Show( $"{Lex.ThisWillResetTheTimer} {Lex.ContinueQuestion}?"
+                                                          , Lex.Confirmation
                                                           , MessageBoxButton.OKCancel
                                                           , MessageBoxImage.Question))
                 {
@@ -582,6 +585,7 @@ namespace DBF.DataModel
                         psi.FileName = "notepad++.exe";
                         Process.Start(psi);
                     }
+
                     catch
                     {
                         psi.FileName = "notepad.exe";
@@ -694,13 +698,11 @@ namespace DBF.DataModel
         #region Handel PresetsView 
             private void presets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
-                //Application.Current?.Dispatcher?.Invoke(() => _presetsView?.Refresh());
                 _presetsView?.Refresh();
             }
 
             private void presets_ItemChanged(object sender, ItemPropertyChangedEventArgs<Preset> e)
             {
-                //Application.Current?.Dispatcher?.Invoke(() => _presetsView?.Refresh());
                 _presetsView?.Refresh();
             }
         #endregion

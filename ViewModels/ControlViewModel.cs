@@ -2,12 +2,14 @@
 using System.Collections.Specialized;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using System.Xml.Serialization;
 
 using Caliburn.Micro;
@@ -15,10 +17,13 @@ using Caliburn.Micro;
 using DBF.Converters;
 using DBF.DataModel;
 using DBF.Helpers;
+using DBF.Resources;
 using DBF.UserControls;
 using DBF.Views;
-
+using Localization;
+using PropertyChanged;
 using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.Grid;
 
 namespace DBF.ViewModels
 {
@@ -38,7 +43,7 @@ namespace DBF.ViewModels
         private                 int                             sectionNo;
         private                 bool                            showAsOneGroup   = true;
         private static readonly TimeSpan                        threshold        = new TimeSpan(0, 0,  10);
-        private                 SerializedFileSystemWatcher     watcher;
+        private SerializedFileSystemWatcher watcher { get; set; }
 
         private bool disposed;
 
@@ -67,18 +72,21 @@ namespace DBF.ViewModels
         #endregion
 
         #region Public Properties
-            public Configuration            Configuration            { get; set; }
-            public BridgeMate               BridgeMate               { get; set; }
-            public bool                     HideTournamentSummery    { get; set; }
-            public bool                     ImpsPair                 { get; set; }
-            public bool                     HideHacGrp               { get; set; } = true;
-            public DateTime                 Date                     { get; set; }
-            public List<GroupSection>       GroupSections            { get; set; }
-            public BindableCollection<Pair> Pairs                    { get; set; } = [];
-            public BindableCollection<Team> Teams                    { get; set; } = [];
-            public Visibility               ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
-            public UserControl              CurrentView              { get; private set; }
-            public bool                     BC3Available             => SelectedPlayingTime != null;
+            public Configuration                               Configuration            { get; set; }
+            public BridgeMate                                  BridgeMate               { get; set; }
+            public bool                                        HideTournamentSummery    { get; set; }
+            public bool                                        ImpsPair                 { get; set; }
+            public bool                                        HideHac                  { get; set; } = false;
+            public bool                                        HideHacGrp               { get; set; } = true;
+            public DateTime                                    Date                     { get; set; }
+            public List<GroupSection>                          GroupSections            { get; set; }
+            public BindableCollection<Pair>                    Pairs                    { get; set; } = [];
+            public BindableCollection<Team>                    Teams                    { get; set; } = [];
+            public Visibility                                  ShowAsOneGroupVisibility { get; set; } = Visibility.Collapsed;
+            public UserControl                                 CurrentView              { get; private set; }
+            public bool                                        BC3Available             => SelectedPlayingTime != null;
+
+            public ObservableCollection<SortColumnDescription> SharedSortDescriptions   { get; } = new();
 
             public int SectionNo
             {
@@ -112,8 +120,8 @@ namespace DBF.ViewModels
                         if (value == true)
                             foreach (var pair in Pairs)
                             {
-                                pair.SubGroup  = "";
-                                pair.Placering = pair.SectionRank;
+                                pair.SubGroup = "";
+                                pair.Position = pair.SectionRank;
                             }
                         else
                             initSubgroups();
@@ -138,7 +146,8 @@ namespace DBF.ViewModels
                             }
                             else
                             {
-                                Clubs = SelectedMainClub.Clubs?.OrderBy(c => c.Name)
+                                Clubs = SelectedMainClub.Clubs?.OrderBy(c => c.Name
+                                                                       , StringComparer.Create(Global.DkCulture, true))
                                                                .ToObservableCollection();
 
                                 Logger.Info($"SectedMainClub changed: {value}");
@@ -185,7 +194,7 @@ namespace DBF.ViewModels
                         if (Set(ref playingdates, value))
                             SelectedPlayingTime = PlayingTimes.Where(pt => pt.Date <= before && pt.Date >  after).FirstOrDefault()
                                                ?? PlayingTimes.Where(pt => pt.Date >  DateTime.Now.Date).LastOrDefault()
-                                               ?? PlayingTimes.LastOrDefault();
+                                               ?? PlayingTimes.FirstOrDefault();
                     }
                 }
 
@@ -240,7 +249,10 @@ namespace DBF.ViewModels
         #endregion
 
         #region Public Methods
-            public void Test()     => Debugger.Break();
+            public void Test()
+            {
+                Debugger.Break();
+            }
 
             public void AddTimer() => Configuration.AddTimer();
 
@@ -400,7 +412,7 @@ namespace DBF.ViewModels
                 Pairs.Clear();
                 Teams.Clear();
 
-                //bool RoundCompleted   = true;
+                bool RoundCompleted = true;
                 try
                 {
                     Logger.Info($"Loading playingtimer: {playingTime}");
@@ -412,13 +424,15 @@ namespace DBF.ViewModels
 
                     GroupSections = getGroupSections(playingTime, tournaments);
                     Date          = playingTime.Date;
+                    HideHac       = !tournaments[0].CalculateHAC;
 
                     for (var grpNo = 0; grpNo <  GroupSections.Count; grpNo++)
                     {
                         var grp = GroupSections[grpNo];
 
-                        //if (!grp.Completed)
-                        //    RoundCompleted = false;
+                        if (!grp.Completed)
+                            RoundCompleted = false;
+
                         if (grp.Tournament.TournamentType.Text == "Parturnering")
                             buildpairs(pairs, grpNo, grp);
                         else
@@ -441,16 +455,11 @@ namespace DBF.ViewModels
                     team.EntryNo = i++;
 
                 initSubgroups(pairs);
-                Pairs                       = pairs;
-                Teams                       = teams;
+                Pairs = pairs;
+                Teams = teams;
+
                 watcher.EnableRaisingEvents = Configuration.ReadBC3;
                 Logger.Info($"Loaded  playingtimer: {playingTime}");
-
-                // Restore Taskbar Icon.
-                //Execute.OnUIThread(() =>
-                //                   {
-                //                       Application.Current.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
-                //                   });
             }
 
             private void buildTeams(BindableCollection<Team> teams, int grpNo, GroupSection grp)
@@ -503,9 +512,9 @@ namespace DBF.ViewModels
                         }
                     else
                         if (earlierSection is null)
-                            ErrorMessage = $"En tidligere runde er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
+                            ErrorMessage = $"{Lex.aPriorSection} {Lex.UnfinishedSection}";
                         else
-                            ErrorMessage = $"Runden d. {earlierSection.DateStr} er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!";
+                            ErrorMessage = $"{Lex.theSectionDate} {earlierSection.DateStr} {Lex.UnfinishedSection}";
                 }
 
                 // Setup TournamentRank Rank by Total KP
@@ -519,7 +528,7 @@ namespace DBF.ViewModels
             {
                 bool InterWovenHowell =false;
                 bool Mitchell         = grp.Tournament.MovementPlanType == MovementPlans.Mitchell;
-                ImpsPair              = grp.Tournament.TournamentPairCalcType == "3";
+                ImpsPair              = grp.Tournament.TournamentPairCalcType == "2";
 
                 if (grp.Resultlist is not null)
                 {
@@ -594,7 +603,7 @@ namespace DBF.ViewModels
                     if (string.IsNullOrWhiteSpace(Configuration.HomepagePath)
                     || !Directory.Exists(Configuration.HomepagePath))
                     {
-                        showMessageAFewSeconds($"Mappen: '{Configuration.HomepagePath}' findes ikke");
+                        showMessageAFewSeconds($"{Lex.Folder}: '{Configuration.HomepagePath}' {Lex.DoNotExist}");
                         watcher.EnableRaisingEvents = Configuration.ReadBC3;
                         return;
                     }
@@ -614,7 +623,7 @@ namespace DBF.ViewModels
 
                     if (MainClubs.Count == 0)
                     {
-                        showMessageAFewSeconds($"Kan ikke finde Startliste i mappen: {Configuration.HomepagePath}");
+                        showMessageAFewSeconds($"{Lex.MissingStartlist}: {Configuration.HomepagePath}");
                         return;
                     }
 
@@ -663,7 +672,7 @@ namespace DBF.ViewModels
                     }
                     catch (Exception)
                     {
-                        ErrorMessage = $"Fejl ved læsning af Main.xml";
+                        ErrorMessage = Lex.ErrorMainXml;
                         return null;
                     }
                 }
@@ -776,7 +785,7 @@ namespace DBF.ViewModels
 
                     catch (Exception ex)
                     {
-                        ErrorMessage = "Fejl ved læsning af Main.xml";
+                        ErrorMessage = Lex.ErrorMainXml;
                         Logger.Exception(ex, ErrorMessage);
                     }
                 }
@@ -819,24 +828,24 @@ namespace DBF.ViewModels
 
                         foreach (var pair in pairs.Where(p => p.GroupNo == grpNo).OrderBy(p => p.SectionRank))
                         {
-                            pair.Placering = pair.Rank;
-                            pair.Group     = grp.Tournament.Title;
+                            pair.Position = pair.Rank;
+                            pair.Group    = grp.Tournament.Title;
 
                             if (InterwovenHowell)
                             {
-                                pair.SubGroup  = pair.PairNo <= subGroupSize ? "1. halvdel" : "2. halvdel";
-                                pair.Placering = pair.PairNo <= subGroupSize ? rankA++ : rankB++;
+                                pair.SubGroup = pair.PairNo <= subGroupSize ? Lex.FirstHalf : Lex.SecondHalf;
+                                pair.Position = pair.PairNo <= subGroupSize ? rankA++ : rankB++;
                             }
                             else
                                 if (Mitchell)
                                 {
-                                    pair.SubGroup  = pair.Direction == "2" ? "ØV" : "NS";
-                                    pair.Placering = pair.Rank;
+                                    pair.SubGroup = pair.Direction == "2" ? Lex.EW : Lex.NS;
+                                    pair.Position = pair.Rank;
                                 }
                                 else
                                 {
-                                    pair.SubGroup  = "";
-                                    pair.Placering = pair.Rank;
+                                    pair.SubGroup = "";
+                                    pair.Position = pair.Rank;
                                 }
                         }
                     }
@@ -853,16 +862,16 @@ namespace DBF.ViewModels
                     List<Tournament> tournaments = new();
 
                     if (pt is null || pt.TournamentFiles is null)
-                        ErrorMessage = $"BC3 data er ikke sendt til hjemmesiden";
+                        ErrorMessage = Lex.BC3NotUploaded;
                     else
                         foreach (var tournamentFile in pt.TournamentFiles)
                         {
                             if (string.IsNullOrEmpty(tournamentFile.FileName))
                             {
-                                if (ErrorMessage.StartsWith("BC3 data for"))
-                                    ErrorMessage = $"BC3 data er ikke sendt til hjemmesiden";
+                                if (ErrorMessage.StartsWith(Lex.BC3Data))
+                                    ErrorMessage = Lex.BC3NotUploaded;
                                 else
-                                    ErrorMessage = $"BC3 data for '{tournamentFile.GroupName}' er ikke sendt til hjemmesiden";
+                                    ErrorMessage = $"{Lex.BC3Data} '{tournamentFile.GroupName}' {Lex.NotUploaded}";
 
                                 continue;
                             }
@@ -874,9 +883,9 @@ namespace DBF.ViewModels
 
                             if (tournament is null)
                                 if (string.IsNullOrEmpty(ErrorMessage))
-                                    ErrorMessage = $"BC3 data for '{tournamentFile.GroupName}' er ikke sendt til hjemmesiden";
+                                    ErrorMessage = $"{Lex.BC3DataFor} '{tournamentFile.GroupName}' {Lex.NotUploaded}";
                                 else
-                                    ErrorMessage = $"BC3 data er ikke sendt til hjemmesiden";
+                                    ErrorMessage = Lex.BC3NotUploaded;
                             else
                             {
                                 tournament.SectionNo = tournamentFile.Section?.SectionNo ?? 1;
@@ -961,8 +970,8 @@ namespace DBF.ViewModels
 
                     catch (Exception)
                     {
-                        Logger.Info($"Fejl ved deserialisering af fil: {fullPath}");
-                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                        Logger.Info($"{Lex.ErrorDeserializing}: {fullPath}");
+                        ErrorMessage = Lex.ErrorReadingStartOrResultLists;
                         return default;
                     }
                 }
@@ -1053,9 +1062,9 @@ namespace DBF.ViewModels
                 }
 
                 if (projectorView == null)
-                    Logger.Error("Kunne ikke finde eller oprette ProjectorView");
+                    Logger.Error("Could not find or create ProjectorView");
                 else
-                    Logger.Info($"ProjectorView vist på {(projectorScreen != null ? $"skærm: {projectorScreen.DeviceName}" : "primær skærm")}");
+                    Logger.Info($"ProjectorView shown on {(projectorScreen != null ? $"screen: {projectorScreen.DeviceName}" : "primary screen")}");
 
                 // Move ShellView activation out here, so that it ALWAS get focus in the end.
                 var shellVm   = IoC.Get<ShellViewModel>();
@@ -1083,18 +1092,21 @@ namespace DBF.ViewModels
             #region FileWatcher and Handlers
                 private async Task handleFileEventAsync(FileSystemEventArgs ev)
                 {
-                    Logger.Debug($"File Event: {ev.FullPath}");
-                    try
+                    if (watcher?.EnableRaisingEvents == true)
                     {
-                        if (ev.FullPath.StartsWith(Configuration.HomepagePath))
-                            reloadSelectedClub(ev.FullPath);
-                        else
-                            initWatcher();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
-                        ErrorMessage = "Fejl ved læsning af Start- eller Resultatlister";
+                        Logger.Debug($"File Event: {ev.FullPath}");
+                        try
+                        {
+                            if (ev.FullPath.StartsWith(Configuration.HomepagePath))
+                                reloadSelectedClub(ev.FullPath);
+                            else
+                                initWatcher();
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
+                            ErrorMessage = Lex.ErrorReadingStartOrResultLists;
+                        }
                     }
                 }
 
@@ -1114,7 +1126,6 @@ namespace DBF.ViewModels
                         BridgeMate.CheckOrOpen(SelectedPlayingTime?.Date, SelectedMainClub?.No);
                     else
                         BridgeMate.Close();
-
                 }
             #endregion
 
@@ -1172,6 +1183,8 @@ namespace DBF.ViewModels
 
                 protected virtual void Dispose(bool disposing)
                 {
+                    watcher?.EnableRaisingEvents = false;
+
                     if (disposed)
                         return;
 
