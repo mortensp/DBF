@@ -2,7 +2,7 @@
 using AppArguments;
 using DBF.Helpers;
 using DBF.Localization;
-using GithubTools;
+using GitHubTools;
 using Localization;
 
 namespace DBF
@@ -12,7 +12,7 @@ namespace DBF
     /// </summary>
     public partial class App : Application
     {
-        private Github _github = new Github("DBF");
+        private GitHub _github = new GitHub("DBF");
 
         protected override void OnStartup(StartupEventArgs e)
         {

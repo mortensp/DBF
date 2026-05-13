@@ -8,7 +8,7 @@ using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.Views;
-using GithubTools;
+using GitHubTools;
 using Localization;
 //using Strings = DBF.Properties.Strings;
 namespace DBF.ViewModels;
@@ -134,7 +134,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         try
         {
             Logger.Info("Running Githup Updater");
-            Github _github = new Github("DBF");
+            GitHub _github = new GitHub("DBF");
             _github.Update(Arguments.DebugMode, "install");
         }
         catch (Exception ex)

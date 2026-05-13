@@ -46,27 +46,37 @@ namespace DBF.ViewModels
 
         #region Constructors
             public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
+        {
+            try
             {
                 _lexStrings = new(this);
-                BridgeMate  = bridgeMate;
+                BridgeMate = bridgeMate;
+
 
                 if (BridgeMate?.RoundStatus is not null)
                     BridgeMate.RoundStatus.ItemChanged += roundStatusItemChanged;
 
-                Configuration               = configuration;
-                this._windowManager         = windowManager;
-                _watcher                    = new();
-                _watcher.EventGroupingDelay = TimeSpan.FromMilliseconds(7000);
-                _watcher.UpdatedAsync      += handleFileEventAsync;
+                Configuration = configuration;
+                this._windowManager = windowManager;
+                _watcher = new()
+                {
+                    EventGroupingDelay = TimeSpan.FromMilliseconds(7000),
+                };
+                _watcher.UpdatedAsync += handleFileEventAsync;
                 //
-                Pairs.CollectionChanged+= pairsCollectionChanged;
-                Teams.CollectionChanged+= teamsCollectionChanged;
+                Pairs.CollectionChanged += pairsCollectionChanged;
+                Teams.CollectionChanged += teamsCollectionChanged;
                 //
-                Configuration.PropertyChanged+= configurationPropertyChanged;
+                Configuration.PropertyChanged += configurationPropertyChanged;
 
                 initWatcher();
                 loadMainClubs();
             }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+            }
+        }
         #endregion
 
         #region Public Properties
@@ -355,6 +365,8 @@ namespace DBF.ViewModels
         #region Private Method
             void initWatcher()
             {
+                Logger.Info($"Init Watcher");
+
                 _watcher.Path = Configuration.HomepagePath.FindDeepestExistingDirectory();
 
                 if (_watcher.Path + "\\" == Configuration.HomepagePath)
@@ -372,6 +384,9 @@ namespace DBF.ViewModels
 
                 if (Configuration.ReadBC3)
                     Logger.Info($"Files Watcher set up on path: {_watcher.Path}");
+                else
+                    Logger.Info($"Files Watcher on path: {_watcher.Path} is disabled");
+                
             }
 
             private void showMessageAFewSeconds(string msg)
