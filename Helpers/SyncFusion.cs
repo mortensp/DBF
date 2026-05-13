@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Reflection;
-using System.Text;
 using Syncfusion.Licensing;
 
 namespace DBF.Helpers

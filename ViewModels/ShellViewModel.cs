@@ -1,20 +1,16 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Media3D;
 using AppArguments;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
-using DBF.Resources;
 using DBF.Views;
 using GithubTools;
 using Localization;
-using Syncfusion.DocIO.DLS;
-
+//using Strings = DBF.Properties.Strings;
 namespace DBF.ViewModels;
 
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
@@ -53,10 +49,24 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
     public async Task ToggleLanguageAsync()
     {
-        if (Strings.Culture.Name != "da")
-            Strings.Culture = LanguageService.Instance.SetCulture("da");
-        else
-            Strings.Culture = LanguageService.Instance.SetCulture("en");
+        var name = Lex.Culture?.Name is "da-DK" or "da" ? "en" : "da-DK";
+
+        // 1. Gem konfiguration
+        Configuration.CultureName = name;
+        Configuration.Save();
+
+        // 2. Sæt kultur først
+        // Lex.Culture = LanguageService.Instance.SetCulture(name);
+        LanguageService.Instance.SetCulture(name);
+
+        // 3. Opdater UI på alle views
+        IoC.Get<ControlViewModel>()?.LexRefresh();
+    }
+
+    public async Task Test()
+    {
+        var cvm = IoC.Get<ControlViewModel>();
+        cvm.Test();
     }
 
     public void TimersHelp()

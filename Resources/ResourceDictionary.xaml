@@ -20,6 +20,7 @@
     <conv:FourthPartConverter x:Key="FourthPartConverter" />
     <conv:GroupColorConverter x:Key="GroupColorConverter" />
     <conv:EnumCastConverter x:Key="EnumCastConverter" />
+    <conv:CapitalizerConverter x:Key="CapitalizerConverter" />
     <conv:CollectionContainsToBrushConverter
         x:Key="ContainsToBrush"
         FalseBrush="Black"
@@ -168,15 +169,17 @@
             <Setter.Value>
                 <ControlTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Key, Converter={StaticResource FirstPartConverter}}"
+                        <TextBlock
                             Margin="10,0,0,0"
                             FontWeight="Bold"
-                            Foreground="Black" />
+                            Foreground="Black"
+                            Text="{Binding Key, Converter={StaticResource FirstPartConverter}}" />
                         <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
                         <TextBlock Foreground="Black" Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
-                        <TextBlock Text="{Binding Key, Converter={StaticResource FourthPartConverter}}"
+                        <TextBlock
                             FontWeight="Normal"
-                            Foreground="Black" />
+                            Foreground="Black"
+                            Text="{Binding Key, Converter={StaticResource FourthPartConverter}}" />
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
@@ -190,10 +193,11 @@
             <Setter.Value>
                 <ControlTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Key, Converter={StaticResource FirstPartConverter}}"
+                        <TextBlock
                             Margin="10,0,0,0"
                             FontWeight="Bold"
-                            Foreground="Black" />
+                            Foreground="Black"
+                            Text="{Binding Key, Converter={StaticResource FirstPartConverter}}" />
                         <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
                         <TextBlock Foreground="Black" Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
                     </StackPanel>

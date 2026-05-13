@@ -11,7 +11,7 @@
 		<RootNamespace>DBF</RootNamespace>
 		<Company>Morten Sparding</Company>
 		<Product>DBF Tools</Product>
-		<Copyright>Copyright © 2025</Copyright>	
+		<Copyright>Copyright © 2025</Copyright>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net10.0-windows7.0</TargetFramework>
 		<Nullable>disable</Nullable>
@@ -26,6 +26,7 @@
 		<Guid>8e71374d-fd18-4298-8e6b-816e21df3aa8</Guid>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<PlatformTarget>x64</PlatformTarget>
+		<GenerateSatelliteAssemblies>true</GenerateSatelliteAssemblies>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -41,7 +42,14 @@
 		<Compile Remove="BridgeMateModel\ReceivedDataCount.cs" />
 		<Compile Remove="BridgeMateModel\ReceivedDataGrouped.cs" />
 		<Compile Remove="BridgeMateModel\ScoreUpload.cs" />
-		<Compile Remove="BridgeMateModel\Setting.cs" />		
+		<Compile Remove="BridgeMateModel\Setting.cs" />
+		<Compile Remove="Helpers\ToastService.cs" />
+		<Compile Remove="UserControls\Toast.xaml.cs" />
+		<Compile Remove="ViewModels\BadgeExtensions.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Remove="UserControls\Toast.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -73,7 +81,7 @@
 		<PackageReference Include="Caliburn.Micro.Core" Version="4.0.230" />
 	</ItemGroup>
 
-	<ItemGroup>	
+	<ItemGroup>
 		<PackageReference Include="Fody" Version="6.9.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -82,12 +90,11 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<PackageReference Include="NAudio" Version="2.3.0" />
 		<PackageReference Include="NetCoreAudio" Version="2.0.1" />
 	</ItemGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.5" />
@@ -95,7 +102,6 @@
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 		<PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
 	</ItemGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="syncfusion.ui.wpf.net" Version="31.1.19" />
@@ -115,7 +121,15 @@
 		<Folder Include="Properties\PublishProfiles\" />
 	</ItemGroup>
 
+	<!-- Designer generation for Resources.resx and Settings.settings -->
 	<ItemGroup>
+	
+		<Compile Update="Localization\Syncfusion.SfColorPalette.Wpf.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Syncfusion.SfColorPalette.Wpf.resx</DependentUpon>
+		</Compile>
+	
 		<Compile Update="Properties\Resources.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
@@ -127,53 +141,72 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Settings.settings</DependentUpon>
 		</Compile>
-
-		<Compile Update="Resources\Strings.da.Designer.cs">
-		  <DependentUpon>Strings.da.resx</DependentUpon>
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		</Compile>
-
-		<Compile Update="Resources\Strings.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>Strings.resx</DependentUpon>
-		</Compile>
 	</ItemGroup>
+	
+	<ItemGroup>
+		<EmbeddedResource Update="Localization\Strings.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Strings.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 
+		<Compile Update="Localization\Strings.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Strings.resx</DependentUpon>
+		</Compile>
+
+		<EmbeddedResource Update="Localization\Strings.da-DK.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+
+		<EmbeddedResource Update="Localization\Syncfusion.SfColorPalette.Wpf.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Syncfusion.SfColorPalette.Wpf.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+
+		<Compile Update="Localization\Syncfusion.SfColorPalette.Wpf.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Syncfusion.SfColorPalette.Wpf.resx</DependentUpon>
+		</Compile>
+
+		<EmbeddedResource Update="Localization\Syncfusion.SfColorPalette.Wpf.da-DK.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+
+		<EmbeddedResource Update="Localization\Syncfusion.Shared.Wpf.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>Syncfusion.Shared.Wpf.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+
+		<Compile Update="Localization\Syncfusion.Shared.Wpf.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Syncfusion.Shared.Wpf.resx</DependentUpon>
+		</Compile>
+
+		<EmbeddedResource Update="Localization\Syncfusion.Shared.Wpf.da-DK.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+	</ItemGroup>
+	
+	<!-- Only Resources.resx needs explicit generator; Strings.resx and all culture files handled automatically -->
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-		<EmbeddedResource Update="Resources\Strings.da.resx">
-		  <Generator></Generator>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Resources\Strings.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-		
-		<!--<EmbeddedResource Update="Resources\Strings.da.resx">
-		  <LastGenOutput>Strings.da.Designer.cs</LastGenOutput>
-		  <Generator>ResXFileCodeGenerator</Generator>
-		</EmbeddedResource>
-		
-		<EmbeddedResource Update="Resources\Strings.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-		</EmbeddedResource>-->
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="Images\projector.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		
+
 		<None Update="Images\projector_48x48.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		
+
 		<None Update="Properties\Settings.settings">
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -182,8 +215,19 @@
 		<Content Include="..\..\SyncfusionLicense.txt" Link="SyncfusionLicense.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		
+
 		<None Include="FodyWeavers.xsd" />
+
+		<None Include="Localization\Syncfusion.SfColorPalette.Wpf.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>Syncfusion.SfColorPalette.Wpf2.Designer.cs</LastGenOutput>
+		</None>
+
+		<None Include="Localization\Syncfusion.Shared.Wpf.da-DK.resx" />
+
+		<None Include="Localization\Syncfusion.Shared.Wpf.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		</None>
 
 		<ProjectReference Include="..\..\Common Libs\AppArguments\AppArguments.csproj" />
 		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />

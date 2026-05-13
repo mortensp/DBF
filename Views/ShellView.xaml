@@ -19,34 +19,52 @@
     WindowState="Normal"
     mc:Ignorable="d">
 
+    <Window.Resources>
+        <Style TargetType="MenuItem" x:Key="OrphanMenuItemStyle">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0">
-            <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="{lex:Loc mnuSettings}" />
+        <DockPanel Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+            <MenuItem
+                Name="mnuTest"
+                Style="{StaticResource OrphanMenuItemStyle}"
+                cal:Message.Attach="[Event Click] = [Action Test]"
+                DockPanel.Dock="Right"
+                Header="Break"
+                Visibility="Collapsed" />
 
-            <MenuItem Header="{lex:Loc mnuView}">
-                <MenuItem
-                    cal:Message.Attach="[Event Click] = [ToggleFullscreen]"
-                    Header="{lex:Loc mnuFullscreen}"
-                    InputGestureText="F11" />
-            </MenuItem>
+            <Menu>
+                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="{lex:Loc mnuSettings}" />
 
-            <MenuItem Header="{lex:Loc mnuHelp}">
-                <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuBridgeTimers}" />
-                <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />-->
-                <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="{lex:Loc mnuOpenJsonSettings}" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}" />
-                <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="{lex:Loc mnuAbout}" />
-            </MenuItem>
-            
-            <MenuItem Name="toggleLanguage"  cal:Message.Attach="[Event Click] = [Action ToggleLanguageAsync]" Header="{lex:Loc mnuToggleLanguage}" />
+                <MenuItem Header="{lex:Loc mnuView}">
+                    <MenuItem
+                        cal:Message.Attach="[Event Click] = [ToggleFullscreen]"
+                        Header="{lex:Loc mnuFullscreen}"
+                        InputGestureText="F11" />
+                </MenuItem>
 
-        </Menu>
+                <MenuItem Header="{lex:Loc mnuHelp}">
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuBridgeTimers}" />
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}" />
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="{lex:Loc mnuOpenJsonSettings}" />
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}" />
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="{lex:Loc mnuAbout}" />
+                </MenuItem>
+            </Menu>
+
+
+
+
+        </DockPanel>
 
         <ContentControl x:Name="ActiveItem" Grid.Row="1" />
     </Grid>

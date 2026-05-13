@@ -230,6 +230,14 @@ namespace DBF.DataModel
                 }
             }
 
+            public void Stop()
+            {
+                lock (_sync)
+                {
+                    _timer.Stop();
+                }
+            }
+
             public void Back()
             {
                 lock (_sync)
@@ -414,8 +422,7 @@ namespace DBF.DataModel
             {
                 lock (_sync)
                 {
-                    stopTimer();
-
+                    //stopTimer();
                     _isAtBreak      = state.IsAtBreak;
                     _isAtTransition = state.IsAtTransition;
                     _remainingTime  = state.RemainingTime;
@@ -425,12 +432,23 @@ namespace DBF.DataModel
                     _transitionTime = new TimeSpan(0, TransitionMinutes, 0);
                     _breakTime      = new TimeSpan(0, BreakMinutes, 0);
 
+                    if (state.IsPaused && state.IsStarted)
+                        Start();
+                    else
+                        stopTimer();
+
                     updateDisplay();
                 }
             }
         #endregion
 
         #region Private Methods
+            private void stopTimer()
+            {
+                _timer.Stop();
+                updateDisplay();
+            }
+
             private void updateDisplay()
             {
                 if (_timer.IsEnabled)
@@ -467,8 +485,8 @@ namespace DBF.DataModel
                                         ||  _isAtBreak)
                                         {
                                             _player.Play("Ding Ding", Volume);  // Start next round
-                                            _remainingTime = _startTime;
-                                                                                    _isAtTransition = false;
+                                            _remainingTime  = _startTime;
+                                            _isAtTransition = false;
                                             _isAtBreak      = false;
                                             IncremetRound();
                                         }
@@ -574,12 +592,6 @@ namespace DBF.DataModel
             }
 
             #region Private Timer Events         
-                private void stopTimer()
-                {
-                    _timer.Stop();
-                    updateDisplay();
-                }
-
                 private void Timer_Tick(object sender, EventArgs e)
                 {
                     if (_timer.IsEnabled)
@@ -601,9 +613,7 @@ namespace DBF.DataModel
                                                                    &&  p.BoardsPerRound == boardsPerRound);
 
                         if (preset != null)
-                        {
                             Logger.Info($"Timer settings syncronized with BridgeMate Server - Preset: {preset.Name}");
-                        }
                         else
                         {
                             preset                   = new(this);
@@ -613,7 +623,6 @@ namespace DBF.DataModel
                             preset.Minutes           = boardsPerRound * 7;
                             preset.TransitionMinutes = 0;
                             preset.BreakAfterRound   = (rounds + 1) / 2;
-
                         }
 
                         UpdateBMSettings(preset);
@@ -621,7 +630,7 @@ namespace DBF.DataModel
                 }
 
                 private string getRoundText  => TeamMatch ? Lex.Half : Lex.Round;
-                private string getRoundsText => TeamMatch ? Lex.Halfs : Lex.Rounds   ;
+                private string getRoundsText => TeamMatch ? Lex.Halfs : Lex.Rounds;
             #endregion
         #endregion
     }

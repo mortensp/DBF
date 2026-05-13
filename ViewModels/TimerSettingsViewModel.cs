@@ -6,6 +6,7 @@ using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.DataModel;
 using DBF.Helpers;
+using Localization;
 using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.ViewModels;
@@ -25,8 +26,8 @@ public class TimerSettingsViewModel : Screen
                 throw new InvalidOperationException("Use TimerSettingsViewModel(Configuration configuration) constructor.");
 
             Configuration = new();
-            _=Configuration.LoadAsync();
-            Setting = Configuration.BridgeTimers.First();
+            _             = Configuration.LoadAsync();
+            Setting       = Configuration.BridgeTimers.First();
 
             NewColorCollection         = new ObservableCollection<CustomColor>(Configuration.BackgroundColors);
             NewSetting.PropertyChanged+= newSetting_PropertyChanged;
@@ -40,7 +41,7 @@ public class TimerSettingsViewModel : Screen
 
             if (Design.IsInDesignMode())
             {
-                _=Configuration.LoadAsync();
+                _       = Configuration.LoadAsync();
                 Setting = Configuration.BridgeTimers.First();
             }
             else
@@ -52,7 +53,12 @@ public class TimerSettingsViewModel : Screen
     #endregion
 
     #region public Properties
-        public        string                            Message            { get; set; }
+        public string Message
+        {
+            get => field ?? (NewSetting.ChangedProperties.Count >  0 ? Lex.MarkedValues : null);
+            set => field = value;
+        }
+
         public static ObservableCollection<CustomColor> NewColorCollection { get; private set; }
         public        Configuration                     Configuration      { get; private set; }
         public        TimerSetting                      NewSetting         { get; set; } = new();
@@ -99,6 +105,7 @@ public class TimerSettingsViewModel : Screen
 
         public async void AcceptSetting()
         {
+
             Setting.Update(NewSetting);
 
             if (selectedPreset is not null
@@ -117,6 +124,7 @@ public class TimerSettingsViewModel : Screen
             await TryCloseAsync();
             Configuration.Save();
             Logger.Info("Timer setting changed");
+
         }
 
         public async void AddPreset()
@@ -253,9 +261,9 @@ public class TimerSettingsViewModel : Screen
     }
 
     internal void SuggestedSettings(Preset suggested)
-    {        
+    {
         // Finally update the editable NewSetting so the UI shows the suggested values
-        var name=selectedPreset?.Name;
+        var name =selectedPreset?.Name;
 
         NewSetting.MarkChanged(suggested);
 
@@ -267,5 +275,6 @@ public class TimerSettingsViewModel : Screen
         if (SelectedPreset?.Name != name)
             NewSetting.ChangedProperties.Add(nameof(NewSetting.Name));
 
+        NotifyOfPropertyChange(nameof(Message));
     }
 }

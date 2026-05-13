@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,18 +12,15 @@ using DBF.Helpers;
 using DBF.ViewModels;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.Windows.Controls.PivotGrid;
 using Group = Syncfusion.Data.Group;
 
 namespace DBF.UserControls
 {
-    /// <summary>
-    /// Interaction logic for ResultsControl.xaml
-    /// </summary>
-    public partial class ResultsControl : UserControl
+    public partial class ResultsControl : UserControl, INotifyPropertyChanged
     {
         private Configuration config = IoC.Get<Configuration>();
 
-        private bool              parentIsViewbox;
         private int               displayLineIndex = -1;
         private Interval          interval         = new(0, 0);
         private int               linesAllocated;
@@ -43,22 +42,33 @@ namespace DBF.UserControls
                 dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
                 dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
                 dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
-                dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
-                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = InProjectorView; };
+                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = InProjectorView; };
                 dgPairs.ItemsSourceChanged             += onPairsChanged;
 
                 dgTeams.Columns["TeamName"].ColumnSizer = GridLengthUnitType.SizeToCells;
                 dgTeams.GroupCollapsed                 += (s, e) => dgTeams.RefreshSorting();
                 dgTeams.GroupExpanded                  += (s, e) => dgTeams.RefreshSorting();
-                dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = parentIsViewbox; };
-                dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = parentIsViewbox; };
+                dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = InProjectorView; };
+                dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = InProjectorView; };
                 dgTeams.ItemsSourceChanged             += onTeamsChanged;
 
                 // Initialiser timeren
                 groupTimer             = new DispatcherTimer();
                 groupTimer.Tick       += (s, e) => showNextGroup();
                 config.PropertyChanged+= (s, e) => setupPaging();
+
+                //showBreak();
             }
+        #endregion
+
+        #region Public Properties
+            public Visibility CollapsedInProjectorView => InProjectorView
+                                                      ||  DataContext is not ControlViewModel vm
+                                                        ? Visibility.Collapsed
+                                                        : vm.ShowAsOneGroupVisibility;
+
+            public bool       InProjectorView          { get; private set; }
         #endregion
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -66,12 +76,10 @@ namespace DBF.UserControls
             var parent = VisualTreeHelper.GetParent(this);
 
             while (parent is not null
-               &&  parent is not Viewbox)
+               &&  parent is not Window)
                 parent = VisualTreeHelper.GetParent(parent);
 
-            if (parent is not null)
-                parentIsViewbox = true;
-
+            InProjectorView = parent?.GetType().Name == "ProjectorView";
             setupPaging();
         }
 
@@ -80,15 +88,24 @@ namespace DBF.UserControls
             if (s              is SfDataGrid dg
             &&  dg.ItemsSource is not null)
             {
-                dg.ClearFilters();
-                dg.GroupColumnDescriptions.Clear();
-                dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
+                try
+                {
+                    dg.ClearFilters();
+                    dg.GroupColumnDescriptions.Clear();
+                    dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
 
-                pairs = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Pair>;
+                    pairs = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Pair>;
 
-                // SubGroups?                
-                if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
-                    dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
+                    // SubGroups?                
+                    if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
+                        dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
+                }
+
+                catch (Exception ex)
+                {
+                    Logger.Exception(ex);
+                    throw;
+                }
 
                 dg.RefreshSorting();
                 dg.View.RefreshFilter();
@@ -127,7 +144,7 @@ namespace DBF.UserControls
 
         private void setupPaging()
         {
-            if (parentIsViewbox)
+            if (InProjectorView)
             {
                 groupTimer.Stop();
                 groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
@@ -193,7 +210,7 @@ namespace DBF.UserControls
 
             private void addGroup(Group group)
             {
-                interval.To   += group.Records.Count();
+                interval.To   += group.Records?.Count() ?? 0;
                 linesAllocated+= group.LineCount();
             }
 
@@ -229,6 +246,11 @@ namespace DBF.UserControls
             }
         #endregion
 
+        public void btnBreak_Click(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
         #region OnDatacontextChanged
             private void ResultsControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
             {
@@ -248,14 +270,19 @@ namespace DBF.UserControls
                 ||  e.PropertyName == nameof(ControlViewModel.ShowAsOneGroup)
                 ||  e.PropertyName == nameof(ControlViewModel.HideTournamentSummery))
                     UpdateColumnVisibility();
+
+                if (e.PropertyName == nameof(ControlViewModel.ShowAsOneGroupVisibility))
+                    OnPropertyChanged(nameof(CollapsedInProjectorView));  // Notify binding
             }
 
             private void UpdateColumnVisibility()
             {
                 if (this.DataContext is ControlViewModel vm)
                 {
+                    // dgPairs.Columns[] bruger MappingName som key
+
                     // HideHacGrp
-                    var hacGrpColumn = dgPairs.Columns.FirstOrDefault(c => c.MappingName == "HACRankSectionPart");
+                    var hacGrpColumn = dgPairs.Columns.FirstOrDefault(c => c.MappingName == "HACRankSectionGroup");
 
                     if (hacGrpColumn != null)
                         hacGrpColumn.IsHidden = vm.HideHacGrp;
@@ -276,5 +303,25 @@ namespace DBF.UserControls
                 }
             }
         #endregion
+
+        private void showBreak()
+        {
+            try
+            {
+                // Only show the test button when running under a debugger
+                if (Debugger.IsAttached)
+                {
+                    var btn = this.FindName("btnBreak") as UIElement;
+
+                    if (btn != null)
+                        btn.Visibility = Visibility.Visible;
+                }
+            }
+
+            catch
+            {
+                // ignore any lookup failures
+            }
+        }
     }
 }

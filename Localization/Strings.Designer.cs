@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DBF.Resources {
+namespace DBF.Localization {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DBF.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DBF.Resources.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DBF.Localization.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -106,6 +106,51 @@ namespace DBF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        internal static string BackgroundColor_Blue {
+            get {
+                return ResourceManager.GetString("BackgroundColor_Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        internal static string BackgroundColor_Green {
+            get {
+                return ResourceManager.GetString("BackgroundColor_Green", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orange.
+        /// </summary>
+        internal static string BackgroundColor_Orange {
+            get {
+                return ResourceManager.GetString("BackgroundColor_Orange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        internal static string BackgroundColor_Red {
+            get {
+                return ResourceManager.GetString("BackgroundColor_Red", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White.
+        /// </summary>
+        internal static string BackgroundColor_White {
+            get {
+                return ResourceManager.GetString("BackgroundColor_White", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BC3 data.
         /// </summary>
         internal static string BC3Data {
@@ -129,6 +174,15 @@ namespace DBF.Resources {
         internal static string BC3NotUploaded {
             get {
                 return ResourceManager.GetString("BC3NotUploaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error reading the start or resultlist.
+        /// </summary>
+        internal static string BC3ReadError {
+            get {
+                return ResourceManager.GetString("BC3ReadError", resourceCulture);
             }
         }
         
@@ -214,6 +268,15 @@ namespace DBF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string btnSave {
+            get {
+                return ResourceManager.GetString("btnSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save and Close.
         /// </summary>
         internal static string btnSaveAndClose {
@@ -286,6 +349,15 @@ namespace DBF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Closing the window will reset alle the timers..
+        /// </summary>
+        internal static string ClosingTheWindow {
+            get {
+                return ResourceManager.GetString("ClosingTheWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Club.
         /// </summary>
         internal static string Club {
@@ -327,6 +399,15 @@ namespace DBF.Resources {
         internal static string CreateNewPreset {
             get {
                 return ResourceManager.GetString("CreateNewPreset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UI Language.
+        /// </summary>
+        internal static string CultureName {
+            get {
+                return ResourceManager.GetString("CultureName", resourceCulture);
             }
         }
         
@@ -498,6 +579,15 @@ namespace DBF.Resources {
         internal static string ExpectedPlayingTime {
             get {
                 return ResourceManager.GetString("ExpectedPlayingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Favorite Colors.
+        /// </summary>
+        internal static string FavoriteColers {
+            get {
+                return ResourceManager.GetString("FavoriteColers", resourceCulture);
             }
         }
         
@@ -862,6 +952,15 @@ namespace DBF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use the red values from the BridgeMate Server?.
+        /// </summary>
+        internal static string MarkedValues {
+            get {
+                return ResourceManager.GetString("MarkedValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Max rows in window:.
         /// </summary>
         internal static string MaxRows {
@@ -970,6 +1069,15 @@ namespace DBF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Restart the program saving the timer states.
+        /// </summary>
+        internal static string mnuRestartAndPreserveTimers {
+            get {
+                return ResourceManager.GetString("mnuRestartAndPreserveTimers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Settings.
         /// </summary>
         internal static string mnuSettings {
@@ -1006,6 +1114,15 @@ namespace DBF.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        internal static string New {
+            get {
+                return ResourceManager.GetString("New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Setting.
         /// </summary>
         internal static string NewSetting {
@@ -1015,7 +1132,7 @@ namespace DBF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to not uploaded.
+        ///   Looks up a localized string similar to is not uploaded.
         /// </summary>
         internal static string NotUploaded {
             get {
@@ -1182,6 +1299,15 @@ namespace DBF.Resources {
         internal static string Seconds {
             get {
                 return ResourceManager.GetString("Seconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Section not Completed or not uploaded.
+        /// </summary>
+        internal static string SectionNotCompletedOrNotSent {
+            get {
+                return ResourceManager.GetString("SectionNotCompletedOrNotSent", resourceCulture);
             }
         }
         
@@ -1416,6 +1542,15 @@ namespace DBF.Resources {
         internal static string UnfinishedSection {
             get {
                 return ResourceManager.GetString("UnfinishedSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown format.
+        /// </summary>
+        internal static string UnknownFormat {
+            get {
+                return ResourceManager.GetString("UnknownFormat", resourceCulture);
             }
         }
         

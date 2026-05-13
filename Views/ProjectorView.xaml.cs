@@ -14,20 +14,11 @@ using System.Windows.Shapes;
 
 namespace DBF.Views
 {
-    /// <summary>
-    /// Interaction logic for ProjectorView.xaml
-    /// </summary>
     public partial class ProjectorView : Window
     {
         public ProjectorView()
         {
             InitializeComponent();
         }
-
-        //private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        //{
-        //    e.Cancel = true;
-        //    this.Close();
-        //}
     }
 }

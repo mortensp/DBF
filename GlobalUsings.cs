@@ -1,3 +1,3 @@
 ﻿global using System;
 global using System.Text;
-global using Lex = DBF.Resources.Strings;
+global using Lex = DBF.Localization.Strings;

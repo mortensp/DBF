@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DBF.Resources {
+namespace DBF.Localization {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace DBF.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Strings___Copy {
+    internal class Syncfusion_SfColorPalette_Wpf {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Strings___Copy() {
+        internal Syncfusion_SfColorPalette_Wpf() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace DBF.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DBF.Resources.Strings - Copy", typeof(Strings___Copy).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DBF.Localization.Syncfusion.SfColorPalette.Wpf2", typeof(Syncfusion_SfColorPalette_Wpf).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,29 @@ namespace DBF.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Close.
+        ///   Looks up a localized string similar to Colors.
         /// </summary>
-        internal static string btnClose {
+        internal static string Color {
             get {
-                return ResourceManager.GetString("btnClose", resourceCulture);
+                return ResourceManager.GetString("Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Swatches.
+        /// </summary>
+        internal static string Swatch {
+            get {
+                return ResourceManager.GetString("Swatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to a.
+        /// </summary>
+        internal static string test {
+            get {
+                return ResourceManager.GetString("test", resourceCulture);
             }
         }
     }

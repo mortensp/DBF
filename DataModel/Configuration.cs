@@ -2,51 +2,51 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Media;
+
 using AppArguments;
+
 using Caliburn.Micro;
+
 using DBF.AudioServices;
 using DBF.Helpers;
-using DBF.Resources;
+using DBF.Localization;
 using DBF.ViewModels;
+
 using Localization;
-using Syncfusion.Data.Extensions;
-using Syncfusion.DocIO.DLS;
-using Syncfusion.UI.Xaml.ImageEditor;
+
 using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.DataModel
 {
     public partial class Configuration : PropertyChangedBase
     {
-        private static readonly string[]              audioExtensions   = new[] {                    ".wav",               ".mp3" };
-        private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions {WriteIndented = true, };
-        private static          string                currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
-        private static          string                path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Mortensp\\DBF\\configuration.json";
-        private static          string                oldPath           = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
-        private                 Configuration         loadedConfig;
-        private                 string                configVersion     = "v01";
-        private                 int                   visibleTimerCount;
-        private static readonly TimeSpan              _fiveHours        = new TimeSpan(5, 0, 0);
-        private static readonly TimeSpan              _zeroTime         = new TimeSpan(0, 0, 0);
-        private                 DateTime              startDate         = new(2026,1,1,18,30,0);
-
-        private IWindowManager  windowManager = IoC.Get<IWindowManager>();
-        private ICollectionView _presetsView;
+        private static readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions {WriteIndented = true, };
+        private static          string                _currentversion    = "v" + Assembly.GetExecutingAssembly().GetName().Version;
+        private static          string                _path              = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Mortensp\\DBF\\configuration.json";
+        private static          string                _oldPath           = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DBFTools\\configuration.json";
+        private                 Configuration         _loadedConfig;
+        private                 string                _configVersion     = "v01";
+        private                 int                   _visibleTimerCount;
+        private                 DateTime              _startDate         = new(2026,1,1,18,30,0);
+        private                 string                _cultureName;
+        private                 IWindowManager        _windowManager     = IoC.Get<IWindowManager>();
+        private                 ICollectionView       _presetsView;
+        private                 LexStrings            _lexStrings;
 
         #region Constructors
             static Configuration()
             {
-                serializerOptions.Converters.Add(new PresetCollectionConverter());
+                _serializerOptions.Converters.Add(new PresetCollectionConverter());
 
                 // Make sure that Roaming folder exists
-                var configDir = Path.GetDirectoryName(path);
+                var configDir = Path.GetDirectoryName(_path);
 
                 if (!Directory.Exists(configDir))
                     Directory.CreateDirectory(configDir);
@@ -57,6 +57,9 @@ namespace DBF.DataModel
                 BridgeTimers.CollectionChanged+= bridgeTimers_CollectionChanged;
                 Presets.CollectionChanged     += presets_CollectionChanged;
                 Presets.ItemChanged           += presets_ItemChanged;
+
+                // Sikre at Arguments.Values ikke er null
+                CultureName = Arguments.Values?.Lookup("language", "en") ?? "en";
             }
         #endregion
 
@@ -78,7 +81,7 @@ namespace DBF.DataModel
                     }
                 } = @"C:\BC3\";
 
-                public string AppVersion        { get; private set; } = currentversion;
+                public string AppVersion        { get; private set; } = _currentversion;
                 public string ConfigVersion     { get; set; }
                 public bool   IsLoaded          { get; private set; }
                 public bool   ReadBC3           { get; set; } = true;
@@ -90,14 +93,14 @@ namespace DBF.DataModel
                 public string BridgeMatePath    => BC3Path + @"BridgeMate\";
                 public TimeOnly? StartTime
                 {
-                    get => field ?? TimeOnly.FromDateTime(startDate);
+                    get => field ?? TimeOnly.FromDateTime(_startDate);
 
                     set
                     {
                         if (Set(ref field, value))
-                            StartDate = new( startDate.Year
-                                           , startDate.Month
-                                           , startDate.Day
+                            StartDate = new( _startDate.Year
+                                           , _startDate.Month
+                                           , _startDate.Day
                                            , value?.Hour ?? 18
                                            , value?.Minute ?? 30
                                            , 0);
@@ -111,6 +114,43 @@ namespace DBF.DataModel
                                       , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
                                       , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
                                   };
+
+                #region Culture and CultureName Properties
+                    public static BindableCollection<CultureInfo> UILanguages
+                    {
+                        get
+                        {
+                            if (field is null)
+                            {
+                                var languages = LanguageService.Instance.GetAvailableCultures().ToList();
+
+                                field = new BindableCollection<CultureInfo>(languages.OrderBy(c => c.DisplayName));
+                            }
+
+                            return field;
+                        }
+                    }
+
+                    public string CultureName
+                    {
+                        get => _cultureName;
+                        set
+                        {
+                            Set(ref _cultureName, value?.Trim());
+                        }
+                    }
+
+                    [JsonIgnore]
+                    public CultureInfo Culture
+                    {
+                        get => field;
+                        set
+                        {
+                            field       = value;
+                            CultureName = value?.Name;
+                        }
+                    }
+                #endregion
 
                 [JsonIgnore]
                 public ICollectionView PresetsView
@@ -166,19 +206,19 @@ namespace DBF.DataModel
                 {
                     get
                     {
-                        var limit = startDate.AddMinutes(-30);
+                        var limit = _startDate.AddMinutes(-30);
                         var now   = DateTime.Now;
 
-                        if (now >= startDate
+                        if (now >= _startDate
                         &&  now <= limit)
                             return now;
 
-                        return startDate;
+                        return _startDate;
                     }
 
                     set
                     {
-                        if (Set(ref startDate, value))
+                        if (Set(ref _startDate, value))
                             setEndTime();
                     }
                 }
@@ -192,22 +232,16 @@ namespace DBF.DataModel
                 [JsonIgnore]
                 public int VisibleTimerCount
                 {
-                    get => visibleTimerCount;
+                    get => _visibleTimerCount;
                     set
                     {
-                        visibleTimerCount = value;
-                        TimersCanBeAdded  = VisibleTimerCount <  4;
+                        _visibleTimerCount = value;
+                        TimersCanBeAdded   = VisibleTimerCount <  4;
                     }
                 }
 
                 [JsonIgnore]
-                public ObservableCollection<CustomColor> BackgroundColors = 
-                                                         new() {     new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = "Hvid" }
-                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = "Rød (dbf)" }
-                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = "Blå (dbf)" }
-                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = "Orange (dbf)" }
-                                                                   , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = "Grøn (dbf)" }
-                                                               };
+                public ObservableCollection<CustomColor> BackgroundColors => Global.GetBackgroundColors();
 
                 [JsonIgnore]
                 public bool TimersActive
@@ -228,53 +262,79 @@ namespace DBF.DataModel
             #region Save / Load Configuration
                 public void Save()
                 {
-                    ConfigVersion = configVersion;
+                    ConfigVersion = _configVersion;
 
                     foreach (var preset in Presets.Where(p => p.CustomPreset == false))
                         preset.IsHidden = Presets.Any(p => p.CustomPreset == true && p.Name == preset.Name);
 
                     // Only Custom Presets are saved due to PresetCollectionConverter
-                    string json = JsonSerializer.Serialize(this, serializerOptions);
-                    File.WriteAllText(path, json);
+                    string json = JsonSerializer.Serialize(this, _serializerOptions);
+                    File.WriteAllText(_path, json);
 
                     setEndTime();
                 }
 
-                public async Task LoadAsync()
+                public void LoadLanguageSetting()
                 {
-                    if (!File.Exists(path)
-                    &&  File.Exists(oldPath))
+                    if (!File.Exists(_path)
+                    &&  File.Exists(_oldPath))
                     {
                         // Sørg for at destination-mappen eksisterer
-                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+                        Directory.CreateDirectory(Path.GetDirectoryName(_path));
 
                         // Flyt gammel config fil
-                        File.Move(oldPath, path);
+                        File.Move(_oldPath, _path);
 
                         // Slet evt. gammel tom mappe
-                        string sourceFolder = Path.GetDirectoryName(oldPath)!;
+                        string sourceFolder = Path.GetDirectoryName(_oldPath)!;
 
                         if (Directory.GetFiles(sourceFolder).Length       == 0
                         &&  Directory.GetDirectories(sourceFolder).Length == 0)
                             Directory.Delete(sourceFolder);
                     }
 
-                    //var shell = IoC.Get<ShellViewModel>();
-                    if (!File.Exists(path)
+                    if (!File.Exists(_path)
+                    ||  Arguments.Values.Lookup("mode") == "reset")
+                        LanguageService.Instance.SetCulture("en-US");
+                    else
+                    {
+                        var jsonData = File.ReadAllText(_path);
+
+                        if (string.IsNullOrWhiteSpace(jsonData))
+                            LanguageService.Instance.SetCulture("en-US");
+                        else
+                        {
+                            Logger.Info("Reading Configuration file");
+
+                            //TODO: kan fjernes senere
+                            if (jsonData.IndexOf("\"Color\":") >  -1)
+                                jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
+
+                            _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
+                            CultureName   = _loadedConfig.CultureName;
+
+                            LanguageService.Instance.SetCulture(_loadedConfig.CultureName);
+                        }
+                    }
+                }
+
+                public async Task LoadAsync()
+                {
+                    if (!File.Exists(_path)
                     ||  Arguments.Values.Lookup("mode") == "reset")
                     {
-                        AppVersion    = currentversion;
-                        ConfigVersion = configVersion;
+                        AppVersion    = _currentversion;
+                        ConfigVersion = _configVersion;
                         Save();
                         await OpenSettingsAsync();
                     }
                     else
                     {
-                        var jsonData = File.ReadAllText(path);
+                        var jsonData = File.ReadAllText(_path);
 
                         if (string.IsNullOrWhiteSpace(jsonData))
                         {
-                            AppVersion = currentversion;
+                            AppVersion = _currentversion;
                             await OpenSettingsAsync();
                             Save();
                         }
@@ -286,12 +346,12 @@ namespace DBF.DataModel
                             if (jsonData.IndexOf("\"Color\":") >  -1)
                                 jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
 
-                            loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, serializerOptions);
+                            _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
 
-                            Update(loadedConfig);
+                            Update(_loadedConfig);
 
-                            if (loadedConfig.ConfigVersion                          is null
-                            ||  loadedConfig.ConfigVersion.CompareTo(configVersion) <  0)
+                            if (_loadedConfig.ConfigVersion                           is null
+                            ||  _loadedConfig.ConfigVersion.CompareTo(_configVersion) <  0)
                                 await OpenSettingsAsync();
                         }
                     }
@@ -309,8 +369,8 @@ namespace DBF.DataModel
                     {
                         BridgeTimer timer;
 
-                        if (loadedConfig?.BridgeTimers      is null
-                        ||  loadedConfig.BridgeTimers.Count == 0)
+                        if (_loadedConfig?.BridgeTimers      is null
+                        ||  _loadedConfig.BridgeTimers.Count == 0)
                         {
                             timer = new BridgeTimer();
                             timer.Update(Presets[i]);
@@ -318,12 +378,12 @@ namespace DBF.DataModel
                             timer.BackgroundColor = BackgroundColors[i].Color;
                             timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
 
-                            if (visibleTimerCount >  1) // Lad som standard de to første være visible
+                            if (_visibleTimerCount >  1) // Lad som standard de to første være visible
                                 timer.Visibility = System.Windows.Visibility.Collapsed;
                         }
                         else
-                            if (loadedConfig.BridgeTimers.Count >  i)
-                                timer = loadedConfig.BridgeTimers[i];
+                            if (_loadedConfig.BridgeTimers.Count >  i)
+                                timer = _loadedConfig.BridgeTimers[i];
                             else
                             {
                                 timer = new();
@@ -363,11 +423,11 @@ namespace DBF.DataModel
                             VisibleTimerCount++;
                     }
 
-                    if (visibleTimerCount == 0)
+                    if (_visibleTimerCount == 0)
                     {
                         BridgeTimers[0].Visibility = Visibility.Visible;
                         BridgeTimers[0].UpdateDisplay();
-                        visibleTimerCount = 1;
+                        _visibleTimerCount = 1;
                         Save();
                     }
 
@@ -387,7 +447,7 @@ namespace DBF.DataModel
                     if (timer.Visibility != Visibility.Visible)
                         BridgeTimers.Move(i, BridgeTimers.Count - 1);
                     else
-                        timer.CanClose = visibleTimerCount >  1;
+                        timer.CanClose = _visibleTimerCount >  1;
                 }
             }
 
@@ -409,23 +469,20 @@ namespace DBF.DataModel
                                              , TimerStates    = BridgeTimers.Where(t=>t.IsStarted).Select(t => t.CurrentState).ToList()
                                            };
 
-                    //var states = BridgeTimers.Select(t => t.CurrentState)
-                    //                             .ToList();
-                    string json = JsonSerializer.Serialize(state, serializerOptions);
+                    string json = JsonSerializer.Serialize(state, _serializerOptions);
                     File.WriteAllText(StatePath, json);
                 }
 
                 public void RestoreState()
                 {
-                    //if (Arguments.Values.Lookup("mode") == "restart")
                 {
                     if (File.Exists(StatePath))
                         try
                         {
                             Logger.Info("Restoring Timers");
-                            ; //todo: Empty Statement!! 
+
                             var jsonData = File.ReadAllText(StatePath);
-                            var state    = JsonSerializer.Deserialize<State>(jsonData, serializerOptions);
+                            var state    = JsonSerializer.Deserialize<State>(jsonData, _serializerOptions);
 
                             var controlViewModel = IoC.Get<ControlViewModel>();
 
@@ -442,9 +499,10 @@ namespace DBF.DataModel
                                 if (state.TimerStates[i].IsStarted)
                                     BridgeTimers[i].Restore(state.TimerStates[i]);
                         }
+
                         catch (Exception ex)
                         {
-                            Logger.Exception(ex, "Fejl ved genskabelse af state");
+                            Logger.Exception(ex, "Unable to restore state");
                             Debugger.Break();
                         }
 
@@ -456,17 +514,14 @@ namespace DBF.DataModel
             public async Task OpenSettingsAsync()
             {
                 var viewModel = IoC.Get<ConfigurationViewModel>();
-                await windowManager.ShowDialogAsync(viewModel);
+                await _windowManager.ShowDialogAsync(viewModel);
             }
-
-    
 
             public void OpenJSONFiles()
             {
-                tryOpenFile(path);
-
                 SaveState();
                 tryOpenFile(StatePath);
+                tryOpenFile(_path);
             }
 
             public void OpenLogFile()
@@ -474,7 +529,7 @@ namespace DBF.DataModel
                 tryOpenFile(Logger.LogFilePath);
             }
 
-            public void Update(Configuration newConfiguration)
+            public void Update(Configuration newConfiguration, bool updateUI = false)
             {
                 ReadBridgeMate    = newConfiguration.ReadBridgeMate;
                 ReadBC3           = newConfiguration.ReadBC3;
@@ -482,6 +537,9 @@ namespace DBF.DataModel
                 ProjectorInterval = newConfiguration.ProjectorInterval;
                 ProjectorMaxRows  = newConfiguration.ProjectorMaxRows;
                 StartTime         = newConfiguration.StartTime;
+                CultureName       = newConfiguration.CultureName;
+
+                Culture = LanguageService.Instance.SetCulture(CultureName);
 
                 if (newConfiguration.hasUserValues)
                 {
@@ -502,6 +560,9 @@ namespace DBF.DataModel
 
                     Presets.Add(preset);
                 }
+
+                if (updateUI)
+                    UpdateTimers();
             }
         #endregion
 
@@ -567,6 +628,12 @@ namespace DBF.DataModel
                     SetUpDownVisibility();
                 }
             }
+
+            internal void UpdateTimers()
+            {
+                foreach (var bridgeTimer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
+                    bridgeTimer.UpdateDisplay();
+            }
         #endregion
 
         #region Private Methods
@@ -585,7 +652,6 @@ namespace DBF.DataModel
                         psi.FileName = "notepad++.exe";
                         Process.Start(psi);
                     }
-
                     catch
                     {
                         psi.FileName = "notepad.exe";
@@ -652,10 +718,20 @@ namespace DBF.DataModel
                 timer.Start();
         }
 
-        internal void PauseAll()
+        internal void StopAll()
         {
             foreach (var timer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
-                timer.Pause();
+                timer.Stop();
+        }
+
+        internal void PauseAll()
+        {
+            var list = BridgeTimers.Where(t => t.Visibility == Visibility.Visible).ToList();
+
+            if (list.Any(t => t.IsRunning))
+                StopAll();
+            else
+                StartAll();
         }
 
         internal void MoreTimeAll()

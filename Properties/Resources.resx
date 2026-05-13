@@ -142,6 +142,9 @@
   <data name="Mekanisk klokke" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\Mechanical Bell.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Notify" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\AudioFiles\Notify.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="Skole" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\bell-ringing.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

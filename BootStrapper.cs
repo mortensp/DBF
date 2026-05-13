@@ -14,6 +14,7 @@ using DBF.DataModel;
 using DBF.Helpers;
 using DBF.ViewModels;
 using DBF.Views;
+using Localization;
 using Microsoft.DotNet.DesignTools.ViewModels;
 
 namespace DBF
@@ -24,18 +25,17 @@ namespace DBF
         public Bootstrapper()
         {
             Logger.Debug("Bootstrapper initialising");
-            Encoding.RegisterProvider(                                       CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             FrameworkElement.LanguageProperty
                             .OverrideMetadata( typeof(FrameworkElement)
                                              , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
-            Thread.CurrentThread.CurrentCulture = Global.DkCulture;
+            //Thread.CurrentThread.CurrentCulture = Global.DkCulture;
             Initialize();
             Logger.Debug("Bootstrapper initialised");
         }
 
-    
         #region SimpleContainer Overrides and Configuration.
             private readonly SimpleContainer _container = new();
 
@@ -50,22 +50,21 @@ namespace DBF
                 _container.Singleton<BridgeMate>();
                 _container.Singleton<IAudioService, WindowsAudioService>();
 
-            foreach (var viewModel in SelectViewModels())
-                if (_container.HasHandler(viewModel, null) == false)
-                    if (viewModel.Name == "ConfigurationViewModel"
-                    || viewModel.Name == "TimerSettingsViewModel"
-                    || viewModel.Name == "PresetNameViewModel")
-                    {
-                        _container.RegisterPerRequest(viewModel, null, viewModel);
-                        Logger.Debug($"Registered {viewModel.Name} as PerRequest");
-                    }
-                    else
-                    {
-                        _container.RegisterSingleton(viewModel, null, viewModel);
-                        Logger.Debug($"Registered {viewModel.Name} as Singleton");
-                    }
+                foreach (var viewModel in SelectViewModels())
+                    if (_container.HasHandler(viewModel, null) == false)
+                        if (viewModel.Name == "ShellViewModel"
+                        ||  viewModel.Name == "ControlViewModel")
+                        {
+                            _container.RegisterSingleton(viewModel, null, viewModel);
+                            Logger.Debug($"Registered {viewModel.Name} as Singleton");
+                        }
+                        else
+                        {
+                            _container.RegisterPerRequest(viewModel, null, viewModel);
+                            Logger.Debug($"Registered {viewModel.Name} as PerRequest");
+                        }
 
-                        var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
+                var defaultLocateTypeForModelType = ViewLocator.LocateTypeForModelType;
 
                 ViewLocator.LocateTypeForModelType = FindTypeForModelType(defaultLocateTypeForModelType);
             }
@@ -130,6 +129,10 @@ namespace DBF
             DisplayRootViewForAsync<ShellViewModel>();
             var screen = IoC.Get<ShellViewModel>();
             //var view   = screen.GetView() as ShellView;
+            var configuration = IoC.Get<Configuration>();
+
+            configuration.LoadLanguageSetting(); // Load settings before opening the ControlView to ensure that the correct language is set.
+
             screen.OpenControlView();
 #endif
             // Restore Taskbar Icon.

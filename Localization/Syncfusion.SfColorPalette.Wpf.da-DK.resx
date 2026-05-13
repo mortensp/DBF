@@ -118,9 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Color" xml:space="preserve">
-    <value>Colors</value>
+    <value>Farver</value>
   </data>
   <data name="Swatch" xml:space="preserve">
-    <value>Swatches</value>
+    <value>Farveprøver</value>
+  </data>
+  <data name="test" xml:space="preserve">
+    <value>a</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-﻿<Window x:Name="root"
+﻿<Window
     x:Class="DBF.Views.TimerSettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -13,9 +13,10 @@
     xmlns:model="clr-namespace:DBF.DataModel"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    x:Name="root"
     Title="{lex:Loc TimerSettings}"
     Width="605"
-    Height="647"
+    Height="700"
     lex:LocalizeDictionary.DesignCulture="da"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
@@ -60,18 +61,19 @@
                 CornerRadius="6">
 
                 <StackPanel>
-                    <WrapPanel>
-                        <TextBlock Text="{lex:Loc SetClock}"
-                            Margin="0,0,0,12"
-                            FontSize="16"
-                            FontWeight="Bold" />
+                    <TextBlock
+                        Margin="0,0,0,12"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Text="{lex:Loc SetClock}" />
 
-                        <TextBlock Text="{Binding Message}"
-                            Margin="70,0,0,12"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Foreground="Red" />
-                    </WrapPanel>
+                    <TextBlock
+                        Margin="0,0,0,5"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="Red"
+                        Text="{Binding Message}"
+                        Visibility="{Binding Message, Converter={StaticResource HideEmptyConverter}}" />
 
                     <Grid Margin="0,0,0,0" DataContext="{Binding NewSetting}">
                         <Grid.RowDefinitions>
@@ -101,11 +103,12 @@
                         </Grid.ColumnDefinitions>
 
                         <!--  Row: Group(s):  -->
-                        <TextBlock Text="{lex:Loc Groups}"
+                        <TextBlock
                             Grid.Row="0"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc Groups}" />
 
                         <ctl:EnumFlagsControl
                             Grid.Row="0"
@@ -115,13 +118,15 @@
                             SelectedFlags="{Binding Groups, Mode=TwoWay, Converter={StaticResource EnumCastConverter}}" />
 
                         <!--  Row - Background:  -->
-                        <TextBlock Text="{lex:Loc Background}"
+                        <TextBlock
                             Grid.Row="1"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc Background}" />
 
-                        <sf:ColorPickerPalette Name="bgColor"
+                        <sf:ColorPickerPalette
+                            Name="bgColor"
                             Grid.Row="1"
                             Grid.Column="1"
                             Width="200"
@@ -129,23 +134,27 @@
                             Margin="0,5"
                             HorizontalAlignment="Left"
                             AutomaticColorVisibility="Collapsed"
+                            BlackWhiteVisibility="Both"
                             CustomColorsCollection="{Binding NewColorCollection}"
-                            CustomHeaderText="Udvalgte Farver"
+                            CustomHeaderText="{lex:Loc FavoriteColers}"
                             CustomHeaderVisibility="Visible"
                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                            IsStandardTabVisible="Hidden"
                             SetCustomColors="True"
                             StandardPanelVisibility="Collapsed"
                             ThemePanelVisibility="Collapsed"
                             Color="{Binding NewSetting.BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - Foreground:  -->
-                        <TextBlock Text="{lex:Loc Foreground}"
+                        <TextBlock
                             Grid.Row="2"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc Foreground}" />
 
-                        <sf:ColorPickerPalette Name="fgColor"
+                        <sf:ColorPickerPalette
+                            Name="fgColor"
                             Grid.Row="2"
                             Grid.Column="1"
                             Width="200"
@@ -153,21 +162,23 @@
                             Margin="0,5"
                             HorizontalAlignment="Left"
                             AutomaticColorVisibility="Collapsed"
+                            BlackWhiteVisibility="Both"
                             CustomColorsCollection="{Binding NewColorCollection}"
-                            CustomHeaderText="Udvalgte Farver"
+                            CustomHeaderText="{lex:Loc FavoriteColers}"
                             CustomHeaderVisibility="Visible"
                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                            IsStandardTabVisible="Hidden"
                             SetCustomColors="True"
                             StandardPanelVisibility="Collapsed"
                             ThemePanelVisibility="Collapsed"
                             Color="{Binding NewSetting.ForegroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-
                         <!--  Row - sound:  -->
-                        <TextBlock Text="{lex:Loc Sound}"
+                        <TextBlock
                             Grid.Row="3"
                             Grid.Column="0"
-                            Margin="0,5" />
+                            Margin="0,5"
+                            Text="{lex:Loc Sound}" />
 
                         <WrapPanel Grid.Row="3" Grid.Column="1">
                             <ComboBox
@@ -177,7 +188,8 @@
                                 ItemsSource="{x:Static audio:AudioResources.Sounds}"
                                 SelectedItem="{Binding Sound}" />
 
-                            <Slider x:Name="volume"
+                            <Slider
+                                x:Name="volume"
                                 Width="200"
                                 Margin="0,5"
                                 HorizontalAlignment="Left"
@@ -188,11 +200,12 @@
                         </WrapPanel>
 
                         <!--  Row - use preset:  -->
-                        <TextBlock Text="{lex:Loc UsePreset}"
+                        <TextBlock
                             Grid.Row="4"
                             Grid.Column="0"
                             Margin="0,5,0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc UsePreset}" />
 
                         <StackPanel
                             Grid.Row="4"
@@ -254,11 +267,13 @@
                         </StackPanel>
 
                         <!--  Row - Teammatch:  -->
-                        <TextBlock x:Name="chkTeams" Text="{lex:Loc TeamMatch}"
+                        <TextBlock
+                            x:Name="chkTeams"
                             Grid.Row="5"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc TeamMatch}" />
 
                         <CheckBox
                             Grid.Row="5"
@@ -268,104 +283,120 @@
                             IsChecked="{Binding TeamMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - Rounds:  -->
-                        <TextBlock Text="{lex:Loc Rounds}"
+                        <TextBlock
                             Grid.Row="6"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc Rounds}" />
 
                         <StackPanel
                             Grid.Row="6"
                             Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
-                            <TextBox x:Name="txtRounds" Text="{Binding Rounds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
+                                x:Name="txtRounds"
                                 Width="50"
                                 Margin="0,0,4,0"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Rounds}" />
-                            <TextBlock Text="{lex:Loc By}"
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Rounds}"
+                                Text="{Binding Rounds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
                                 Margin="0,0,4,0"
-                                VerticalAlignment="Center" />
-                            <TextBox Text="{Binding BoardsPerRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                VerticalAlignment="Center"
+                                Text="{lex:Loc By}" />
+                            <TextBox
                                 Width="50"
                                 Margin="0,0,4,0"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BoardsPerRound}" />
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BoardsPerRound}"
+                                Text="{Binding BoardsPerRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock VerticalAlignment="Center" Text="spil." />
                         </StackPanel>
 
                         <!--  Break after round  -->
-                        <TextBlock Text="{lex:Loc BreakAfterRound}"
+                        <TextBlock
                             Grid.Row="7"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc BreakAfterRound}" />
 
-                        <TextBox Text="{Binding BreakAfterRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox
                             Grid.Row="7"
                             Grid.Column="1"
                             Width="50"
                             Margin="0,5"
                             HorizontalAlignment="Left"
-                            Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BreakAfterRound}" />
+                            Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BreakAfterRound}"
+                            Text="{Binding BreakAfterRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - time per round:  -->
-                        <TextBlock Text="{lex:Loc TimePerRound}"
+                        <TextBlock
                             Grid.Row="8"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc TimePerRound}" />
 
                         <StackPanel
                             Grid.Row="8"
                             Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
-                            <TextBox Text="{Binding Hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
                                 Width="40"
                                 Margin="0,0,2,0"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Hours}" />
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Hours}"
+                                Text="{Binding Hours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock VerticalAlignment="Center" Text=":" />
-                            <TextBox Text="{Binding Minutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
                                 Width="40"
                                 Margin="2,0,2,0"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Minutes}" />
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Minutes}"
+                                Text="{Binding Minutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock VerticalAlignment="Center" Text=":" />
-                            <TextBox Text="{Binding Seconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
                                 Width="40"
                                 Margin="2,0,2,0"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Seconds}" />
-                            <TextBlock Text="(tt:mm:ss)"
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Seconds}"
+                                Text="{Binding Seconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
                                 Margin="4,0,0,0"
-                                VerticalAlignment="Center" />
+                                VerticalAlignment="Center"
+                                Text="(tt:mm:ss)" />
                         </StackPanel>
 
                         <!--  Row - Warning - do not start new boards  -->
-                        <TextBlock Text="{lex:Loc WarningDoNotStartNewGames}"
+                        <TextBlock
                             Grid.Row="9"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc WarningDoNotStartNewGames}" />
 
                         <StackPanel
                             Grid.Row="9"
                             Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
-                            <TextBox Text="{Binding WarningMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
                                 Width="50"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=WarningMinutes}" />
-                            <TextBlock Text="{lex:Loc Minutes}"
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=WarningMinutes}"
+                                Text="{Binding WarningMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
                                 Margin="4,0,0,0"
-                                VerticalAlignment="top" />
+                                VerticalAlignment="top"
+                                Text="{lex:Loc Minutes}" />
                         </StackPanel>
 
 
                         <!--  Row - transition time:  -->
-                        <TextBlock Text="{lex:Loc TransitionTime}"
+                        <TextBlock
                             Grid.Row="10"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc TransitionTime}" />
 
 
                         <StackPanel
@@ -373,45 +404,51 @@
                             Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
-                            <TextBox Text="{Binding TransitionMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
                                 Width="50"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=TransitionMinutes}" />
-                            <TextBlock Text="{lex:Loc Minutes}"
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=TransitionMinutes}"
+                                Text="{Binding TransitionMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
                                 Margin="4,0,0,0"
-                                VerticalAlignment="top" />
+                                VerticalAlignment="top"
+                                Text="{lex:Loc Minutes}" />
                         </StackPanel>
 
                         <!--  Row - Breake minutes:  -->
-                        <TextBlock Text="{lex:Loc BreakMinutes}"
+                        <TextBlock
                             Grid.Row="11"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc BreakMinutes}" />
 
                         <StackPanel
                             Grid.Row="11"
                             Grid.Column="1"
                             Orientation="Horizontal">
 
-                            <TextBox Text="{Binding BreakMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox
                                 Width="50"
                                 Margin="0,5"
-                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BreakMinutes}" />
+                                Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BreakMinutes}"
+                                Text="{Binding BreakMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock Text="{lex:Loc Minutes}"
+                            <TextBlock
                                 Margin="4,0,0,0"
-                                VerticalAlignment="top" />
+                                VerticalAlignment="top"
+                                Text="{lex:Loc Minutes}" />
                         </StackPanel>
 
                         <!--  Row - Break message  -->
-                        <TextBlock Text="{lex:Loc BreakMessage}"
+                        <TextBlock
                             Grid.Row="12"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc BreakMessage}" />
 
 
-                        <TextBox Text="{Binding PauseMessage, Mode=TwoWay}"
+                        <TextBox
                             Grid.Row="12"
                             Grid.Column="1"
                             Width="320"
@@ -420,17 +457,19 @@
                             HorizontalAlignment="Left"
                             AcceptsReturn="True"
                             FontWeight="Bold"
+                            Text="{Binding PauseMessage, Mode=TwoWay}"
                             TextWrapping="Wrap" />
 
 
                         <!--  Row - End Greetings:  -->
-                        <TextBlock Text="{lex:Loc EndGreetingTop}"
+                        <TextBlock
                             Grid.Row="13"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc EndGreetingTop}" />
 
-                        <TextBox Text="{Binding EndGreetingTop, Mode=TwoWay}"
+                        <TextBox
                             Grid.Row="13"
                             Grid.Column="1"
                             Width="320"
@@ -439,16 +478,18 @@
                             HorizontalAlignment="Left"
                             AcceptsReturn="True"
                             FontWeight="Bold"
+                            Text="{Binding EndGreetingTop, Mode=TwoWay}"
                             TextWrapping="Wrap" />
 
                         <!--  Row - End Greeting Bottom  -->
-                        <TextBlock Text="{lex:Loc EndGreetingBottom}"
+                        <TextBlock
                             Grid.Row="14"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc EndGreetingBottom}" />
 
-                        <TextBox Text="{Binding EndGreetingBottom, Mode=TwoWay}"
+                        <TextBox
                             Grid.Row="14"
                             Grid.Column="1"
                             Width="320"
@@ -457,14 +498,16 @@
                             HorizontalAlignment="Left"
                             AcceptsReturn="True"
                             FontWeight="Bold"
+                            Text="{Binding EndGreetingBottom, Mode=TwoWay}"
                             TextWrapping="Wrap" />
 
                         <!--  Row - Playing Time:  -->
-                        <TextBlock Text="{lex:Loc ExpectedPlayingTime}"
+                        <TextBlock
                             Grid.Row="15"
                             Grid.Column="0"
                             Margin="0,5"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc ExpectedPlayingTime}" />
 
                         <StackPanel
                             Grid.Row="15"
@@ -473,16 +516,18 @@
 
                             <!--<TextBlock Margin="0,4" Text="kl. " />-->
 
-                            <TextBox Text="{Binding DataContext.Configuration.StartTime, RelativeSource={RelativeSource AncestorType=Window}}"
+                            <TextBox
                                 Margin="0,4"
-                                FontWeight="Bold" />
+                                FontWeight="Bold"
+                                Text="{Binding DataContext.Configuration.StartTime, RelativeSource={RelativeSource AncestorType=Window}}" />
 
                             <TextBlock Margin="0,4" Text=" - " />
 
-                            <TextBlock Text="{Binding DataContext.EndTime, RelativeSource={RelativeSource AncestorType=Window}}"
+                            <TextBlock
                                 Margin="0,4"
                                 HorizontalAlignment="Left"
-                                FontWeight="Bold" />
+                                FontWeight="Bold"
+                                Text="{Binding DataContext.EndTime, RelativeSource={RelativeSource AncestorType=Window}}" />
 
 
                         </StackPanel>
@@ -506,7 +551,7 @@
             <Button
                 Width="80"
                 cal:Message.Attach="[Event Click] = [Action AcceptSetting]"
-                Content="{lex:Loc btnAccept}"
+                Content="{lex:Loc btnSave}"
                 IsDefault="True" />
         </StackPanel>
     </Grid>

@@ -21,7 +21,7 @@ namespace DBF.UserControls
     /// </summary>
     public partial class StartListControl : UserControl
     {
-        private Configuration config = IoC.Get<Configuration>();
+        private Configuration config;// = IoC.Get<Configuration>();
 
         private bool              parentIsViewbox;
         private int               displayLineIndex = -1;
@@ -57,16 +57,13 @@ namespace DBF.UserControls
                 dgTeams.GroupCollapsing             += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.GroupExpanding              += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.ItemsSourceChanged          += onTeamsChanged;
-
-                // Initialiser timeren
-                groupTimer             = new DispatcherTimer();
-                groupTimer.Tick       += (s, e) => showNextGroup();
-                config.PropertyChanged+= (s, e) => setupPaging();
             }
         #endregion
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            config ??= IoC.Get<Configuration>();
+
             var parent = VisualTreeHelper.GetParent(this);
 
             while (parent is not null
@@ -77,6 +74,11 @@ namespace DBF.UserControls
                 parentIsViewbox = true;
 
             setupPaging();
+
+            // Initialiser timeren
+            groupTimer             = new DispatcherTimer();
+            groupTimer.Tick       += (s, e) => showNextGroup();
+            config.PropertyChanged+= (s, e) => setupPaging();
         }
 
         private void onPairsChanged(object s, GridItemsSourceChangedEventArgs e)
@@ -316,7 +318,7 @@ namespace DBF.UserControls
                 if (this.DataContext is ControlViewModel vm)
                 {
                     // Hide or unhide columns
-                    dgPairs.Columns["HACRankSectionPart"]?.IsHidden = vm.HideHacGrp;
+                    dgPairs.Columns["HACRankSectionGroup"]?.IsHidden = vm.HideHacGrp;
                     dgPairs.Columns["ExpectedPct"]?.IsHidden = vm.ImpsPair || vm.HideHac;
                     dgPairs.Columns["HACTotal"]?.IsHidden = vm.HideTournamentSummery || vm.HideHac;
                     dgPairs.Columns["TournamentRank"]?.IsHidden = vm.HideTournamentSummery;

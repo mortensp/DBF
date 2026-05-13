@@ -21,15 +21,20 @@ namespace DBF.Views
             Loaded += ShellView_Loaded;
             Closing+= ShellView_Closing;
 
-            // Only show the test button when running under a debugger
-            if (Debugger.IsAttached)
+            try
             {
-                var btn = this.FindName("toggleLanguage") as UIElement;
+                // Only show the test button when running under a debugger
+                if (Debugger.IsAttached)
+                {
+                    var btn = this.FindName("mnuTest") as UIElement;
 
-                if (btn != null)
-                    btn.Visibility = Visibility.Visible;
-                else
-                    btn.Visibility = Visibility.Collapsed;
+                    if (btn != null)
+                        btn.Visibility = Visibility.Visible;
+                }
+            }
+            catch
+            {
+                // ignore any lookup failures
             }
         }
 

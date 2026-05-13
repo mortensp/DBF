@@ -3,12 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using Syncfusion.Windows.Controls.Notification;
-using Syncfusion.Windows.Tools.Controls;
 using Configuration = DBF.DataModel.Configuration;
 
 namespace DBF.UserControls;
@@ -24,27 +22,6 @@ public partial class BridgeTimerControl : UserControl
 
         // Ensure the badge reads from this control's Timer regardless of adorner layer DataContext
         badge.SetBinding(SfBadge.ContentProperty, new Binding("Timer.BadgeText") { Source = this, Mode = BindingMode.OneWay });
-
-        if (this.IsInDesignMode())
-        {
-            Visibility = Visibility.Visible;
-
-            Timer = new BridgeTimer
-                    {
-                        Visibility       = Visibility.Visible
-                      , Foreground       = System.Windows.Media.Brushes.Black
-                      , Background       = System.Windows.Media.Brushes.Orange
-                      , Time             = "21:17"
-                      , RoundText        = "3. Runde"
-                      , Info             = "Vi spiller 7 runder af 24 spil"
-                                         + Environment.NewLine +
-                                         "Pause efter 4. Runde"
-                      , MinutesLeft      = 13d
-                      , WarningVisiblity = Visibility.Visible
-                    };
-
-            Configuration = new Configuration() { StartDate = DateTime.Now };
-        }
     }
 
     public Configuration Configuration { get => field ??= IoC.Get<Configuration>(); set => field = value; }
@@ -114,27 +91,9 @@ public partial class BridgeTimerControl : UserControl
                                                               , typeof(BridgeTimerControl)
                                                               , new FrameworkPropertyMetadata(Visibility.Visible));//, onButtonsVisibilityPropertyChanged));
 
-            //private static void onButtonsVisibilityPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-            //{
-            //    if (d is BridgeTimerControl ctl)
-            //      ctl.CanClose =
-            //          ctl.ButtonsVisibility == Visibility.Visible;
-            //}
+     
         #endregion
 
-        //#region Dependency Property BMSettings
-        //    public Preset BMSettings
-        //    {
-        //        get => (Preset)GetValue(BMSettingsProperty);
-        //        set => SetValue(BMSettingsProperty, value);
-        //    }
-
-        //    public static readonly DependencyProperty BMSettingsProperty = 
-        //                           DependencyProperty.Register( nameof(BMSettings)
-        //                                                      , typeof(Preset)
-        //                                                      , typeof(BridgeTimerControl)
-        //                                                      , new FrameworkPropertyMetadata(null));
-        //#endregion
     #endregion
 
     #region Public Properties
@@ -219,4 +178,28 @@ public partial class BridgeTimerControl : UserControl
 
         private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(Timer);
     #endregion
+
+    private void ControlLoaded(object sender, RoutedEventArgs e)
+    {
+        if (this.IsInDesignMode())
+        {
+            Visibility = Visibility.Visible;
+
+            Timer = new BridgeTimer
+                    {
+                        Visibility       = Visibility.Visible
+                      , Foreground       = System.Windows.Media.Brushes.Black
+                      , Background       = System.Windows.Media.Brushes.Orange
+                      , Time             = "21:17"
+                      , RoundText        = "3. Runde"
+                      , Info             = "Vi spiller 7 runder af 24 spil"
+                                         + Environment.NewLine +
+                                         "Pause efter 4. Runde"
+                      , MinutesLeft      = 13d
+                      , WarningVisiblity = Visibility.Visible
+                    };
+
+            Configuration = new Configuration() { StartDate = DateTime.Now };
+        }
+    }
 }

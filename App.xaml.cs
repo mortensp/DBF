@@ -1,18 +1,9 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using AppArguments;
 using DBF.Helpers;
-using DBF.Resources;
+using DBF.Localization;
 using GithubTools;
-using WPFLocalizeExtension.Engine;
 using Localization;
-using Microsoft.VisualBasic.Devices;
-using Syncfusion.UI.Xaml.Maps;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Syncfusion.Windows.Edit;
-using WPFLocalizeExtension.Providers;
 
 namespace DBF
 {
@@ -25,18 +16,13 @@ namespace DBF
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            //    Thread.CurrentThread.CurrentUICulture = new("en");
             Arguments.Parse(validArgs, requiredArgs, showHelp);
             Logger.Info($"Application arguments: {Arguments.Values.ToFormattedString()}");
 
             // Initialize LanguageService
-            var asmName = typeof(Resources.Strings).Assembly.GetName().Name;
-            LanguageService.Instance.Initialize(asmName, "Strings");
-            Strings.Culture = LanguageService.Instance.SetCulture(Arguments.Values.Lookup("language"));
-#if DEBUG        
-            //Strings.Culture = LanguageService.Instance.SetCulture("en");
-#endif
-            //base.OnStartup(e);
-            
+            LanguageService.Instance.Initialize(typeof(Lex), typeof(Syncfusion_Shared_Wpf), typeof(Syncfusion_SfColorPalette_Wpf));
+
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
 
@@ -56,7 +42,6 @@ namespace DBF
 #endif
 
             base.OnStartup(e);
-
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -77,7 +62,7 @@ namespace DBF
             private static void showHelp(string msg, bool exitProgram)
             {
                 string helpText = @"
-                🔧 DBF Tools Help
+                            🔧 DBF Tools Help
         ====================
         Usages:
           DBF.exe [mode:MyMode]  

@@ -76,7 +76,7 @@ namespace DBF.DataModel
         [XmlIgnore] public                                        int          Position             { get; set; }
 
         [XmlIgnore] public                                        string       SubGroup              { get; set; } = "";
-        [XmlIgnore] public                                        int          HACRankSectionPart    { get; set; }
+        [XmlIgnore] public                                        int          HACRankSectionGroup    { get; set; }
         [XmlIgnore] public int EntryNo { get; set; }
 
         // ---

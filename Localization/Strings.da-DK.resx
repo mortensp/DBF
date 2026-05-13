@@ -118,319 +118,319 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutTitle" xml:space="preserve">
-    <value>About DBF Tools</value>
+    <value>Om DBF Tools</value>
   </data>
   <data name="AddTimer" xml:space="preserve">
-    <value>Add Timer</value>
+    <value>Tilføj Ur</value>
   </data>
   <data name="BridgeTimers" xml:space="preserve">
-    <value>Bridge Timers</value>
+    <value>Bridge Ure</value>
   </data>
   <data name="btnAccept" xml:space="preserve">
-    <value>Accept</value>
+    <value>OK</value>
   </data>
   <data name="btnCancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Annuller</value>
   </data>
   <data name="btnClose" xml:space="preserve">
-    <value>Close</value>
+    <value>Luk</value>
   </data>
   <data name="btnSaveAndClose" xml:space="preserve">
-    <value>Save and Close</value>
+    <value>Gem status og Luk</value>
   </data>
   <data name="Results" xml:space="preserve">
-    <value>Results</value>
+    <value>Resultater</value>
   </data>
   <data name="btnYesAndReset" xml:space="preserve">
-    <value>Reset and Close</value>
+    <value>Nulstil og Luk</value>
   </data>
   <data name="Club" xml:space="preserve">
-    <value>Club</value>
+    <value>Klub</value>
   </data>
   <data name="Confirm" xml:space="preserve">
-    <value>Confirm</value>
+    <value>Bekræft</value>
   </data>
   <data name="Date" xml:space="preserve">
-    <value>Date</value>
+    <value>Dato</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>This is a simple app offers up to four bridge timers that can be controlled on the pc, at optional displayed on an second monitor or projector.&amp;#10; It can be read a corresponding BridgeMate database and update the timers accordantly and in Denmark it's also possible to Start and Result lists from BC3's output. </value>
+    <value>Dette er et simpelt hjælpe program, som arbejder samme med BC3's output. Dvs. at Start og Resultatlister hentes fra de data, som er sendt eller sendes til hjemmesiden.&amp;#10; Bridgeurene er dog uafhængige af BC3. </value>
   </data>
   <data name="ExpectedEndTime" xml:space="preserve">
-    <value>Expected end time</value>
+    <value>Forventet slut</value>
   </data>
   <data name="General" xml:space="preserve">
-    <value>General</value>
+    <value>Generalt</value>
   </data>
   <data name="MaxRows" xml:space="preserve">
-    <value>Max rows in window:</value>
+    <value>Max linjer af gangen:</value>
   </data>
   <data name="Projector" xml:space="preserve">
-    <value>Projector</value>
+    <value>Projektor</value>
   </data>
   <data name="ProjectorInterval" xml:space="preserve">
-    <value>Scrolling frekvens on projector:</value>
+    <value>Bladringsinterval på projektor:</value>
   </data>
   <data name="ReadBC3" xml:space="preserve">
-    <value>Read Start- and Result list:</value>
+    <value>Indlæs Start- og Resultatliste:</value>
   </data>
   <data name="ReadBM" xml:space="preserve">
-    <value>Read BridgeMate status:</value>
+    <value>Indlæs BridgeMate status:</value>
   </data>
   <data name="Vis Start" xml:space="preserve">
-    <value>Results</value>
+    <value>Resultater</value>
   </data>
   <data name="Seconds" xml:space="preserve">
-    <value>seconds</value>
+    <value>sekunder</value>
   </data>
   <data name="Startlist" xml:space="preserve">
-    <value>Startlist</value>
+    <value>Startliste</value>
   </data>
   <data name="StartTime" xml:space="preserve">
-    <value>Start time</value>
+    <value>Start kl.</value>
   </data>
   <data name="Subclub" xml:space="preserve">
-    <value>SubClub</value>
+    <value>Hold</value>
   </data>
   <data name="btnShowStartLists" xml:space="preserve">
-    <value>Show Startlists</value>
+    <value>Vis Startlister</value>
   </data>
   <data name="btnShowResults" xml:space="preserve">
-    <value>Show Results</value>
+    <value>Vis Resultater</value>
   </data>
   <data name="btnShowBridgeTimers" xml:space="preserve">
-    <value>Show Timers</value>
+    <value>Vis Urene</value>
   </data>
   <data name="NewSetting" xml:space="preserve">
-    <value>New Setting</value>
+    <value>Ny Instilling</value>
   </data>
   <data name="NameIt" xml:space="preserve">
-    <value>Give it a name</value>
+    <value>Navngiv den</value>
   </data>
   <data name="DBFProjector" xml:space="preserve">
-    <value>DBF Projector</value>
+    <value>DBF Projektor</value>
   </data>
   <data name="mnuSettings" xml:space="preserve">
-    <value>_Settings</value>
+    <value>_Indstillinger</value>
   </data>
   <data name="mnuView" xml:space="preserve">
-    <value>View</value>
+    <value>Vis</value>
   </data>
   <data name="mnuFullscreen" xml:space="preserve">
-    <value>Fullscreen mode</value>
+    <value>Fuldskærm tilstand</value>
   </data>
   <data name="mnuHelp" xml:space="preserve">
-    <value>Help</value>
+    <value>Hjælp</value>
   </data>
   <data name="mnuBridgeTimers" xml:space="preserve">
-    <value>Bridge Timers</value>
+    <value>Bridge Ure</value>
   </data>
   <data name="mnuChangeProgramVersion" xml:space="preserve">
-    <value>Change Program Version</value>
+    <value>_Skift Program Version</value>
   </data>
   <data name="mnuOpenJsonSettings" xml:space="preserve">
-    <value>Open JSON settings</value>
+    <value>Åben JSON Indstillinger</value>
   </data>
   <data name="mnuOpenLogFile" xml:space="preserve">
-    <value>Open Logfile</value>
+    <value>Åben Logfile</value>
   </data>
   <data name="mnuAbout" xml:space="preserve">
-    <value>About</value>
+    <value>Om</value>
   </data>
   <data name="TimerSettings" xml:space="preserve">
-    <value>Timer Settings</value>
+    <value>Ur Indstillinger</value>
   </data>
   <data name="Groups" xml:space="preserve">
-    <value>Groups</value>
+    <value>Rækker</value>
   </data>
   <data name="SetClock" xml:space="preserve">
-    <value>Set Clock</value>
+    <value>Indstil Uret</value>
   </data>
   <data name="Background" xml:space="preserve">
-    <value>Background</value>
+    <value>Baggrunds farve</value>
   </data>
   <data name="Foreground" xml:space="preserve">
-    <value>Foreground</value>
+    <value>Tekst farve</value>
   </data>
   <data name="Sound" xml:space="preserve">
-    <value>Sound</value>
+    <value>Lyd</value>
   </data>
   <data name="CreateNewPreset" xml:space="preserve">
-    <value>Create New Preset</value>
+    <value>Brug Gemt Indstilling</value>
   </data>
   <data name="UsePreset" xml:space="preserve">
-    <value>Use Preset</value>
+    <value>Brug forudindstilling</value>
   </data>
   <data name="SavePreset" xml:space="preserve">
-    <value>Save Preset</value>
+    <value>Gem Forudindstilling</value>
   </data>
   <data name="DeletePreset" xml:space="preserve">
-    <value>Delete Preset</value>
+    <value>Slet Forudindstilling</value>
   </data>
   <data name="TeamMatch" xml:space="preserve">
-    <value>Team Match</value>
+    <value>Holdkamp</value>
   </data>
   <data name="Rounds" xml:space="preserve">
-    <value>Rounds</value>
+    <value>Runder</value>
   </data>
   <data name="By" xml:space="preserve">
-    <value>by</value>
+    <value>af</value>
   </data>
   <data name="BreakAfterRound" xml:space="preserve">
-    <value>Break After Round</value>
+    <value>Pause efter Runde</value>
   </data>
   <data name="TimePerRound" xml:space="preserve">
-    <value>Time Per Round</value>
+    <value>Tid pr. Runde</value>
   </data>
   <data name="WarningDoNotStartNewGames" xml:space="preserve">
-    <value>Do Not Start New Game Warning</value>
+    <value>Start ikke nye spil advarsel</value>
   </data>
   <data name="Minutes" xml:space="preserve">
-    <value>minutes</value>
+    <value>minutter</value>
   </data>
   <data name="TransitionTime" xml:space="preserve">
-    <value>Transition Time</value>
+    <value>Tid til Rundeskifte</value>
   </data>
   <data name="BreakMinutes" xml:space="preserve">
-    <value>Break Minutes</value>
+    <value>Pause længde</value>
   </data>
   <data name="BreakMessage" xml:space="preserve">
-    <value>Break Message</value>
+    <value>Pause Meddelse</value>
   </data>
   <data name="EndGreetingTop" xml:space="preserve">
-    <value>End Greeting Top</value>
+    <value>Slut Hilsen Øverst</value>
   </data>
   <data name="EndGreetingBottom" xml:space="preserve">
-    <value>End Greeting Bottom</value>
+    <value>Slut Hilsen Nederst</value>
   </data>
   <data name="ExpectedPlayingTime" xml:space="preserve">
-    <value>Expected Playing Time</value>
+    <value>Forventet spille tid</value>
   </data>
   <data name="appSettings" xml:space="preserve">
-    <value>App Settings</value>
+    <value>Program Indstillinger</value>
   </data>
   <data name="MissingSoundFile" xml:space="preserve">
-    <value>Sound file was not found</value>
+    <value>Lyd filen blev ikke fundet</value>
   </data>
   <data name="ErrorPlayingSound" xml:space="preserve">
-    <value>Error playing sound</value>
+    <value>Fejl ved afspilling af lyd</value>
   </data>
   <data name="Folder" xml:space="preserve">
-    <value>Folder</value>
+    <value>Mappen</value>
   </data>
   <data name="DoNotExist" xml:space="preserve">
-    <value>does not exist</value>
+    <value>findes ikke</value>
   </data>
   <data name="Error" xml:space="preserve">
-    <value>Error</value>
+    <value>Fejl</value>
   </data>
   <data name="FileNotFound" xml:space="preserve">
-    <value>file not found</value>
+    <value>Filen blev ikke fundet</value>
   </data>
   <data name="InPath" xml:space="preserve">
-    <value>in path</value>
+    <value>i stien</value>
   </data>
   <data name="ErrorReadingBrideMateFolder" xml:space="preserve">
-    <value>Error reading BridgeMate folder</value>
+    <value>Fejl ved læsning af BridgeMate mappen</value>
   </data>
   <data name="CloseAndResetWarning" xml:space="preserve">
-    <value>Closing the Timer will reset it. Do you want to continue?</value>
+    <value>Hvis du lukker uret, så nulstilles det. Vil du lukke uret?</value>
   </data>
   <data name="Confirmation" xml:space="preserve">
-    <value>Confirmation</value>
+    <value>Bekræftelse</value>
   </data>
   <data name="ContinueQuestion" xml:space="preserve">
-    <value>Do you want to continue?</value>
+    <value>Vil du fortsætte?</value>
   </data>
   <data name="ResetTimersPlural" xml:space="preserve">
-    <value>Resetting the Timers will restore the saved settings</value>
+    <value>Hvis du nulstiller urene, indlæses alle indstillingerne på ny.</value>
   </data>
   <data name="ResetTimers" xml:space="preserve">
-    <value>Resetting the Timer will restore the saved setting</value>
+    <value>Hvis du nulstiller uret, indlæses indstillingerne på ny.</value>
   </data>
   <data name="WeArePlaying" xml:space="preserve">
-    <value>We are playing</value>
+    <value>Vi spiller</value>
   </data>
   <data name="Of" xml:space="preserve">
-    <value>of</value>
+    <value>af</value>
   </data>
   <data name="Boards" xml:space="preserve">
-    <value>boards</value>
+    <value>spil</value>
   </data>
   <data name="LastRound" xml:space="preserve">
-    <value>Last Round!</value>
+    <value>Sidste Runde!</value>
   </data>
   <data name="PauseUntil" xml:space="preserve">
-    <value>Pause until</value>
+    <value>Pause til kl</value>
   </data>
   <data name="MinutesBreakAfter" xml:space="preserve">
-    <value>minutes break after</value>
+    <value>minutters pause efter</value>
   </data>
   <data name="TransitioningTo" xml:space="preserve">
-    <value>Transition to</value>
+    <value>Der skiftes til</value>
   </data>
   <data name="ThanksForNow" xml:space="preserve">
-    <value>Thank you for the peace and order.</value>
+    <value>Tak for god ro og orden.</value>
   </data>
   <data name="RememberToCleanUp" xml:space="preserve">
-    <value>Please remember to clean up on and around the table</value>
+    <value>Husk at rydde op på og omkring bordet</value>
   </data>
   <data name="Half" xml:space="preserve">
-    <value>Half</value>
+    <value>Halvleg</value>
   </data>
   <data name="Round" xml:space="preserve">
-    <value>round</value>
+    <value>runde</value>
   </data>
   <data name="Halfs" xml:space="preserve">
-    <value>Halfs</value>
+    <value>Halvlege</value>
   </data>
   <data name="ThisWillResetTheTimer" xml:space="preserve">
-    <value>This will reset the timer.</value>
+    <value>Dette vil nulstille uret.</value>
   </data>
   <data name="tipTimerSetup" xml:space="preserve">
-    <value>Timer setup</value>
+    <value>Indstil uret</value>
   </data>
   <data name="tipCloseTimer" xml:space="preserve">
-    <value>Close the timer</value>
+    <value>Luk og sluk uret</value>
   </data>
   <data name="tipStartTimer" xml:space="preserve">
-    <value>Start the timer</value>
+    <value>Start uret</value>
   </data>
   <data name="tipRestartTimer" xml:space="preserve">
-    <value>Restart the round. Hold down the Shift key to restart the round on all timers</value>
+    <value>Genstart runden. Hold Shift nede for at genstarts runden på alle urene</value>
   </data>
   <data name="tipPauseTimer" xml:space="preserve">
-    <value>Pause the timer. Hold down the shift key to pause all timers</value>
+    <value>Sæt uret på Pause. Hold Shift nede for at Pause alle urene</value>
   </data>
   <data name="tipNextRound" xml:space="preserve">
-    <value>Go to next round. Hold down the shift key to go to next round on all the timers</value>
+    <value>Gå til næste Runden. Hold shift nede for at gå til næste runde på alle urene</value>
   </data>
   <data name="tipLessTime" xml:space="preserve">
-    <value>Reduce time for this round. Hold down the shift key to reduce time on all the watches</value>
+    <value>Afkort Runden. Hold Shift nede for at Afkorte tiden på alle urene</value>
   </data>
   <data name="tipMoreTime" xml:space="preserve">
-    <value>Increase the time for this round. Hold down the shift key to increase time on all the timers</value>
+    <value>Give mere tid i runden. Hold shift nede for at give mere tid på alle urene</value>
   </data>
   <data name="tipMoveTimerUp" xml:space="preserve">
-    <value>Move the timer up</value>
+    <value>Flyt uret op</value>
   </data>
   <data name="tipMoveTimerDown" xml:space="preserve">
-    <value>Move timer down</value>
+    <value>Flyt uret ned</value>
   </data>
   <data name="tipResetTimer" xml:space="preserve">
-    <value>Reset the timer. Hold down the shift key to reset all the timers</value>
+    <value>Indlæs valgte indstillinger. Hold Shift nede for at Indlæse indstillinger for alle urene</value>
   </data>
   <data name="chkShowAsOneGroup" xml:space="preserve">
-    <value>Show as one group</value>
+    <value>Vis som én række</value>
   </data>
   <data name="hdGroup" xml:space="preserve">
-    <value>Grp</value>
+    <value>Rk</value>
   </data>
   <data name="hdNo" xml:space="preserve">
-    <value>No</value>
+    <value>Nr</value>
   </data>
   <data name="hdTeam" xml:space="preserve">
-    <value>Team</value>
+    <value>Hold</value>
   </data>
   <data name="hpKp" xml:space="preserve">
     <value>KP</value>
@@ -439,25 +439,25 @@
     <value>Imps</value>
   </data>
   <data name="hdOpponentTeam" xml:space="preserve">
-    <value>Opps.</value>
+    <value>Mod</value>
   </data>
   <data name="hdKPTotal" xml:space="preserve">
     <value>KP Total</value>
   </data>
   <data name="hdSubGroup" xml:space="preserve">
-    <value>Sub group</value>
+    <value>Led</value>
   </data>
   <data name="hdNames" xml:space="preserve">
-    <value>Names</value>
+    <value>Navne</value>
   </data>
   <data name="hdHACRank" xml:space="preserve">
-    <value>Hac #</value>
+    <value>Hac pos</value>
   </data>
   <data name="hdHACGroup" xml:space="preserve">
     <value>Hac grp</value>
   </data>
   <data name="hdActualScore" xml:space="preserve">
-    <value>Imps</value>
+    <value>Score</value>
   </data>
   <data name="hdScore" xml:space="preserve">
     <value>Score</value>
@@ -472,25 +472,25 @@
     <value>KP</value>
   </data>
   <data name="hdResult" xml:space="preserve">
-    <value>Result</value>
+    <value>Resultat</value>
   </data>
   <data name="hdTournament" xml:space="preserve">
-    <value>Tournament</value>
+    <value>Turnering</value>
   </data>
   <data name="hdTournamentScore" xml:space="preserve">
     <value>Score</value>
   </data>
   <data name="hdRanking" xml:space="preserve">
-    <value>Ranking</value>
+    <value>Stilling</value>
   </data>
   <data name="hdPosition" xml:space="preserve">
     <value>Position</value>
   </data>
   <data name="hdActualPct" xml:space="preserve">
-    <value>Obtained %</value>
+    <value>Opnået %</value>
   </data>
   <data name="hdSection" xml:space="preserve">
-    <value>Section</value>
+    <value>Sektion</value>
   </data>
   <data name="hdTournamentPos" xml:space="preserve">
     <value>Pos</value>
@@ -502,84 +502,129 @@
     <value>Hac pos</value>
   </data>
   <data name="hdStartPos" xml:space="preserve">
-    <value>Seating</value>
+    <value>Start</value>
   </data>
   <data name="hdPlayers" xml:space="preserve">
-    <value>Players</value>
+    <value>Spillere</value>
   </data>
   <data name="hdDeltaHac" xml:space="preserve">
     <value>ΔHac</value>
   </data>
   <data name="hdExpectedScore" xml:space="preserve">
-    <value>Expected</value>
+    <value>Forventet</value>
   </data>
   <data name="UnfinishedSection" xml:space="preserve">
-    <value>is unfinished</value>
+    <value>er endnu ikke afsluttet eller er ikke sendt til hjemmesiden!</value>
   </data>
   <data name="aPriorSection" xml:space="preserve">
-    <value>A prior section</value>
+    <value>En tidligere runde</value>
   </data>
   <data name="theSectionDate" xml:space="preserve">
-    <value>The section dated</value>
+    <value>Runden d.</value>
   </data>
   <data name="MissingStartlist" xml:space="preserve">
-    <value>Missing startlist in</value>
+    <value>Kan ikke finde Startliste i mappen</value>
   </data>
   <data name="FirstHalf" xml:space="preserve">
-    <value>First Half</value>
+    <value>1. halvdel</value>
   </data>
   <data name="SecondHalf" xml:space="preserve">
-    <value>Second Half</value>
+    <value>2. halvdel</value>
   </data>
   <data name="EW" xml:space="preserve">
-    <value>E/W</value>
+    <value>ØV</value>
   </data>
   <data name="NS" xml:space="preserve">
-    <value>N/S</value>
+    <value>NS</value>
   </data>
   <data name="BC3NotUploaded" xml:space="preserve">
-    <value>BC3 data not uploaded</value>
+    <value>BC3 data er ikke sendt til hjemmesiden</value>
   </data>
   <data name="BC3Data" xml:space="preserve">
     <value>BC3 data</value>
   </data>
   <data name="NotUploaded" xml:space="preserve">
-    <value>not uploaded</value>
+    <value>er ikke sendt til hjemmesiden</value>
   </data>
   <data name="BC3DataFor" xml:space="preserve">
     <value>BC3 data for</value>
   </data>
   <data name="ErrorReadingStartOrResultLists" xml:space="preserve">
-    <value>Error reading start or result lists</value>
+    <value>Fejl ved læsning af Start- eller Resultatlister</value>
   </data>
   <data name="ErrorFile" xml:space="preserve">
-    <value>error opening/handling the file</value>
+    <value>fejl ved åbning/håndtering af filen</value>
   </data>
   <data name="ErrorMainXml" xml:space="preserve">
-    <value>Error reading Main.xml file</value>
+    <value>Fejl ved læsning af Main.xml</value>
   </data>
   <data name="ErrorDeserializing" xml:space="preserve">
-    <value>Error deserializing file</value>
+    <value>Fejl ved deserialisering af fil</value>
   </data>
   <data name="BridgeMateError" xml:space="preserve">
-    <value>Unable to get data from the terminals</value>
+    <value>Så oplysningerne fra terminalerne kan ikke indlæses</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Indstillinger</value>
   </data>
   <data name="PresetAlreadyExists" xml:space="preserve">
-    <value>A setting with the same name already exists</value>
+    <value>Der findes allerede en indstilling med samme navn</value>
   </data>
   <data name="ErrorExecutableFileMissing" xml:space="preserve">
-    <value>Unable to locate  executable file</value>
+    <value>Kan ikke finde den eksekverbare fil</value>
   </data>
   <data name="ErrorRestart" xml:space="preserve">
-    <value>Restart error</value>
+    <value>Genstart mislykkedes</value>
   </data>
   <data name="SaveSettingsQuestion" xml:space="preserve">
-    <value>Do you want to save the settings</value>
+    <value>Vil du også gemme ændringerne i din forudstilling</value>
   </data>
   <data name="mnuToggleLanguage" xml:space="preserve">
-    <value>Dansk</value>
+    <value>English</value>
+  </data>
+  <data name="CultureName" xml:space="preserve">
+    <value>Grænseflade Sprog</value>
+  </data>
+  <data name="SectionNotCompletedOrNotSent" xml:space="preserve">
+    <value>Sektionen er ikke færdig eller er ikke sendt til hjemmesiden</value>
+  </data>
+  <data name="ClosingTheWindow" xml:space="preserve">
+    <value>Hvis du lukker vinduet, så nulstilles alle aktive ure.</value>
+  </data>
+  <data name="UnknownFormat" xml:space="preserve">
+    <value>Ukendt format</value>
+  </data>
+  <data name="BC3ReadError" xml:space="preserve">
+    <value>Fejl ved læsning af Start- eller Resultatlister</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>Ny</value>
+  </data>
+  <data name="MarkedValues" xml:space="preserve">
+    <value>Vil du bruge de røde værdier fra Serveren?</value>
+  </data>
+  <data name="btnSave" xml:space="preserve">
+    <value>Gem</value>
+  </data>
+  <data name="BackgroundColor_White" xml:space="preserve">
+    <value>Hvid</value>
+  </data>
+  <data name="BackgroundColor_Red" xml:space="preserve">
+    <value>Rød</value>
+  </data>
+  <data name="BackgroundColor_Blue" xml:space="preserve">
+    <value>Blå</value>
+  </data>
+  <data name="BackgroundColor_Orange" xml:space="preserve">
+    <value>Orange</value>
+  </data>
+  <data name="BackgroundColor_Green" xml:space="preserve">
+    <value>Grøn</value>
+  </data>
+  <data name="FavoriteColers" xml:space="preserve">
+    <value>Udvalgte Farver</value>
+  </data>
+  <data name="mnuRestartAndPreserveTimers" xml:space="preserve">
+    <value>Luk og genstart programmet uden at stoppe urene</value>
   </data>
 </root>

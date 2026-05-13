@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DBF.DataModel;
 
 namespace DBF.Converters
 {
@@ -14,7 +15,7 @@ namespace DBF.Converters
 
         public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToString("0.00", new CultureInfo("da-DK")));
+            writer.WriteStringValue(value.ToString("0.00", Global.DkCulture));
         }
     }
 }

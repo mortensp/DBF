@@ -129,7 +129,7 @@ namespace DBF.AudioServices
                     if (header.StartsWith("52-49-46-46")) // RIFF-header for WAV
                         return "WAV";
 
-                return "Ukendt format";
+                return Lex.UnknownFormat;
             }
 
             private bool IsValidFilePath(string path)

@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
+﻿using System.Windows;
 using Caliburn.Micro;
-using Syncfusion.Presentation;
-using PropertyChanged;
 
 namespace DBF.DataModel;
 
@@ -26,7 +17,6 @@ public class DesignTimeData : PropertyChangedBase
                   ,   RoundText        = "3. Runde"
                   ,   Info             = "Vi spiller 7 runder af 24 spil"
                                        + Environment.NewLine + "Pause efter 4. Runde"
-              //MoreInfo = "Pause efter 4. Runde",
                   ,   MinutesLeft      = 13d
                   ,   WarningVisiblity = Visibility.Visible
                 };

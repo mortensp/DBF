@@ -1,22 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
-using Syncfusion.UI.Xaml.Diagram;
 
 namespace DBF.UserControls
 {
@@ -26,24 +13,11 @@ namespace DBF.UserControls
         {
             InitializeComponent();
 
-            if (Design.IsInDesignMode())
-            {
-                Visibility    = Visibility.Visible;
-                Configuration = new Configuration() { StartDate = DateTime.Now };
-                _=Configuration.LoadAsync();
-            }
-        }
+   }
 
         public TimersPanel(Visibility buttonsVisibility)
         {
             InitializeComponent();
-
-            if (Design.IsInDesignMode())
-            {
-                Visibility    = Visibility.Visible;
-                Configuration = new Configuration() { StartDate = DateTime.Now };
-                _=Configuration.LoadAsync();
-            }
 
             ButtonsVisibility = buttonsVisibility;
         }
@@ -59,7 +33,8 @@ namespace DBF.UserControls
                 public static readonly DependencyProperty TimersProperty = 
                                        DependencyProperty.Register( nameof(Timers)
                                                                   , typeof(ObservableCollection<BridgeTimer>)
-                                                                  , typeof(TimersPanel));
+                                                                  , typeof(TimersPanel)
+                                                                  , new PropertyMetadata(new ObservableCollection<BridgeTimer>()));
             #endregion
 
             #region Dependency Property ButtonsVisibility
@@ -87,9 +62,19 @@ namespace DBF.UserControls
                                        DependencyProperty.Register( nameof(TimersCanBeAdded)
                                                                   , typeof(bool)
                                                                   , typeof(TimersPanel)
-                                                                  , new PropertyMetadata(true));
+                                                                  , new PropertyMetadata(false));
             #endregion
         #endregion
+
+        private void userControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Design.IsInDesignMode())
+            {
+                Visibility    = Visibility.Visible;
+                Configuration = new Configuration() { StartDate = DateTime.Now };
+                _             = Configuration.LoadAsync();
+            }
+        }
 
         public Configuration Configuration { get => field ?? IoC.Get<Configuration>(); private set => field = value; }
     }

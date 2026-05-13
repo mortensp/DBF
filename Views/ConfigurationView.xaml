@@ -71,13 +71,13 @@
                     </Grid.ColumnDefinitions>
 
                     <!--  General  -->
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Margin="0,3,171,18"
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                        Grid.RowSpan="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0,3,4,0"
                         FontSize="16"
                         FontWeight="Bold"
-                        Text="{lex:Loc General}" Grid.ColumnSpan="2" Grid.RowSpan="3" />
+                        Text="{lex:Loc General}" />
 
                     <!--  Start time  -->
                     <!--<TextBlock
@@ -94,33 +94,47 @@
                         HorizontalAlignment="Left"
                         SelectedTime="{Binding StartTime, Mode=TwoWay}" />-->
 
+                    <!--  Language  -->
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                        Margin="8,5,4,0"
+                        VerticalAlignment="Center"
+                        Text="{lex:Loc CultureName}" />
+
+                    <ComboBox Grid.Row="1" Grid.Column="1"
+                        Width="140"
+                        Margin="0,3,4,2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        IsEditable="False"
+                        IsSynchronizedWithCurrentItem="True"
+                        ItemsSource="{Binding UILanguages}"
+                        SelectedItem="{Binding Culture}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding NativeName, Converter={StaticResource CapitalizerConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
                     <!--  BC3:  -->
-                    <TextBlock
-                        Grid.Row="2"
-                        Grid.Column="0"
+                    <TextBlock Grid.Row="2" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc ReadBC3}" />
 
-                    <CheckBox
-                        Grid.Row="2"
-                        Grid.Column="1"
+                    <CheckBox Grid.Row="2" Grid.Column="1"
                         Width="Auto"
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         IsChecked="{Binding ReadBC3, Mode=TwoWay}" />
 
-                    <TextBlock
-                        Grid.Row="3"
-                        Grid.Column="0"
+                    <TextBlock Grid.Row="3" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc ReadBM}" />
 
-                    <CheckBox
-                        Grid.Row="3"
-                        Grid.Column="1"
+                    <CheckBox Grid.Row="3" Grid.Column="1"
                         Width="Auto"
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
@@ -145,24 +159,18 @@
                         Text="{Binding BC3Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />-->
 
                     <!--  Projector  -->
-                    <TextBlock
-                        Grid.Row="5"
-                        Grid.Column="0"
+                    <TextBlock Grid.Row="5" Grid.Column="0"
                         FontSize="16"
                         FontWeight="Bold"
                         Text="{lex:Loc Projector}" />
 
                     <!--  Projector Interval:  -->
-                    <TextBlock
-                        Grid.Row="6"
-                        Grid.Column="0"
+                    <TextBlock Grid.Row="6" Grid.Column="0"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc ProjectorInterval}" />
 
-                    <StackPanel
-                        Grid.Row="6"
-                        Grid.Column="1"
+                    <StackPanel Grid.Row="6" Grid.Column="1"
                         Margin="0,2,0,5"
                         Orientation="Horizontal">
                         <TextBox
@@ -178,16 +186,12 @@
 
                     <!--  Maximum rows  -->
 
-                    <TextBlock
-                        Grid.Row="7"
-                        Grid.Column="0"
+                    <TextBlock Grid.Row="7" Grid.Column="0"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc MaxRows}" />
 
-                    <TextBox
-                        Grid.Row="7"
-                        Grid.Column="1"
+                    <TextBox Grid.Row="7" Grid.Column="1"
                         Width="50"
                         Margin="0,5,0,5"
                         HorizontalAlignment="Left"
@@ -197,8 +201,7 @@
             </StackPanel>
         </Border>
 
-        <StackPanel
-            Grid.Row="1"
+        <StackPanel Grid.Row="1"
             Margin="0,12,0,0"
             HorizontalAlignment="Right"
             Orientation="Horizontal">

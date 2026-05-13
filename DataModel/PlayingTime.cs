@@ -6,13 +6,13 @@ namespace DBF.DataModel
     [XmlRoot(ElementName = "PlayingTime")]
     public class PlayingTime : IEquatable<PlayingTime>
     {
-        private static readonly CultureInfo DkCulture = new("da-DK");
+        //private static readonly CultureInfo DkCulture = new("da-DK");
 
         [XmlAttribute(AttributeName = "Date")] public string                DateStr         { get; set; }
         [XmlElement("GroupTournament")] public        List<GroupTournament> TournamentFiles { get; set; }
 
         //-----
-        public DateTime              Date=> DateTime.Parse(DateStr, DkCulture);
+        public DateTime              Date=> DateTime.Parse(DateStr, Global.DkCulture);
 
         //-----
         [XmlIgnore]

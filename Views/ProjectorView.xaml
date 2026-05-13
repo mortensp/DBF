@@ -6,6 +6,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{lex:Loc DBFProjector}"
+    IsHitTestVisible="False"
     Width="800"
     Height="600"
     lex:LocalizeDictionary.DesignCulture="en"

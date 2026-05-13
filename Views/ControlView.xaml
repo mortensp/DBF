@@ -1,4 +1,4 @@
-﻿<UserControl x:Name="root"
+﻿<UserControl
     x:Class="DBF.Views.ControlView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,7 +6,10 @@
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:DBF.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sf="http://schemas.syncfusion.com/wpf"
+    x:Name="root"
     d:Background="White"
     lex:LocalizeDictionary.DesignCulture="en"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
@@ -35,19 +38,31 @@
 
             <!--  Bridge Center or Mainclub  -->
             <Label Content="{lex:Loc Club}" FontWeight="Bold" />
-            <TextBlock Text=":"
-                Margin="-4,4,5,0"
-                FontWeight="Bold" />
 
-            <ComboBox Name="cmbClubNo"
+            <TextBlock
+                Margin="-4,4,5,0"
+                FontWeight="Bold"
+                Text=":" />
+
+            <ComboBox
+                Name="cmbClubNo"
                 Width="Auto"
                 MinWidth="100"
                 MaxHeight="20"
                 Padding="4,1"
                 HorizontalAlignment="Left"
+                cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
+                local:ComboBoxAutoScrollBehavior.AutoScroll="True"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding MainClubs}"
                 SelectedItem="{Binding SelectedMainClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <sf:SfBadge
+                Width="25"
+                Background="LightBlue"
+                Content="{Binding MainClubBadge}"
+                Foreground="Black"
+                HorizontalAnchor="Inside" />
 
             <StackPanel
                 HorizontalAlignment="Left"
@@ -55,38 +70,67 @@
                 Visibility="{Binding BC3Available, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <!--  Under the subclub name  -->
                 <Label Content="{lex:Loc Subclub}" FontWeight="Bold" />
-                <TextBlock Text=":"
-                    Margin="-4,4,5,0"
-                    FontWeight="Bold" />
 
-                <ComboBox Name="cmbClub"
+                <TextBlock
+                    Margin="-4,4,5,0"
+                    FontWeight="Bold"
+                    Text=":" />
+
+                <ComboBox
+                    Name="cmbClub"
                     Width="Auto"
                     MinWidth="100"
                     MaxHeight="20"
                     Padding="4,1"
                     HorizontalAlignment="Left"
+                    cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
+                    local:ComboBoxAutoScrollBehavior.AutoScroll="True"
                     ItemsSource="{Binding Clubs}"
                     SelectedItem="{Binding SelectedClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
+                <sf:SfBadge
+                    Width="25"
+                    Background="LightBlue"
+                    Content="{Binding SubClubBadge}"
+                    Foreground="Black" />
+
                 <!--  Playing date and time  -->
-                <WrapPanel Grid.Row="0" Grid.Column="0">
+                <WrapPanel>
                     <Label Content="{lex:Loc Date}" FontWeight="Bold" />
 
-                    <TextBlock Text=":"
+                    <TextBlock
                         Margin="-4,4,5,0"
-                        FontWeight="Bold" />
+                        FontWeight="Bold"
+                        Text=":" />
                 </WrapPanel>
 
-                <ComboBox Name="cmbDate"
-                    Grid.Row="0"
-                    Grid.Column="1"
+                <!--<WrapPanel Margin="1,4">-->
+
+                <ComboBox
+                    Name="cmbDate"
                     Width="Auto"
                     MinWidth="100"
                     MaxHeight="20"
                     Padding="4,1"
                     HorizontalAlignment="Left"
+                    cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
+                    local:ComboBoxAutoScrollBehavior.AutoScroll="True"
                     ItemsSource="{Binding PlayingTimes}"
                     SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <sf:SfBadge
+                    Width="25"
+                    Background="LightBlue"
+                    Content="{Binding DateBadge}"
+                    Foreground="Black" />
+
+                <!--</WrapPanel>-->
+                <!--  Toast overlay  -->
+                <Grid
+                    x:Name="ToastHost"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    IsHitTestVisible="False" />
             </StackPanel>
 
             <StackPanel
@@ -95,32 +139,45 @@
                 Visibility="{Binding BC3Available, Converter={StaticResource VisibilityInvertConverter}}">
 
                 <!--  Start time  -->
-                <TextBlock Text="{lex:Loc StartTime}"
+                <TextBlock
                     Margin="10,5,5,0"
                     HorizontalAlignment="Left"
-                    FontWeight="Bold" />
-                <TextBlock Text=":"
+                    FontWeight="Bold"
+                    Text="{lex:Loc StartTime}" />
+                <TextBlock
                     Margin="-4,4,5,0"
-                    FontWeight="Bold" />
+                    FontWeight="Bold"
+                    Text=":" />
 
                 <ctl:TimePicker SelectedTime="{Binding Configuration.StartTime, Mode=TwoWay}" />
 
             </StackPanel>
 
             <!--  Calculated end time  -->
-            <TextBlock Text="{lex:Loc ExpectedEndTime}"
+            <TextBlock
                 Margin="10,5,5,0"
                 HorizontalAlignment="Left"
-                FontWeight="Bold" />
+                FontWeight="Bold"
+                Text="{lex:Loc ExpectedEndTime}" />
 
-            <TextBlock Text=":"
+            <TextBlock
                 Margin="-4,4,5,0"
-                FontWeight="Bold" />
+                FontWeight="Bold"
+                Text=":" />
 
-            <TextBlock x:Name="Configuration_EndTime"
+            <TextBlock
+                x:Name="Configuration_EndTime"
                 Margin="0,5"
                 HorizontalAlignment="Left"
                 FontWeight="Bold" />
+
+            <!--<Button
+                x:Name="btnTest"
+                Width="70"
+                Margin="10,0,0,0"
+                cal:Message.Attach="[Event Click] = [Action Test]"
+                Content="Test"
+                Visibility="Collapsed" />-->
 
         </WrapPanel>
 
@@ -128,14 +185,15 @@
             Grid.Row="1"
             Grid.Column="2"
             Height="28"
-            Visibility="{Binding ErrorMessage, Converter={StaticResource HideEmptyConverter}}">
-            <TextBlock Text="{Binding ErrorMessage}"
+            Visibility="{Binding ErrorMessage.Value, Converter={StaticResource HideEmptyConverter}}">
+            <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Background="Red"
                 FontSize="16"
                 FontWeight="Bold"
-                Foreground="White" />
+                Foreground="White"
+                Text="{Binding ErrorMessage}" />
         </Border>
 
         <TabControl
@@ -149,18 +207,15 @@
                         Grid.Row="0"
                         Grid.ColumnSpan="2"
                         Margin="5,4,5,0">
-                        <Button x:Name="AddTimer"
+                        <Button
+                            x:Name="AddTimer"
                             Width="70"
                             cal:Message.Attach="[Event Click] = [Action AddTimer]"
                             Content="{lex:Loc AddTimer}"
                             IsEnabled="{Binding Configuration.TimersCanBeAdded}"
                             Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}" />
 
-                        <Button x:Name="btnTest"
-                            Width="70"
-                            cal:Message.Attach="[Event Click] = [Action Test]"
-                            Content="Test"
-                            Visibility="Collapsed" />
+
                     </WrapPanel>
 
                     <Viewbox>

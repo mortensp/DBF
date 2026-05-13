@@ -1,6 +1,10 @@
-﻿using Caliburn.Micro;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
+using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
+using EntityFrameworkCore.Jet.Data;
+using Localization;
 
 namespace DBF.ViewModels
 {
@@ -19,6 +23,8 @@ namespace DBF.ViewModels
 
         #region public Properties  
             public Configuration NewConfiguration { get; set; }
+
+       
         #endregion
 
         #region Public Methods
@@ -30,10 +36,12 @@ namespace DBF.ViewModels
 
             public async void AcceptSetting()
             {
+                var culture = LanguageService.Instance.CurrentCulture   ;
+
                 var readBC3        =configuration.ReadBC3 ;
                 var readBridgeMate =configuration.ReadBridgeMate ;
 
-                configuration.Update(NewConfiguration);
+                configuration.Update(NewConfiguration, true);
                 configuration.Save();
 
                 Logger.Debug("App settings changed");
@@ -47,6 +55,14 @@ namespace DBF.ViewModels
 
                     if (readBridgeMate != NewConfiguration.ReadBridgeMate)
                         vm?.SetBridgeMateWatcher(NewConfiguration.ReadBridgeMate);
+                }
+
+                if (LanguageService.Instance.CurrentCulture.TwoLetterISOLanguageName != culture.TwoLetterISOLanguageName)
+                {
+                    Logger.Info($"Restarting application to apply new culture settings.");
+
+                    var shell = IoC.Get<ShellViewModel>();
+                    shell.Restart();
                 }
 
                 await TryCloseAsync();
