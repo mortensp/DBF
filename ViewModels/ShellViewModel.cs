@@ -10,7 +10,6 @@ using DBF.Helpers;
 using DBF.Views;
 using GitHubTools;
 using Localization;
-//using Strings = DBF.Properties.Strings;
 namespace DBF.ViewModels;
 
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
@@ -35,7 +34,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         public async void OpenControlView()
         {
             await Configuration.LoadAsync();
-            Logger.Info("Opening ControlViewModel");
+
             var viewModel = IoC.Get<ControlViewModel>();
             await ActivateItemAsync(viewModel);
         }

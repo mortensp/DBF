@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
-using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
 using DBF.Helpers;
-using Microsoft.DotNet.DesignTools.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace DBF;
 
@@ -41,7 +32,7 @@ public class BridgeMate : PropertyChangedBase
             watcher              = new();
             watcher.UpdatedAsync+= handleFileEventAsync;
             initWatcher(Configuration.BridgeMatePath, false);
-        }
+    }
     #endregion
 
     public void CheckOrOpen(DateTime? playingTime, int? clubNumber)
@@ -201,7 +192,6 @@ public class BridgeMate : PropertyChangedBase
 
                     default:
                         Logger.Info($"BridgeMate: unhandled file event {ev.ChangeType} for file {ev.FullPath}");
-                        Logger.Debug($"File {ev.ChangeType}: {ev.Name}");
                         break;
                 }
             }
@@ -277,7 +267,7 @@ public class BridgeMate : PropertyChangedBase
                                                         Section       = (short)g.Key.Section
                                                       , Round         = (short)g.Key.Round
                                                       , Done          = g.Count(g => g.Done) == db.Tables.Count(t => t.Section == g.Key.Section)
-                                                      , RemaingBoards = g.Sum  (g => g.BoardsRemaining)
+                                                      , RemainingBoards = g.Sum  (g => g.BoardsRemaining)
                                                     }))
 
             {
@@ -297,7 +287,7 @@ public class BridgeMate : PropertyChangedBase
                 else
                 {
                     existing.Done          = roundStatus.Done;
-                    existing.RemaingBoards = roundStatus.RemaingBoards;
+                    existing.RemainingBoards = roundStatus.RemainingBoards;
                 }
             }
         }
@@ -339,7 +329,6 @@ public class BridgeMate : PropertyChangedBase
                 {
                     while (await timer.WaitForNextTickAsync(token))
                     {
-                        Logger.Debug("Polling....");
                         updatePlayedBoards();
                     }
                 }

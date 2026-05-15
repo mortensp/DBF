@@ -15,7 +15,6 @@ AppVersion={#MyVersion}
 VersionInfoVersion={#MyVersion}
 AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
-
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
@@ -40,15 +39,37 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "D:\Build\DBF\publish\*"; DestDir: "{app}\DBF"; Flags: ignoreversion recursesubdirs
 Source: "D:\Build\Github Updater\publish\*"; DestDir: "{app}\Github"; Flags: ignoreversion recursesubdirs
-;Source: "D:\Build\Bootstrapper\publish\*"; DestDir: "{app}\Bootstrapper"; Flags: ignoreversion recursesubdirs
+Source: "D:\Build\Bootstrapper\publish\*"; DestDir: "{app}\Bootstrapper"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\DBF\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}";  Filename: "{app}\DBF\{#MyAppExeName}"; Tasks: desktopicon
+;Name: "{uninstallicon}{#MyAppName}"; Filename: "{app}\DBF\{#MyAppExeName}"
 
 [Run]
-;Filename: "{tmp}\dotnet9.exe"; Parameters: "/norestart"; StatusMsg: "Installerer .NET 9 Desktop Runtime..."; Flags: waituntilterminated
-Filename: "{app}\DBF\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+;Filename: "{app}\DBF\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 ;Filename: "{app}\Bootstrapper\Bootstrapper.exe"; Description: "Starting the application"; Flags: nowait postinstall skipifsilent
 
 [Code]
+const
+  DotNet9Url = 'https://download.visualstudio.microsoft.com/download/pr/.../windowsdesktop-runtime-9.0.0-win-x64.exe';
+  
+function IsDotNet9Installed(): Boolean;
+begin
+  Result := RegKeyExists(HKLM, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App');
+end;
+
+procedure InitializeWizard();
+var
+  TempFile: string;
+  ResultCode: Integer;
+begin
+  if not IsDotNet9Installed() then
+  begin
+    TempFile := ExpandConstant('{tmp}\dotnet9desktop.exe');
+
+    idpDownloadFile(DotNet9Url, TempFile);
+
+    Exec(TempFile, '/quiet /norestart', '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+  end;
+end;

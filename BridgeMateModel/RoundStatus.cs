@@ -11,8 +11,8 @@ namespace DBF
         public          string Letter        { get; set; }
         public          short Round         { get; set; }
         public          bool   Done          { get; set; }
-        public          int    RemaingBoards { get; set; }
+        public          int    RemainingBoards { get; set; }
 
-        public override string ToString() => $"Section:{Section}-{Letter} ,Round:{Round}, Done:{Done}, Remaing:{RemaingBoards}";
+        public override string ToString() => $"Section:{Section}-{Letter} ,Round:{Round}, Done:{Done}, Remaing:{RemainingBoards}";
     }
 }

@@ -100,7 +100,6 @@ namespace DBF.UserControls
                     if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
                         dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
                 }
-
                 catch (Exception ex)
                 {
                     Logger.Exception(ex);
@@ -317,7 +316,6 @@ namespace DBF.UserControls
                         btn.Visibility = Visibility.Visible;
                 }
             }
-
             catch
             {
                 // ignore any lookup failures

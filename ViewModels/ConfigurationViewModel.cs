@@ -44,7 +44,7 @@ namespace DBF.ViewModels
                 configuration.Update(NewConfiguration, true);
                 configuration.Save();
 
-                Logger.Debug("App settings changed");
+                Logger.Info("App settings changed");
 
                 if (configuration.IsLoaded)
                 {

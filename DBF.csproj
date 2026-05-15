@@ -13,10 +13,10 @@
 		<Product>DBF Tools</Product>
 		<Copyright>Copyright © 2025</Copyright>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net10.0-windows7.0</TargetFramework>
+		<TargetFramework>net9.0.0-windows7.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<UseWindowsForms>false</UseWindowsForms>
+		<UseWindowsForms>true</UseWindowsForms>
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Platforms>AnyCPU;x64</Platforms>
@@ -27,6 +27,7 @@
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<PlatformTarget>x64</PlatformTarget>
 		<GenerateSatelliteAssemblies>true</GenerateSatelliteAssemblies>
+		<PublishTrimmed>false</PublishTrimmed>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -49,8 +50,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="InstallerFiles\Inno Setup Script.old.iss" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Page Remove="UserControls\Toast.xaml" />
 	</ItemGroup>
+
+	<!--<ItemGroup>
+	  <COMReference Include="{215d64d2-031c-33c7-96e3-61794cd1ee61}">
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <VersionMinor>4</VersionMinor>
+	    <VersionMajor>2</VersionMajor>
+	    <Guid>215d64d2-031c-33c7-96e3-61794cd1ee61</Guid>
+	  </COMReference>
+	</ItemGroup>-->
 
 	<ItemGroup>
 		<Resource Include="Images\DBF_Tools.ico">
@@ -71,9 +85,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EntityFrameworkCore.Jet" Version="10.0.0" />
-		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="10.0.0" />
-		<PackageReference Include="System.Data.Odbc" Version="10.0.5" />
+		<PackageReference Include="EntityFrameworkCore.Jet" Version="9.0.0" />
+		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="9.0.0" />
+		<PackageReference Include="System.Data.Odbc" Version="9.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -101,6 +115,7 @@
 		<PackageReference Include="System.Management" Version="10.0.5" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 		<PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
+      
 	</ItemGroup>
 
 	<ItemGroup>
