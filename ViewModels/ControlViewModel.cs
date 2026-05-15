@@ -1,4 +1,17 @@
-﻿using System.Collections.ObjectModel;
+﻿using Caliburn.Micro;
+
+using DBF.AudioServices;
+using DBF.Converters;
+using DBF.DataModel;
+using DBF.Helpers;
+using DBF.Localization;
+using DBF.UserControls;
+using DBF.Views;
+
+using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.Grid;
+
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
@@ -7,23 +20,11 @@ using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Xml.Serialization;
-
-using Caliburn.Micro;
-using DBF.AudioServices;
-using DBF.Converters;
-using DBF.DataModel;
-using DBF.Helpers;
-using DBF.Localization;
-using DBF.UserControls;
-using DBF.Views;
-using Syncfusion.Data.Extensions;
-using Syncfusion.UI.Xaml.Grid;
 
 namespace DBF.ViewModels;
 
-public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
+public class ControlViewModel : Screen, IDisposable
 {
     #region Constructors
         public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
@@ -33,12 +34,14 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                 _lexStrings = new(this);
 
                 BridgeMate = bridgeMate;
+
                 if (BridgeMate?.RoundStatus is not null)
                     BridgeMate.RoundStatus.ItemChanged += roundStatusItemChanged;
 
-                Configuration       = configuration;
-                this._windowManager = windowManager;
-                _watcher            = new() { EventGroupingDelay = TimeSpan.FromMilliseconds(7000) };
+                Configuration = configuration;
+
+                _windowManager = windowManager;
+                _watcher       = new() { EventGroupingDelay = TimeSpan.FromMilliseconds(7000) };
 
                 _watcher.UpdatedAsync+= handleFileEventAsync;
                 //
@@ -50,6 +53,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                 initWatcher();
                 loadMainClubs();
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -132,7 +136,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                     if (value == true)
                         foreach (var pair in Pairs)
                         {
-                            pair.SubGroup = "";
+                            pair.SubGroup = string.Empty;
                             pair.Position = pair.SectionRank;
                         }
                     else
@@ -150,7 +154,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                 get => _selectedMainClub;
                 set
                 {
-                    _lexStrings.Set(ErrorMessage, () => "");
+                    _lexStrings.Set(ErrorMessage, () => string.Empty);
 
                     if (Set(ref _selectedMainClub, value))
                         if (value == null)
@@ -180,7 +184,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                 get => _selectedClub;
                 set
                 {
-                    _lexStrings.Set(ErrorMessage, () => "");
+                    _lexStrings.Set(ErrorMessage, () => string.Empty);
 
                     if (Set(ref _selectedClub, value))
                         if (value is null)
@@ -241,18 +245,18 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                                                                           .Where(r => r.Done)
                                                                           .GroupBy(r => r.Section)
                                                                           .SelectMany(
-                                                                    g =>
-                                                                    {
-                                                                        var maxRound = g.Max(x => x.Round);
-                                                                        return g.Where(x => x.Round == maxRound);
-                                                                    })
+                                                                                                            g =>
+                                                                                                            {
+                                                                                                                var maxRound = g.Max(x => x.Round);
+                                                                                                                return g.Where(x => x.Round == maxRound);
+                                                                                                            })
                                                                           .ToList();
 
                                     foreach (var timer in Configuration.BridgeTimers
                                                                        .Where(t => t.Visibility == Visibility.Visible))
                                         timer.Reset(false);
 
-                                    foreach (var rs in highestDonePerSection.Where(rs => rs.RemainingBoards>0))
+                                    foreach (var rs in highestDonePerSection.Where(rs => rs.RemainingBoards >  0))
                                         foreach (var timer in Configuration.GetRelatedTimers(rs))//, _threshold))
                                             timer.SetRound(rs.Round + 1);
                                 }
@@ -273,7 +277,18 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
             Configuration.UpdateTimers();
         }
 
-        public void AddTimer() => Configuration.AddTimer();
+        public void AddTimer()
+        {
+            Configuration.AddTimer();
+        }
+
+        public void ToggleWindowOrientation()
+        {
+            Configuration.WindowOrientation = Configuration.WindowOrientation == Orientation.Horizontal
+                                            ? Orientation.Vertical
+                                            : Orientation.Horizontal;
+            Configuration.Save();
+        }
 
         #region Public Projector Methods
             public async Task ShowStartListAsync(CancellationToken cancellationToken = default)
@@ -326,7 +341,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                 if (Configuration.TimersActive && (owner.GetType().Name != "ProjectorView"))
                 {
                     // show custom dialog with three choices
-                    var dlg   = new DBF.Views.ConfirmCloseDialog($"{Lex.ClosingTheWindow} {Lex.ContinueQuestion}");
+                    var dlg   = new ConfirmCloseDialog($"{Lex.ClosingTheWindow} {Lex.ContinueQuestion}");
                     dlg.Owner = owner;
                     dlg.ShowDialog();
 
@@ -353,6 +368,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                     //return await Task.FromResult(true);
                 }
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex, $"Error when closing the ControlViewModel");
@@ -371,13 +387,13 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
     #endregion
 
     #region Private Method
-        void initWatcher()
+        private void initWatcher()
         {
             Logger.Info($"Init Watcher");
 
             _watcher.Path = Configuration.HomePagePath.FindDeepestExistingDirectory();
 
-            if (string.Compare(_watcher.Path + "\\", Configuration.HomePagePath, StringComparison.Ordinal) == 0)
+            if (string.Compare($"{_watcher.Path}\\", Configuration.HomePagePath, StringComparison.Ordinal) == 0)
             {
                 _watcher.Filters.Clear();
                 _watcher.LikeFilters.Add(@"Resultater_????*");
@@ -409,7 +425,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                         () =>
                     {
                         if (ErrorMessage.Value == msg)
-                            _lexStrings.Set(ErrorMessage, () => "");
+                            _lexStrings.Set(ErrorMessage, () => string.Empty);
                         return Task.CompletedTask;
                     })
                                  .ConfigureAwait(false);
@@ -436,7 +452,10 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
             //});
         }
 
-        public void ResetBadges() => MainClubBadge = SubClubBadge = DateBadge = null;
+        public void ResetBadges()
+        {
+            MainClubBadge = SubClubBadge = DateBadge = null;
+        }
 
         private void fetchPlayingTimes()
         {
@@ -456,6 +475,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                                                        })
                                             .OrderByDescending(pt => pt.Date));
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -471,7 +491,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
             ShowAsOneGroup           = true;
             HideHacGrp               = true;
             ShowAsOneGroupVisibility = Visibility.Collapsed;
-            _lexStrings.Set(ErrorMessage, () => "");
+            _lexStrings.Set(ErrorMessage, () => string.Empty);
             BindableCollection<Pair> pairs = [];
             BindableCollection<Team> teams = [];
             Pairs.Clear();
@@ -503,6 +523,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                         buildTeams(teams, grpNo, grp);
                 }
             }
+
             catch (Exception)
             {
                 _lexStrings.Set(ErrorMessage, () => Lex.BC3ReadError);
@@ -722,8 +743,8 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
 
             private MainClub loadMainClub(int no)
             {
-                var path     = Configuration.HomePagePath + @$"Resultater_{no}\";
-                var filename = path + @"Main.xml";
+                var path     = $@"{Configuration.HomePagePath}Resultater_{no}\";
+                var filename = $@"{path}Main.xml";
 
                 try
                 {
@@ -737,6 +758,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
 
                     return mainclub;
                 }
+
                 catch (Exception)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -875,6 +897,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                                 }
                         }
                 }
+
                 catch (Exception ex)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -939,7 +962,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                             }
                             else
                             {
-                                pair.SubGroup = "";
+                                pair.SubGroup = string.Empty;
                                 pair.Position = pair.Rank;
                             }
                     }
@@ -973,7 +996,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                             continue;
                         }
 
-                        var path       = SelectedMainClub.Path + tournamentFile.FileName;
+                        var path       = $"{SelectedMainClub.Path}{tournamentFile.FileName}";
                         var tournament = deserialize<Tournament>(path);
 
                         _watcher.Filters.Add(tournamentFile.FileName);
@@ -1005,7 +1028,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
 
                 foreach (var tur in tournaments)
                 {
-                    var path    = SelectedMainClub.Path + tur.SectionFile.FileName;
+                    var path    = $"{SelectedMainClub.Path}{tur.SectionFile.FileName}";
                     var section = deserialize<GroupSection>(path);
 
                     _watcher.Filters.Add(tur.SectionFile.FileName);
@@ -1025,7 +1048,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
 
             private GroupSection getGroupSection(string fileName, Tournament tournament)
             {
-                var path    = SelectedMainClub.Path + fileName;
+                var path    = $"{SelectedMainClub.Path}{fileName}";
                 var section = deserialize<GroupSection>(path);
 
                 if (section != null)
@@ -1066,6 +1089,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                         return (T)serializer.Deserialize(reader);
                     }
                 }
+
                 catch (Exception)
                 {
                     Logger.Info($"{Lex.ErrorDeserializing}: {fullPath}");
@@ -1090,11 +1114,13 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                         using var sr = new StreamReader(fs, encoding);
                         return sr.ReadToEnd();
                     }
+
                     catch (IOException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
                         delay = Math.Min(1000, delay * 2); // exponential backoff, cap at 1s
                     }
+
                     catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
@@ -1141,6 +1167,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                     projectorView.Top  = primaryScreen.WorkingArea.Top;
                     projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                 }
+
 #endif
             }
             else
@@ -1204,6 +1231,7 @@ public class ControlViewModel : Caliburn.Micro.Screen, IDisposable
                         else
                             initWatcher();
                     }
+
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");

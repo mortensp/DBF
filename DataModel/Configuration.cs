@@ -82,16 +82,24 @@ namespace DBF.DataModel
                     }
                 } = @"C:\BC3\";
 
-                public string AppVersion        { get; private set; } = _currentversion;
-                public string ConfigVersion     { get; set; }
-                public bool   IsLoaded          { get; private set; }
-                public bool   ReadBC3           { get; set; } = true;
-                public bool   ReadBridgeMate    { get; set; } = false;
-                public int    ProjectorInterval { get; set; } = 20;
-                public int    ProjectorMaxRows  { get; set; } = 40;
+                public string      AppVersion            { get; private set; } = _currentversion;
+                public string      ConfigVersion         { get; set; }
+                public bool        IsLoaded              { get; private set; }
+                public bool        ReadBC3               { get; set; } = true;
+                public bool        ReadBridgeMate        { get; set; } = false;
+                public int         ProjectorInterval     { get; set; } = 20;
+                public int         ProjectorMaxRows      { get; set; } = 40;
+                public string      HomePagePath          => BC3Path + @"Hjemmeside\";
+                public string      BridgeMatePath        => BC3Path + @"BridgeMate\";
 
-                public string HomePagePath      => BC3Path + @"Hjemmeside\";
-                public string BridgeMatePath    => BC3Path + @"BridgeMate\";
+                public Orientation WindowOrientation     { get; set; } = Orientation.Horizontal;
+
+                public string      WindowOrientationIcon => VisibleTimerCount == 1
+                                                          ? null
+                                                          : WindowOrientation == Orientation.Horizontal
+                                                          ? "/Images/VerticalWindows.PNG"
+                                                          : "/Images/HorizontalWindows.PNG";
+
                 public TimeOnly? StartTime
                 {
                     get => field ?? TimeOnly.FromDateTime(_startDate);
@@ -176,7 +184,7 @@ namespace DBF.DataModel
                     }
                 }
 
-                public ObservableCollection<BridgeTimer> BridgeTimers { get; set; } = new();
+                public BindableCollectionExt<BridgeTimer> BridgeTimers { get; set; } = new();
 
                 public List<BridgeTimer> GetRelatedTimers(RoundStatus roundStatus, TimeSpan? threshold = null)
                 {
@@ -268,6 +276,7 @@ namespace DBF.DataModel
                 ProjectorMaxRows  = newConfiguration.ProjectorMaxRows;
                 StartTime         = newConfiguration.StartTime;
                 CultureName       = newConfiguration.CultureName;
+                WindowOrientation = newConfiguration.WindowOrientation;
 
                 Culture = LanguageService.Instance.SetCulture(CultureName);
 
@@ -317,13 +326,13 @@ namespace DBF.DataModel
                     if (!File.Exists(_path)
                     &&  File.Exists(_oldPath))
                     {
-                        // Sørg for at destination-mappen eksisterer
+                        // make sure that destination folder exists
                         Directory.CreateDirectory(Path.GetDirectoryName(_path));
 
-                        // Flyt gammel config fil
+                        // move old config file
                         File.Move(_oldPath, _path);
 
-                        // Slet evt. gammel tom mappe
+                        // Delete old folder if empty
                         string sourceFolder = Path.GetDirectoryName(_oldPath)!;
 
                         if (Directory.GetFiles(sourceFolder).Length       == 0
@@ -344,7 +353,7 @@ namespace DBF.DataModel
                         {
                             Logger.Info("Reading Configuration file");
 
-                            //TODO: kan fjernes senere
+                            //TODO: Can later be removed 
                             if (jsonData.IndexOf("\"Color\":") >  -1)
                                 jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
 
@@ -384,7 +393,7 @@ namespace DBF.DataModel
                             {
                                 Logger.Info("Reading Configuration file");
 
-                                //TODO: kan fjernes senere
+                                //TODO: Can be removed when old config files are no longer in circulation
                                 if (jsonData.IndexOf("\"Color\":") >  -1)
                                     jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
 
@@ -488,7 +497,7 @@ namespace DBF.DataModel
             {
                 if (VisibleTimerCount <  4)
                 {
-                    var bridgeTimer = BridgeTimers[VisibleTimerCount];
+                    var bridgeTimer = BridgeTimers[^1];
 
                     bridgeTimer.Visibility = Visibility.Visible;
 
@@ -693,7 +702,23 @@ namespace DBF.DataModel
 
             private void arrangeTimers()
             {
-                // Move collapsed timers at the end and enable/diable Close buttons
+                // Move collapsed timers at the end and enable/disable Close buttons
+                //if (WindowOrientation == Orientation.Vertical
+                //&& !string.IsNullOrEmpty(WindowOrientationIcon))
+                //{   
+                //    var order = new[] { 0, 2, 1, 3 };
+
+                //    for (var i = BridgeTimers.Count - 1; i >= 0; i--)
+                //    {
+                //        var timer = BridgeTimers[i];
+
+                //        if (timer.Visibility != Visibility.Visible)
+                //            BridgeTimers.Move(i, BridgeTimers.Count - 1);
+                //        else
+                //            timer.CanClose = _visibleTimerCount > 1;
+                //    }
+                //}
+                //else
                 for (var i = BridgeTimers.Count - 1; i >= 0; i--)
                 {
                     var timer = BridgeTimers[i];
@@ -761,7 +786,7 @@ namespace DBF.DataModel
             }
         #endregion
 
-        #region private BridgeTimer Collection Change Handling
+        #region Private BridgeTimer Collection Change Handling
             private void bridgeTimers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
             {
                 if (e.NewItems != null)

@@ -21,7 +21,7 @@ public partial class BridgeTimerControl : UserControl
         InitializeComponent();
 
         // Ensure the badge reads from this control's Timer regardless of adorner layer DataContext
-        badge.SetBinding(SfBadge.ContentProperty, new Binding("Timer.BadgeText") { Source = this, Mode = BindingMode.OneWay });
+        badge.SetBinding(SfBadge.ContentProperty, new Binding("BridgeTimer.BadgeText") { Source = this, Mode = BindingMode.OneWay });
     }
 
     public Configuration Configuration { get => field ??= IoC.Get<Configuration>(); set => field = value; }
@@ -29,11 +29,11 @@ public partial class BridgeTimerControl : UserControl
     #region Dependency Properties
         #region Timer Dependency Property
             public static readonly DependencyProperty BridgeTimerProperty = 
-                                   DependencyProperty.Register( nameof(Timer)
+                                   DependencyProperty.Register( nameof(BridgeTimer)
                                                               , typeof(BridgeTimer)
                                                               , typeof(BridgeTimerControl)
                                                               , new FrameworkPropertyMetadata(null,onBridgeTimerPropertyChanged));
-            public BridgeTimer Timer
+            public BridgeTimer BridgeTimer
             {
                 get => (BridgeTimer)GetValue(BridgeTimerProperty);
                 set => SetValue(BridgeTimerProperty, value);
@@ -47,14 +47,14 @@ public partial class BridgeTimerControl : UserControl
                         oldValue.PropertyChanged -= ctl.Timer_PropertyChanged;
 
                     if (e.NewValue is BridgeTimer newValue)
-                        ctl.UpdateText(ctl.Timer);
+                        ctl.UpdateText(ctl.BridgeTimer);
                 }
             }
 
             private void Timer_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
                 if (sender         is BridgeTimer timer
-                &&  e.PropertyName == nameof(Timer.ForegroundColor))
+                &&  e.PropertyName == nameof(BridgeTimer.ForegroundColor))
                     UpdateText(timer);
             }
 
@@ -109,10 +109,10 @@ public partial class BridgeTimerControl : UserControl
                 Configuration.BackAll();
             else
 
-                Timer.Back();
+                BridgeTimer.Back();
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e) => Configuration.CloseTimer(Timer);
+        private void btnClose_Click(object sender, RoutedEventArgs e) => Configuration.CloseTimer(BridgeTimer);
 
         private void BtnForward_Click(object sender, RoutedEventArgs e)
         {
@@ -121,7 +121,7 @@ public partial class BridgeTimerControl : UserControl
                 Configuration.ForwardAll();
             else
 
-                Timer.Forward();
+                BridgeTimer.Forward();
         }
 
         private void BtnLessTime_Click(object sender, RoutedEventArgs e)
@@ -131,7 +131,7 @@ public partial class BridgeTimerControl : UserControl
                 Configuration.LessTimeAll();
             else
 
-                Timer.LessTime();
+                BridgeTimer.LessTime();
         }
 
         private void BtnMoreTime_Click(object sender, RoutedEventArgs e)
@@ -140,7 +140,7 @@ public partial class BridgeTimerControl : UserControl
             if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                 Configuration.MoreTimeAll();
             else
-                Timer.MoreTime();
+                BridgeTimer.MoreTime();
         }
 
         private void BtnPause_Click(object sender, RoutedEventArgs e)
@@ -150,7 +150,7 @@ public partial class BridgeTimerControl : UserControl
                 Configuration.PauseAll();
             else
 
-                Timer.Pause();
+                BridgeTimer.Pause();
         }
 
         private void BtnReset_Click(object sender, RoutedEventArgs e)
@@ -160,23 +160,23 @@ public partial class BridgeTimerControl : UserControl
                 Configuration.ResetAll();
             else
 
-                Timer.Reset();
+                BridgeTimer.Reset();
         }
 
-        private void BtnSetting_Click(object sender, RoutedEventArgs e) => Timer.OpenSetting();
+        private void BtnSetting_Click(object sender, RoutedEventArgs e) => BridgeTimer.OpenSetting();
 
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
-            // If Shift is held while clicking to affect alle timers, otherwise just this one
+            // If Shift is held while clicking to affect all timers, otherwise just this one
             if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                 Configuration.StartAll();
             else
-                Timer.Start();
+                BridgeTimer.Start();
         }
 
-        private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(Timer);
+        private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(BridgeTimer);
 
-        private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(Timer);
+        private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(BridgeTimer);
     #endregion
 
     private void ControlLoaded(object sender, RoutedEventArgs e)
@@ -185,7 +185,7 @@ public partial class BridgeTimerControl : UserControl
         {
             Visibility = Visibility.Visible;
 
-            Timer = new BridgeTimer
+            BridgeTimer = new BridgeTimer
                     {
                         Visibility       = Visibility.Visible
                       , Foreground       = System.Windows.Media.Brushes.Black
