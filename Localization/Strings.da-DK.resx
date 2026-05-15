@@ -154,7 +154,7 @@
     <value>Dato</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Dette er et simpelt hjælpe program, som arbejder samme med BC3's output. Dvs. at Start og Resultatlister hentes fra de data, som er sendt eller sendes til hjemmesiden.&amp;#10; Bridgeurene er dog uafhængige af BC3. </value>
+    <value>Dette er et simpelt hjælpe program, som arbejder samme med BC3's output. Dvs. at Start og Resultatlister hentes fra de data, som er sendt eller sendes til hjemmesiden. Bridgeurene er dog uafhængige af BC3. </value>
   </data>
   <data name="ExpectedEndTime" xml:space="preserve">
     <value>Forventet slut</value>

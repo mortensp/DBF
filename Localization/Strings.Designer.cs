@@ -439,7 +439,7 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a simple app offers up to four bridge timers that can be controlled on the pc, at optional displayed on an second monitor or projector.&amp;#10; It can be read a corresponding BridgeMate database and update the timers accordantly and in Denmark it&apos;s also possible to Start and Result lists from BC3&apos;s output. .
+        ///   Looks up a localized string similar to This is a simple app offers up to four bridge timers that can be controlled on the pc, at optional displayed on an second monitor or projector. It can be read a corresponding BridgeMate database and update the timers accordantly and in Denmark it&apos;s also possible to Start and Result lists from BC3&apos;s output. .
         /// </summary>
         internal static string Description {
             get {

@@ -19,11 +19,10 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\mortensp
+DefaultDirName={autopf}\{#MyAppName}
 UninstallDisplayIcon={#MyAppExeName}
 
 ArchitecturesAllowed=x64compatible 
-;ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
 OutputDir="D:\Build\DBF\Installer"

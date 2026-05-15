@@ -50,6 +50,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Images\projector.ico" />
+	  <None Remove="Images\VerticalWindows.PNG" />
 	  <None Remove="InstallerFiles\Inno Setup Script.old.iss" />
 	</ItemGroup>
 
@@ -75,7 +77,15 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
 
+		<Resource Include="Images\HorizontalWindows.PNG" />
+
+		<EmbeddedResource Include="Images\projector.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
+
 		<EmbeddedResource Include="Images\projector_48x48.ico" />
+
+		<Resource Include="Images\VerticalWindows.PNG" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -214,9 +224,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Images\projector.ico">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
 
 		<None Update="Images\projector_48x48.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
