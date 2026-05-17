@@ -28,10 +28,10 @@ namespace DBF.DataModel
         private static readonly TimeSpan        _oneMinute      = new TimeSpan(0, 1,  0);
         private static readonly TimeSpan        _twoMinutes     = new TimeSpan(0, 2,  0);
         private static readonly TimeSpan        _threshold      = new TimeSpan(0, 0,  0);
-        private                 TimeSpan        _startTime      = new TimeSpan(                   0, 21, 0);
-        private                 TimeSpan        _transitionTime = new TimeSpan(                   0, 1,  0);
-        private                 TimeSpan        _breakTime      = new TimeSpan(                   0, 12, 0);
-        private                 TimeSpan        _warningTime    = new TimeSpan(                   0, 5,  0);
+        private                 TimeSpan        _startTime      = new TimeSpan(0, 21, 0);
+        private                 TimeSpan        _transitionTime = new TimeSpan(0, 1,  0);
+        private                 TimeSpan        _breakTime      = new TimeSpan(0, 12, 0);
+        private                 TimeSpan        _warningTime    = new TimeSpan(0, 5,  0);
         private                 bool            _isAtBreak;
         private                 bool            _isAtTransition;
         private Preset BMSettings { get => field; set => field = value; }
@@ -56,19 +56,19 @@ namespace DBF.DataModel
 
         #region Public Properties
             [JsonIgnore] public TimeSpan RemainingTime => _remainingTime;
-            [JsonIgnore] public bool IsStarted    => Round >  0;
-            [JsonIgnore] public bool IsActive     => Round >  0 && Round <= Rounds;
-            [JsonIgnore] public bool IsEnded      => Round >  Rounds;
-            [JsonIgnore] public bool IsRunning    => _timer.IsEnabled;
+            [JsonIgnore] public bool IsStarted     => Round >  0;
+            [JsonIgnore] public bool IsActive      => Round >  0 && Round <= Rounds;
+            [JsonIgnore] public bool IsEnded       => Round >  Rounds;
+            [JsonIgnore] public bool IsRunning     => _timer.IsEnabled;
 
-            [JsonIgnore] public Configuration Configuration    { get => field ??= IoC.Get<Configuration>(); set => field = value; }
-            [JsonIgnore] public string        Time             { get; set; }
-            [JsonIgnore] public bool          CanClose         { get; set; }
-            [JsonIgnore] public Visibility    WarningVisiblity { get; set; }
-            [JsonIgnore] public string        RoundText        { get; set; }
-            [JsonIgnore] public Visibility    ShowUpButton     { get; set; }
-            [JsonIgnore] public Visibility    ShowDownButton   { get; set; }
-            [JsonIgnore] public double        MinutesLeft      { get; set; }
+            [JsonIgnore] public Configuration Configuration     { get => field ??= IoC.Get<Configuration>(); set => field = value; }
+            [JsonIgnore] public string        Time              { get; set; }
+            [JsonIgnore] public bool          CanClose          { get; set; }
+            [JsonIgnore] public Visibility    WarningVisibility { get; set; }
+            [JsonIgnore] public string        RoundText         { get; set; }
+            [JsonIgnore] public Visibility    ShowUpButton      { get; set; }
+            [JsonIgnore] public Visibility    ShowDownButton    { get; set; }
+            [JsonIgnore] public double        MinutesLeft       { get; set; }
 
             [JsonIgnore]
             public int Round
@@ -511,18 +511,18 @@ namespace DBF.DataModel
 
                 if (Round          >  Rounds
                 ||  _remainingTime <= TimeSpan.Zero)
-                    WarningVisiblity = Visibility.Collapsed;
+                    WarningVisibility = Visibility.Collapsed;
                 else
                     if (_isAtBreak)
-                        WarningVisiblity = ( _remainingTime <= _twoMinutes
-                                         &&  _breakTime >  _twoMinutes)
-                                         ? Visibility.Visible
-                                         : Visibility.Collapsed;
+                        WarningVisibility = ( _remainingTime <= _twoMinutes
+                                          &&  _breakTime >  _twoMinutes)
+                                          ? Visibility.Visible
+                                          : Visibility.Collapsed;
                     else
-                        WarningVisiblity = ( _remainingTime <= _warningTime
-                                         &&  _startTime >  _warningTime)
-                                         ? Visibility.Visible : 
-                                         Visibility.Collapsed;
+                        WarningVisibility = ( _remainingTime <= _warningTime
+                                          &&  _startTime >  _warningTime)
+                                          ? Visibility.Visible : 
+                                          Visibility.Collapsed;
 
                 Info = $"{Lex.WeArePlaying} {Rounds} {getRoundsText} {Lex.Of} {BoardsPerRound} {Lex.Boards}";
 
@@ -613,11 +613,11 @@ namespace DBF.DataModel
                                                                    &&  p.BoardsPerRound == boardsPerRound);
 
                         if (preset != null)
-                            Logger.Info($"Timer settings syncronized with BridgeMate Server - Preset: {preset.Name}");
+                            Logger.Info($"Timer settings synchronized with BridgeMate Server - Preset: {preset.Name}");
                         else
                         {
                             preset                   = new(this);
-                            preset.Name              = null;
+                            preset.Key               = null;
                             preset.Rounds            = rounds;
                             preset.BoardsPerRound    = boardsPerRound;
                             preset.Minutes           = boardsPerRound * 7;

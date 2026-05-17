@@ -14,7 +14,7 @@
     Title="{lex:Loc appSettings}"
     Width="400"
     Height="350"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     WindowStartupLocation="CenterScreen"

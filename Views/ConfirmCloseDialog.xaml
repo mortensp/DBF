@@ -5,7 +5,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     Title="{lex:Loc Confirm}"
     MinWidth="380"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     ResizeMode="NoResize"

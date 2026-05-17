@@ -9,7 +9,7 @@
     IsHitTestVisible="False"
     Width="800"
     Height="600"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     WindowStartupLocation="CenterOwner">

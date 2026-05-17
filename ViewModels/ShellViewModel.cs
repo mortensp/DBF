@@ -9,7 +9,8 @@ using DBF.DataModel;
 using DBF.Helpers;
 using DBF.Views;
 using GitHubTools;
-using Localization;
+using DBF.Localization;
+using String.Localization;
 namespace DBF.ViewModels;
 
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
@@ -48,17 +49,17 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
     public async Task ToggleLanguageAsync()
     {
-        var name = Lex.Culture?.Name is "da-DK" or "da" ? "en" : "da-DK";
+        var name = Lex.Culture?.Name is "da-DK" or "da" ? "en-US" : "da-DK";
 
-        // 1. Gem konfiguration
+        // 1. Save configuration
         Configuration.CultureName = name;
         Configuration.Save();
 
-        // 2. Sæt kultur først
+        // 2. Set culture first
         // Lex.Culture = LanguageService.Instance.SetCulture(name);
         LanguageService.Instance.SetCulture(name);
 
-        // 3. Opdater UI på alle views
+        // 3. Update UI on all views
         IoC.Get<ControlViewModel>()?.LexRefresh();
     }
 
@@ -86,7 +87,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
         if (_isFullscreen)
         {
-            // Gendan tidligere tilstand
+            // Restore previous state
             vindow.WindowStyle = _previousWindowStyle;
             vindow.ResizeMode  = _previousResizeMode;
 
@@ -102,16 +103,16 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         }
         else
         {
-            // Gem nuværende tilstand
+            // Save current state
             _previousWindowState = vindow.WindowState;
             _previousWindowStyle = vindow.WindowStyle;
             _previousResizeMode  = vindow.ResizeMode;
             _previousBounds      = new Rect(vindow.Left, vindow.Top, vindow.Width, vindow.Height);
 
-            // Gå i fullscreen
-            vindow.WindowStyle = WindowStyle.None;
+            // Fullscreen mode
+            //vindow.WindowStyle = WindowStyle.None;
             vindow.ResizeMode  = ResizeMode.NoResize;
-            vindow.WindowState = WindowState.Normal; // vigtigt for korrekt max
+            vindow.WindowState = WindowState.Normal; // Need to maximize correctly
             vindow.WindowState = WindowState.Maximized;
 
             _isFullscreen = true;
@@ -155,7 +156,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         {
             Configuration.SaveState();
 
-            // Best-effort for at finde den reelle exe (ikke en DLL)
+            // Best-effort on finding the actual exe (not a DLL)
             string exePath = null;
 
             try
@@ -163,7 +164,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
 
-            catch { /* adgang/permission kan fejle i visse miljøer */ }
+            catch { /* permission can fail in certain environments */ }
 
             if (string.IsNullOrEmpty(exePath))
             {

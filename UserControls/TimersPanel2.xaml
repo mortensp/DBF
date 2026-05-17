@@ -1,0 +1,41 @@
+﻿<UserControl x:Name="root"
+    x:Class="DBF.UserControls.TimersPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userctls="clr-namespace:DBF.UserControls"
+
+    d:Background="White"
+  
+    mc:Ignorable="d" Loaded="userControl_Loaded">
+
+    <Grid DataContext="{Binding ElementName=root}" d:DataContext="{d:DesignInstance Type=userctls:TimersPanel, IsDesignTimeCreatable=True}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <userctls:BridgeTimerControl x:Name="timer1" Grid.Row="0" Grid.Column="0" 
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            BridgeTimer="{Binding Configuration.BridgeTimers[0]}" />
+
+        <userctls:BridgeTimerControl x:Name="timer2" Grid.Row="0" Grid.Column="1"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            BridgeTimer="{Binding Configuration.BridgeTimers[1]}" />
+
+        <userctls:BridgeTimerControl x:Name="timer3" Grid.Row="1" Grid.Column="0"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            BridgeTimer="{Binding Configuration.BridgeTimers[2]}" />
+
+        <userctls:BridgeTimerControl x:Name="timer4" Grid.Row="1" Grid.Column="1"
+            ButtonsVisibility="{Binding ButtonsVisibility}"
+            BridgeTimer="{Binding Configuration.BridgeTimers[3]}" />
+
+    </Grid>
+</UserControl>

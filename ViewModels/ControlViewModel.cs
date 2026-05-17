@@ -4,7 +4,7 @@ using DBF.AudioServices;
 using DBF.Converters;
 using DBF.DataModel;
 using DBF.Helpers;
-using DBF.Localization;
+using String.Localization;
 using DBF.UserControls;
 using DBF.Views;
 
@@ -26,6 +26,30 @@ namespace DBF.ViewModels;
 
 public class ControlViewModel : Screen, IDisposable
 {
+    #region Private Fields
+        private                 SerializedFileSystemWatcher _watcher;
+        private static readonly TimeSpan                    _threshold   = new TimeSpan(0, 0, 10);
+        private                 bool                        _disposed;
+        private                 Encoding                    _iso_8859_1  = Encoding.GetEncoding("iso-8859-1");
+        private                 JsonSerializerOptions       _jsonOptions = new()
+                                                                           {
+                                                                               Converters = { new DecimalCommaConverter() }
+                                                                           };
+
+        private          LexStrings                      _lexStrings       ;
+        private          BindableCollection<PlayingTime> _playingDates     = [];
+        private          PlayingTime                     _playingTime;
+        private          UserControl                     _resultsControl   = new ResultsControl();
+        private          int                             _sectionNo;
+        private          Club                            _selectedClub;
+        private          MainClub                        _selectedMainClub;
+        private          bool                            _showAsOneGroup   = true;
+        private          UserControl                     _startListControl = new StartListControl();
+        private          TimersPanel                     _timersPanel      =new();
+        private          List<Tournament>                _tournaments;
+        private readonly IWindowManager                  _windowManager;
+    #endregion
+
     #region Constructors
         public ControlViewModel(IWindowManager windowManager, Configuration configuration, BridgeMate bridgeMate)
         {
@@ -49,7 +73,25 @@ public class ControlViewModel : Screen, IDisposable
                 Teams.CollectionChanged+= teamsCollectionChanged;
                 //
                 Configuration.PropertyChanged+= configurationPropertyChanged;
+                //
+                _timersPanel.SetBinding( TimersPanel.OrientationProperty
+                                       , new Binding(nameof(Configuration.WindowOrientation))
+                                         {
+                                             Source = Configuration
+                                           , Mode   = System.Windows.Data.BindingMode.OneWay
+                                         }
 
+                                       );
+
+                _timersPanel.SetBinding( TimersPanel.BridgeTimersProperty
+                                       , new Binding(nameof(Configuration.BridgeTimers))
+                                         {
+                                             Source = Configuration
+                                           , Mode   = System.Windows.Data.BindingMode.OneWay
+                                         }
+
+                                       );
+                //
                 initWatcher();
                 loadMainClubs();
             }
@@ -59,30 +101,6 @@ public class ControlViewModel : Screen, IDisposable
                 Logger.Exception(ex);
             }
         }
-    #endregion
-
-    #region Private Fields
-        private                 SerializedFileSystemWatcher _watcher;
-        private static readonly TimeSpan                    _threshold   = new TimeSpan(0, 0, 10);
-        private                 bool                        _disposed;
-        private                 Encoding                    _iso_8859_1  = Encoding.GetEncoding("iso-8859-1");
-        private                 JsonSerializerOptions       _jsonOptions = new()
-                                                                           {
-                                                                               Converters = { new DecimalCommaConverter() }
-                                                                           };
-
-        private          LexStrings                      _lexStrings       ;
-        private          BindableCollection<PlayingTime> _playingDates     = [];
-        private          PlayingTime                     _playingTime;
-        private          UserControl                     _resultsControl   = new ResultsControl();
-        private          int                             _sectionNo;
-        private          Club                            _selectedClub;
-        private          MainClub                        _selectedMainClub;
-        private          bool                            _showAsOneGroup   = true;
-        private          UserControl                     _startListControl = new StartListControl();
-        private          TimersPanel                     _timersPanel      = new(Visibility.Collapsed);
-        private          List<Tournament>                _tournaments;
-        private readonly IWindowManager                  _windowManager;
     #endregion
 
     #region Public Properties
@@ -245,11 +263,11 @@ public class ControlViewModel : Screen, IDisposable
                                                                           .Where(r => r.Done)
                                                                           .GroupBy(r => r.Section)
                                                                           .SelectMany(
-                                                                                                            g =>
-                                                                                                            {
-                                                                                                                var maxRound = g.Max(x => x.Round);
-                                                                                                                return g.Where(x => x.Round == maxRound);
-                                                                                                            })
+                                                                                                                                                                                                                                                                                            g =>
+                                                                                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                                                                                                var maxRound = g.Max(x => x.Round);
+                                                                                                                                                                                                                                                                                                return g.Where(x => x.Round == maxRound);
+                                                                                                                                                                                                                                                                                            })
                                                                           .ToList();
 
                                     foreach (var timer in Configuration.BridgeTimers
@@ -291,26 +309,23 @@ public class ControlViewModel : Screen, IDisposable
         }
 
         #region Public Projector Methods
-            public async Task ShowStartListAsync(CancellationToken cancellationToken = default)
+            public async Task ShowStartListAsync()
             {
                 if (CurrentView is not StartListControl)
-                    CurrentView = _startListControl ?? new();
+                    CurrentView = _startListControl;
 
                 await showProjector().ConfigureAwait(false);
             }
 
-            public async Task ShowBridgeTimers()
+            public async Task ShowBridgeTimersAsync()
             {
                 if (CurrentView is not TimersPanel)
-                {
-                    _timersPanel ??= new(Visibility.Collapsed);
                     CurrentView = _timersPanel;
-                }
 
                 await showProjector().ConfigureAwait(false);
             }
 
-            public async Task ShowResultsAsync(CancellationToken cancellationToken = default)
+            public async Task ShowResultsAsync()
             {
                 if (CurrentView is not ResultsControl)
                     CurrentView = _resultsControl;
@@ -494,13 +509,11 @@ public class ControlViewModel : Screen, IDisposable
             _lexStrings.Set(ErrorMessage, () => string.Empty);
             BindableCollection<Pair> pairs = [];
             BindableCollection<Team> teams = [];
-            Pairs.Clear();
-            Teams.Clear();
 
             //bool RoundCompleted = true;
             try
             {
-                Logger.Info($"Loading playingtimer: {_playingTime}");
+                Logger.Info($"Loading Playing Section: {_playingTime}");
                 Configuration.StartDate = _playingTime.Date;
                 _tournaments            = getTournaments(_playingTime);
 
@@ -539,11 +552,24 @@ public class ControlViewModel : Screen, IDisposable
                 team.EntryNo = i++;
 
             initSubgroups(pairs);
-            Pairs = pairs;
-            Teams = teams;
+        Pairs = pairs;
+        Teams = teams;
+            //var pairsView = System.Windows.Data.CollectionViewSource.GetDefaultView(Pairs);
+            //using (pairsView.DeferRefresh())
+            //{
+            //    Pairs.Clear();
+            //    Pairs.AddRange(pairs);
+            //}
 
-            //_watcher.EnableRaisingEvents = Configuration.ReadBC3;
-            Logger.Info($"Loaded  playingtimer: {_playingTime}");
+            //var teamsView = System.Windows.Data.CollectionViewSource.GetDefaultView(Teams);
+
+            //using (teamsView.DeferRefresh())
+            //{
+            //    Teams.Clear();
+            //    Teams.AddRange(teams);
+            //}
+
+            Logger.Info($"Loaded  Playing Section: {_playingTime}");
         }
 
         private void buildTeams(BindableCollection<Team> teams, int grpNo, GroupSection grp)
@@ -1141,15 +1167,14 @@ public class ControlViewModel : Screen, IDisposable
                                                                            .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height)
                                                                            .FirstOrDefault();
             ProjectorView          projectorView   = null;
-            WpfScreenHelper.Screen primaryScreen   = null;
-
+            
             if (projectorScreen is null)
             {
                 //#if (RELEASE || PRODTEST)
 #if RELEASE
                 MessageBox.Show("Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K", "Info");
 #else
-                primaryScreen = WpfScreenHelper.Screen.PrimaryScreen;
+                var primaryScreen = WpfScreenHelper.Screen.PrimaryScreen;
 
                 projectorView = Application.Current.Windows.OfType<ProjectorView>().FirstOrDefault();
 
@@ -1192,8 +1217,7 @@ public class ControlViewModel : Screen, IDisposable
             if (projectorView == null)
                 Logger.Error("Could not find or create ProjectorView");
             else
-                Logger.Info(
-                    $"ProjectorView shown on {(projectorScreen != null ? $"screen: {projectorScreen.DeviceName}" : "primary screen")}");
+                Logger.Info($"ProjectorView shown on {(projectorScreen != null ? $"screen: {projectorScreen.DeviceName}" : "primary screen")}");
 
             // Move ShellView activation out here, so that it ALWAS get focus in the end.
             var shellVm   = IoC.Get<ShellViewModel>();

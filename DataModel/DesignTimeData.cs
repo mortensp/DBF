@@ -18,7 +18,7 @@ public class DesignTimeData : PropertyChangedBase
                   ,   Info             = "Vi spiller 7 runder af 24 spil"
                                        + Environment.NewLine + "Pause efter 4. Runde"
                   ,   MinutesLeft      = 13d
-                  ,   WarningVisiblity = Visibility.Visible
+                  ,   WarningVisibility = Visibility.Visible
                 };
 
         Configuration           = IoC.Get<Configuration>();

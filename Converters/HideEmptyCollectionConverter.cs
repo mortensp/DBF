@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace DBF.Converters
 {
-    public class EmptyCollectionToVisibilityConverter : IValueConverter
+    public class HideEmptyCollectionConverter : IValueConverter
     {
         public bool Invert { get; set; }
 

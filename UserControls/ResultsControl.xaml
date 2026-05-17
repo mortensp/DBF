@@ -89,7 +89,7 @@
             HeaderRowHeight="25"
             ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             ScrollViewer.CanContentScroll="True"
-            Visibility="{Binding Teams, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+            Visibility="{Binding Teams, Converter={StaticResource HideCollectionEmptyConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn HeaderText="{lex:Loc hdGroup}"
@@ -174,7 +174,7 @@
             HeaderRowHeight="25"
             ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             ScrollViewer.CanContentScroll="True"
-            Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+            Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn HeaderText="{lex:Loc hdGroup}"

@@ -1,0 +1,178 @@
+﻿using Caliburn.Micro;
+
+using System.Text.Json.Serialization;
+
+namespace DBF.DataModel
+{
+    public class PresetOld : PropertyChangedBase
+    {
+        private string name;
+        private bool   customPreset;
+
+        [JsonConstructor]
+        public PresetOld(string name = null
+                     , bool customPreset = true
+                     , bool teamMatch = false
+                     , int rounds = 9
+                     , int boardsPerRound = 3
+                     , int breakAfterRound = 5
+                     , int hours = 0
+                     , int minutes = 26
+                     , int seconds = 0
+                     , int transitionMinutes = 1
+                     , int breakMinutes = 12
+                     , int warningMinutes = 5
+                     )
+        {
+            Name = name?.ToString();
+            CustomPreset = customPreset;
+            TeamMatch = teamMatch;
+            Rounds = rounds;
+            BoardsPerRound = boardsPerRound;
+            Hours = hours;
+            Minutes = minutes;
+            Seconds = seconds;
+            TransitionMinutes = transitionMinutes;
+            WarningMinutes = warningMinutes;
+
+            setBreak(breakAfterRound, breakMinutes);
+        }
+
+        public PresetOld(Preset other)
+        {
+            Name = other.Name?.ToString();
+            CustomPreset = true;
+            TeamMatch = other.TeamMatch;
+            Rounds = other.Rounds;
+            BoardsPerRound = other.BoardsPerRound;
+            Hours = other.Hours;
+            Minutes = other.Minutes;
+            Seconds = other.Seconds;
+            TransitionMinutes = other.TransitionMinutes;
+            WarningMinutes = other.WarningMinutes;
+
+            setBreak(other.BreakAfterRound, other.BreakMinutes);
+        }
+
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name != value)
+                    name = value?.ToString();
+            }
+        }
+
+        public bool CustomPreset
+        {
+            get => customPreset;
+            set
+            {
+                if (customPreset != value)
+                    customPreset = value;
+            }
+        }
+
+        public bool IsHidden { get; set; }
+
+        public bool TeamMatch { get; set; }
+        public int Rounds { get; set; }
+        public int BoardsPerRound { get; set; }
+        public int BreakAfterRound { get; set; }
+
+        public int Hours { get; set; }
+        public int Minutes
+        {
+            get => field;
+            set
+            {
+                if (value > 60)
+                {
+                    Hours = value / 60;
+                    field = value % 60;
+                }
+                else
+                    field = value;
+            }
+        }
+
+        public int Seconds
+        {
+            get => field;
+            set
+            {
+                if (value > 60)
+                {
+                    Minutes = value / 60;
+                    field = value % 60;
+                }
+                else
+                    field = value;
+            }
+        }
+
+        public int TransitionMinutes { get; set; }
+        public int BreakMinutes { get; set; }
+        public int WarningMinutes { get; set; }
+
+        public double Duration => BreakMinutes
+                                         + Rounds * (Hours * 60 + Minutes + Seconds / 60d)
+                                         + (BreakAfterRound > 0 && BreakAfterRound < Rounds ? Rounds - 2 : Rounds - 1)
+                                         * Math.Max(0, TransitionMinutes);
+
+        public bool Matches(PresetOld other, bool withoutName = false)
+        {
+            return (withoutName
+                  || other.Name is null
+                  || Name is null
+                  || Name == other.Name)
+                 && TeamMatch == other.TeamMatch
+                 && Rounds == other.Rounds
+                 && BoardsPerRound == other.BoardsPerRound
+                 && BreakAfterRound == other.BreakAfterRound
+                 && Hours == other.Hours
+                 && Minutes == other.Minutes
+                 && Seconds == other.Seconds
+                 && TransitionMinutes == other.TransitionMinutes
+                 && BreakMinutes == other.BreakMinutes
+                 && WarningMinutes == other.WarningMinutes;
+        }
+
+        override public string ToString() => Name;
+
+        internal void Update(PresetOld other)
+        {
+            CustomPreset = true;
+            TeamMatch = other.TeamMatch;
+            Rounds = other.Rounds;
+            BoardsPerRound = other.BoardsPerRound;
+            Hours = other.Hours;
+            Minutes = other.Minutes;
+            Seconds = other.Seconds;
+            TransitionMinutes = other.TransitionMinutes;
+            WarningMinutes = other.WarningMinutes;
+
+            setBreak(other.BreakAfterRound, other.BreakMinutes);
+        }
+
+        internal void setBreak(int breakAfterRound, int breakMinutes)
+        {
+            if (breakAfterRound > 0
+            && breakMinutes > 0)
+            {
+                BreakAfterRound = breakAfterRound;
+                BreakMinutes = breakMinutes;
+            }
+            else
+            {
+                BreakAfterRound = 0;
+                BreakMinutes = 0;
+            }
+        }
+    }
+}
+
+
+
+

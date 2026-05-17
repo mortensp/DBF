@@ -187,6 +187,15 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        internal static string Blue {
+            get {
+                return ResourceManager.GetString("Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to boards.
         /// </summary>
         internal static string Boards {
@@ -633,6 +642,15 @@ namespace DBF.Localization {
         internal static string General {
             get {
                 return ResourceManager.GetString("General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        internal static string Green {
+            get {
+                return ResourceManager.GetString("Green", resourceCulture);
             }
         }
         
@@ -1159,6 +1177,51 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pairs - 11 rounds of 2 boards.
+        /// </summary>
+        internal static string Pairs_11x2 {
+            get {
+                return ResourceManager.GetString("Pairs_11x2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pairs - 11 rounds of 3 boards.
+        /// </summary>
+        internal static string Pairs_11x3 {
+            get {
+                return ResourceManager.GetString("Pairs_11x3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pairs - 7 rounds of 4 boards.
+        /// </summary>
+        internal static string Pairs_7x4 {
+            get {
+                return ResourceManager.GetString("Pairs_7x4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pairs - 8 rounds of 4 boards.
+        /// </summary>
+        internal static string Pairs_8x4 {
+            get {
+                return ResourceManager.GetString("Pairs_8x4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pairs - 9 rounds of 3 boards.
+        /// </summary>
+        internal static string Pairs_9x3 {
+            get {
+                return ResourceManager.GetString("Pairs_9x3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pause until.
         /// </summary>
         internal static string PauseUntil {
@@ -1209,6 +1272,15 @@ namespace DBF.Localization {
         internal static string ReadBM {
             get {
                 return ResourceManager.GetString("ReadBM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        internal static string Red {
+            get {
+                return ResourceManager.GetString("Red", resourceCulture);
             }
         }
         
@@ -1371,6 +1443,15 @@ namespace DBF.Localization {
         internal static string TeamMatch {
             get {
                 return ResourceManager.GetString("TeamMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teams - 32 boards.
+        /// </summary>
+        internal static string Teams_2x16 {
+            get {
+                return ResourceManager.GetString("Teams_2x16", resourceCulture);
             }
         }
         
@@ -1587,6 +1668,24 @@ namespace DBF.Localization {
         internal static string WeArePlaying {
             get {
                 return ResourceManager.GetString("WeArePlaying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White.
+        /// </summary>
+        internal static string White {
+            get {
+                return ResourceManager.GetString("White", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yellow.
+        /// </summary>
+        internal static string Yellow {
+            get {
+                return ResourceManager.GetString("Yellow", resourceCulture);
             }
         }
     }

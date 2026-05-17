@@ -4,7 +4,8 @@ using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using EntityFrameworkCore.Jet.Data;
-using Localization;
+using DBF.Localization;
+using String.Localization;
 
 namespace DBF.ViewModels
 {
@@ -36,8 +37,7 @@ namespace DBF.ViewModels
 
             public async void AcceptSetting()
             {
-                var culture = LanguageService.Instance.CurrentCulture   ;
-
+                var culture = LanguageService.Instance.CurrentCulture;
                 var readBC3        =configuration.ReadBC3 ;
                 var readBridgeMate =configuration.ReadBridgeMate ;
 

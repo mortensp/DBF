@@ -1,9 +1,10 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using AppArguments;
 using DBF.Helpers;
-using DBF.Localization;
 using GitHubTools;
-using Localization;
+
+using String.Localization;
 
 namespace DBF
 {
@@ -16,12 +17,13 @@ namespace DBF
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            //    Thread.CurrentThread.CurrentUICulture = new("en");
             Arguments.Parse(validArgs, requiredArgs, showHelp);
             Logger.Info($"Application arguments: {Arguments.Values.ToFormattedString()}");
 
             // Initialize LanguageService
-            LanguageService.Instance.Initialize(typeof(Lex), typeof(Syncfusion_Shared_Wpf), typeof(Syncfusion_SfColorPalette_Wpf));
+            LanguageService.Instance.Initialize( typeof(Lex)
+                                               , typeof(Syncfusion_Shared_Wpf)
+                                               , typeof(Syncfusion_SfColorPalette_Wpf));
 
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
@@ -62,7 +64,7 @@ namespace DBF
             private static void showHelp(string msg, bool exitProgram)
             {
                 string helpText = @"
-                            🔧 DBF Tools Help
+                                        🔧 DBF Tools Help
         ====================
         Usages:
           DBF.exe [mode:MyMode]  

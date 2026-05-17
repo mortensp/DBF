@@ -627,4 +627,34 @@
   <data name="mnuRestartAndPreserveTimers" xml:space="preserve">
     <value>Luk og genstart programmet uden at stoppe urene</value>
   </data>
+  <data name="Red" xml:space="preserve">
+    <value>Rød</value>
+  </data>
+  <data name="Yellow" xml:space="preserve">
+    <value>Gul</value>
+  </data>
+  <data name="Blue" xml:space="preserve">
+    <value>Grøn</value>
+  </data>
+  <data name="White" xml:space="preserve">
+    <value>Hvid</value>
+  </data>
+  <data name="Pairs_7x4" xml:space="preserve">
+    <value>Par - 7 runder af 4 spil</value>
+  </data>
+  <data name="Pairs_9x3" xml:space="preserve">
+    <value>Par - 9 runder af 3 spil</value>
+  </data>
+  <data name="Pairs_8x4" xml:space="preserve">
+    <value>Par - 8 runder af 4 spil</value>
+  </data>
+  <data name="Pairs_11x2" xml:space="preserve">
+    <value>Par - 11 runder af 2 spil</value>
+  </data>
+  <data name="Pairs_11x3" xml:space="preserve">
+    <value>Par - 11 runder af 3 spil</value>
+  </data>
+  <data name="Teams_2x16" xml:space="preserve">
+    <value>Hold - 32 spil</value>
+  </data>
 </root>

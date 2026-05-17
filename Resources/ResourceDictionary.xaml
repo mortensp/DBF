@@ -9,22 +9,25 @@
 
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    <conv:BooleanInvertConverter x:Key="BooleanInvertConverter" />
-    <conv:VisibilityInvertConverter x:Key="VisibilityInvertConverter" />
 
-    <conv:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" />
-    <conv:HideEmptyConverter x:Key="HideEmptyConverter" />
-    <conv:FirstPartConverter x:Key="FirstPartConverter" />
-    <conv:SecondPartConverter x:Key="SecondPartConverter" />
-    <conv:ThirdPartConverter x:Key="ThirdPartConverter" />
-    <conv:FourthPartConverter x:Key="FourthPartConverter" />
-    <conv:GroupColorConverter x:Key="GroupColorConverter" />
-    <conv:EnumCastConverter x:Key="EnumCastConverter" />
+
+    <conv:BooleanInvertConverter x:Key="BooleanInvertConverter" />
     <conv:CapitalizerConverter x:Key="CapitalizerConverter" />
     <conv:CollectionContainsToBrushConverter
         x:Key="ContainsToBrush"
         FalseBrush="Black"
         TrueBrush="Red" />
+    <conv:EnumCastConverter x:Key="EnumCastConverter" />
+    <conv:FirstPartConverter x:Key="FirstPartConverter" />
+    <conv:FourthPartConverter x:Key="FourthPartConverter" />
+    <conv:GroupColorConverter x:Key="GroupColorConverter" />
+    <conv:HideEmptyCollectionConverter x:Key="HideCollectionEmptyConverter" />
+    <conv:HideEmptyConverter x:Key="HideEmptyConverter" />
+    <conv:HideEqualsConverter x:Key="HideEqualsConverter" />
+    <conv:SecondPartConverter x:Key="SecondPartConverter" />
+    <conv:ThirdPartConverter x:Key="ThirdPartConverter" />
+    <conv:VisibilityInvertConverter x:Key="VisibilityInvertConverter" />
+    <conv:VisibleEqualsConverter x:Key="VisibleEqualsConverter" />
 
 
     <LinearGradientBrush x:Key="HeaderBrush" StartPoint="0.5,0" EndPoint="0.5,1">

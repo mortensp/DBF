@@ -11,7 +11,7 @@
     Width="650"
     Height="500"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     Padding="20"

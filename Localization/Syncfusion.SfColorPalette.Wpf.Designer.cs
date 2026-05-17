@@ -39,7 +39,7 @@ namespace DBF.Localization {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DBF.Localization.Syncfusion.SfColorPalette.Wpf2", typeof(Syncfusion_SfColorPalette_Wpf).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Localization.Syncfusion.SfColorPalette.Wpf2", typeof(Syncfusion_SfColorPalette_Wpf).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

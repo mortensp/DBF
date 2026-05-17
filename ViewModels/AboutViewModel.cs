@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Caliburn.Micro;
 using WPFLocalizeExtension.Engine;
-using Localization;
+using DBF.Localization;
 
 namespace DBF.ViewModels;
 

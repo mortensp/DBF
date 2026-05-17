@@ -10,6 +10,8 @@ namespace DBF.UserControls;
 
 public partial class TimersPanel : UserControl, INotifyPropertyChanged
 {
+    public Guid Id { get; } = Guid.NewGuid();
+
     #region Constructors
         public TimersPanel(Visibility buttonsVisibility)
         {
@@ -65,22 +67,22 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
                                                               , new PropertyMetadata(Visibility.Visible));
         #endregion
 
-        #region Dependency Property TimersCanBeAdded
-            public bool TimersCanBeAdded
+        #region Dependency Property CanAndTimer
+            public bool CanAndTimer
             {
                 get => (bool)GetValue(TimersCanBeAddedProperty);
                 set => SetValue(TimersCanBeAddedProperty, value);
             }
 
             public static readonly DependencyProperty TimersCanBeAddedProperty = 
-                                   DependencyProperty.Register( nameof(TimersCanBeAdded)
+                                   DependencyProperty.Register( nameof(CanAndTimer)
                                                               , typeof(bool)
                                                               , typeof(TimersPanel)
-                                                              , new PropertyMetadata(false));
-        #endregion
+                                                              , new PropertyMetadata(false,onTimersCanBeAddedChanged ));
+    #endregion
 
-        #region Dependency Property Orientation
-            public Orientation Orientation
+    #region Dependency Property Orientation
+    public Orientation Orientation
             {
                 get => (Orientation)GetValue(OrientationProperty);
                 set => SetValue(OrientationProperty, value);
@@ -95,6 +97,13 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
     #endregion
 
     #region Private Methods
+
+    private static void onTimersCanBeAddedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is TimersPanel ctl)
+        {
+        }
+    }
         private void onCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             UpdateBridgeTimers();

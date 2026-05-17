@@ -10,7 +10,7 @@
     Title="{lex:Loc NewSetting}"
     Width="600"
     Height="70"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     FontSize="12"

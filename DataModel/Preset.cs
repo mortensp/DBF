@@ -1,15 +1,23 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Globalization;
+using System.Reflection;
+using System.Resources;
+using System.Text.Json.Serialization;
 using Caliburn.Micro;
+using String.Localization;
+using DBF.Converters;
 
 namespace DBF.DataModel
 {
     public class Preset : PropertyChangedBase
     {
-        private string name;
+        private string key;
         private bool   customPreset;
 
-        [JsonConstructorAttribute]
-        public Preset( string name = null
+        // Parameterless constructor for JSON deserialization
+        public Preset() { }
+
+        public Preset( string key = null
                      , bool customPreset = true
                      , bool teamMatch = false
                      , int rounds = 9
@@ -23,7 +31,7 @@ namespace DBF.DataModel
                      , int warningMinutes = 5
                      )
         {
-            Name              = name?.ToString();
+            Key               = key;
             CustomPreset      = customPreset;
             TeamMatch         = teamMatch;
             Rounds            = rounds;
@@ -39,7 +47,7 @@ namespace DBF.DataModel
 
         public Preset(Preset other)
         {
-            Name              = other.Name?.ToString();
+            Key               = other.Key;
             CustomPreset      = true;
             TeamMatch         = other.TeamMatch;
             Rounds            = other.Rounds;
@@ -53,15 +61,21 @@ namespace DBF.DataModel
             setBreak(other.BreakAfterRound, other.BreakMinutes);
         }
 
-        public string Name
+        [JsonPropertyName("Name")]
+        [JsonConverter(typeof(PresetNameJsonConverter))]
+        public string Key
         {
-            get => name;
+            get => key;
             set
             {
-                if (name != value)
-                    name =  value?.ToString();
+                if (key != value)
+                    key = value;
             }
         }
+
+        // Display name — translated dynamically based on CurrentCulture
+        [JsonIgnore]
+        public string Name =>  LanguageService.Translate(typeof(Lex), Key);
 
         public bool CustomPreset
         {
@@ -69,12 +83,11 @@ namespace DBF.DataModel
             set
             {
                 if (customPreset != value)
-                    customPreset =  value;
+                    customPreset = value;
             }
         }
 
         public bool IsHidden        { get; set; }
-
         public bool TeamMatch       { get; set; }
         public int  Rounds          { get; set; }
         public int  BoardsPerRound  { get; set; }
@@ -120,12 +133,13 @@ namespace DBF.DataModel
                                          + (BreakAfterRound >  0 && BreakAfterRound <  Rounds ? Rounds - 2 : Rounds - 1)
                                          * Math.Max(0, TransitionMinutes);
 
+        // Matches uses an invariant key (not localized name)
         public bool Matches(Preset other, bool withoutName = false)
         {
             return  (withoutName
-                  || other.Name        is null
-                  || Name              is null
-                  || Name              == other.Name)
+                  || other.Key         is null
+                  || Key                is null
+                  || string.Equals(Key, other.Key, StringComparison.Ordinal))
                  &&  TeamMatch         == other.TeamMatch
                  &&  Rounds            == other.Rounds
                  &&  BoardsPerRound    == other.BoardsPerRound

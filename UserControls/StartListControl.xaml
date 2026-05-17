@@ -11,7 +11,7 @@
     xmlns:userctl="clr-namespace:DBF.UserControls"
     d:DesignHeight="450"
     d:DesignWidth="1100"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     mc:Ignorable="d">
@@ -67,7 +67,7 @@
             ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             QueryRowHeight="SfDataGrid_QueryRowHeight"
             ScrollViewer.CanContentScroll="True"
-            Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+            Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn HeaderText="{lex:Loc hdGroup}"
@@ -113,6 +113,9 @@
                 <syncfusion:SortColumnDescription ColumnName="TeamNo" SortDirection="Ascending" />
             </syncfusion:SfDataGrid.SortColumnDescriptions>
 
+            <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:GroupColumnDescription ColumnName="Group" />
+            </syncfusion:SfDataGrid.GroupColumnDescriptions>
 
         </syncfusion:SfDataGrid>
 
@@ -135,7 +138,7 @@
             NavigationMode="Row"
             ScrollViewer.CanContentScroll="True"
             ShowColumnWhenGrouped="True"
-            Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmptyCollectionToVisibilityConverter}}">
+            Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn HeaderText="{lex:Loc hdGroup}"
@@ -220,6 +223,11 @@
                 <syncfusion:SortColumnDescription ColumnName="SubGroup" SortDirection="Ascending" />
                 <syncfusion:SortColumnDescription ColumnName="PairNo" SortDirection="Ascending" />
             </syncfusion:SfDataGrid.SortColumnDescriptions>
+
+            <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:GroupColumnDescription ColumnName="Group" />
+                <syncfusion:GroupColumnDescription ColumnName="SubGroup" />
+            </syncfusion:SfDataGrid.GroupColumnDescriptions>
         </syncfusion:SfDataGrid>
     </Grid>
 </UserControl>

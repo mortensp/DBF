@@ -6,7 +6,7 @@ using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.DataModel;
 using DBF.Helpers;
-using Localization;
+using DBF.Localization;
 using Syncfusion.Windows.Tools.Controls;
 
 namespace DBF.ViewModels;
@@ -134,7 +134,7 @@ public class TimerSettingsViewModel : Screen
 
             if (!string.IsNullOrEmpty(dialog.PresetName))
             {
-                NewSetting.Name = dialog.PresetName;
+                        NewSetting.Key = dialog.PresetName;
                 var preset      = new Preset(NewSetting);
                 Configuration.Presets.Add(preset);
                 Configuration.Save();
@@ -162,7 +162,7 @@ public class TimerSettingsViewModel : Screen
                 if (buildin != null)
                     buildin.IsHidden = true;
 
-                preset.Name     = name;
+                preset.Key     = name;
                 preset.IsHidden = false;
 
                 Configuration.Presets.Add(preset);
@@ -192,12 +192,12 @@ public class TimerSettingsViewModel : Screen
 
                 Configuration.Presets.Remove(selectedPreset);
                 Configuration.Save();
-                NewSetting.Name = null;
+                NewSetting.Key = null;
                 SelectedPreset  = FindPreset(NewSetting);
-                Logger.Info($"Preset '{NewSetting.Name}' deleted");
+                Logger.Info($"Preset '{NewSetting.Key}' deleted");
 
                 if (buildin != null)
-                    Logger.Info($"Buildin Preset '{NewSetting.Name}' restored");
+                    Logger.Info($"BuildIn Preset '{NewSetting.Key}' restored");
             }
         }
 
@@ -237,14 +237,14 @@ public class TimerSettingsViewModel : Screen
                 &&  preset.Matches(selectedPreset))
                     return;
 
-                preset.Name   = null;
+                preset.Key   = null;
                 var newPreset = FindPreset(preset);
 
                 if (newPreset is not null)
                     if (selectedPreset is null)
                         SelectedPreset = newPreset;
                     else
-                        SelectedPreset.Name = newPreset?.Name;
+                        SelectedPreset.Key = newPreset?.Key;
             }
         }
     #endregion
@@ -263,7 +263,7 @@ public class TimerSettingsViewModel : Screen
     internal void SuggestedSettings(Preset suggested)
     {
         // Finally update the editable NewSetting so the UI shows the suggested values
-        var name =selectedPreset?.Name;
+        var key =selectedPreset?.Key;
 
         NewSetting.MarkChanged(suggested);
 
@@ -272,8 +272,8 @@ public class TimerSettingsViewModel : Screen
 
         SelectedPreset = FindPreset(suggested);
 
-        if (SelectedPreset?.Name != name)
-            NewSetting.ChangedProperties.Add(nameof(NewSetting.Name));
+        if (SelectedPreset?.Key != key)
+            NewSetting.ChangedProperties.Add(nameof(NewSetting.Key));
 
         NotifyOfPropertyChange(nameof(Message));
     }

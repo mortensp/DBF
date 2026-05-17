@@ -627,4 +627,37 @@
   <data name="mnuRestartAndPreserveTimers" xml:space="preserve">
     <value>Restart the program saving the timer states</value>
   </data>
+  <data name="Red" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="Yellow" xml:space="preserve">
+    <value>Yellow</value>
+  </data>
+  <data name="Blue" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="Green" xml:space="preserve">
+    <value>Green</value>
+  </data>
+  <data name="White" xml:space="preserve">
+    <value>White</value>
+  </data>
+  <data name="Pairs_7x4" xml:space="preserve">
+    <value>Pairs - 7 rounds of 4 boards</value>
+  </data>
+  <data name="Pairs_9x3" xml:space="preserve">
+    <value>Pairs - 9 rounds of 3 boards</value>
+  </data>
+  <data name="Pairs_8x4" xml:space="preserve">
+    <value>Pairs - 8 rounds of 4 boards</value>
+  </data>
+  <data name="Pairs_11x2" xml:space="preserve">
+    <value>Pairs - 11 rounds of 2 boards</value>
+  </data>
+  <data name="Pairs_11x3" xml:space="preserve">
+    <value>Pairs - 11 rounds of 3 boards</value>
+  </data>
+  <data name="Teams_2x16" xml:space="preserve">
+    <value>Teams - 32 boards</value>
+  </data>
 </root>

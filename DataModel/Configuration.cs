@@ -16,10 +16,9 @@ using Caliburn.Micro;
 
 using DBF.AudioServices;
 using DBF.Helpers;
-using DBF.Localization;
 using DBF.ViewModels;
 
-using Localization;
+using String.Localization;
 
 using Syncfusion.Windows.Tools.Controls;
 
@@ -39,7 +38,6 @@ namespace DBF.DataModel
             private                 string                _cultureName;
             private                 IWindowManager        _windowManager     = IoC.Get<IWindowManager>();
             private                 ICollectionView       _presetsView;
-            private                 LexStrings            _lexStrings;
         #endregion
 
         #region Constructors
@@ -60,7 +58,7 @@ namespace DBF.DataModel
                 Presets.CollectionChanged     += presets_CollectionChanged;
                 Presets.ItemChanged           += presets_ItemChanged;
 
-                CultureName = Arguments.Values?.Lookup("language", "en") ?? "en";
+                CultureName = Arguments.Values?.Lookup("language");
             }
         #endregion
 
@@ -99,7 +97,6 @@ namespace DBF.DataModel
                                                           : WindowOrientation == Orientation.Horizontal
                                                           ? "/Images/VerticalWindows.PNG"
                                                           : "/Images/HorizontalWindows.PNG";
-
                 public TimeOnly? StartTime
                 {
                     get => field ?? TimeOnly.FromDateTime(_startDate);
@@ -116,13 +113,7 @@ namespace DBF.DataModel
                     }
                 }
 
-                public BindableCollectionExt<Preset> Presets { get; set; } =
-                            new() {     new Preset("Par - 7 runder af 4 spil",  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
-                                      , new Preset("Par - 8 runder af 4 spil",  false, false, 8,  4,  4, 0, 27, 0, 1, 10, 5)
-                                      , new Preset("Par - 9 runder af 3 spil",  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
-                                      , new Preset("Par - 11 runder af 2 spil", false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
-                                      , new Preset("Hold kamp af 32 spil",      false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                  };
+                public BindableCollectionExt<Preset> Presets { get; set; } = new();
 
                 #region Culture and CultureName Properties
                     public static BindableCollection<CultureInfo> UILanguages
@@ -131,7 +122,7 @@ namespace DBF.DataModel
                         {
                             if (field is null)
                             {
-                                var languages = LanguageService.Instance.GetAvailableCultures().ToList();
+                                var languages = LanguageService.Instance.GetAvailableCultures("en-US").ToList();
 
                                 field = new BindableCollection<CultureInfo>(languages.OrderBy(c => c.DisplayName));
                             }
@@ -145,7 +136,13 @@ namespace DBF.DataModel
                         get => _cultureName;
                         set
                         {
-                            Set(ref _cultureName, value?.Trim());
+                            if (string.IsNullOrWhiteSpace(value))
+                                value = "en-US";
+
+                            if (Set(ref _cultureName, value?.Trim()))
+                                if (Culture?.Name != value)
+                                    Culture = UILanguages.FirstOrDefault(c => c.Name == value)
+                                           ?? new CultureInfo(value);
                         }
                     }
 
@@ -155,8 +152,19 @@ namespace DBF.DataModel
                         get => field;
                         set
                         {
-                            field       = value;
-                            CultureName = value?.Name;
+                            if (value?.Name != field?.Name)
+                            {
+                                field = UILanguages.FirstOrDefault(c => c.Name == value.Name);
+
+                                if (field == null)
+                                    if (string.IsNullOrWhiteSpace(value.Name))
+                                        new CultureInfo("en-US");
+                                    else
+                                        new CultureInfo(value.Name);
+
+                                if (CultureName != value?.Name)
+                                    CultureName =  value?.Name;
+                            }
                         }
                     }
                 #endregion
@@ -168,7 +176,7 @@ namespace DBF.DataModel
                     {
                         if (_presetsView == null)
                         {
-                            // Sørg for at dette kaldes fra UI-tråden
+                            // Make sure this is called from the UI thread
                             _presetsView        = CollectionViewSource.GetDefaultView(Presets);
                             _presetsView.Filter = o => o is Preset p && !p.IsHidden;
 
@@ -232,10 +240,10 @@ namespace DBF.DataModel
                 }
 
                 [JsonIgnore]
-                public TimeOnly EndTime          { get; set; }
+                public TimeOnly EndTime     { get; set; }
 
                 [JsonIgnore]
-                public bool     TimersCanBeAdded { get; set; }
+                public bool     CanAndTimer { get; set; }
 
                 [JsonIgnore]
                 public int VisibleTimerCount
@@ -244,7 +252,7 @@ namespace DBF.DataModel
                     set
                     {
                         _visibleTimerCount = value;
-                        TimersCanBeAdded   = VisibleTimerCount <  4;
+                        CanAndTimer        = VisibleTimerCount <  4;
                     }
                 }
 
@@ -358,11 +366,18 @@ namespace DBF.DataModel
                                 jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
 
                             _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
-                            CultureName   = _loadedConfig.CultureName;
 
-                            LanguageService.Instance.SetCulture(_loadedConfig.CultureName);
+                            LanguageService.Instance.SetCulture(CultureName);
                         }
                     }
+
+                    Presets.AddRange([ new Preset(nameof(Lex.Pairs_7x4),  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                                     , new Preset(nameof(Lex.Pairs_8x4),  false, false, 8,  4,  4, 0, 27, 0, 1, 10, 5)
+                                     , new Preset(nameof(Lex.Pairs_9x3),  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
+                                     , new Preset(nameof(Lex.Pairs_11x2), false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
+                                     , new Preset(nameof(Lex.Pairs_11x3), false, false, 11, 3,  6, 0, 21, 0, 1, 12, 5)
+                                     , new Preset(nameof(Lex.Teams_2x16), false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
+                                     ]);
 
                     Logger.Info("Loaded  language setting from Configuration file");
                 }
@@ -638,11 +653,11 @@ namespace DBF.DataModel
                     {
                         timer = new BridgeTimer();
                         timer.Update(Presets[i]);
-                        timer.Name            = null;
+                        timer.Key             = null;
                         timer.BackgroundColor = BackgroundColors[i].Color;
                         timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
 
-                        if (_visibleTimerCount >  1) // Lad som standard de to første være visible
+                        if (_visibleTimerCount >  1) // make sure that the first one is always visible
                             timer.Visibility = System.Windows.Visibility.Collapsed;
                     }
                     else
@@ -654,7 +669,7 @@ namespace DBF.DataModel
                             timer.Update(Presets[i]);
                             timer.Visibility = System.Windows.Visibility.Collapsed;
                         }
-
+                                   
                     if (timer.BreakAfterRound == 0
                     ||  timer.BreakMinutes    == 0)
                         timer.BreakAfterRound = timer.BreakMinutes = 0;
@@ -675,7 +690,7 @@ namespace DBF.DataModel
                 {
                     var timer = new BridgeTimer();
                     timer.Update(Presets[i]);
-                    timer.Name            = null;
+                    timer.Key             = null;
                     timer.BackgroundColor = BackgroundColors[i].Color;
                     timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
                     timer.Visibility      = Visibility.Collapsed;

@@ -1,7 +1,8 @@
-﻿using Syncfusion.UI.Xaml.Grid;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using Syncfusion.UI.Xaml.Grid;
 
 namespace DBF.Views
 {
@@ -28,6 +29,22 @@ namespace DBF.Views
             //{
             //    // ignore any lookup failures
             //}
+        }
+
+        /// <summary>
+        /// Activates the window that contains the control when the control receives a mouse-down event.
+        /// </summary>
+        /// <remarks>Locates the containing Window using Window.GetWindow and calls Activate if a window
+        /// is found.</remarks>
+        /// <param name="sender">The control that raised the event.</param>
+        /// <param name="e">The MouseButtonEventArgs that identifies the mouse button and event details.</param>
+       ///<usages>
+       ///   <UserControl ..
+       ///       MouseDown="UserControl_MouseDown"/>
+       ///</usages>
+        private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Window.GetWindow(this)?.Activate();
         }
     }
 }

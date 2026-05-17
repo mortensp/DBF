@@ -10,7 +10,7 @@
     xmlns:userctls="clr-namespace:DBF.UserControls"
     x:Name="root"
     d:Background="white"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     Loaded="ControlLoaded"
@@ -121,7 +121,7 @@
 
                         <TextBlock Grid.Row="1" Grid.Column="2"
                             x:Name="warning"
-                            Visibility="{Binding BridgeTimer.WarningVisiblity}">
+                            Visibility="{Binding BridgeTimer.WarningVisibility}">
                             <Canvas
                                 Width="31"
                                 Height="31"

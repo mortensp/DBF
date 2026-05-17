@@ -12,7 +12,7 @@
     cal:Message.Attach="[Event KeyDown] = [OnKeyDown($eventArgs)]"
     d:Height="800"
     d:Width="1100"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     FontSize="14"

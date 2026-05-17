@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized; // <-- tilføjet
+using System.Collections.Specialized;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
@@ -90,7 +90,7 @@ namespace DBF.DataModel
         }
 
         public              List<string>                 GroupList         { get; set; }
-        public              string                       Info              { get; set; }
+        [JsonIgnore]        public              string                       Info              { get; set; }
         [JsonIgnore] public Brush                        Foreground        { get; set; }
         [JsonIgnore] public Brush                        Background        { get; set; }
         public              string                       Sound             { get; set; }
@@ -142,7 +142,7 @@ namespace DBF.DataModel
 
         public new void Update(Preset preset)
         {
-            Name              = preset.Name;
+            Key              = preset.Key       ;
             CustomPreset      = preset.CustomPreset;
             TeamMatch         = preset.TeamMatch;
             Rounds            = preset.Rounds;

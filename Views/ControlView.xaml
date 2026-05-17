@@ -11,9 +11,10 @@
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     x:Name="root"
     d:Background="White"
-    lex:LocalizeDictionary.DesignCulture="en"
+    lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
+    MouseDown="UserControl_MouseDown"
     mc:Ignorable="d">
 
     <Grid>
@@ -38,7 +39,7 @@
                 Orientation="Horizontal"
                 Visibility="{Binding BC3Available, Converter={StaticResource BooleanToVisibilityConverter}}">
 
-                <!--  Bridge Center or Mainclub  -->
+                <!--  BridgeCenter ie. Mainclub  -->
                 <Label Content="{lex:Loc Club}" FontWeight="Bold" />
 
                 <TextBlock
@@ -66,7 +67,7 @@
                     Foreground="Black"
                     HorizontalAnchor="Inside" />
 
-                <!--  Under the subclub name  -->
+                <!--  Subclub  -->
                 <Label Content="{lex:Loc Subclub}" FontWeight="Bold" />
 
                 <TextBlock
@@ -102,8 +103,6 @@
                         Text=":" />
                 </WrapPanel>
 
-                <!--<WrapPanel Margin="1,4">-->
-
                 <ComboBox
                     Name="cmbDate"
                     Width="Auto"
@@ -122,13 +121,13 @@
                     Content="{Binding DateBadge}"
                     Foreground="Black" />
 
-                <!--</WrapPanel>-->
                 <!--  Toast overlay  -->
+                <!--
                 <Grid
                     x:Name="ToastHost"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    IsHitTestVisible="False" />
+                    IsHitTestVisible="False" />-->
             </StackPanel>
 
             <StackPanel
@@ -179,7 +178,7 @@
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="Red"
+                Background="#E10000"
                 FontSize="16"
                 FontWeight="Bold"
                 Foreground="White"
@@ -197,34 +196,65 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!--  Top: knapper  -->
+                    <!--  Top: buttons  -->
                     <DockPanel Grid.Row="0"
                         Margin="5,4,5,0"
                         LastChildFill="False"
                         Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}">
 
+
                         <Button
                             x:Name="AddTimer"
                             Width="70"
                             Content="{lex:Loc AddTimer}"
-                            DockPanel.Dock="Left" />
+                            DockPanel.Dock="Left"
+                            IsEnabled="{Binding Configuration.CanAndTimer}" />
 
                         <Button
-                            x:Name="ToggleWindowOrientation"
                             Width="40"
                             Height="25"
-                            DockPanel.Dock="Right"
-                            Visibility="{Binding Configuration.WindowOrientationIcon, Converter={StaticResource HideEmptyConverter}}">
-                            <Image Source="{Binding Configuration.WindowOrientationIcon}" />
+                            cal:Message.Attach="[Event Click] = [Action ToggleWindowOrientation]"
+                            DockPanel.Dock="Right">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Configuration.WindowOrientation}" Value="Vertical">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <Image Source="/Images/VerticalWindows.PNG" />
+                        </Button>
+
+                        <Button
+                            Width="40"
+                            Height="25"
+                            Margin="5,0"
+                            cal:Message.Attach="[Event Click] = [Action ToggleWindowOrientation]"
+                            DockPanel.Dock="Right">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Configuration.WindowOrientation}" Value="Horizontal">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+
+                            <Image Source="/Images/HorizontalWindows.PNG" />
                         </Button>
                     </DockPanel>
 
-                    <!--  Nederst: timers  -->
+                    <!--  main part: the TimersPanel  -->
                     <Viewbox Grid.Row="1">
                         <ctl:TimersPanel
-                            Orientation="{Binding Configuration.WindowOrientation}"
                             BridgeTimers="{Binding Configuration.BridgeTimers}"
-                            TimersCanBeAdded="{Binding Configuration.TimersCanBeAdded}" />
+                            CanAndTimer="{Binding Configuration.CanAndTimer}"
+                            Orientation="{Binding Configuration.WindowOrientation}" />
                     </Viewbox>
                 </Grid>
             </TabItem>
@@ -255,17 +285,17 @@
             <Button
                 Width="100"
                 Margin="5"
-                cal:Message.Attach="[Event Click] = [Action ShowStartList]"
+                cal:Message.Attach="[Event Click] = [Action ShowStartListAsync]"
                 Content="{lex:Loc btnShowStartLists}" />
             <Button
                 Width="100"
                 Margin="5"
-                cal:Message.Attach="[Event Click] = [Action ShowBridgeTimers]"
+                cal:Message.Attach="[Event Click] = [Action ShowBridgeTimersAsync]"
                 Content="{lex:Loc btnShowBridgeTimers}" />
             <Button
                 Width="100"
                 Margin="5"
-                cal:Message.Attach="[Event Click] = [Action ShowResults]"
+                cal:Message.Attach="[Event Click] = [Action ShowResultsAsync]"
                 Content="{lex:Loc btnShowResults}" />
 
             <Button

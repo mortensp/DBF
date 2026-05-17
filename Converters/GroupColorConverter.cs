@@ -12,7 +12,7 @@ namespace DBF.Converters
             var Text = value?.ToString().ToLower();
 
             // Select color based on content
-            //TODO: Use Localazation
+            // Not Localized as these a read from BC3 files in danish
             if (Text?.ToLower().Contains(" rød ") == true)
                 return Brushes.Red;
 

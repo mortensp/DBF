@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using Caliburn.Micro;
 using DBF.ViewModels;
@@ -32,15 +33,22 @@ namespace DBF.Views
                         btn.Visibility = Visibility.Visible;
                 }
             }
+
             catch
             {
                 // ignore any lookup failures
             }
         }
 
+        //protected override void OnMouseDown(MouseButtonEventArgs e)
+        //{
+        //    base.OnMouseDown(e);
+        //    this.Activate();
+        //}
+
         private void ShellView_Loaded(object sender, RoutedEventArgs e)
         {
-            // Genskab størrelse og position
+            // restore size and position
             if (Properties.Settings.Default.WindowWidth >  0)
             {
                 Width       = Properties.Settings.Default.WindowWidth;
@@ -56,7 +64,7 @@ namespace DBF.Views
 
         private void ShellView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // Gem størrelse og position
+            // save size and position
             if (WindowState == WindowState.Normal
             ||  WindowState == WindowState.Minimized)
             {

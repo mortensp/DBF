@@ -33,7 +33,7 @@ namespace DBF.UserControls
         private int               pairRows;
         private int               teamRows;
         private List<Interval>    displayLines     = [];
-        private DispatcherTimer   groupTimer;
+        private DispatcherTimer   groupTimer       =new();
 
         #region Constructors
             public StartListControl()
@@ -75,8 +75,7 @@ namespace DBF.UserControls
 
             setupPaging();
 
-            // Initialiser timeren
-            groupTimer             = new DispatcherTimer();
+            //groupTimer             = new DispatcherTimer();
             groupTimer.Tick       += (s, e) => showNextGroup();
             config.PropertyChanged+= (s, e) => setupPaging();
         }
@@ -87,20 +86,23 @@ namespace DBF.UserControls
             &&  dg.ItemsSource is not null)
             {
                 dg.ClearFilters();
-                dg.GroupColumnDescriptions.Clear();
-                dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
 
                 pairs = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Pair>;
 
-                // SubGroups?                
-                if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
+                var subGroup      = dg.GroupColumnDescriptions.FirstOrDefault(g => g.ColumnName == "SubGroup");
+                var showSubGroups = pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup));
+
+                if (subGroup is null && showSubGroups)
                     dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
 
-                dg.View.RefreshFilter();
+                if (subGroup is not null && !showSubGroups)
+                    dg.GroupColumnDescriptions.Remove(subGroup);
+
                 dg.View.Filter = item =>  displayLines.Count == 0
                                       ||  item               is Pair pair
                                       &&  displayLines[displayLineIndex].Contains(pair.EntryNo);
-                // 
+                dg.View.RefreshFilter();
+
                 setupPaging();
             }
         }
@@ -111,15 +113,14 @@ namespace DBF.UserControls
             &&  dg.ItemsSource is not null)
             {
                 dg.ClearFilters();
-                dg.GroupColumnDescriptions.Clear();
-                dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
 
                 teams = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Team>;
 
-                dg.View.RefreshFilter();
                 dg.View.Filter = item =>  displayLines.Count == 0
                                       ||  item               is Team team
                                       &&  displayLines[displayLineIndex].Contains(team.EntryNo);
+                dg.View.RefreshFilter();
+
                 // 
                 setupPaging();
             }
@@ -254,7 +255,7 @@ namespace DBF.UserControls
 
             private void addGroup(Group group)
             {
-                interval.To   += group.Records.Count();
+                interval.To   += group.Records?.Count() ?? 32;
                 linesAllocated+= group.LineCount();
             }
 

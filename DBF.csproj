@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AssemblyVersion>0.9.9.23</AssemblyVersion>
-		<FileVersion>0.9.9.23</FileVersion>
-		<Version>0.9.9.23</Version>
-		<ProductVersion>0.9.9.23</ProductVersion>
+		<AssemblyVersion>0.9.9.24</AssemblyVersion>
+		<FileVersion>0.9.9.24</FileVersion>
+		<Version>0.9.9.24</Version>
+		<ProductVersion>0.9.9.24</ProductVersion>
 		<AssemblyTitle>DBF</AssemblyTitle>
 		<AssemblyName>DBF</AssemblyName>
 		<Description>DBF Tools - Viser Start og resultatlister og 1-4 bruidgeure</Description>
@@ -45,6 +45,7 @@
 		<Compile Remove="BridgeMateModel\ScoreUpload.cs" />
 		<Compile Remove="BridgeMateModel\Setting.cs" />
 		<Compile Remove="Helpers\ToastService.cs" />
+		<Compile Remove="UserControls\TimersPanel2.xaml.cs" />
 		<Compile Remove="UserControls\Toast.xaml.cs" />
 		<Compile Remove="ViewModels\BadgeExtensions.cs" />
 	</ItemGroup>
@@ -56,6 +57,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Page Remove="UserControls\TimersPanel2.xaml" />
 	  <Page Remove="UserControls\Toast.xaml" />
 	</ItemGroup>
 

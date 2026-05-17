@@ -196,7 +196,7 @@ public partial class BridgeTimerControl : UserControl
                                          + Environment.NewLine +
                                          "Pause efter 4. Runde"
                       , MinutesLeft      = 13d
-                      , WarningVisiblity = Visibility.Visible
+                      , WarningVisibility = Visibility.Visible
                     };
 
             Configuration = new Configuration() { StartDate = DateTime.Now };
