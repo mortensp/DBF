@@ -95,7 +95,6 @@ public class ControlViewModel : Screen, IDisposable
                 initWatcher();
                 loadMainClubs();
             }
-
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -263,11 +262,11 @@ public class ControlViewModel : Screen, IDisposable
                                                                           .Where(r => r.Done)
                                                                           .GroupBy(r => r.Section)
                                                                           .SelectMany(
-                                                                                                                                                                                                                                                                                            g =>
-                                                                                                                                                                                                                                                                                            {
-                                                                                                                                                                                                                                                                                                var maxRound = g.Max(x => x.Round);
-                                                                                                                                                                                                                                                                                                return g.Where(x => x.Round == maxRound);
-                                                                                                                                                                                                                                                                                            })
+                                                                                                                                                                                                                                                                                                    g =>
+                                                                                                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                                                                                                        var maxRound = g.Max(x => x.Round);
+                                                                                                                                                                                                                                                                                                        return g.Where(x => x.Round == maxRound);
+                                                                                                                                                                                                                                                                                                    })
                                                                           .ToList();
 
                                     foreach (var timer in Configuration.BridgeTimers
@@ -383,7 +382,6 @@ public class ControlViewModel : Screen, IDisposable
                     //return await Task.FromResult(true);
                 }
             }
-
             catch (Exception ex)
             {
                 Logger.Exception(ex, $"Error when closing the ControlViewModel");
@@ -449,22 +447,10 @@ public class ControlViewModel : Screen, IDisposable
 
         private void showBadge(Action<string> setter, string message, int delayMs = 60000)
         {
-            //System.Media.SystemSounds.Exclamation.Play();
-            //Console.Beep(800, 150); // frekvens, varighed
             var _player = IoC.Get<IAudioService>();
-            _player.Play("Notify");
+            _player.Play(AudioResources.Sound_Notify);
 
             setter(message);
-
-            //_ = Task.Run(async () =>
-            //{
-            //    await Task.Delay(delayMs);
-            //    await Execute.OnUIThreadAsync(() =>
-            //    {
-            //        setter(null);
-            //        return Task.CompletedTask;
-            //    });
-            //});
         }
 
         public void ResetBadges()
@@ -490,7 +476,6 @@ public class ControlViewModel : Screen, IDisposable
                                                        })
                                             .OrderByDescending(pt => pt.Date));
             }
-
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -536,7 +521,6 @@ public class ControlViewModel : Screen, IDisposable
                         buildTeams(teams, grpNo, grp);
                 }
             }
-
             catch (Exception)
             {
                 _lexStrings.Set(ErrorMessage, () => Lex.BC3ReadError);
@@ -552,8 +536,8 @@ public class ControlViewModel : Screen, IDisposable
                 team.EntryNo = i++;
 
             initSubgroups(pairs);
-        Pairs = pairs;
-        Teams = teams;
+            Pairs = pairs;
+            Teams = teams;
             //var pairsView = System.Windows.Data.CollectionViewSource.GetDefaultView(Pairs);
             //using (pairsView.DeferRefresh())
             //{
@@ -568,7 +552,6 @@ public class ControlViewModel : Screen, IDisposable
             //    Teams.Clear();
             //    Teams.AddRange(teams);
             //}
-
             Logger.Info($"Loaded  Playing Section: {_playingTime}");
         }
 
@@ -784,7 +767,6 @@ public class ControlViewModel : Screen, IDisposable
 
                     return mainclub;
                 }
-
                 catch (Exception)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -923,7 +905,6 @@ public class ControlViewModel : Screen, IDisposable
                                 }
                         }
                 }
-
                 catch (Exception ex)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -1115,7 +1096,6 @@ public class ControlViewModel : Screen, IDisposable
                         return (T)serializer.Deserialize(reader);
                     }
                 }
-
                 catch (Exception)
                 {
                     Logger.Info($"{Lex.ErrorDeserializing}: {fullPath}");
@@ -1140,13 +1120,11 @@ public class ControlViewModel : Screen, IDisposable
                         using var sr = new StreamReader(fs, encoding);
                         return sr.ReadToEnd();
                     }
-
                     catch (IOException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
                         delay = Math.Min(1000, delay * 2); // exponential backoff, cap at 1s
                     }
-
                     catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
@@ -1162,12 +1140,12 @@ public class ControlViewModel : Screen, IDisposable
 
         private async Task showProjector()
         {
-            var                    projectorScreen = WpfScreenHelper.Screen.AllScreens
-                                                                           .Where(s => !s.Primary)
-                                                                           .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height)
-                                                                           .FirstOrDefault();
-            ProjectorView          projectorView   = null;
-            
+            var           projectorScreen = WpfScreenHelper.Screen.AllScreens
+                                                                  .Where(s => !s.Primary)
+                                                                  .OrderByDescending(s => s.Bounds.Width * s.Bounds.Height)
+                                                                  .FirstOrDefault();
+            ProjectorView projectorView   = null;
+
             if (projectorScreen is null)
             {
                 //#if (RELEASE || PRODTEST)
@@ -1192,7 +1170,6 @@ public class ControlViewModel : Screen, IDisposable
                     projectorView.Top  = primaryScreen.WorkingArea.Top;
                     projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                 }
-
 #endif
             }
             else
@@ -1255,7 +1232,6 @@ public class ControlViewModel : Screen, IDisposable
                         else
                             initWatcher();
                     }
-
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");

@@ -3,8 +3,9 @@ using System.Collections.Specialized;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Media;
+using DBF.AudioServices;
+using DBF.Converters;
 using DBF.Helpers;
-
 
 namespace DBF.DataModel
 {
@@ -31,7 +32,7 @@ namespace DBF.DataModel
                                , string info = ""
                                , Color? foregroundColor = null
                                , Color? backgroundColor = null
-                               , string sound = null
+                               , SoundDefinition selectedSound = null
                                , int volume = 50
                                , Visibility visibility = Visibility.Visible
                                , string pauseMessage = null
@@ -42,7 +43,7 @@ namespace DBF.DataModel
             {
                 Groups            = groups;
                 Info              = info;
-                Sound             = sound;
+                SelectedSound     = selectedSound;
                 Volume            = volume;
                 BackgroundColor   = backgroundColor;
                 ForegroundColor   = foregroundColor;
@@ -51,9 +52,9 @@ namespace DBF.DataModel
                 EndGreetingTop    = endGreetingTop;
                 EndGreetingBottom = endGreetingBottom;
                 //StartTime         = startTime;
-                
-      
-            }
+
+         
+        }
         #endregion
 
         public Color? ForegroundColor
@@ -90,10 +91,11 @@ namespace DBF.DataModel
         }
 
         public              List<string>                 GroupList         { get; set; }
-        [JsonIgnore]        public              string                       Info              { get; set; }
+        [JsonIgnore] public string                       Info              { get; set; }
         [JsonIgnore] public Brush                        Foreground        { get; set; }
         [JsonIgnore] public Brush                        Background        { get; set; }
-        public              string                       Sound             { get; set; }
+
+        public              SoundDefinition              SelectedSound     { get; set; }
         public              int                          Volume            { get; set; }
         public              Visibility                   Visibility        { get; set; }
         public              string                       GroupStr          { get => Groups.ToFriendlyString(); }
@@ -142,7 +144,7 @@ namespace DBF.DataModel
 
         public new void Update(Preset preset)
         {
-            Key              = preset.Key       ;
+            Key               = preset.Key;
             CustomPreset      = preset.CustomPreset;
             TeamMatch         = preset.TeamMatch;
             Rounds            = preset.Rounds;
@@ -160,7 +162,7 @@ namespace DBF.DataModel
                 Groups            = tSetting.Groups;
                 Info              = tSetting.Info;
                 Volume            = 0;
-                Sound             = tSetting.Sound;
+                SelectedSound             = tSetting.SelectedSound;
                 Volume            = tSetting.Volume;
                 BackgroundColor   = tSetting.BackgroundColor;
                 ForegroundColor   = tSetting.ForegroundColor;

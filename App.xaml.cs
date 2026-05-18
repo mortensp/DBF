@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using AppArguments;
+using DBF.AudioServices;
 using DBF.Helpers;
 using GitHubTools;
 
@@ -21,10 +22,11 @@ namespace DBF
             Logger.Info($"Application arguments: {Arguments.Values.ToFormattedString()}");
 
             // Initialize LanguageService
-            LanguageService.Instance.Initialize( typeof(Lex)
+            LanguageService.Instance.Initialize(typeof(Lex)
                                                , typeof(Syncfusion_Shared_Wpf)
                                                , typeof(Syncfusion_SfColorPalette_Wpf));
 
+ 
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
 

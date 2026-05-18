@@ -660,4 +660,37 @@
   <data name="Teams_2x16" xml:space="preserve">
     <value>Teams - 32 boards</value>
   </data>
+  <data name="Sound_Boxing" xml:space="preserve">
+    <value>Boxing Bell</value>
+  </data>
+  <data name="Sound_Boxing2" xml:space="preserve">
+    <value>Boxing Bell 2</value>
+  </data>
+  <data name="Sound_DingDing" xml:space="preserve">
+    <value>Ding Ding</value>
+  </data>
+  <data name="Sound_DinnerReady" xml:space="preserve">
+    <value>Dinner is Ready</value>
+  </data>
+  <data name="Sound_HandHeld" xml:space="preserve">
+    <value>Hand Held Bell</value>
+  </data>
+  <data name="Sound_IonBell" xml:space="preserve">
+    <value>Ion Bell</value>
+  </data>
+  <data name="Sound_MechanicalBell" xml:space="preserve">
+    <value>Mechanical Bell</value>
+  </data>
+  <data name="Sound_Notify" xml:space="preserve">
+    <value>Notify</value>
+  </data>
+  <data name="Sound_School" xml:space="preserve">
+    <value>School</value>
+  </data>
+  <data name="Sound_School2" xml:space="preserve">
+    <value>School 2</value>
+  </data>
+  <data name="Sound_Bowl" xml:space="preserve">
+    <value>Bowl</value>
+  </data>
 </root>

@@ -63,99 +63,99 @@ namespace DBF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Bokse {
+        internal static System.IO.UnmanagedMemoryStream Sound_Bowl {
             get {
-                return ResourceManager.GetStream("Bokse", resourceCulture);
+                return ResourceManager.GetStream("Sound_Bowl", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Bokse_2 {
+        internal static System.IO.UnmanagedMemoryStream Sound_Boxing {
             get {
-                return ResourceManager.GetStream("Bokse 2", resourceCulture);
+                return ResourceManager.GetStream("Sound_Boxing", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Bowl {
+        internal static System.IO.UnmanagedMemoryStream Sound_Boxing_2 {
             get {
-                return ResourceManager.GetStream("Bowl", resourceCulture);
+                return ResourceManager.GetStream("Sound_Boxing\'2", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Ding_Ding {
+        internal static System.IO.UnmanagedMemoryStream Sound_DingDing {
             get {
-                return ResourceManager.GetStream("Ding Ding", resourceCulture);
+                return ResourceManager.GetStream("Sound_DingDing", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Håndholdt {
+        internal static System.IO.UnmanagedMemoryStream Sound_DinnerReady {
             get {
-                return ResourceManager.GetStream("Håndholdt", resourceCulture);
+                return ResourceManager.GetStream("Sound_DinnerReady", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Jern_Klokke {
+        internal static System.IO.UnmanagedMemoryStream Sound_HandHeld {
             get {
-                return ResourceManager.GetStream("Jern Klokke", resourceCulture);
+                return ResourceManager.GetStream("Sound_HandHeld", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Maden_er_færdig {
+        internal static System.IO.UnmanagedMemoryStream Sound_IonBell {
             get {
-                return ResourceManager.GetStream("Maden er færdig", resourceCulture);
+                return ResourceManager.GetStream("Sound_IonBell", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Mekanisk_klokke {
+        internal static System.IO.UnmanagedMemoryStream Sound_MechanicalBell {
             get {
-                return ResourceManager.GetStream("Mekanisk klokke", resourceCulture);
+                return ResourceManager.GetStream("Sound_MechanicalBell", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Notify {
+        internal static System.IO.UnmanagedMemoryStream Sound_Notify {
             get {
-                return ResourceManager.GetStream("Notify", resourceCulture);
+                return ResourceManager.GetStream("Sound_Notify", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Skole {
+        internal static System.IO.UnmanagedMemoryStream Sound_School {
             get {
-                return ResourceManager.GetStream("Skole", resourceCulture);
+                return ResourceManager.GetStream("Sound_School", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Skole_2 {
+        internal static System.IO.UnmanagedMemoryStream Sound_School2 {
             get {
-                return ResourceManager.GetStream("Skole 2", resourceCulture);
+                return ResourceManager.GetStream("Sound_School2", resourceCulture);
             }
         }
     }

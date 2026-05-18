@@ -1411,6 +1411,105 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bowl.
+        /// </summary>
+        internal static string Sound_Bowl {
+            get {
+                return ResourceManager.GetString("Sound_Bowl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Boxing Bell.
+        /// </summary>
+        internal static string Sound_Boxing {
+            get {
+                return ResourceManager.GetString("Sound_Boxing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Boxing Bell 2.
+        /// </summary>
+        internal static string Sound_Boxing2 {
+            get {
+                return ResourceManager.GetString("Sound_Boxing2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ding Ding.
+        /// </summary>
+        internal static string Sound_DingDing {
+            get {
+                return ResourceManager.GetString("Sound_DingDing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dinner is Ready.
+        /// </summary>
+        internal static string Sound_DinnerReady {
+            get {
+                return ResourceManager.GetString("Sound_DinnerReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hand Held Bell.
+        /// </summary>
+        internal static string Sound_HandHeld {
+            get {
+                return ResourceManager.GetString("Sound_HandHeld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ion Bell.
+        /// </summary>
+        internal static string Sound_IonBell {
+            get {
+                return ResourceManager.GetString("Sound_IonBell", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mechanical Bell.
+        /// </summary>
+        internal static string Sound_MechanicalBell {
+            get {
+                return ResourceManager.GetString("Sound_MechanicalBell", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notify.
+        /// </summary>
+        internal static string Sound_Notify {
+            get {
+                return ResourceManager.GetString("Sound_Notify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to School.
+        /// </summary>
+        internal static string Sound_School {
+            get {
+                return ResourceManager.GetString("Sound_School", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to School 2.
+        /// </summary>
+        internal static string Sound_School2 {
+            get {
+                return ResourceManager.GetString("Sound_School2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Startlist.
         /// </summary>
         internal static string Startlist {

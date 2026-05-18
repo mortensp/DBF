@@ -476,7 +476,6 @@ namespace DBF.DataModel
                                 if (state.TimerStates[i].IsStarted)
                                     BridgeTimers[i].Restore(state.TimerStates[i]);
                         }
-
                         catch (Exception ex)
                         {
                             Logger.Exception(ex, "Unable to restore state");
@@ -669,13 +668,14 @@ namespace DBF.DataModel
                             timer.Update(Presets[i]);
                             timer.Visibility = System.Windows.Visibility.Collapsed;
                         }
-                                   
+
                     if (timer.BreakAfterRound == 0
                     ||  timer.BreakMinutes    == 0)
                         timer.BreakAfterRound = timer.BreakMinutes = 0;
 
-                    if (string.IsNullOrEmpty(timer.Sound))
-                        timer.Sound = AudioResources.Sounds[i];
+                    timer.SelectedSound = AudioResources.SoundDefinitions
+                                                        .FirstOrDefault(s => s.DisplayName == timer.SelectedSound.DisplayName)
+                                       ?? AudioResources.SoundDefinitions[i];
 
                     BridgeTimers.Add(timer);
 
@@ -694,7 +694,7 @@ namespace DBF.DataModel
                     timer.BackgroundColor = BackgroundColors[i].Color;
                     timer.Groups          = (GroupFlags)(1 << i); // Set group to A, B, C or D
                     timer.Visibility      = Visibility.Collapsed;
-                    timer.Sound           = AudioResources.Sounds[i];
+                    timer.SelectedSound   = AudioResources.SoundDefinitions[i];
 
                     BridgeTimers.Add(timer);
 
@@ -760,6 +760,7 @@ namespace DBF.DataModel
                         psi.FileName = "notepad++.exe";
                         Process.Start(psi);
                     }
+
                     catch
                     {
                         psi.FileName = "notepad.exe";

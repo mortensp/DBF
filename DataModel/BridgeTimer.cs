@@ -222,9 +222,8 @@ namespace DBF.DataModel
                         &&  _remainingTime == _startTime
                         && !_isAtBreak
                         && !_isAtTransition)
-                            _player.Play("Ding Ding", Volume);  // Start next round
+                            _player.Play(AudioResources.Sound_DingDing, Volume);  // Start next round
 
-                        //_player.Play(Sound, Volume);    // End of round
                         _timer.Start();
                     }
                 }
@@ -456,19 +455,19 @@ namespace DBF.DataModel
                     &&  _warningTime == _remainingTime
                     &&  _warningTime >  TimeSpan.Zero
                     &&  _warningTime <  _startTime)
-                        _player.Play(Sound, Volume);                            // Warning before end of round
+                        _player.Play(SelectedSound, Volume);                            // Warning before end of round
                     else
                         if (_isAtBreak
                         &&  _startTime     >  _twoMinutes
                         &&  _remainingTime == _twoMinutes)
-                            _player.Play(Sound, Volume);                        // Warning two minutes before end of Break
+                            _player.Play(SelectedSound, Volume);                        // Warning two minutes before end of Break
                         else
                             if (_remainingTime <= TimeSpan.Zero)
                                 if (!_isAtBreak
                                 &&  Round           == BreakAfterRound
                                 &&  BreakAfterRound >  0)
                                 {
-                                    _player.Play("Ding Ding", Volume);          // Break
+                                    _player.Play(AudioResources.Sound_DingDing, Volume);          // Break
                                     _remainingTime  = _breakTime;
                                     _isAtTransition = false;
                                     _isAtBreak      = true;
@@ -476,7 +475,7 @@ namespace DBF.DataModel
                                 else
                                     if (Round >= Rounds)
                                     {
-                                        _player.Play(Sound, Volume);            // End of game                                        
+                                        _player.Play(SelectedSound, Volume);            // End of game                                        
                                         _timer.Stop();
                                         Round = Rounds + 1;
                                     }
@@ -484,7 +483,7 @@ namespace DBF.DataModel
                                         if (_isAtTransition
                                         ||  _isAtBreak)
                                         {
-                                            _player.Play("Ding Ding", Volume);  // Start next round
+                                            _player.Play(AudioResources.Sound_DingDing, Volume);  // Start next round
                                             _remainingTime  = _startTime;
                                             _isAtTransition = false;
                                             _isAtBreak      = false;
@@ -493,13 +492,13 @@ namespace DBF.DataModel
                                         else
                                             if (_transitionTime >  TimeSpan.Zero)
                                             {
-                                                _player.Play(Sound, Volume);    // FinishRound
+                                                _player.Play(SelectedSound, Volume);    // FinishRound
                                                 _isAtTransition = true;
                                                 _remainingTime  = _transitionTime;
                                             }
                                             else
                                             {
-                                                _player.Play(Sound, Volume);    // End of round
+                                                _player.Play(SelectedSound, Volume);    // End of round
                                                 _remainingTime = _startTime;
                                                 IncremetRound();
                                             }

@@ -184,9 +184,10 @@
                             <ComboBox
                                 Width="120"
                                 Margin="0,5"
+                                DisplayMemberPath="DisplayName"
                                 cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]"
-                                ItemsSource="{x:Static audio:AudioResources.Sounds}"
-                                SelectedItem="{Binding Sound}" />
+                                ItemsSource="{x:Static audio:AudioResources.SoundDefinitions}"
+                                SelectedItem="{Binding SelectedSound}" />
 
                             <Slider
                                 x:Name="volume"

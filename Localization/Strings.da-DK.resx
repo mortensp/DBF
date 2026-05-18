@@ -636,6 +636,9 @@
   <data name="Blue" xml:space="preserve">
     <value>Grøn</value>
   </data>
+  <data name="Green" xml:space="preserve">
+    <value>Grøn</value>
+  </data>
   <data name="White" xml:space="preserve">
     <value>Hvid</value>
   </data>
@@ -656,5 +659,38 @@
   </data>
   <data name="Teams_2x16" xml:space="preserve">
     <value>Hold - 32 spil</value>
+  </data>
+  <data name="Sound_Boxing" xml:space="preserve">
+    <value>Boksning</value>
+  </data>
+  <data name="Sound_Boxing2" xml:space="preserve">
+    <value>Boksning 2</value>
+  </data>
+  <data name="Sound_DingDing" xml:space="preserve">
+    <value>Ding Ding</value>
+  </data>
+  <data name="Sound_DinnerReady" xml:space="preserve">
+    <value>Maden er færdig</value>
+  </data>
+  <data name="Sound_HandHeld" xml:space="preserve">
+    <value>Håndholdt klokke</value>
+  </data>
+  <data name="Sound_IonBell" xml:space="preserve">
+    <value>Jern klokke</value>
+  </data>
+  <data name="Sound_MechanicalBell" xml:space="preserve">
+    <value>Mekanisk klokke</value>
+  </data>
+  <data name="Sound_Notify" xml:space="preserve">
+    <value>Notifikation</value>
+  </data>
+  <data name="Sound_School" xml:space="preserve">
+    <value>Skole</value>
+  </data>
+  <data name="Sound_School2" xml:space="preserve">
+    <value>Skole 2</value>
+  </data>
+  <data name="Sound_Bowl" xml:space="preserve">
+    <value>Glas skål</value>
   </data>
 </root>

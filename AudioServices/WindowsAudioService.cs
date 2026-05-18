@@ -38,6 +38,10 @@ namespace DBF.AudioServices
 
         public void Play(string sound) => Play(sound, 50);
 
+        public void Play(SoundDefinition sound) => Play(sound.Key, 50);
+
+        public void Play(SoundDefinition sound, int volume) => Play(sound.Key, volume);
+
         public void Play(string soundName, int volume)
         {
             try
@@ -90,9 +94,10 @@ namespace DBF.AudioServices
                 Volume = volume;
                 _player.Play(filePath);
             }
+
             catch (Exception ex)
             {
-                Logger.Exception(ex,$"{Lex.ErrorPlayingSound}:'{soundName}'");
+                Logger.Exception(ex, $"{Lex.ErrorPlayingSound}:'{soundName}'");
                 return;
             }
         }

@@ -118,37 +118,37 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Bokse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_Boxing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\boxing-bell.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Bokse 2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_Boxing'2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\start-boxing-bell.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Bowl" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_Bowl" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\bowl_bell.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Ding Ding" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_DingDing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\Ding Ding.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Håndholdt" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_HandHeld" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\start-bell.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Jern Klokke" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_IonBell" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\iron_bell3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Maden er færdig" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_DinnerReady" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\mixkit-notification-bell.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Mekanisk klokke" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_MechanicalBell" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\Mechanical Bell.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Notify" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_Notify" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\Notify.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Skole" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_School" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\bell-ringing.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Skole 2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_School2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\school-bell.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

@@ -206,12 +206,12 @@ public class TimerSettingsViewModel : Screen
             double newValue = e.NewValue;
 
             if (!onOpen)
-                _player.Play(NewSetting.Sound, (int)newValue);
+                _player.Play(NewSetting.SelectedSound, (int)newValue);
         }
 
         public void SoundChanged()
         {
-            _player.Play(NewSetting.Sound, (int)NewSetting.Volume);
+            _player.Play(NewSetting.SelectedSound, (int)NewSetting.Volume);
         }
     #endregion
 

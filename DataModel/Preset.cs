@@ -75,7 +75,7 @@ namespace DBF.DataModel
 
         // Display name — translated dynamically based on CurrentCulture
         [JsonIgnore]
-        public string Name =>  LanguageService.Translate(typeof(Lex), Key);
+        public string Name =>  LanguageService.GetTranslationFor(typeof(Lex), Key);
 
         public bool CustomPreset
         {

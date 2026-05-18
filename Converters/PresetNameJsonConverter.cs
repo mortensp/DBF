@@ -22,7 +22,7 @@ namespace DBF.Converters
                 return jsonValue;
 
             // Try to map from translated text to resource key
-            var resourceKey = ResolveKeyFromTranslatedValue(jsonValue);
+            var resourceKey = LanguageService.GetKeyForTranslation(typeof(Lex), jsonValue);
             return resourceKey ?? jsonValue;
         }
 
@@ -30,47 +30,6 @@ namespace DBF.Converters
         {
             // Write the resource key directly (not the translated text)
             writer.WriteStringValue(value);
-        }
-
-        private static string ResolveKeyFromTranslatedValue(string translatedValue)
-        {
-            if (string.IsNullOrEmpty(translatedValue))
-                return null;
-
-            var rmProp = typeof(Lex).GetProperty("ResourceManager", BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (rmProp == null)
-                return null;
-
-            try
-            {
-                var rm = (ResourceManager)rmProp.GetValue(null);
-
-                // Search for all available cultures
-                var cultures = LanguageService.Instance?.GetAvailableCultures()
-                            ?? CultureInfo.GetCultures(CultureTypes.SpecificCultures);
-
-                foreach (var culture in cultures)
-                    try
-                    {
-                        var rs = rm.GetResourceSet(culture, true, false);
-
-                        if (rs == null)
-                            continue;
-
-                        foreach (DictionaryEntry entry in rs)
-                        {
-                            if (entry.Value is string s && string.Equals(s, translatedValue, StringComparison.Ordinal))
-                                return entry.Key as string;
-                        }
-                    }
-
-                    catch { }
-            }
-
-            catch { }
-
-            return null;
         }
     }
 }
