@@ -1,5 +1,6 @@
 ﻿global using System;
 global using System.Text;
+global using System.Diagnostics;
 global using DBF.Localization;
 global using Lex = DBF.Localization.Strings;
 

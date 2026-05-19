@@ -68,23 +68,28 @@ namespace DBF.DataModel
                 &&  name.Contains(" " + curBlue, StringComparison.OrdinalIgnoreCase))
                     return "C";
 
-                  // Fallback: check all localized translations for each key
-                foreach (var kv in LanguageService.GetTranslationsFor(() => Lex.Red))
+                // Fallback: check all localized translations for each key
+                foreach (var kv in LanguageService.GetTranslations(() => Lex.Red))
                     if (!string.IsNullOrEmpty(kv.Value) && name.Contains(" " + kv.Value, StringComparison.OrdinalIgnoreCase))
                         return "A";
 
-                foreach (var kv in LanguageService.GetTranslationsFor(() => Lex.Yellow))
+                foreach (var kv in LanguageService.GetTranslations(() => Lex.Yellow))
                     if (!string.IsNullOrEmpty(kv.Value) && name.Contains(" " + kv.Value, StringComparison.OrdinalIgnoreCase))
                         return "B";
 
-                foreach (var kv in LanguageService.GetTranslationsFor(() => Lex.Blue))
+                foreach (var kv in LanguageService.GetTranslations(() => Lex.Blue))
                     if (!string.IsNullOrEmpty(kv.Value) && name.Contains(" " + kv.Value, StringComparison.OrdinalIgnoreCase))
                         return "C";
 
                 // Last-resort: literal Danish names (keeps compatibility)
-                if (name.Contains("Rød", StringComparison.OrdinalIgnoreCase)) return "A";
-                if (name.Contains("Gul", StringComparison.OrdinalIgnoreCase)) return "B";
-                if (name.Contains("Blå", StringComparison.OrdinalIgnoreCase)) return "C";
+                if (name.Contains("Rød", StringComparison.OrdinalIgnoreCase))
+                    return "A";
+
+                if (name.Contains("Gul", StringComparison.OrdinalIgnoreCase))
+                    return "B";
+
+                if (name.Contains("Blå", StringComparison.OrdinalIgnoreCase))
+                    return "C";
 
                 return " ";
             }

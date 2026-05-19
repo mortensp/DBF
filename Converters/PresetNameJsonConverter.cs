@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Globalization;
-using System.Reflection;
-using System.Resources;
+﻿using DBF.Helpers;
+
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using String.Localization;
 
 namespace DBF.Converters
 {
@@ -22,7 +19,7 @@ namespace DBF.Converters
                 return jsonValue;
 
             // Try to map from translated text to resource key
-            var resourceKey = LanguageService.GetKeyForTranslation(typeof(Lex), jsonValue);
+            var resourceKey = jsonValue.GetKeyForTranslation();
             return resourceKey ?? jsonValue;
         }
 

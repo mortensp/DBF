@@ -121,7 +121,7 @@
   <data name="Sound_Boxing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\boxing-bell.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Sound_Boxing'2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Sound_Boxing2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\AudioFiles\start-boxing-bell.mp3;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Sound_Bowl" type="System.Resources.ResXFileRef, System.Windows.Forms">

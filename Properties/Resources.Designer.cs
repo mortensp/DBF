@@ -81,9 +81,9 @@ namespace DBF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream Sound_Boxing_2 {
+        internal static System.IO.UnmanagedMemoryStream Sound_Boxing2 {
             get {
-                return ResourceManager.GetStream("Sound_Boxing\'2", resourceCulture);
+                return ResourceManager.GetStream("Sound_Boxing2", resourceCulture);
             }
         }
         

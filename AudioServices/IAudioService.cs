@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DBF.DataModel;
 
 namespace DBF.AudioServices;
 
 public interface IAudioService
 {
-    void Play(string path);
+    //void Play(string path);
     void Play(SoundDefinition sound);
 
-    void Play(string path, int volume);
+    //void Play(string path, int volume);
 
-    void Play(SoundDefinition  sound, int volume);
+    void Play(SoundDefinition sound, int volume);
 
     void Pause();
 
@@ -24,5 +20,5 @@ public interface IAudioService
 
     bool IsPlaying { get; }
 
-    int  Volume    { get; set; }
+    int Volume { get; set; }
 }
