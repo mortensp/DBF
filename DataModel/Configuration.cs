@@ -49,6 +49,7 @@ namespace DBF.DataModel
         static Configuration()
         {
             _serializerOptions.Converters.Add(new PresetCollectionConverter());
+            _serializerOptions.Converters.Add(new SoundDefinitionConverter());
 
             // Make sure that Roaming folder exists
             var configDir = Path.GetDirectoryName(_path);

@@ -29,6 +29,11 @@ namespace DBF.AudioServices
                     _entries.Add(new SoundDefinition(entry));
         }
 
+        // Parameterless constructor for JSON deserialization
+        public SoundDefinition()
+        {
+        }
+
         // Public constructor for User Instantiation  based on displayName
         public SoundDefinition(string displayName)
         {
