@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using DBF.AudioServices;
 
-namespace DBF.AudioServices
+namespace DBF.Converters
 {
     public class SoundDefinitionConverter : JsonConverter<SoundDefinition>
     {

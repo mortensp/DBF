@@ -33,7 +33,7 @@ public static class AudioResources
           , Sound_HandHeld
           , Sound_IonBell
           , Sound_MechanicalBell
-          , Sound_Notify
+          //, Sound_Notify
           , Sound_School
           , Sound_School2
         };

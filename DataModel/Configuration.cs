@@ -4,6 +4,7 @@ using AppArguments;
 using Caliburn.Micro;
 
 using DBF.AudioServices;
+using DBF.Converters;
 using DBF.Helpers;
 using DBF.ViewModels;
 

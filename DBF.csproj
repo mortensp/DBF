@@ -35,6 +35,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="AudioServices\SoundResource.cs" />
 		<Compile Remove="BridgeMateModel\BiddingData.cs" />
 		<Compile Remove="BridgeMateModel\HandEvaluation.cs" />
 		<Compile Remove="BridgeMateModel\HandRecord.cs" />
