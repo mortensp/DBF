@@ -5,6 +5,7 @@ using System.Windows;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
+using DBF.Views;
 
 namespace DBF.UserControls;
 
@@ -79,10 +80,10 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
                                                               , typeof(bool)
                                                               , typeof(TimersPanel)
                                                               , new PropertyMetadata(false,onTimersCanBeAddedChanged ));
-    #endregion
+        #endregion
 
-    #region Dependency Property Orientation
-    public Orientation Orientation
+        #region Dependency Property Orientation
+            public Orientation Orientation
             {
                 get => (Orientation)GetValue(OrientationProperty);
                 set => SetValue(OrientationProperty, value);
@@ -97,13 +98,13 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
     #endregion
 
     #region Private Methods
-
-    private static void onTimersCanBeAddedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is TimersPanel ctl)
+        private static void onTimersCanBeAddedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            if (d is TimersPanel ctl)
+            {
+            }
         }
-    }
+
         private void onCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             UpdateBridgeTimers();
@@ -114,7 +115,6 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
         //    if (e.PropertyName == nameof(Visibility))
         //        UpdateBridgeTimers();
         //}
-
         private static void onBridgeTimersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TimersPanel ctl)
@@ -158,6 +158,17 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
                 Configuration = new Configuration { StartDate = DateTime.Now };
                 _             = Configuration.LoadAsync();
             }
+
+            var parent = VisualTreeHelper.GetParent(this);
+
+            while (parent is not null
+               &&  parent is not Window)
+                parent = VisualTreeHelper.GetParent(parent);
+
+            // Overwrite the default visibility of buttons if the parent is ProjectorView, as it doesn't need them.
+            ButtonsVisibility = parent?.GetType().Name == "ProjectorView"
+                              ? Visibility.Collapsed
+                              : Visibility.Visible;
         }
     #endregion
 }

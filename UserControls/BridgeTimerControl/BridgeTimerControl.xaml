@@ -68,11 +68,19 @@
                 <!--  BridgeTimer Display in row 0  -->
                 <Border Grid.Row="0"
                     Padding="0"
+                      
                     CornerRadius="6">
                     <Grid
                         Name="display"
                         Background="{Binding BridgeTimer.Background}"
                         TextBlock.FontSize="20">
+
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{Binding BridgeTimer.Foreground}" />
+                            </Style>
+                        </Grid.Resources>
+                        
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50" />
                             <ColumnDefinition Width="*" />

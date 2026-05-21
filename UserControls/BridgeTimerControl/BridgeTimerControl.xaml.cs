@@ -60,8 +60,8 @@ public partial class BridgeTimerControl : UserControl
 
             private void UpdateText(BridgeTimer timer)
             {
-                foreach (var elm in this.display.Children.OfType<TextBlock>())
-                    elm.Foreground = timer.Foreground;
+                //foreach (var elm in this.display.Children.OfType<TextBlock>())
+                //    elm.Foreground = timer.Foreground;
             }
         #endregion
 
@@ -177,7 +177,7 @@ public partial class BridgeTimerControl : UserControl
         private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(BridgeTimer);
 
         private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(BridgeTimer);
-    #endregion
+    
 
     private void ControlLoaded(object sender, RoutedEventArgs e)
     {
@@ -202,4 +202,5 @@ public partial class BridgeTimerControl : UserControl
             Configuration = new Configuration() { StartDate = DateTime.Now };
         }
     }
+#endregion
 }

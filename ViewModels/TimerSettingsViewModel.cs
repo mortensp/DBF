@@ -1,14 +1,12 @@
-﻿using Caliburn.Micro;
-
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.DataModel;
 using DBF.Helpers;
-
+using Microsoft.DotNet.DesignTools.Protocol.Values;
 using Syncfusion.Windows.Tools.Controls;
-
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
 
 namespace DBF.ViewModels;
 
@@ -26,7 +24,7 @@ public class TimerSettingsViewModel : Screen
     public TimerSettingsViewModel(Configuration configuration)
     {
         Configuration = configuration;
-        NewColorCollection = new ObservableCollection<CustomColor>(Configuration.BackgroundColors);
+        NewColorCollection = new ObservableCollection<CustomColor>(Configuration.CustomColors);
         NewSetting.PropertyChanged += newSetting_PropertyChanged;
 
         if (Design.IsInDesignMode())
@@ -54,7 +52,7 @@ public class TimerSettingsViewModel : Screen
         _ = Configuration.LoadAsync();
         Setting = Configuration.BridgeTimers.First();
 
-        NewColorCollection = new ObservableCollection<CustomColor>(Configuration.BackgroundColors);
+        NewColorCollection = new ObservableCollection<CustomColor>(Configuration.CustomColors);
         NewSetting.PropertyChanged += newSetting_PropertyChanged;
     }
     #endregion
@@ -227,13 +225,24 @@ public class TimerSettingsViewModel : Screen
 
     private void newSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        // When the duration or the start time of the new setting changes,
-        // notify that EndTime has changed. Also notify StartTime so bindings update.
-        if (e.PropertyName == nameof(NewSetting.Duration))
+        if (sender is TimerSetting setting)
         {
-            //NotifyOfPropertyChange(nameof(StartTime));
-            NotifyOfPropertyChange(nameof(EndTime));
+            if (e.PropertyName == nameof(NewSetting.Background))
+            {
+                setting.ForegroundColor =setting.BackgroundColor.GetBestForegroundColor();
+            }
+
+
+            // When the duration or the start time of the new setting changes,
+            // notify that EndTime has changed. Also notify StartTime so bindings update.
+            if (e.PropertyName == nameof(NewSetting.Duration))
+            {
+                //NotifyOfPropertyChange(nameof(StartTime));
+                NotifyOfPropertyChange(nameof(EndTime));
+            }
         }
+
+
     }
     #endregion
 

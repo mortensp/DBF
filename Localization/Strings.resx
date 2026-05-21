@@ -223,7 +223,7 @@
     <value>Help</value>
   </data>
   <data name="mnuBridgeTimers" xml:space="preserve">
-    <value>Bridge Timers</value>
+    <value>Guide</value>
   </data>
   <data name="mnuChangeProgramVersion" xml:space="preserve">
     <value>Change Program Version</value>
@@ -606,21 +606,6 @@
   <data name="btnSave" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="BackgroundColor_White" xml:space="preserve">
-    <value>White</value>
-  </data>
-  <data name="BackgroundColor_Red" xml:space="preserve">
-    <value>Red</value>
-  </data>
-  <data name="BackgroundColor_Blue" xml:space="preserve">
-    <value>Blue</value>
-  </data>
-  <data name="BackgroundColor_Orange" xml:space="preserve">
-    <value>Orange</value>
-  </data>
-  <data name="BackgroundColor_Green" xml:space="preserve">
-    <value>Green</value>
-  </data>
   <data name="FavoriteColers" xml:space="preserve">
     <value>Favorite Colors</value>
   </data>
@@ -692,5 +677,23 @@
   </data>
   <data name="Sound_Bowl" xml:space="preserve">
     <value>Bowl</value>
+  </data>
+  <data name="Color_White" xml:space="preserve">
+    <value>White</value>
+  </data>
+  <data name="Color_Red" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="Color_Blue" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="Color_Orange" xml:space="preserve">
+    <value>Orange</value>
+  </data>
+  <data name="Color_Green" xml:space="preserve">
+    <value>Green</value>
+  </data>
+  <data name="Color_Black" xml:space="preserve">
+    <value>Black</value>
   </data>
 </root>

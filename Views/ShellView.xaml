@@ -20,7 +20,7 @@
     mc:Ignorable="d">
 
     <Window.Resources>
-        <Style TargetType="MenuItem" x:Key="OrphanMenuItemStyle">
+        <Style x:Key="OrphanMenuItemStyle" TargetType="MenuItem">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
@@ -35,10 +35,10 @@
         <DockPanel Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
             <MenuItem
                 Name="mnuTest"
-                Style="{StaticResource OrphanMenuItemStyle}"
                 cal:Message.Attach="[Event Click] = [Action Test]"
                 DockPanel.Dock="Right"
                 Header="Break"
+                Style="{StaticResource OrphanMenuItemStyle}"
                 Visibility="Collapsed" />
 
             <Menu>
@@ -53,7 +53,7 @@
 
                 <MenuItem Header="{lex:Loc mnuHelp}">
                     <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuBridgeTimers}" />
-                    <MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />
+                    <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />-->
                     <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}" />
                     <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="{lex:Loc mnuOpenJsonSettings}" />
                     <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}" />

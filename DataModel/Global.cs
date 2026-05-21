@@ -8,20 +8,23 @@ namespace DBF.DataModel;
 
 public static class Global
 {
-    public static readonly CultureInfo             UsCulture = new("en-US");
-    public static readonly CultureInfo             DkCulture = new("da-DK");
-//    public static          Localization.LexStrings LexStrings;
+    public static readonly CultureInfo UsCulture = new("en-US");
+    public static readonly CultureInfo DkCulture = new("da-DK");
 
-        public static ObservableCollection<CustomColor> GetBackgroundColors()
+    public static ObservableCollection<CustomColor> GetStandardColors()
     {
         return new()
         {
-            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = Lex.BackgroundColor_White },
-            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = Lex.BackgroundColor_Red },
-            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = Lex.BackgroundColor_Blue },
-            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = Lex.BackgroundColor_Orange },
-            new CustomColor() { Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = Lex.BackgroundColor_Green }
-        };
+              new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FFFFFF"),   ColorName = Lex.Color_White }
+            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#F2460D"),   ColorName = Lex.Color_Red }
+            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF66CCFF"), ColorName = Lex.Color_Blue }
+            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#FF9D00"),   ColorName = Lex.Color_Orange }
+            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#81C784"),   ColorName = Lex.Color_Green }
+            , new CustomColor() {Color = (Color)ColorConverter.ConvertFromString("#000000"),   ColorName = Lex.Color_Black }
+  
+            };
     }
+
+
 }
 

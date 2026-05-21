@@ -106,51 +106,6 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Blue.
-        /// </summary>
-        internal static string BackgroundColor_Blue {
-            get {
-                return ResourceManager.GetString("BackgroundColor_Blue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Green.
-        /// </summary>
-        internal static string BackgroundColor_Green {
-            get {
-                return ResourceManager.GetString("BackgroundColor_Green", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Orange.
-        /// </summary>
-        internal static string BackgroundColor_Orange {
-            get {
-                return ResourceManager.GetString("BackgroundColor_Orange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Red.
-        /// </summary>
-        internal static string BackgroundColor_Red {
-            get {
-                return ResourceManager.GetString("BackgroundColor_Red", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to White.
-        /// </summary>
-        internal static string BackgroundColor_White {
-            get {
-                return ResourceManager.GetString("BackgroundColor_White", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to BC3 data.
         /// </summary>
         internal static string BC3Data {
@@ -372,6 +327,60 @@ namespace DBF.Localization {
         internal static string Club {
             get {
                 return ResourceManager.GetString("Club", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Black.
+        /// </summary>
+        internal static string Color_Black {
+            get {
+                return ResourceManager.GetString("Color_Black", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        internal static string Color_Blue {
+            get {
+                return ResourceManager.GetString("Color_Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        internal static string Color_Green {
+            get {
+                return ResourceManager.GetString("Color_Green", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Orange.
+        /// </summary>
+        internal static string Color_Orange {
+            get {
+                return ResourceManager.GetString("Color_Orange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        internal static string Color_Red {
+            get {
+                return ResourceManager.GetString("Color_Red", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White.
+        /// </summary>
+        internal static string Color_White {
+            get {
+                return ResourceManager.GetString("Color_White", resourceCulture);
             }
         }
         
@@ -1033,7 +1042,7 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bridge Timers.
+        ///   Looks up a localized string similar to Guide.
         /// </summary>
         internal static string mnuBridgeTimers {
             get {

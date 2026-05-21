@@ -223,7 +223,7 @@
     <value>Hjælp</value>
   </data>
   <data name="mnuBridgeTimers" xml:space="preserve">
-    <value>Bridge Ure</value>
+    <value>Vejledning</value>
   </data>
   <data name="mnuChangeProgramVersion" xml:space="preserve">
     <value>_Skift Program Version</value>
@@ -606,21 +606,6 @@
   <data name="btnSave" xml:space="preserve">
     <value>Gem</value>
   </data>
-  <data name="BackgroundColor_White" xml:space="preserve">
-    <value>Hvid</value>
-  </data>
-  <data name="BackgroundColor_Red" xml:space="preserve">
-    <value>Rød</value>
-  </data>
-  <data name="BackgroundColor_Blue" xml:space="preserve">
-    <value>Blå</value>
-  </data>
-  <data name="BackgroundColor_Orange" xml:space="preserve">
-    <value>Orange</value>
-  </data>
-  <data name="BackgroundColor_Green" xml:space="preserve">
-    <value>Grøn</value>
-  </data>
   <data name="FavoriteColers" xml:space="preserve">
     <value>Udvalgte Farver</value>
   </data>
@@ -692,5 +677,23 @@
   </data>
   <data name="Sound_Bowl" xml:space="preserve">
     <value>Glas skål</value>
+  </data>
+  <data name="Color_White" xml:space="preserve">
+    <value>Hvid</value>
+  </data>
+  <data name="Color_Red" xml:space="preserve">
+    <value>Rød</value>
+  </data>
+  <data name="Color_Blue" xml:space="preserve">
+    <value>Blå</value>
+  </data>
+  <data name="Color_Orange" xml:space="preserve">
+    <value>Orange</value>
+  </data>
+  <data name="Color_Green" xml:space="preserve">
+    <value>Grøn</value>
+  </data>
+  <data name="Color_Black" xml:space="preserve">
+    <value>Sort</value>
   </data>
 </root>

@@ -118,5 +118,16 @@ public static class ExtentionMethods
             return string.Empty;
         }
     }
+
+        //public static Color GetContrastingColor(this Color bgColor)
+        //{
+        //    // Beregn luminans (per W3C standard)
+        //    double luminance = (0.299 * bgColor.R + 0.587 * bgColor.G + 0.114 * bgColor.B) / 255;
+
+        //    // Hvis baggrunden er lys, brug sort tekst – ellers hvid
+        //    return luminance >  0.5 ? Colors.Black : Colors.White;
+        //}
+
+
 }
 
