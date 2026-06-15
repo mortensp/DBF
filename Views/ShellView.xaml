@@ -5,27 +5,24 @@
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:help="clr-namespace:DBF.HelpSystem"
     xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
+    x:Name="root"
     Title="DBF Tools"
     cal:Message.Attach="[Event KeyDown] = [OnKeyDown($eventArgs)]"
     d:Height="800"
     d:Width="1100"
+    help:Help.Key="AppSettings"
     lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     FontSize="14"
-    x:Name="root"
     WindowState="Normal"
     mc:Ignorable="d">
 
-    <!--<Window.InputBindings>
-        <KeyBinding Key="F11" Command="{Binding ToggleFullscreenCommand}" />
-        <KeyBinding Key="Escape" Command="{Binding ToggleFullscreenCommand}" />
-    </Window.InputBindings>-->
-    
     <Window.Resources>
         <Style x:Key="OrphanMenuItemStyle" TargetType="MenuItem">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -39,8 +36,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel   Visibility="{Binding FullScreenMode}"
-            Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+        <DockPanel Grid.Row="0"
+            Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}"
+            Visibility="{Binding FullScreenMode}">
             <MenuItem
                 Name="mnuTest"
                 cal:Message.Attach="[Event Click] = [Action Test]"
@@ -56,9 +54,10 @@
                     <MenuItem
                         cal:Message.Attach="[Event Click] = [ToggleFullscreen]"
                         Header="{lex:Loc mnuFullscreen}"
-                        InputGestureText="F11, Esc" >
+                        InputGestureText="F11, Esc">
                         <MenuItem.Icon>
-                            <icons:Modern Kind="Fullscreen" />
+                            <!--<icons:Modern Kind="Fullscreen" />-->
+                            <icons:FontAwesome Kind="ExpandSolid" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
@@ -66,17 +65,26 @@
                 <MenuItem Header="{lex:Loc mnuGuide}">
                     <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuGuide}">
                         <MenuItem.Icon>
-                            <icons:Modern Kind="BookHardcoverOpen" />
+                            <!--<icons:Modern Kind="BookHardcoverOpen" />-->
+
+                            <icons:FontAwesome Kind="BookOpenSolid" />
+                            <!--<icons:BootstrapIcons Kind="Book" />-->
+
                         </MenuItem.Icon>
                     </MenuItem>
 
                     <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />-->
                     <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}">
                         <MenuItem.Icon>
-                            <icons:PhosphorIcons
+                            <!--<icons:PhosphorIcons
                                 Width="16"
                                 Height="16"
-                                Kind="ArrowBendDoubleUpLeftFill " />
+                                Kind="ArrowBendDoubleUpLeftFill " />-->
+
+                            <icons:FontAwesome
+                                Width="16"
+                                Height="16"
+                                Kind="ArrowRotateLeftSolid" />
                         </MenuItem.Icon>
                     </MenuItem>
 
@@ -88,13 +96,17 @@
 
                     <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}">
                         <MenuItem.Icon>
-                            <icons:SimpleIcons Kind="Logseq" />
+                            <!--<icons:SimpleIcons Kind="Logseq" />-->
+                            <icons:FontAwesome Kind="ListSolid" />
+
                         </MenuItem.Icon>
                     </MenuItem>
 
                     <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="{lex:Loc mnuAbout}">
                         <MenuItem.Icon>
-                            <icons:PhosphorIcons Kind="Info" />
+                            <!--<icons:PhosphorIcons Kind="Info" />-->
+                            <icons:FontAwesome Kind="InfoSolid" />
+
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
@@ -105,5 +117,5 @@
         <ContentControl x:Name="ActiveItem" Grid.Row="1" />
     </Grid>
 
-  
+
 </Window>

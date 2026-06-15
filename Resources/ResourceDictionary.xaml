@@ -29,7 +29,7 @@
     <conv:VisibilityInvertConverter x:Key="VisibilityInvertConverter" />
     <conv:VisibleEqualsConverter x:Key="VisibleEqualsConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
-
+    <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
     <LinearGradientBrush x:Key="HeaderBrush" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientStop Offset="0.000" Color="#FFFFFFFF" />

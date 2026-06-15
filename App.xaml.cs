@@ -22,15 +22,15 @@ namespace DBF
             Logger.Info($"Application arguments: {Arguments.Values.ToFormattedString()}");
 
             // Initialize LanguageService
-            LanguageService.Instance.Initialize(typeof(Lex)
+            LanguageService.Instance.Initialize( typeof(Lex)
+                                               , typeof(LocHelp)
                                                , typeof(Syncfusion_Shared_Wpf)
                                                , typeof(Syncfusion_SfColorPalette_Wpf));
 
- 
+#if RELEASE
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
 
-#if RELEASE
             if (Arguments.Values.Lookup("mode") == "restart")
             {
                 Logger.Info("Performing a Restart");
@@ -66,7 +66,7 @@ namespace DBF
             private static void showHelp(string msg, bool exitProgram)
             {
                 string helpText = @"
-                                        🔧 DBF Tools Help
+                                            🔧 DBF Tools Help
         ====================
         Usages:
           DBF.exe [mode:MyMode]  

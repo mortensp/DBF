@@ -3,36 +3,36 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace DBF.Converters
+namespace DBF.Converters;
+
+public class HideEmptyCollectionConverter : IValueConverter
 {
-    public class HideEmptyCollectionConverter : IValueConverter
+    public bool Invert { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public bool Invert { get; set; }
+        bool isEmpty = true;
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        if (value is IEnumerable enumerable)
         {
-            bool isEmpty = true;
-
-            if (value is IEnumerable enumerable)
-            {
-                var enumerator = enumerable.GetEnumerator();
-                isEmpty        = !enumerator.MoveNext();
-            }
+            var enumerator = enumerable.GetEnumerator();
+            isEmpty        = !enumerator.MoveNext();
+        }
+        else
+            if (value == null)
+                isEmpty = true;
             else
-                if (value == null)
-                    isEmpty = true;
-                else
-                    isEmpty = false;
+                isEmpty = false;
 
-            if (Invert)
-                isEmpty = !isEmpty;
+        if (Invert)
+            isEmpty = !isEmpty;
 
-            return isEmpty ? Visibility.Collapsed : Visibility.Visible;
-        }
+        return isEmpty ? Visibility.Collapsed : Visibility.Visible;
+    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }
+

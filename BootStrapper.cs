@@ -21,18 +21,18 @@ namespace DBF;
 public class Bootstrapper : BootstrapperBase
 {
     #region Constructors
-    public Bootstrapper()
-    {
-        Logger.Info("Bootstrapper initializing");
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        public Bootstrapper()
+        {
+            Logger.Info("Bootstrapper initializing");
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        FrameworkElement.LanguageProperty
-                        .OverrideMetadata( typeof(FrameworkElement)
-                                         , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+            FrameworkElement.LanguageProperty
+                            .OverrideMetadata( typeof(FrameworkElement)
+                                             , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
-        Initialize();
-        Logger.Info("Bootstrapper initializer");
-    }
+            Initialize();
+            Logger.Info("Bootstrapper initializer");
+        }
     #endregion
 
     protected override void OnStartup(object sender, StartupEventArgs e)
@@ -69,7 +69,9 @@ public class Bootstrapper : BootstrapperBase
         {
             SyncFusion.FindandRegisterLicenseKey();
 
-            _container.Instance<IWindowManager>(new WindowManager());
+            //_container.Instance<IWindowManager>(new WindowManager());
+            _container.Singleton<IWindowManager, ZoomWindowManager>();
+
             _container.Singleton<IEventAggregator, EventAggregator>();
             _container.Singleton<Configuration>();
             _container.Singleton<BridgeMate>();

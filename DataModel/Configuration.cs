@@ -71,6 +71,7 @@ namespace DBF.DataModel
         #region Public Properties
             #region Public Properties - Serilizable
                 public static readonly string StatePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\state.json";
+                public static readonly string UpdaterSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\updater settings.json";
                 public string BC3Path
                 {
                     get => field;
@@ -504,6 +505,7 @@ namespace DBF.DataModel
 
             public void OpenJSONFiles()
             {
+            tryOpenFile(UpdaterSettingsPath);
                 SaveState();
                 tryOpenFile(StatePath);
                 tryOpenFile(_path);
@@ -758,7 +760,7 @@ namespace DBF.DataModel
             {
                 var psi = new ProcessStartInfo
                           {
-#if RELEASE
+#if DEBUG
                               Arguments        = $"\"{path}\""
 #else
                               Arguments        = $"-fullReadOnlySavingForbidden \"{path}\""  

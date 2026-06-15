@@ -35,6 +35,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Themes\**" />
+	  <EmbeddedResource Remove="Themes\**" />
+	  <None Remove="Themes\**" />
+	  <Page Remove="Themes\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Remove="AudioServices\SoundResource.cs" />
 		<Compile Remove="BridgeMateModel\BiddingData.cs" />
 		<Compile Remove="BridgeMateModel\HandEvaluation.cs" />
@@ -139,9 +146,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!--<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />-->
+		<PackageReference Include="MahApps.Metro.IconPacks.BootstrapIcons" Version="6.2.1" />
+		<PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="6.2.1" />
+		<!--<PackageReference Include="MahApps.Metro.IconPacks.Modern" Version="6.2.1" />-->
+		<!--<PackageReference Include="MahApps.Metro.IconPacks.PhosphorIcons" Version="6.2.1" />-->
+		<!--<PackageReference Include="MahApps.Metro.IconPacks.SimpleIcons" Version="6.2.1" />-->
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="EntityFrameworkCore.Jet" Version="9.0.0" />
 		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="9.0.0" />
-		<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
 		<PackageReference Include="System.Data.Odbc" Version="9.0.5" />
 	</ItemGroup>
 
@@ -168,6 +183,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.5" />
 		<PackageReference Include="System.Management" Version="10.0.5" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.16" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 		<PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
       
@@ -194,6 +210,12 @@
 	<!-- Designer generation for Resources.resx and Settings.settings -->
 	<ItemGroup>
 	
+		<Compile Update="Localization\LocHelp.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>LocHelp.resx</DependentUpon>
+		</Compile>
+	
 		<Compile Update="Localization\Syncfusion.SfColorPalette.Wpf.Designer.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -214,6 +236,10 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+		<EmbeddedResource Update="Localization\LocHelp.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>LocHelp.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 		<EmbeddedResource Update="Localization\Strings.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Strings.Designer.cs</LastGenOutput>

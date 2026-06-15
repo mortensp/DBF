@@ -14,10 +14,7 @@
     mc:Ignorable="d">
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <Grid>
-            <Image
-                Name="helpImage"
-                Height="1400"
-                Stretch="Uniform" />
+            <Image Name="helpImage" Stretch="UniformToFill" />
         </Grid>
     </ScrollViewer>
 </Window>

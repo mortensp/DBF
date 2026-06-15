@@ -73,7 +73,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     public void TimersHelp()
     {
         var window = new TimersHelpWindow();
-        window.ShowDialog();
+        window.Show();
     }
 
     public void OnKeyDown(KeyEventArgs e)
