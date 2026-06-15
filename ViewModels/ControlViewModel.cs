@@ -1150,7 +1150,7 @@ public class ControlViewModel : Screen, IDisposable
 
         if (projectorScreen is null)
         {
-            //#if (RELEASE || PRODTEST)
+            //#if RELEASE
 #if RELEASE
             MessageBox.Show("Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K", "Info");
 #else

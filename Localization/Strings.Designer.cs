@@ -232,6 +232,15 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string btnNo {
+            get {
+                return ResourceManager.GetString("btnNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         internal static string btnSave {
@@ -273,6 +282,15 @@ namespace DBF.Localization {
         internal static string btnShowStartLists {
             get {
                 return ResourceManager.GetString("btnShowStartLists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string btnYes {
+            get {
+                return ResourceManager.GetString("btnYes", resourceCulture);
             }
         }
         
@@ -673,6 +691,24 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to App Settings.
+        /// </summary>
+        internal static string guideGeneral {
+            get {
+                return ResourceManager.GetString("guideGeneral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timer functions.
+        /// </summary>
+        internal static string guideTimer {
+            get {
+                return ResourceManager.GetString("guideTimer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Half.
         /// </summary>
         internal static string Half {
@@ -1042,15 +1078,6 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Guide.
-        /// </summary>
-        internal static string mnuBridgeTimers {
-            get {
-                return ResourceManager.GetString("mnuBridgeTimers", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Change Program Version.
         /// </summary>
         internal static string mnuChangeProgramVersion {
@@ -1065,6 +1092,15 @@ namespace DBF.Localization {
         internal static string mnuFullscreen {
             get {
                 return ResourceManager.GetString("mnuFullscreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Guide.
+        /// </summary>
+        internal static string mnuGuide {
+            get {
+                return ResourceManager.GetString("mnuGuide", resourceCulture);
             }
         }
         
@@ -1087,7 +1123,7 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Logfile.
+        ///   Looks up a localized string similar to Logfile.
         /// </summary>
         internal static string mnuOpenLogFile {
             get {

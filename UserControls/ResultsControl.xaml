@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:help="clr-namespace:DBF.Helpers"
+    xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:DBF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -24,6 +25,15 @@
 
         <!--  proxy that exposes this UserControl.DataContext  -->
         <help:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
+
+        <BounceEase
+            x:Key="BounceEaseOut"
+            Bounces="2"
+            Bounciness="2"
+            EasingMode="EaseOut" />
+
+
+        <SineEase x:Key="SmoothEase" EasingMode="EaseInOut" />
     </UserControl.Resources>
 
     <Grid>
@@ -55,6 +65,8 @@
                 FontSize="16"
                 FontWeight="Bold"
                 Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
+
+
         </StackPanel>
 
         <CheckBox Grid.Row="0" Grid.Column="1"
@@ -65,10 +77,43 @@
             Visibility="{Binding CollapsedInProjectorView, ElementName=root}" />
 
 
-        <!--<Button Grid.Row="0" Grid.Column="2"
-            Name="btnBreak"
-            Click="btnBreak_Click"
-            Content="Break" />-->
+
+        <icons:PackIconFontAwesome Grid.Row="0" Grid.Column="2"
+            Width="30"
+            Height="30"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Foreground="#FFB200"
+            Kind="TrophySolid">
+
+            <icons:PackIconFontAwesome.RenderTransform>
+                <ScaleTransform x:Name="PulseTransform" CenterX="10" CenterY="10" />
+            </icons:PackIconFontAwesome.RenderTransform>
+
+            <icons:PackIconFontAwesome.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard AutoReverse="True" RepeatBehavior="Forever">
+                            <DoubleAnimation
+                                EasingFunction="{StaticResource SmoothEase}"
+                                Storyboard.TargetName="PulseTransform"
+                                Storyboard.TargetProperty="ScaleX"
+                                From="1.0"
+                                To="1.15"
+                                Duration="0:0:1.0" />
+
+                            <DoubleAnimation
+                                EasingFunction="{StaticResource SmoothEase}"
+                                Storyboard.TargetName="PulseTransform"
+                                Storyboard.TargetProperty="ScaleY"
+                                From="1.0"
+                                To="1.15"
+                                Duration="0:0:0.6" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </icons:PackIconFontAwesome.Triggers>
+        </icons:PackIconFontAwesome>
 
         <syncfusion:SfDataGrid Grid.Row="1"
             Name="dgTeams"

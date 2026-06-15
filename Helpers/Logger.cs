@@ -23,7 +23,7 @@ namespace DBF.Helpers
 
                 foreach (var path in Directory.GetFiles(_logFolder, "dbf_????????.log"))
                 {
-#if (RELEASE || PRODTEST)
+#if RELEASE
                     if (string.Compare(Path.GetFileName(path), clearLogsBefore, StringComparison.Ordinal) <  0)
 #endif
                         File.Delete(path);

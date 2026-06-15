@@ -24,7 +24,9 @@ UninstallDisplayIcon={#MyAppExeName}
 
 ArchitecturesAllowed=x64compatible 
 DisableProgramGroupPage=yes
-PrivilegesRequired=admin
+;PrivilegesRequired=admin
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 OutputDir="D:\Build\DBF\Installer"
 OutputBaseFilename="DBF Setup"
 SolidCompression=yes
@@ -46,8 +48,6 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\DBF\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}";  Filename: "{app}\DBF\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-;Filename: "{tmp}\dotnet9.exe"; Parameters: "/norestart"; StatusMsg: "Installerer .NET 9 Desktop Runtime..."; Flags: waituntilterminated
 Filename: "{app}\DBF\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-;Filename: "{app}\Bootstrapper\Bootstrapper.exe"; Description: "Starting the application"; Flags: nowait postinstall skipifsilent
 
 [Code]

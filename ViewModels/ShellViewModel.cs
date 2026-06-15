@@ -23,6 +23,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     private Rect        _previousBounds;
     public Visibility    FullScreenMode => _isFullscreen ? Visibility.Collapsed : Visibility.Visible;
 
+ 
     public Configuration Configuration  { get; set; }
 
     public ShellViewModel(Configuration configuration, IWindowManager windowManager)
@@ -79,41 +80,45 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     {
         if (e.Key == Key.F11)
             ToggleFullscreen();
+        else
+            if (_isFullscreen
+            &&  e.Key == Key.Escape)
+                ToggleFullscreen();
     }
 
     public void ToggleFullscreen()
     {
-        var vindow = Application.Current.MainWindow;
+        var window = Application.Current.MainWindow;
 
         if (_isFullscreen)
         {
             // Restore previous state
-            vindow.WindowStyle = _previousWindowStyle;
-            vindow.ResizeMode  = _previousResizeMode;
+            window.WindowStyle = _previousWindowStyle;
+            window.ResizeMode  = _previousResizeMode;
 
-            vindow.WindowState = WindowState.Normal;
+            window.WindowState = WindowState.Normal;
 
-            vindow.Left        = _previousBounds.Left;
-            vindow.Top         = _previousBounds.Top;
-            vindow.Width       = _previousBounds.Width;
-            vindow.Height      = _previousBounds.Height;
-            vindow.WindowState = _previousWindowState;
+            window.Left        = _previousBounds.Left;
+            window.Top         = _previousBounds.Top;
+            window.Width       = _previousBounds.Width;
+            window.Height      = _previousBounds.Height;
+            window.WindowState = _previousWindowState;
 
             _isFullscreen = false;
         }
         else
         {
             // Save current state
-            _previousWindowState = vindow.WindowState;
-            _previousWindowStyle = vindow.WindowStyle;
-            _previousResizeMode  = vindow.ResizeMode;
-            _previousBounds      = new Rect(vindow.Left, vindow.Top, vindow.Width, vindow.Height);
+            _previousWindowState = window.WindowState;
+            _previousWindowStyle = window.WindowStyle;
+            _previousResizeMode  = window.ResizeMode;
+            _previousBounds      = new Rect(window.Left, window.Top, window.Width, window.Height);
 
             // Fullscreen mode
             //vindow.WindowStyle = WindowStyle.None;
-            vindow.ResizeMode  = ResizeMode.NoResize;
-            vindow.WindowState = WindowState.Normal; // Need to maximize correctly
-            vindow.WindowState = WindowState.Maximized;
+            window.ResizeMode  = ResizeMode.NoResize;
+            window.WindowState = WindowState.Normal; // Need to maximize correctly
+            window.WindowState = WindowState.Maximized;
 
             _isFullscreen = true;
         }
@@ -137,6 +142,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             GitHub _github = new GitHub("DBF");
             _github.Update(Arguments.DebugMode, "install");
         }
+
         catch (Exception ex)
         {
             MessageBox.Show($"Updater Error: {ex.Message}", "Updater Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -163,7 +169,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             {
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
-
             catch { /* permission can fail in certain environments */ }
 
             if (string.IsNullOrEmpty(exePath))
@@ -193,7 +198,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             var process =Process.Start(psi);
         }
-
         catch (Exception ex)
         {
             MessageBox.Show($"{Lex.ErrorRestart}: {ex.Message}", Lex.Error, MessageBoxButton.OK, MessageBoxImage.Error);

@@ -30,7 +30,7 @@ namespace DBF
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
 
-#if (RELEASE || PRODTEST)
+#if RELEASE
             if (Arguments.Values.Lookup("mode") == "restart")
             {
                 Logger.Info("Performing a Restart");

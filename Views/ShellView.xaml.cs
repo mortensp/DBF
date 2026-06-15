@@ -1,20 +1,28 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Caliburn.Micro;
-using DBF.ViewModels;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace DBF.Views
 {
     /// <summary>
-    /// Interaction logic for Window1.xaml
+    /// Interaction logic for ShellView.xaml
     /// </summary>
     public partial class ShellView : Window
     {
         public ShellView()
         {
             InitializeComponent();
+
 
             if (this.WindowState == System.Windows.WindowState.Maximized)
                 this.WindowState =  System.Windows.WindowState.Normal;
@@ -40,13 +48,7 @@ namespace DBF.Views
             }
         }
 
-        //protected override void OnMouseDown(MouseButtonEventArgs e)
-        //{
-        //    base.OnMouseDown(e);
-        //    this.Activate();
-        //}
-
-        private void ShellView_Loaded(object sender, RoutedEventArgs e)
+                private void ShellView_Loaded(object sender, RoutedEventArgs e)
         {
             // restore size and position
             if (Properties.Settings.Default.WindowWidth >  0)

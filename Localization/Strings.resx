@@ -222,7 +222,7 @@
   <data name="mnuHelp" xml:space="preserve">
     <value>Help</value>
   </data>
-  <data name="mnuBridgeTimers" xml:space="preserve">
+  <data name="mnuGuide" xml:space="preserve">
     <value>Guide</value>
   </data>
   <data name="mnuChangeProgramVersion" xml:space="preserve">
@@ -232,7 +232,7 @@
     <value>Open JSON settings</value>
   </data>
   <data name="mnuOpenLogFile" xml:space="preserve">
-    <value>Open Logfile</value>
+    <value>Logfile</value>
   </data>
   <data name="mnuAbout" xml:space="preserve">
     <value>About</value>
@@ -695,5 +695,17 @@
   </data>
   <data name="Color_Black" xml:space="preserve">
     <value>Black</value>
+  </data>
+  <data name="btnYes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="btnNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="guideGeneral" xml:space="preserve">
+    <value>App Settings</value>
+  </data>
+  <data name="guideTimer" xml:space="preserve">
+    <value>Timer functions</value>
   </data>
 </root>

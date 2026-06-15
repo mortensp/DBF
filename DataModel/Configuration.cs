@@ -98,11 +98,14 @@ namespace DBF.DataModel
 
                 public Orientation WindowOrientation     { get; set; } = Orientation.Horizontal;
 
-                public string      WindowOrientationIcon => VisibleTimerCount == 1
-                                                          ? null
-                                                          : WindowOrientation == Orientation.Horizontal
-                                                          ? "/Images/VerticalWindows.PNG"
-                                                          : "/Images/HorizontalWindows.PNG";
+                //public string      WindowOrientationIcon => VisibleTimerCount == 1
+                //                                          ? null
+                //                                          : WindowOrientation == Orientation.Horizontal
+                //                                          ? "/Images/VerticalWindows.PNG"
+                //                                          : "/Images/HorizontalWindows.PNG";
+                public Visibility  WindowOrientationVisibility => VisibleTimerCount >  1
+                                                                ? Visibility.Visible
+                                                                : Visibility.Collapsed;
                 public TimeOnly? StartTime
                 {
                     get => field ?? TimeOnly.FromDateTime(_startDate);
@@ -680,7 +683,7 @@ namespace DBF.DataModel
                         timer.BreakAfterRound = timer.BreakMinutes = 0;
 
                     timer.SelectedSound = AudioResources.SoundDefinitions
-                                                        .FirstOrDefault(s => s.DisplayName == timer.SelectedSound.DisplayName)
+                                                        .FirstOrDefault(s => s.DisplayName == timer.SelectedSound?.DisplayName)
                                        ?? AudioResources.SoundDefinitions[i];
 
                     BridgeTimers.Add(timer);

@@ -1,9 +1,12 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Markup;
+using AppArguments;
 using Caliburn.Micro;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
 using DBF.Helpers;
+using DBF.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DBF;
@@ -32,7 +35,7 @@ public class BridgeMate : PropertyChangedBase
             watcher              = new();
             watcher.UpdatedAsync+= handleFileEventAsync;
             initWatcher(Configuration.BridgeMatePath, false);
-    }
+        }
     #endregion
 
     public void CheckOrOpen(DateTime? playingTime, int? clubNumber)
@@ -53,13 +56,43 @@ public class BridgeMate : PropertyChangedBase
 
         if (!Directory.Exists(path))
         {
+            //if (Arguments.Values.Lookup("mode") != "restart"
+            //&&  Configuration.BridgeMatePath.IsDirectoryLink())
+            //{
+            //    Logger.Info($"BridgeMate: Directory not found: {path}");
+
+            //    var ok =MessageBox.Show( $"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}"
+            //                           + Environment.NewLine
+            //                           + $"If this occurs when started from the installer it might be fixed by restarting."
+            //                           + "Do you want to restart"
+            //                           , Lex.Error
+            //                           , MessageBoxButton.YesNo
+            //                           , MessageBoxImage.Question);
+
+            //    if (ok == MessageBoxResult.Yes)
+            //    {
+            //        var shell = IoC.Get<ShellViewModel>();
+            //        shell.Restart();
+            //    }
+
+            //    return;
+            //}
+
+            //&& (Configuration.BridgeMatePath.IsDirectoryLink()
+            // || path.IsDirectoryLink()))
+            //{
+            //    var shell = IoC.Get<ShellViewModel>();
+            //    shell.Restart();
+            //}
+            //
             Logger.Info($"BridgeMate: Directory not found: {path}");
-            MessageBox.Show($"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}", Lex.Error);
+            MessageBox.Show( $"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}"
+                           , Lex.Error);
         }
         else
             foreach (var found in Directory.GetFiles(path, $"*.{SearchExt}")
                                            .Where(f => File.GetLastWriteTime(f) >= after)
-                                           .OrderByDescending(f => File.GetLastWriteTime(f))) //TODO: should it be creation datetime?
+                                           .OrderByDescending(f => File.GetLastWriteTime(f))) 
             {
                 var file = Path.ChangeExtension(found, ".bws");
 
@@ -163,7 +196,7 @@ public class BridgeMate : PropertyChangedBase
             watcher.EnableRaisingEvents   = enableRaisingEvents;
 
             if (watcher.EnableRaisingEvents)
-                Logger.Info($"BridgeMate watcher enabled on path:{watcher.Path} ");
+                Logger.Info($"BridgeMate watcher enabled on path: {watcher.Path} ");
             else
                 Logger.Info($"BridgeMate watcher disabled");
         }
@@ -264,9 +297,9 @@ public class BridgeMate : PropertyChangedBase
                                        .ThenBy(g => g.Key.Round)
                                        .Select(g => new RoundStatus
                                                     {
-                                                        Section       = (short)g.Key.Section
-                                                      , Round         = (short)g.Key.Round
-                                                      , Done          = g.Count(g => g.Done) == db.Tables.Count(t => t.Section == g.Key.Section)
+                                                        Section         = (short)g.Key.Section
+                                                      , Round           = (short)g.Key.Round
+                                                      , Done            = g.Count(g => g.Done) == db.Tables.Count(t => t.Section == g.Key.Section)
                                                       , RemainingBoards = g.Sum  (g => g.BoardsRemaining)
                                                     }))
 
@@ -286,7 +319,7 @@ public class BridgeMate : PropertyChangedBase
                     RoundStatus.Add(roundStatus);
                 else
                 {
-                    existing.Done          = roundStatus.Done;
+                    existing.Done            = roundStatus.Done;
                     existing.RemainingBoards = roundStatus.RemainingBoards;
                 }
             }

@@ -172,7 +172,7 @@
     <value>Bladringsinterval på projektor:</value>
   </data>
   <data name="ReadBC3" xml:space="preserve">
-    <value>Indlæs Start- og Resultatliste:</value>
+    <value>Indlæs BC3 data:</value>
   </data>
   <data name="ReadBM" xml:space="preserve">
     <value>Indlæs BridgeMate status:</value>
@@ -222,7 +222,7 @@
   <data name="mnuHelp" xml:space="preserve">
     <value>Hjælp</value>
   </data>
-  <data name="mnuBridgeTimers" xml:space="preserve">
+  <data name="mnuGuide" xml:space="preserve">
     <value>Vejledning</value>
   </data>
   <data name="mnuChangeProgramVersion" xml:space="preserve">
@@ -232,7 +232,7 @@
     <value>Åben JSON Indstillinger</value>
   </data>
   <data name="mnuOpenLogFile" xml:space="preserve">
-    <value>Åben Logfile</value>
+    <value>Logfil</value>
   </data>
   <data name="mnuAbout" xml:space="preserve">
     <value>Om</value>
@@ -695,5 +695,17 @@
   </data>
   <data name="Color_Black" xml:space="preserve">
     <value>Sort</value>
+  </data>
+  <data name="btnYes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="btnNo" xml:space="preserve">
+    <value>Nej</value>
+  </data>
+  <data name="guideGeneral" xml:space="preserve">
+    <value>Program Indstillinger</value>
+  </data>
+  <data name="guideTimer" xml:space="preserve">
+    <value>Betjening af uret</value>
   </data>
 </root>

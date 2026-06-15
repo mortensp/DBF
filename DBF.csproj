@@ -52,7 +52,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Images\about.png" />
+	  <None Remove="Images\DBF_Tools.png" />
+	  <None Remove="Images\json.png" />
+	  <None Remove="Images\logs-file.png" />
+	  <None Remove="Images\manual.png" />
+	  <None Remove="Images\open-book.png" />
 	  <None Remove="Images\projector.ico" />
+	  <None Remove="Images\Splash.org.png" />
+	  <None Remove="Images\stopwatch.png" />
+	  <None Remove="Images\update-app.png" />
 	  <None Remove="Images\VerticalWindows.PNG" />
 	  <None Remove="InstallerFiles\Inno Setup Script.old.iss" />
 	</ItemGroup>
@@ -72,23 +81,55 @@
 	</ItemGroup>-->
 
 	<ItemGroup>
+		<Resource Include="Images\about.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
 		<Resource Include="Images\DBF_Tools.ico">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
-
-		<Resource Include="Images\guideTilUr.jpg">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<Resource Include="Images\DBF_Tools.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
-		<Resource Include="Images\HorizontalWindows.PNG" />
+		<Resource Include="Images\guideTilUr.jpg">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+
+		<Resource Include="Images\HorizontalWindows.PNG">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
 
 		<EmbeddedResource Include="Images\projector.ico">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 
 		<EmbeddedResource Include="Images\projector_48x48.ico" />
 
-		<Resource Include="Images\VerticalWindows.PNG" />
+		<Resource Include="Images\json.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+
+		<Resource Include="Images\logs-file.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+
+		<Resource Include="Images\open-book.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+
+		<Resource Include="Images\Splash.org.png" />
+
+		<Resource Include="Images\stopwatch.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+
+		<Resource Include="Images\update-app.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+
+		<Resource Include="Images\VerticalWindows.PNG">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -100,6 +141,7 @@
 	<ItemGroup>
 		<PackageReference Include="EntityFrameworkCore.Jet" Version="9.0.0" />
 		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="9.0.0" />
+		<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
 		<PackageReference Include="System.Data.Odbc" Version="9.0.5" />
 	</ItemGroup>
 

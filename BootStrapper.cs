@@ -23,7 +23,7 @@ public class Bootstrapper : BootstrapperBase
     #region Constructors
     public Bootstrapper()
     {
-        Logger.Info("Bootstrapper initialising");
+        Logger.Info("Bootstrapper initializing");
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         FrameworkElement.LanguageProperty
@@ -31,7 +31,7 @@ public class Bootstrapper : BootstrapperBase
                                          , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
         Initialize();
-        Logger.Info("Bootstrapper initialised");
+        Logger.Info("Bootstrapper initializer");
     }
     #endregion
 

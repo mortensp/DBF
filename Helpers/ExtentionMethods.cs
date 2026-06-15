@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
-using System.Windows.Data;
 using Group = Syncfusion.Data.Group;
-
 namespace DBF.Helpers;
 
 public static class ExtentionMethods
@@ -53,7 +51,7 @@ public static class ExtentionMethods
         string deepest = Directory.Exists(current) ? current : null;
 
         // Gå ned gennem stien
-        for (int i = 1; i <  parts.Length; i++)
+        for (int i = 1; i < parts.Length; i++)
         {
             current = Path.Combine(current, parts[i]);
 
@@ -66,7 +64,7 @@ public static class ExtentionMethods
         return deepest;
     }
 
-     public static string FirstNonSharedDirectory(this string fullPath,string basePath)
+    public static string FirstNonSharedDirectory(this string fullPath, string basePath)
     {
         basePath = Path.GetFullPath(basePath).TrimEnd(Path.DirectorySeparatorChar);
         fullPath = Path.GetFullPath(fullPath).TrimEnd(Path.DirectorySeparatorChar);
@@ -77,7 +75,7 @@ public static class ExtentionMethods
         int i = 0;
 
         // Find første forskel
-        while (i < a.Length && i < b.Length && 
+        while (i < a.Length && i < b.Length &&
                string.Equals(a[i], b[i], StringComparison.OrdinalIgnoreCase))
         {
             i++;
@@ -119,14 +117,42 @@ public static class ExtentionMethods
         }
     }
 
-        //public static Color GetContrastingColor(this Color bgColor)
-        //{
-        //    // Beregn luminans (per W3C standard)
-        //    double luminance = (0.299 * bgColor.R + 0.587 * bgColor.G + 0.114 * bgColor.B) / 255;
+    public static bool IsUsableDirectory(this string path)
+    {
+        var dirInfo = new DirectoryInfo(path);
 
-        //    // Hvis baggrunden er lys, brug sort tekst – ellers hvid
-        //    return luminance >  0.5 ? Colors.Black : Colors.White;
-        //}
+        if (!dirInfo.Exists)
+            return false;
+
+        if (dirInfo.Attributes.HasFlag(FileAttributes.ReparsePoint))
+        {
+            try
+            {
+                Directory.GetFiles(path);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+
+    public static bool IsDirectoryLink(this string path)
+    {
+        var dirInfo = new DirectoryInfo(path);
+
+
+        if (!dirInfo.Exists)
+            return false;
+
+        return dirInfo.Attributes.HasFlag(FileAttributes.ReparsePoint);
+    }
+
 
 
 }

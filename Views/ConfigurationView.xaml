@@ -66,7 +66,7 @@
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" MinWidth="177" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
@@ -116,30 +116,32 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <!--  BC3:  -->
+
                     <TextBlock Grid.Row="2" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
-                        Text="{lex:Loc ReadBC3}" />
+                        Text="{lex:Loc ReadBM}" />
 
                     <CheckBox Grid.Row="2" Grid.Column="1"
                         Width="Auto"
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding ReadBC3, Mode=TwoWay}" />
+                        IsChecked="{Binding ReadBridgeMate, Mode=TwoWay}" />
 
+
+                    <!--  BC3:  -->
                     <TextBlock Grid.Row="3" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
-                        Text="{lex:Loc ReadBM}" />
+                        Text="{lex:Loc ReadBC3}" />
 
                     <CheckBox Grid.Row="3" Grid.Column="1"
                         Width="Auto"
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        IsChecked="{Binding ReadBridgeMate, Mode=TwoWay}" />
+                        IsChecked="{Binding ReadBC3, Mode=TwoWay}" />
 
                     <!--<TextBlock
                         Grid.Row="4"
@@ -160,19 +162,23 @@
 
                     <!--  Projector  -->
                     <TextBlock Grid.Row="5" Grid.Column="0"
+                        Margin="0,7,4,0"
                         FontSize="16"
                         FontWeight="Bold"
-                        Text="{lex:Loc Projector}" />
+                        Text="{lex:Loc Projector}"
+                        Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
                     <!--  Projector Interval:  -->
                     <TextBlock Grid.Row="6" Grid.Column="0"
-                        Margin="8,0,4,0"
+                        Margin="8,5,4,0"
                         VerticalAlignment="Center"
-                        Text="{lex:Loc ProjectorInterval}" />
+                        Text="{lex:Loc ProjectorInterval}"
+                        Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
                     <StackPanel Grid.Row="6" Grid.Column="1"
-                        Margin="0,2,0,5"
-                        Orientation="Horizontal">
+                        Margin="0,5,4,0"
+                        Orientation="Horizontal"
+                        Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}">
                         <TextBox
                             Width="50"
                             Margin="0,3,4,0"
@@ -189,13 +195,15 @@
                     <TextBlock Grid.Row="7" Grid.Column="0"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
-                        Text="{lex:Loc MaxRows}" />
+                        Text="{lex:Loc MaxRows}"
+                        Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
                     <TextBox Grid.Row="7" Grid.Column="1"
                         Width="50"
                         Margin="0,5,0,5"
                         HorizontalAlignment="Left"
-                        Text="{Binding ProjectorMaxRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding ProjectorMaxRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
                 </Grid>
             </StackPanel>

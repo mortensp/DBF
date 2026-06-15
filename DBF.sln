@@ -17,6 +17,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Github Updater", "..\..\Common Libs\Github Updater\Updater\Github Updater.csproj", "{D4F18404-D340-E3D9-3EB9-4C48CF03D889}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppArguments", "..\..\Common Libs\AppArguments\AppArguments.csproj", "{A3977FA0-37AC-434F-B10C-EBD5CC058B4B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CB4F8947-8728-4282-93EF-C0B9F953DE54} = {CB4F8947-8728-4282-93EF-C0B9F953DE54}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization", "..\..\Common Libs\Localization\Localization.csproj", "{CB4F8947-8728-4282-93EF-C0B9F953DE54}"
 EndProject

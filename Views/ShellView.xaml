@@ -5,6 +5,7 @@
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:DBF.DataModel"
@@ -16,9 +17,15 @@
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     FontSize="14"
+    x:Name="root"
     WindowState="Normal"
     mc:Ignorable="d">
 
+    <!--<Window.InputBindings>
+        <KeyBinding Key="F11" Command="{Binding ToggleFullscreenCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding ToggleFullscreenCommand}" />
+    </Window.InputBindings>-->
+    
     <Window.Resources>
         <Style x:Key="OrphanMenuItemStyle" TargetType="MenuItem">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -32,7 +39,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+        <DockPanel   Visibility="{Binding FullScreenMode}"
+            Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
             <MenuItem
                 Name="mnuTest"
                 cal:Message.Attach="[Event Click] = [Action Test]"
@@ -42,30 +50,60 @@
                 Visibility="Collapsed" />
 
             <Menu>
-                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="{lex:Loc mnuSettings}" />
+                <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingsAsync]" Header="{lex:Loc guideGeneral}" />
 
                 <MenuItem Header="{lex:Loc mnuView}">
                     <MenuItem
                         cal:Message.Attach="[Event Click] = [ToggleFullscreen]"
                         Header="{lex:Loc mnuFullscreen}"
-                        InputGestureText="F11" />
+                        InputGestureText="F11, Esc" >
+                        <MenuItem.Icon>
+                            <icons:Modern Kind="Fullscreen" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
 
-                <MenuItem Header="{lex:Loc mnuHelp}">
-                    <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuBridgeTimers}" />
+                <MenuItem Header="{lex:Loc mnuGuide}">
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action TimersHelp]" Header="{lex:Loc mnuGuide}">
+                        <MenuItem.Icon>
+                            <icons:Modern Kind="BookHardcoverOpen" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
                     <!--<MenuItem cal:Message.Attach="[Event Click] = [Action Restart]" Header="{lex:Loc mnuRestartAndPreserveTimers}" />-->
-                    <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}" />
-                    <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="{lex:Loc mnuOpenJsonSettings}" />
-                    <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}" />
-                    <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="{lex:Loc mnuAbout}" />
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action Install]" Header="{lex:Loc mnuChangeProgramVersion}">
+                        <MenuItem.Icon>
+                            <icons:PhosphorIcons
+                                Width="16"
+                                Height="16"
+                                Kind="ArrowBendDoubleUpLeftFill " />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action OpenSettingFiles]" Header="{lex:Loc mnuOpenJsonSettings}">
+                        <MenuItem.Icon>
+                            <icons:BootstrapIcons Kind="FiletypeJson" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action OpenLogFile]" Header="{lex:Loc mnuOpenLogFile}">
+                        <MenuItem.Icon>
+                            <icons:SimpleIcons Kind="Logseq" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem cal:Message.Attach="[Event Click] = [Action ShowAbout]" Header="{lex:Loc mnuAbout}">
+                        <MenuItem.Icon>
+                            <icons:PhosphorIcons Kind="Info" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
+
             </Menu>
-
-
-
-
         </DockPanel>
 
         <ContentControl x:Name="ActiveItem" Grid.Row="1" />
     </Grid>
+
+  
 </Window>
