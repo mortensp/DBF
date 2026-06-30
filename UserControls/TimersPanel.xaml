@@ -4,18 +4,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:DBF.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:help="clr-namespace:DBF.HelpSystem"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:userctls="clr-namespace:DBF.UserControls"
     x:Name="root"
+    help:Help.Key="BridgeTimers"
     d:Background="White"
     Loaded="userControl_Loaded"
     mc:Ignorable="d">
 
-    <!--<UserControl.Resources>
-        <conv:TimerSelectorConverter x:Key="TimerSelectorConverter" />
-    </UserControl.Resources>-->
+    <Grid
+        d:DataContext="{d:DesignInstance Type=userctls:TimersPanel,
+                                         IsDesignTimeCreatable=True}"
+        AllowDrop="True"
+        DataContext="{Binding ElementName=root}"
+        DragOver="Grid_DragOver"
+        Drop="Grid_Drop">
 
-    <Grid d:DataContext="{d:DesignInstance Type=userctls:TimersPanel, IsDesignTimeCreatable=True}" DataContext="{Binding ElementName=root}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
@@ -27,20 +32,20 @@
         </Grid.RowDefinitions>
 
         <userctls:BridgeTimerControl Grid.Row="0" Grid.Column="0"
-            ButtonsVisibility="{Binding ButtonsVisibility}"
-            BridgeTimer="{Binding BridgeTimer0}" />
+            BridgeTimer="{Binding BridgeTimer0}"
+            ButtonsVisibility="{Binding ButtonsVisibility}" />
 
         <userctls:BridgeTimerControl Grid.Row="0" Grid.Column="1"
-            ButtonsVisibility="{Binding ButtonsVisibility}"
-            BridgeTimer="{Binding BridgeTimer1}" />
+            BridgeTimer="{Binding BridgeTimer1}"
+            ButtonsVisibility="{Binding ButtonsVisibility}" />
 
         <userctls:BridgeTimerControl Grid.Row="1" Grid.Column="0"
-            ButtonsVisibility="{Binding ButtonsVisibility}"
-            BridgeTimer="{Binding BridgeTimer2}" />
+            BridgeTimer="{Binding BridgeTimer2}"
+            ButtonsVisibility="{Binding ButtonsVisibility}" />
 
         <userctls:BridgeTimerControl Grid.Row="1" Grid.Column="1"
-            ButtonsVisibility="{Binding ButtonsVisibility}"
-            BridgeTimer="{Binding BridgeTimer3}" />
+            BridgeTimer="{Binding BridgeTimer3}"
+            ButtonsVisibility="{Binding ButtonsVisibility}" />
     </Grid>
 
 </UserControl>

@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using Syncfusion.Windows.Controls.Notification;
+
 using Configuration = DBF.DataModel.Configuration;
+using DragDropEffects = System.Windows.DragDropEffects;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace DBF.UserControls;
 
@@ -24,7 +26,11 @@ public partial class BridgeTimerControl : UserControl
         badge.SetBinding(SfBadge.ContentProperty, new Binding("BridgeTimer.BadgeText") { Source = this, Mode = BindingMode.OneWay });
     }
 
-    public Configuration Configuration { get => field ??= IoC.Get<Configuration>(); set => field = value; }
+    public Configuration Configuration
+    {
+        get => field ??= IoC.Get<Configuration>();
+        set => field = value;
+    }
 
     #region Dependency Properties
         #region Timer Dependency Property
@@ -90,10 +96,7 @@ public partial class BridgeTimerControl : UserControl
                                                               , typeof(Visibility)
                                                               , typeof(BridgeTimerControl)
                                                               , new FrameworkPropertyMetadata(Visibility.Visible));//, onButtonsVisibilityPropertyChanged));
-
-     
         #endregion
-
     #endregion
 
     #region Public Properties
@@ -101,7 +104,13 @@ public partial class BridgeTimerControl : UserControl
         public Visibility DownButtonVisibility { get; private set; }
     #endregion
 
-    #region Private Methods        
+    #region Private Methods      
+        private void display_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                DragDrop.DoDragDrop(this, this, DragDropEffects.Move);
+        }
+
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             // If Shift is held while clicking to affect alle timers, otherwise just this one
@@ -174,33 +183,31 @@ public partial class BridgeTimerControl : UserControl
                 BridgeTimer.Start();
         }
 
-        private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(BridgeTimer);
+        //private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(BridgeTimer);
 
-        private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(BridgeTimer);
-    
-
-    private void ControlLoaded(object sender, RoutedEventArgs e)
-    {
-        if (this.IsInDesignMode())
+        //private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(BridgeTimer);
+        private void ControlLoaded(object sender, RoutedEventArgs e)
         {
-            Visibility = Visibility.Visible;
+            if (this.IsInDesignMode())
+            {
+                Visibility = Visibility.Visible;
 
-            BridgeTimer = new BridgeTimer
-                    {
-                        Visibility       = Visibility.Visible
-                      , Foreground       = System.Windows.Media.Brushes.Black
-                      , Background       = System.Windows.Media.Brushes.Orange
-                      , Time             = "21:17"
-                      , RoundText        = "3. Runde"
-                      , Info             = "Vi spiller 7 runder af 24 spil"
-                                         + Environment.NewLine +
-                                         "Pause efter 4. Runde"
-                      , MinutesLeft      = 13d
-                      , WarningVisibility = Visibility.Visible
-                    };
+                BridgeTimer = new BridgeTimer
+                              {
+                                  Visibility        = Visibility.Visible
+                                , Foreground        = System.Windows.Media.Brushes.Black
+                                , Background        = System.Windows.Media.Brushes.Orange
+                                , Time              = "21:17"
+                                , RoundText         = "3. Runde"
+                                , Info              = "Vi spiller 7 runder af 24 spil"
+                                                    + Environment.NewLine +
+                                                    "Pause efter 4. Runde"
+                                , MinutesLeft       = 13d
+                                , WarningVisibility = Visibility.Visible
+                              };
 
-            Configuration = new Configuration() { StartDate = DateTime.Now };
+                Configuration = new Configuration() { StartDate = DateTime.Now };
+            }
         }
-    }
-#endregion
+    #endregion
 }

@@ -1,0 +1,36 @@
+﻿<Window
+    x:Class="DBF.Views.HelpView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{Binding Title}"
+    Width="{Binding WindowWidth}"
+    Height="{Binding WindowHeight}"
+    WindowStartupLocation="CenterScreen">
+
+    <ScrollViewer
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Billede  -->
+            <Grid Grid.Row="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Visibility="{Binding Image, Converter={StaticResource NullToVisibilityConverter}}">
+
+                <Image
+                    RenderOptions.BitmapScalingMode="Fant"
+                    Source="{Binding Image}"
+                    Stretch="Uniform"
+                    StretchDirection="Both" />
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Window>

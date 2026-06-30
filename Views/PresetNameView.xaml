@@ -13,7 +13,7 @@
     lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
-    FontSize="12"
+    FontSize="{DynamicResource MeniumFontSize}"
     Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
@@ -25,14 +25,12 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <Label
-            Grid.Column="0"
+        <Label Grid.Column="0"
             VerticalAlignment="Center"
             Content="{lex:Loc NameIt}" />
 
-        <TextBox
+        <TextBox Grid.Column="1"
             x:Name="PresetName"
-            Grid.Column="1"
             Height="20"
             VerticalContentAlignment="Center" />
 

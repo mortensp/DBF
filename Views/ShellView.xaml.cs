@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using Caliburn.Micro;
+using DBF.DataModel;
+using DBF.Helpers;
+using DBF.UserControls;
 
 namespace DBF.Views
 {
@@ -22,7 +14,6 @@ namespace DBF.Views
         public ShellView()
         {
             InitializeComponent();
-
 
             if (this.WindowState == System.Windows.WindowState.Maximized)
                 this.WindowState =  System.Windows.WindowState.Normal;
@@ -41,15 +32,25 @@ namespace DBF.Views
                         btn.Visibility = Visibility.Visible;
                 }
             }
-
             catch
             {
                 // ignore any lookup failures
             }
+
+             var hwnd = new System.Windows.Interop.WindowInteropHelper(this).EnsureHandle();
+
+    int preference = (int)DwmInterop.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_DONOTROUND;
+
+    DwmInterop.DwmSetWindowAttribute(
+        hwnd,
+        DwmInterop.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
+        ref preference,
+        sizeof(int));
         }
 
-                private void ShellView_Loaded(object sender, RoutedEventArgs e)
+        private void ShellView_Loaded(object sender, RoutedEventArgs e)
         {
+          
             // restore size and position
             if (Properties.Settings.Default.WindowWidth >  0)
             {

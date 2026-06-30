@@ -16,15 +16,20 @@ namespace DBF.ViewModels;
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
 {
     private IWindowManager windowManager;
-    private bool _isFullscreen { get; set; }
+    public bool IsFullscreen { get; set; }
     private WindowState _previousWindowState;
     private WindowStyle _previousWindowStyle;
     private ResizeMode  _previousResizeMode;
     private Rect        _previousBounds;
-    public Visibility    FullScreenMode => _isFullscreen ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility    FullScreenVisibility => IsFullscreen
+                                               ? Visibility.Collapsed
+                                               : Visibility.Visible;
 
- 
-    public Configuration Configuration  { get; set; }
+    public Visibility    ListsVisibility      => (!IsFullscreen && Configuration.ReadBC3)
+                                               ? Visibility.Visible
+                                               : Visibility.Collapsed;
+
+    public Configuration Configuration        { get; set; }
 
     public ShellViewModel(Configuration configuration, IWindowManager windowManager)
     {
@@ -36,6 +41,12 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         public async void OpenControlView()
         {
             await Configuration.LoadAsync();
+
+            Configuration.PropertyChanged+= (s, e) =>
+            {
+                if (e.PropertyName == nameof(Configuration.ReadBC3))
+                    NotifyOfPropertyChange(nameof(ListsVisibility));
+            };
 
             var viewModel = IoC.Get<ControlViewModel>();
             await ActivateItemAsync(viewModel);
@@ -76,12 +87,17 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         window.Show();
     }
 
+    //public void Help()
+    //{
+    //    Debugger.Break();
+    //}
+
     public void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.F11)
             ToggleFullscreen();
         else
-            if (_isFullscreen
+            if (IsFullscreen
             &&  e.Key == Key.Escape)
                 ToggleFullscreen();
     }
@@ -90,7 +106,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     {
         var window = Application.Current.MainWindow;
 
-        if (_isFullscreen)
+        if (IsFullscreen)
         {
             // Restore previous state
             window.WindowStyle = _previousWindowStyle;
@@ -104,7 +120,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             window.Height      = _previousBounds.Height;
             window.WindowState = _previousWindowState;
 
-            _isFullscreen = false;
+            IsFullscreen = false;
         }
         else
         {
@@ -120,7 +136,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             window.WindowState = WindowState.Normal; // Need to maximize correctly
             window.WindowState = WindowState.Maximized;
 
-            _isFullscreen = true;
+            IsFullscreen = true;
         }
     }
 
@@ -138,7 +154,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     {
         try
         {
-            Logger.Info("Running Githup Updater");
+            Logger.Info("Running GitHup Updater");
             GitHub _github = new GitHub("DBF");
             _github.Update(Arguments.DebugMode, "install");
         }
@@ -206,4 +222,47 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
         Environment.Exit(0);
     }
+
+    public void Minimize()
+    {
+        (GetView() as Window).WindowState = WindowState.Minimized;
+    }
+
+    public void ToggleMaximize()
+    {
+        var win         = GetView() as Window;
+        win.WindowState = win.WindowState == WindowState.Maximized
+                        ? WindowState.Normal
+                        : WindowState.Maximized;
+    }
+
+    public async Task CloseAsync()
+    {
+        try
+        {
+            await TryCloseAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"{ex.Message}", Lex.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    public void TitleBarDrag(MouseButtonEventArgs e)
+{
+    var win = (Window)GetView();
+
+    if (e.ClickCount == 2)
+    {
+        // Toggle maximize
+        win.WindowState = win.WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
+    }
+    else
+    {
+        win.DragMove();
+    }
+}
+
 }

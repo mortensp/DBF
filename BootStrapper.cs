@@ -1,12 +1,4 @@
-﻿using Caliburn.Micro;
-
-using DBF.AudioServices;
-using DBF.DataModel;
-using DBF.Helpers;
-using DBF.ViewModels;
-using DBF.Views;
-
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -14,6 +6,13 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Caliburn.Micro;
+using DBF.AudioServices;
+using DBF.DataModel;
+using DBF.Helpers;
+using DBF.ViewModels;
+using DBF.Views;
+using String.Localization;
 
 namespace DBF;
 
@@ -24,13 +23,24 @@ public class Bootstrapper : BootstrapperBase
         public Bootstrapper()
         {
             Logger.Info("Bootstrapper initializing");
+
+            // Load arguments and language settings
+            AppArguments.Load();
+            LanguageService.Instance.Initialize( typeof(Lex)
+                                               , typeof(LocHelp)
+                                               , typeof(Syncfusion_Shared_Wpf)
+                                               , typeof(Syncfusion_SfColorPalette_Wpf));
+            //LanguageService.Instance.SetCulture("da-DK");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            FrameworkElement.LanguageProperty
-                            .OverrideMetadata( typeof(FrameworkElement)
-                                             , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
-
+            //FrameworkElement.LanguageProperty
+            //                .OverrideMetadata( typeof(FrameworkElement)
+            //                                 , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
             Initialize();
+
+            // Load language setting first - before anything else
+            IoC.Get<Configuration>().LoadLanguageSetting();
+
             Logger.Info("Bootstrapper initializer");
         }
     #endregion
@@ -43,20 +53,19 @@ public class Bootstrapper : BootstrapperBase
 #else
         // Show screen at startup
         DisplayRootViewForAsync<ShellViewModel>();
-        var screen        = IoC.Get<ShellViewModel>();
-        var configuration = IoC.Get<Configuration>();
 
-        configuration.LoadLanguageSetting(); // Load settings before opening the ControlView to ensure that the correct language is set.
-
-        screen.OpenControlView();
+        IoC.Get<ShellViewModel>().OpenControlView();
 #endif
         // Restore Taskbar Icon.
-        Application.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
+        //Application.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
     }
 
     protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         Logger.Exception(e.Exception, "Unhandled Exception in Bootstrapper");
+
+        if (e.Exception.Message.Equals("No target found for method Close."))
+            Environment.Exit(0);
 
         base.OnUnhandledException(sender, e);
     }
@@ -71,11 +80,11 @@ public class Bootstrapper : BootstrapperBase
 
             //_container.Instance<IWindowManager>(new WindowManager());
             _container.Singleton<IWindowManager, ZoomWindowManager>();
-
             _container.Singleton<IEventAggregator, EventAggregator>();
             _container.Singleton<Configuration>();
             _container.Singleton<BridgeMate>();
             _container.Singleton<IAudioService, WindowsAudioService>();
+            _container.Singleton<FontSizeService>();
 
             foreach (var viewModel in SelectViewModels())
                 if (_container.HasHandler(viewModel, null) == false)

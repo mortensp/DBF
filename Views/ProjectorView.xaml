@@ -6,16 +6,15 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{lex:Loc DBFProjector}"
-    IsHitTestVisible="False"
     Width="800"
     Height="600"
     lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
+    IsHitTestVisible="False"
     WindowStartupLocation="CenterOwner">
     <Viewbox Focusable="False">
-        <ContentControl
-            Grid.Row="1"
+        <ContentControl Grid.Row="1"
             Content="{Binding CurrentView}"
             IsTabStop="False" />
     </Viewbox>

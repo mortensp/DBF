@@ -34,6 +34,16 @@
 
 
         <SineEase x:Key="SmoothEase" EasingMode="EaseInOut" />
+
+        <!--  Works for all TextBlocks in this UserControl  -->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}" />
+        </Style>
+
+        <!--  Works for all CheckBoxes in this UserControl  -->
+        <Style TargetType="CheckBox">
+            <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}" />
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -53,18 +63,9 @@
             Margin="5,5,0,0"
             HorizontalAlignment="Left"
             Orientation="Horizontal">
-            <TextBlock
-                FontSize="16"
-                FontWeight="Bold"
-                Text="{lex:Loc Results}" />
-            <TextBlock
-                FontSize="16"
-                FontWeight="Bold"
-                Text="  " />
-            <TextBlock
-                FontSize="16"
-                FontWeight="Bold"
-                Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
+            <TextBlock FontWeight="Bold" Text="{lex:Loc Results}" />
+            <TextBlock FontWeight="Bold" Text="  " />
+            <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
 
 
         </StackPanel>
@@ -72,7 +73,6 @@
         <CheckBox Grid.Row="0" Grid.Column="1"
             Margin="30,6,0,0"
             Content="{lex:Loc chkShowAsOneGroup}"
-            FontSize="16"
             IsChecked="{Binding ShowAsOneGroup, UpdateSourceTrigger=PropertyChanged}"
             Visibility="{Binding CollapsedInProjectorView, ElementName=root}" />
 
@@ -130,7 +130,7 @@
             CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
-            FontSize="14"
+            FontSize="{DynamicResource MediumFontSize}"
             HeaderRowHeight="25"
             ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             ScrollViewer.CanContentScroll="True"
@@ -215,7 +215,7 @@
             CaptionSummaryRowStyle="{StaticResource captionRowStyle2}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
-            FontSize="14"
+            FontSize="{DynamicResource MediumFontSize}"
             HeaderRowHeight="25"
             ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             ScrollViewer.CanContentScroll="True"

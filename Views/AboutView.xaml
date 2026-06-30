@@ -4,19 +4,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:DBF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:DBF.ViewModels"
     Title="{lex:Loc AboutTitle}"
     Width="650"
     Height="500"
-    xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    lex:LocalizeDictionary.DesignCulture="en-US"
-    lex:ResxLocalizationProvider.DefaultAssembly="DBF"
-    lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     Padding="20"
     d:DataContext="{d:DesignInstance vm:AboutViewModel,
                                      IsDesignTimeCreatable=True}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="DBF"
+    lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
@@ -43,19 +43,19 @@
                     TextAlignment="Center" />
                 <TextBlock
                     Margin="0,5,0,0"
-                    FontSize="14"
+                    FontSize="{DynamicResource LargeFontSize}"
                     Foreground="#7F8C8D"
                     Text="{Binding Version}"
                     TextAlignment="Center" />
                 <TextBlock
                     Margin="0,5,0,0"
-                    FontSize="14"
+                    FontSize="{DynamicResource LargeFontSize}"
                     Foreground="#7F8C8D"
                     Text="{Binding Author}"
                     TextAlignment="Center" />
                 <TextBlock
                     Margin="0,10,0,0"
-                    FontSize="16"
+                    FontSize="{DynamicResource X-LargeFontSize}"
                     Foreground="#34495E"
                     Text="{lex:Loc Description}"
                     TextAlignment="Left"

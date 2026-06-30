@@ -1,4 +1,4 @@
-﻿<UserControl x:Name="root"
+﻿<UserControl
     x:Class="DBF.UserControls.StartListControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
     xmlns:userctl="clr-namespace:DBF.UserControls"
+    x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="1100"
     lex:LocalizeDictionary.DesignCulture="en-US"
@@ -32,26 +33,28 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
-            Grid.Row="0"
+        <StackPanel Grid.Row="0"
             Margin="5,5,0,0"
             HorizontalAlignment="Left"
             Orientation="Horizontal">
-            <TextBlock Text="{lex:Loc StartList}"
-                FontSize="16"
-                FontWeight="Bold" />
+            <TextBlock
+                FontSize="{DynamicResource X-LargeFontSize}"
+                FontWeight="Bold"
+                Text="{lex:Loc StartList}" />
 
-            <TextBlock Text=": "
-                FontSize="16"
-                FontWeight="Bold" />
+            <TextBlock
+                FontSize="{DynamicResource X-LargeFontSize}"
+                FontWeight="Bold"
+                Text=": " />
 
-            <TextBlock Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}"
-                FontSize="16"
-                FontWeight="Bold" />
+            <TextBlock
+                FontSize="{DynamicResource X-LargeFontSize}"
+                FontWeight="Bold"
+                Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
         </StackPanel>
 
-        <syncfusion:SfDataGrid Name="dgTeams"
-            Grid.Row="1"
+        <syncfusion:SfDataGrid Grid.Row="1"
+            Name="dgTeams"
             Margin="0,0,0,10"
             AllowEditing="False"
             AllowResizingColumns="True"
@@ -63,7 +66,7 @@
             CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
-            FontSize="14"
+            FontSize="{DynamicResource LargeFontSize}"
             ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
             QueryRowHeight="SfDataGrid_QueryRowHeight"
             ScrollViewer.CanContentScroll="True"
@@ -79,7 +82,8 @@
                     MappingName="TeamNo"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn x:Name="TeamName" HeaderText="{lex:Loc hdTeam}"
+                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdTeam}"
+                    x:Name="TeamName"
                     Width="250"
                     Padding="5,0"
                     AllowSorting="False"
@@ -119,8 +123,8 @@
 
         </syncfusion:SfDataGrid>
 
-        <syncfusion:SfDataGrid Name="dgPairs"
-            Grid.Row="2"
+        <syncfusion:SfDataGrid Grid.Row="2"
+            Name="dgPairs"
             Padding="5,0,5,0"
             AllowEditing="False"
             AllowGrouping="True"
@@ -133,7 +137,7 @@
             CaptionSummaryRowStyle="{StaticResource captionRowStyle}"
             ColumnSizer="Auto"
             FilterRowPosition="None"
-            FontSize="14"
+            FontSize="{DynamicResource LargeFontSize}"
             ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
             NavigationMode="Row"
             ScrollViewer.CanContentScroll="True"
@@ -186,10 +190,10 @@
 
                 <!--  Tourneringens Score  -->
                 <syncfusion:GridTemplateColumn
-                  Width="2"
-                  CellTemplate="{StaticResource ColumnSeparatorTemplate}"
-                  MappingName="Separator2" />
-                
+                    Width="2"
+                    CellTemplate="{StaticResource ColumnSeparatorTemplate}"
+                    MappingName="Separator2" />
+
                 <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdScore}"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="{Binding Data.HideTournamentSummery, Source={StaticResource ViewModelProxy}}"

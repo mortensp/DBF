@@ -4,15 +4,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dm="clr-namespace:DBF.DataModel"
+    xmlns:help="clr-namespace:DBF.HelpSystem"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     xmlns:userctls="clr-namespace:DBF.UserControls"
     x:Name="root"
     d:Background="white"
+    help:Help.Key="BridgeTimers"
     lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
+    Focusable="True"
     Loaded="ControlLoaded"
     mc:Ignorable="d">
 
@@ -26,7 +29,7 @@
 
             <Setter Property="Height" Value="20" />
             <Setter Property="Width" Value="30" />
-            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontSize" Value="{DynamicResource MediumFontSize}" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="Background" Value="#FBFBFB" />
@@ -50,7 +53,10 @@
     </UserControl.Triggers>
 
 
-    <Grid DataContext="{Binding ElementName=root}" Visibility="{Binding BridgeTimer.Visibility}">
+    <Grid
+        DataContext="{Binding ElementName=root}"
+        Focusable="True"
+        Visibility="{Binding BridgeTimer.Visibility}">
 
         <Border
             Margin="8"
@@ -59,7 +65,7 @@
             BorderThickness="1"
             CornerRadius="8">
 
-            <Grid>
+            <Grid Focusable="True">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
@@ -68,19 +74,21 @@
                 <!--  BridgeTimer Display in row 0  -->
                 <Border Grid.Row="0"
                     Padding="0"
-                      
                     CornerRadius="6">
                     <Grid
                         Name="display"
                         Background="{Binding BridgeTimer.Background}"
-                        TextBlock.FontSize="20">
+                        Focusable="True"
+                        MouseMove="display_MouseMove"
+                        TextBlock.FontSize="20"
+                        ToolTip="{lex:Loc DragNDrop}">
 
                         <Grid.Resources>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{Binding BridgeTimer.Foreground}" />
                             </Style>
                         </Grid.Resources>
-                        
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50" />
                             <ColumnDefinition Width="*" />
@@ -249,7 +257,7 @@
                         </StackPanel>
                     </Button>
 
-                    <WrapPanel Margin="20,2,2,2">
+                    <!--<WrapPanel Margin="20,2,2,2">
                         <Button
                             x:Name="btnUp"
                             Margin="2"
@@ -265,7 +273,7 @@
                             Content="↓"
                             ToolTip="{lex:Loc tipMoveTimerDown}"
                             Visibility="{Binding BridgeTimer.ShowDownButton}" />
-                    </WrapPanel>
+                    </WrapPanel>-->
 
 
                     <Button

@@ -1,31 +1,23 @@
-﻿using AppArguments;
-
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Configuration;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Windows;
+using System.Windows.Data;
+using AppArguments;
 using Caliburn.Micro;
-
 using DBF.AudioServices;
 using DBF.Converters;
 using DBF.Helpers;
 using DBF.ViewModels;
-
+using Microsoft.Extensions.Configuration;
 using String.Localization;
-
 using Syncfusion.Windows.Tools.Controls;
-
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-
-using System.Globalization;
-
-using System.IO;
-
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-using System.Windows;
-
-using System.Windows.Data;
 
 namespace DBF.DataModel
 {
@@ -56,6 +48,20 @@ namespace DBF.DataModel
 
                 if (!Directory.Exists(configDir))
                     Directory.CreateDirectory(configDir);
+
+                // Guard IoC access during design-time
+                if (Design.IsInDesignMode())
+                    FontSizeService = new FontSizeService(); // lightweight fallback for designer
+                else
+                    try
+                    {
+                        FontSizeService = IoC.Get<FontSizeService>();
+                    }
+
+                    catch
+                    {
+                        FontSizeService = new FontSizeService();
+                    }
             }
 
             public Configuration()
@@ -69,8 +75,11 @@ namespace DBF.DataModel
         #endregion
 
         #region Public Properties
+            [JsonIgnore]
+            public static FontSizeService FontSizeService { get; set; }
+
             #region Public Properties - Serilizable
-                public static readonly string StatePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\state.json";
+                public static readonly string StatePath           = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\state.json";
                 public static readonly string UpdaterSettingsPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Mortensp\\DBF\\updater settings.json";
                 public string BC3Path
                 {
@@ -87,17 +96,29 @@ namespace DBF.DataModel
                     }
                 } = @"C:\BC3\";
 
-                public string      AppVersion            { get; private set; } = _currentversion;
-                public string      ConfigVersion         { get; set; }
-                public bool        IsLoaded              { get; private set; }
-                public bool        ReadBC3               { get; set; } = true;
-                public bool        ReadBridgeMate        { get; set; } = false;
-                public int         ProjectorInterval     { get; set; } = 20;
-                public int         ProjectorMaxRows      { get; set; } = 40;
-                public string      HomePagePath          => BC3Path + @"Hjemmeside\";
-                public string      BridgeMatePath        => BC3Path + @"BridgeMate\";
+                public string AppVersion        { get; private set; } = _currentversion;
+                public string ConfigVersion     { get; set; }
+                public bool   IsLoaded          { get; private set; }
+                public bool   ReadBC3           { get; set; } = true;
+                public bool   ReadBridgeMate    { get; set; } = false;
+                public int    ProjectorInterval { get; set; } = 20;
+                public int    ProjectorMaxRows  { get; set; } = 40;
+                public string HomePagePath      => BC3Path + @"Hjemmeside\";
+                public string BridgeMatePath    => BC3Path + @"BridgeMate\";
 
-                public Orientation WindowOrientation     { get; set; } = Orientation.Horizontal;
+                #region FontSize(s)
+                    public static List<double> FontSizes { get; } = new() { 6, 8, 10, 12, 14, 16 };
+
+                    public double FontSize
+                    {
+                        get;
+                        set;
+                        //get => _fontSizeService.FontSize;
+                        //set => _fontSizeService.FontSize = value;
+                    } = 12;
+                #endregion
+
+                public Orientation WindowOrientation           { get; set; } = Orientation.Horizontal;
 
                 //public string      WindowOrientationIcon => VisibleTimerCount == 1
                 //                                          ? null
@@ -295,6 +316,7 @@ namespace DBF.DataModel
                 StartTime         = newConfiguration.StartTime;
                 CultureName       = newConfiguration.CultureName;
                 WindowOrientation = newConfiguration.WindowOrientation;
+                FontSize          = newConfiguration.FontSize;
 
                 Culture = LanguageService.Instance.SetCulture(CultureName);
 
@@ -381,6 +403,7 @@ namespace DBF.DataModel
                         }
                     }
 
+                    //FontSizeService.FontSize = _loadedConfig.FontSize;
                     Presets.AddRange([ new Preset(nameof(Lex.Pairs_7x4),  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
                                      , new Preset(nameof(Lex.Pairs_8x4),  false, false, 8,  4,  4, 0, 27, 0, 1, 10, 5)
                                      , new Preset(nameof(Lex.Pairs_9x3),  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
@@ -426,6 +449,7 @@ namespace DBF.DataModel
                             }
 
                             Update(_loadedConfig);
+                            FontSizeService.FontSize = _loadedConfig.FontSize;
 
                             if (_loadedConfig.ConfigVersion                           is null
                             ||  _loadedConfig.ConfigVersion.CompareTo(_configVersion) <  0)
@@ -486,6 +510,7 @@ namespace DBF.DataModel
                                 if (state.TimerStates[i].IsStarted)
                                     BridgeTimers[i].Restore(state.TimerStates[i]);
                         }
+
                         catch (Exception ex)
                         {
                             Logger.Exception(ex, "Unable to restore state");
@@ -505,7 +530,7 @@ namespace DBF.DataModel
 
             public void OpenJSONFiles()
             {
-            tryOpenFile(UpdaterSettingsPath);
+                tryOpenFile(UpdaterSettingsPath);
                 SaveState();
                 tryOpenFile(StatePath);
                 tryOpenFile(_path);
@@ -552,34 +577,33 @@ namespace DBF.DataModel
                 }
             }
 
-            internal void TimerUp(BridgeTimer timer)
-            {
-                if (timer.Visibility == Visibility.Visible)
-                {
-                    var i               = BridgeTimers.IndexOf(timer);
-                    var gem             = BridgeTimers[i - 1];
-                    BridgeTimers[i - 1] = timer;
-                    BridgeTimers[i]     = gem;
+            //internal void TimerUp(BridgeTimer timer)
+            //{
+            //    if (timer.Visibility == Visibility.Visible)
+            //    {
+            //        var i               = BridgeTimers.IndexOf(timer);
+            //        var gem             = BridgeTimers[i - 1];
+            //        BridgeTimers[i - 1] = timer;
+            //        BridgeTimers[i]     = gem;
 
-                    Save();
-                    SetUpDownVisibility();
-                }
-            }
+            //        Save();
+            //        SetUpDownVisibility();
+            //    }
+            //}
 
-            internal void TimerDown(BridgeTimer timer)
-            {
-                if (timer.Visibility == Visibility.Visible)
-                {
-                    var i               = BridgeTimers.IndexOf(timer);
-                    var gem             = BridgeTimers[i + 1];
-                    BridgeTimers[i + 1] = timer;
-                    BridgeTimers[i]     = gem;
+            //internal void TimerDown(BridgeTimer timer)
+            //{
+            //    if (timer.Visibility == Visibility.Visible)
+            //    {
+            //        var i               = BridgeTimers.IndexOf(timer);
+            //        var gem             = BridgeTimers[i + 1];
+            //        BridgeTimers[i + 1] = timer;
+            //        BridgeTimers[i]     = gem;
 
-                    Save();
-                    SetUpDownVisibility();
-                }
-            }
-
+            //        Save();
+            //        SetUpDownVisibility();
+            //    }
+            //}
             internal void UpdateTimers()
             {
                 foreach (var bridgeTimer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
@@ -775,7 +799,6 @@ namespace DBF.DataModel
                         psi.FileName = "notepad++.exe";
                         Process.Start(psi);
                     }
-
                     catch
                     {
                         psi.FileName = "notepad.exe";

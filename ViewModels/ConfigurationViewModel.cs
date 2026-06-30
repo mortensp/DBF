@@ -3,9 +3,11 @@ using System.Text.RegularExpressions;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
-using EntityFrameworkCore.Jet.Data;
 using DBF.Localization;
+using EntityFrameworkCore.Jet.Data;
+using Microsoft.DotNet.DesignTools.Protocol.Values;
 using String.Localization;
+using Syncfusion.Windows.Forms;
 
 namespace DBF.ViewModels
 {
@@ -14,34 +16,37 @@ namespace DBF.ViewModels
         private Configuration configuration;
 
         #region Constructors
-            public ConfigurationViewModel(Configuration configuration)
+            public ConfigurationViewModel(Configuration configuration, FontSizeService fontSizeService)
             {
                 this.configuration = configuration;
+                FontSizeService    = fontSizeService;
                 NewConfiguration   = new();
                 NewConfiguration.Update(configuration);
             }
         #endregion
 
         #region public Properties  
-            public Configuration NewConfiguration { get; set; }
+            public  Configuration   NewConfiguration { get; set; }
 
-       
+            private FontSizeService FontSizeService  { get; set; }
         #endregion
 
         #region Public Methods
             public async void Cancel()
             {
+                FontSizeService.FontSize = configuration.FontSize;
                 configuration.Save();
                 await TryCloseAsync();
             }
 
             public async void AcceptSetting()
             {
-                var culture = LanguageService.Instance.CurrentCulture;
+                var culture        = LanguageService.Instance.CurrentCulture;
                 var readBC3        =configuration.ReadBC3 ;
                 var readBridgeMate =configuration.ReadBridgeMate ;
 
                 configuration.Update(NewConfiguration, true);
+                configuration.FontSize = FontSizeService.FontSize;
                 configuration.Save();
 
                 Logger.Info("App settings changed");

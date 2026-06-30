@@ -79,6 +79,15 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allow Early Transition.
+        /// </summary>
+        internal static string AllowEarlyTransition {
+            get {
+                return ResourceManager.GetString("AllowEarlyTransition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to App Settings.
         /// </summary>
         internal static string appSettings {
@@ -493,6 +502,15 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Drag and Drop to move the timer.
+        /// </summary>
+        internal static string DragNDrop {
+            get {
+                return ResourceManager.GetString("DragNDrop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to End Greeting Bottom.
         /// </summary>
         internal static string EndGreetingBottom {
@@ -651,6 +669,15 @@ namespace DBF.Localization {
         internal static string Folder {
             get {
                 return ResourceManager.GetString("Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Font Size.
+        /// </summary>
+        internal static string FontSize {
+            get {
+                return ResourceManager.GetString("FontSize", resourceCulture);
             }
         }
         
@@ -1083,6 +1110,15 @@ namespace DBF.Localization {
         internal static string mnuChangeProgramVersion {
             get {
                 return ResourceManager.GetString("mnuChangeProgramVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Font Size.
+        /// </summary>
+        internal static string mnuFontSize {
+            get {
+                return ResourceManager.GetString("mnuFontSize", resourceCulture);
             }
         }
         
@@ -1582,6 +1618,51 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        internal static string tbClose {
+            get {
+                return ResourceManager.GetString("tbClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        internal static string tbHelp {
+            get {
+                return ResourceManager.GetString("tbHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximize.
+        /// </summary>
+        internal static string tbMaximize {
+            get {
+                return ResourceManager.GetString("tbMaximize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Minimize.
+        /// </summary>
+        internal static string tbMinimize {
+            get {
+                return ResourceManager.GetString("tbMinimize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore.
+        /// </summary>
+        internal static string tbRestore {
+            get {
+                return ResourceManager.GetString("tbRestore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Team Match.
         /// </summary>
         internal static string TeamMatch {
@@ -1668,24 +1749,6 @@ namespace DBF.Localization {
         internal static string tipMoreTime {
             get {
                 return ResourceManager.GetString("tipMoreTime", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Move timer down.
-        /// </summary>
-        internal static string tipMoveTimerDown {
-            get {
-                return ResourceManager.GetString("tipMoveTimerDown", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Move the timer up.
-        /// </summary>
-        internal static string tipMoveTimerUp {
-            get {
-                return ResourceManager.GetString("tipMoveTimerUp", resourceCulture);
             }
         }
         
@@ -1798,11 +1861,11 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do Not Start New Game Warning.
+        ///   Looks up a localized string similar to Do Not Start New Board Warning.
         /// </summary>
-        internal static string WarningDoNotStartNewGames {
+        internal static string WarningDoNotStartNewBoard {
             get {
-                return ResourceManager.GetString("WarningDoNotStartNewGames", resourceCulture);
+                return ResourceManager.GetString("WarningDoNotStartNewBoard", resourceCulture);
             }
         }
         

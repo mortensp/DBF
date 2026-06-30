@@ -12,6 +12,8 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary Source="Resources/ResourceDictionary.xaml" />
+                <!--<ResourceDictionary Source="/UserControls/BaseWindow/Style.xaml" />-->
+                <ResourceDictionary Source="HelpSystem/HelpStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <x:Static x:Key="ResxLocalizationProvider" Member="lex:ResxLocalizationProvider.Instance" />

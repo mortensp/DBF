@@ -7,6 +7,7 @@
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dbf="clr-namespace:DBF"
+      xmlns:help="clr-namespace:DBF.HelpSystem"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:DBF.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,6 +16,8 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     x:Name="root"
     Title="{lex:Loc TimerSettings}"
+       Style="{StaticResource HelpWindowStyle}"
+   help:Help.Key="TimerSettings"
     Width="605"
     Height="700"
     lex:LocalizeDictionary.DesignCulture="da"
@@ -48,8 +51,7 @@
         </Grid.RowDefinitions>
 
         <!--  Make this scrollable  -->
-        <ScrollViewer
-            Grid.Row="0"
+        <ScrollViewer Grid.Row="0"
             CanContentScroll="True"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto">
@@ -63,13 +65,13 @@
                 <StackPanel>
                     <TextBlock
                         Margin="0,0,0,12"
-                        FontSize="16"
+                        FontSize="{DynamicResource X-LargeFontSize}"
                         FontWeight="Bold"
                         Text="{lex:Loc SetClock}" />
 
                     <TextBlock
                         Margin="0,0,0,5"
-                        FontSize="16"
+                        FontSize="{DynamicResource X-LargeFontSize}"
                         FontWeight="Bold"
                         Foreground="Red"
                         Text="{Binding Message}"
@@ -95,6 +97,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <Grid.ColumnDefinitions>
@@ -103,32 +106,24 @@
                         </Grid.ColumnDefinitions>
 
                         <!--  Row: Group(s):  -->
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="0" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc Groups}" />
 
-                        <ctl:EnumFlagsControl
-                            Grid.Row="0"
-                            Grid.Column="1"
+                        <ctl:EnumFlagsControl Grid.Row="0" Grid.Column="1"
                             EnumType="{x:Type model:GroupFlags}"
                             Orientation="Horizontal"
                             SelectedFlags="{Binding Groups, Mode=TwoWay, Converter={StaticResource EnumCastConverter}}" />
 
                         <!--  Row - Background:  -->
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="1" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc Background}" />
 
-                        <sf:ColorPickerPalette
+                        <sf:ColorPickerPalette Grid.Row="1" Grid.Column="1"
                             Name="bgColor"
-                            Grid.Row="1"
-                            Grid.Column="1"
                             Width="200"
                             Height="35"
                             Margin="0,5"
@@ -146,17 +141,13 @@
                             Color="{Binding NewSetting.BackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - Foreground:  -->
-                        <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="2" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc Foreground}" />
 
-                        <sf:ColorPickerPalette
+                        <sf:ColorPickerPalette Grid.Row="2" Grid.Column="1"
                             Name="fgColor"
-                            Grid.Row="2"
-                            Grid.Column="1"
                             Width="200"
                             Height="35"
                             Margin="0,5"
@@ -174,9 +165,7 @@
                             Color="{Binding NewSetting.ForegroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - sound:  -->
-                        <TextBlock
-                            Grid.Row="3"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="3" Grid.Column="0"
                             Margin="0,5"
                             Text="{lex:Loc Sound}" />
 
@@ -184,8 +173,8 @@
                             <ComboBox
                                 Width="120"
                                 Margin="0,5"
-                                DisplayMemberPath="DisplayName"
                                 cal:Message.Attach="[Event SelectionChanged] = [Action SoundChanged()]"
+                                DisplayMemberPath="DisplayName"
                                 ItemsSource="{x:Static audio:AudioResources.SoundDefinitions}"
                                 SelectedItem="{Binding SelectedSound}" />
 
@@ -201,16 +190,12 @@
                         </WrapPanel>
 
                         <!--  Row - use preset:  -->
-                        <TextBlock
-                            Grid.Row="4"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="4" Grid.Column="0"
                             Margin="0,5,0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc UsePreset}" />
 
-                        <StackPanel
-                            Grid.Row="4"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="4" Grid.Column="1"
                             VerticalAlignment="Center"
                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
                             Orientation="Horizontal">
@@ -268,32 +253,24 @@
                         </StackPanel>
 
                         <!--  Row - Teammatch:  -->
-                        <TextBlock
+                        <TextBlock Grid.Row="5" Grid.Column="0"
                             x:Name="chkTeams"
-                            Grid.Row="5"
-                            Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc TeamMatch}" />
 
-                        <CheckBox
-                            Grid.Row="5"
-                            Grid.Column="1"
+                        <CheckBox Grid.Row="5" Grid.Column="1"
                             Margin="0,5"
                             Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=TeamMatch}"
                             IsChecked="{Binding TeamMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - Rounds:  -->
-                        <TextBlock
-                            Grid.Row="6"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="6" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc Rounds}" />
 
-                        <StackPanel
-                            Grid.Row="6"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="6" Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
                             <TextBox
@@ -311,20 +288,16 @@
                                 Margin="0,0,4,0"
                                 Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=BoardsPerRound}"
                                 Text="{Binding BoardsPerRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock VerticalAlignment="Center" Text="spil." />
+                            <TextBlock VerticalAlignment="Center" Text="{lex:Loc Boards}" />
                         </StackPanel>
 
                         <!--  Break after round  -->
-                        <TextBlock
-                            Grid.Row="7"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="7" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc BreakAfterRound}" />
 
-                        <TextBox
-                            Grid.Row="7"
-                            Grid.Column="1"
+                        <TextBox Grid.Row="7" Grid.Column="1"
                             Width="50"
                             Margin="0,5"
                             HorizontalAlignment="Left"
@@ -332,16 +305,12 @@
                             Text="{Binding BreakAfterRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                         <!--  Row - time per round:  -->
-                        <TextBlock
-                            Grid.Row="8"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="8" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc TimePerRound}" />
 
-                        <StackPanel
-                            Grid.Row="8"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="8" Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
                             <TextBox
@@ -368,16 +337,12 @@
                         </StackPanel>
 
                         <!--  Row - Warning - do not start new boards  -->
-                        <TextBlock
-                            Grid.Row="9"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="9" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
-                            Text="{lex:Loc WarningDoNotStartNewGames}" />
+                            Text="{lex:Loc WarningDoNotStartNewBoard}" />
 
-                        <StackPanel
-                            Grid.Row="9"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="9" Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
                             <TextBox
@@ -392,17 +357,13 @@
 
 
                         <!--  Row - transition time:  -->
-                        <TextBlock
-                            Grid.Row="10"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="10" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc TransitionTime}" />
 
 
-                        <StackPanel
-                            Grid.Row="10"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="10" Grid.Column="1"
                             Margin="0,5"
                             Orientation="Horizontal">
                             <TextBox
@@ -415,17 +376,26 @@
                                 Text="{lex:Loc Minutes}" />
                         </StackPanel>
 
+                        <!--  AllowEarlyTransition  -->
+                        <TextBlock Grid.Row="11" Grid.Column="0"
+                            Margin="0,5"
+                            VerticalAlignment="top"
+                            Text="{lex:Loc AllowEarlyTransition}" />
+                        <CheckBox Grid.Row="11" Grid.Column="1"
+                            Width="Auto"
+                            Margin="0,0,4,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Foreground="{Binding ChangedProperties, Converter={StaticResource ContainsToBrush}, ConverterParameter=Seconds}"
+                            IsChecked="{Binding AllowEarlyTransition, Mode=TwoWay}" />
+
                         <!--  Row - Breake minutes:  -->
-                        <TextBlock
-                            Grid.Row="11"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="12" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc BreakMinutes}" />
 
-                        <StackPanel
-                            Grid.Row="11"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="12" Grid.Column="1"
                             Orientation="Horizontal">
 
                             <TextBox
@@ -441,17 +411,13 @@
                         </StackPanel>
 
                         <!--  Row - Break message  -->
-                        <TextBlock
-                            Grid.Row="12"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="13" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc BreakMessage}" />
 
 
-                        <TextBox
-                            Grid.Row="12"
-                            Grid.Column="1"
+                        <TextBox Grid.Row="13" Grid.Column="1"
                             Width="320"
                             MaxHeight="50"
                             Margin="0,5"
@@ -463,16 +429,12 @@
 
 
                         <!--  Row - End Greetings:  -->
-                        <TextBlock
-                            Grid.Row="13"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="14" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc EndGreetingTop}" />
 
-                        <TextBox
-                            Grid.Row="13"
-                            Grid.Column="1"
+                        <TextBox Grid.Row="14" Grid.Column="1"
                             Width="320"
                             MaxHeight="50"
                             Margin="0,5"
@@ -483,16 +445,12 @@
                             TextWrapping="Wrap" />
 
                         <!--  Row - End Greeting Bottom  -->
-                        <TextBlock
-                            Grid.Row="14"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="15" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc EndGreetingBottom}" />
 
-                        <TextBox
-                            Grid.Row="14"
-                            Grid.Column="1"
+                        <TextBox Grid.Row="15" Grid.Column="1"
                             Width="320"
                             MaxHeight="50"
                             Margin="0,5"
@@ -503,16 +461,12 @@
                             TextWrapping="Wrap" />
 
                         <!--  Row - Playing Time:  -->
-                        <TextBlock
-                            Grid.Row="15"
-                            Grid.Column="0"
+                        <TextBlock Grid.Row="16" Grid.Column="0"
                             Margin="0,5"
                             VerticalAlignment="Center"
                             Text="{lex:Loc ExpectedPlayingTime}" />
 
-                        <StackPanel
-                            Grid.Row="15"
-                            Grid.Column="1"
+                        <StackPanel Grid.Row="16" Grid.Column="1"
                             Orientation="Horizontal">
 
                             <!--<TextBlock Margin="0,4" Text="kl. " />-->
@@ -538,8 +492,7 @@
             </Border>
         </ScrollViewer>
 
-        <StackPanel
-            Grid.Row="1"
+        <StackPanel Grid.Row="1"
             Margin="0,12,0,0"
             HorizontalAlignment="Right"
             Orientation="Horizontal">

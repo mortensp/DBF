@@ -12,165 +12,165 @@ namespace DBF.DataModel
         private Color bgColor;
 
         #region Constructors
-        public TimerSetting(string name = null
-                           , bool customPreset = true
-                           , bool teamMatch = false
-                           , int rounds = 0
-                           , int boardsPerRound = 0
-                           , int breakAfterRound = 0
-                           , int hours = 0
-                           , int minutes = 0
-                           , int seconds = 0
-                           , int transitionMinutes = 0
-                           , int breakMinutes = 0
-                           , int warningMinutes = 0
-                           //
-                           , GroupFlags groups = 0
-                           , string info = ""
-                           , Color? foregroundColor = null
-                           , Color? backgroundColor = null
-                           , SoundDefinition selectedSound = null
-                           , int volume = 50
-                           , Visibility visibility = Visibility.Visible
-                           , string pauseMessage = null
-                           , string endGreetingTop = null
-                           , string endGreetingBottom = null
-                           //, TimeOnly? startTime = null
-                           ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
-        {
-            Groups = groups;
-            Info = info;
-            SelectedSound = selectedSound;
-            Volume = volume;
-            BackgroundColor = backgroundColor ?? Colors.White;
-            ForegroundColor = foregroundColor ?? Colors.Black;
-            Visibility = visibility;
-            PauseMessage = pauseMessage;
-            EndGreetingTop = endGreetingTop;
-            EndGreetingBottom = endGreetingBottom;
-            //StartTime         = startTime;
-        }
+            public TimerSetting( string name = null
+                               , bool customPreset = true
+                               , bool teamMatch = false
+                               , int rounds = 0
+                               , int boardsPerRound = 0
+                               , int breakAfterRound = 0
+                               , int hours = 0
+                               , int minutes = 0
+                               , int seconds = 0
+                               , int transitionMinutes = 0
+                               , int breakMinutes = 0
+                               , int warningMinutes = 0
+                               //
+                               , GroupFlags groups = 0
+                               , string info = ""
+                               , Color? foregroundColor = null
+                               , Color? backgroundColor = null
+                               , SoundDefinition selectedSound = null
+                               , int volume = 50
+                               , Visibility visibility = Visibility.Visible
+                               , string pauseMessage = null
+                               , string endGreetingTop = null
+                               , string endGreetingBottom = null
+                               , bool allowEarlyTransition = false
+                               ) : base(name, customPreset, teamMatch, rounds, boardsPerRound, breakAfterRound, hours, minutes, seconds, transitionMinutes, breakMinutes, warningMinutes)
+            {
+                Groups               = groups;
+                Info                 = info;
+                SelectedSound        = selectedSound;
+                Volume               = volume;
+                BackgroundColor      = backgroundColor ?? Colors.White;
+                ForegroundColor      = foregroundColor ?? Colors.Black;
+                Visibility           = visibility;
+                PauseMessage         = pauseMessage;
+                EndGreetingTop       = endGreetingTop;
+                EndGreetingBottom    = endGreetingBottom;
+                AllowEarlyTransition = allowEarlyTransition;
+            }
         #endregion
 
-        #region Colors and Brushes
-        [JsonIgnore] public Brush Foreground { get; set; }
+        #region Public Properties
+            #region Colors and Brushes
+                [JsonIgnore] public Brush Foreground { get; set; }
 
-        public Color ForegroundColor
-        {
-            get => fgColor;
-            set
-            {
-
-                if (Set(ref fgColor, value))
-                    Foreground = new SolidColorBrush(fgColor);
-            }
-        }
-
-        [JsonIgnore] public Brush Background { get; set; }
-
-        public Color BackgroundColor
-        {
-            get => bgColor;
-            set
-            {
-
-                if (Set(ref bgColor, value))
+                public Color ForegroundColor
                 {
-                    Background = new SolidColorBrush(bgColor);
+                    get => fgColor;
+                    set
+                    {
+                        if (Set(ref fgColor, value))
+                            Foreground = new SolidColorBrush(fgColor);
+                    }
+                }
+
+                [JsonIgnore] public Brush Background { get; set; }
+
+                public Color BackgroundColor
+                {
+                    get => bgColor;
+                    set
+                    {
+                        if (Set(ref bgColor, value))
+                            Background = new SolidColorBrush(bgColor);
+                    }
+                }
+            #endregion
+
+            public GroupFlags Groups
+            {
+                get => field;
+                set
+                {
+                    if (Set(ref field, value))
+                        GroupList = value.GetFlagNames();
                 }
             }
-        }
+
+            public              List<string>                 GroupList         { get; set; }
+            [JsonIgnore] public string                       Info              { get; set; }
+
+            public              SoundDefinition              SelectedSound     { get; set; }
+            public              int                          Volume            { get; set; }
+            public              Visibility                   Visibility        { get; set; }
+            public              string                       GroupStr          { get => Groups.ToFriendlyString(); }
+
+            [JsonIgnore] public ObservableCollection<string> ChangedProperties { get; private set; } = new();
+            public string PauseMessage
+            {
+                get => field;
+                set
+                {
+                    value = string.IsNullOrWhiteSpace(value)
+                          ? null
+                          : field = value?.Trim();
+
+                    Set(ref field, value);
+                }
+            }
+
+            public string EndGreetingTop
+            {
+                get => field;
+                set
+                {
+                    value = string.IsNullOrWhiteSpace(value)
+                          ? null
+                          : field = value?.Trim();
+
+                    Set(ref field, value);
+                }
+            }
+
+            public string EndGreetingBottom
+            {
+                get => field;
+                set
+                {
+                    value = string.IsNullOrWhiteSpace(value)
+                          ? null
+                          : field = value?.Trim();
+
+                    Set(ref field, value);
+                }
+            }
+
+            public bool AllowEarlyTransition { get; set; }
+
+            public bool IsPropertyChanged(string propertyName) => ChangedProperties.Contains(propertyName);
         #endregion
-
-        public GroupFlags Groups
-        {
-            get => field;
-            set
-            {
-                if (Set(ref field, value))
-                    GroupList = value.GetFlagNames();
-            }
-        }
-
-        public List<string> GroupList { get; set; }
-        [JsonIgnore] public string Info { get; set; }
-
-        public SoundDefinition SelectedSound { get; set; }
-        public int Volume { get; set; }
-        public Visibility Visibility { get; set; }
-        public string GroupStr { get => Groups.ToFriendlyString(); }
-
-        [JsonIgnore] public ObservableCollection<string> ChangedProperties { get; private set; } = new();
-        public string PauseMessage
-        {
-            get => field;
-            set
-            {
-                value = string.IsNullOrWhiteSpace(value)
-                      ? null
-                      : field = value?.Trim();
-
-                Set(ref field, value);
-            }
-        }
-
-        public string EndGreetingTop
-        {
-            get => field;
-            set
-            {
-                value = string.IsNullOrWhiteSpace(value)
-                      ? null
-                      : field = value?.Trim();
-
-                Set(ref field, value);
-            }
-        }
-
-        public string EndGreetingBottom
-        {
-            get => field;
-            set
-            {
-                value = string.IsNullOrWhiteSpace(value)
-                      ? null
-                      : field = value?.Trim();
-
-                Set(ref field, value);
-            }
-        }
-
-        public bool IsPropertyChanged(string propertyName) => ChangedProperties.Contains(propertyName);
 
         public new void Update(Preset preset)
         {
-            Key = preset.Key;
-            CustomPreset = preset.CustomPreset;
-            TeamMatch = preset.TeamMatch;
-            Rounds = preset.Rounds;
-            BoardsPerRound = preset.BoardsPerRound;
-            Hours = preset.Hours;
-            Minutes = preset.Minutes;
-            Seconds = preset.Seconds;
+            Key               = preset.Key;
+            CustomPreset      = preset.CustomPreset;
+            TeamMatch         = preset.TeamMatch;
+            Rounds            = preset.Rounds;
+            BoardsPerRound    = preset.BoardsPerRound;
+            Hours             = preset.Hours;
+            Minutes           = preset.Minutes;
+            Seconds           = preset.Seconds;
             TransitionMinutes = preset.TransitionMinutes;
-            WarningMinutes = preset.WarningMinutes;
+            WarningMinutes    = preset.WarningMinutes;
 
             setBreak(preset.BreakAfterRound, preset.BreakMinutes);
 
             if (preset is TimerSetting tSetting)
             {
-                Groups = tSetting.Groups;
-                Info = tSetting.Info;
-                Volume = 0;
-                SelectedSound = tSetting.SelectedSound;
-                Volume = tSetting.Volume;
-                BackgroundColor = tSetting.BackgroundColor;
-                ForegroundColor = tSetting.ForegroundColor;
-                Visibility = tSetting.Visibility;
-                PauseMessage = tSetting.PauseMessage;
-                EndGreetingTop = tSetting.EndGreetingTop;
-                EndGreetingBottom = tSetting.EndGreetingBottom;
-                //StartTime         = tSetting.StartTime;
+                Groups               = tSetting.Groups;
+                Info                 = tSetting.Info;
+                Volume               = 0;
+                SelectedSound        = tSetting.SelectedSound;
+                Volume               = tSetting.Volume;
+                BackgroundColor      = tSetting.BackgroundColor;
+                ForegroundColor      = tSetting.ForegroundColor;
+                Visibility           = tSetting.Visibility;
+                PauseMessage         = tSetting.PauseMessage;
+                EndGreetingTop       = tSetting.EndGreetingTop;
+                EndGreetingBottom    = tSetting.EndGreetingBottom;
+                AllowEarlyTransition = tSetting.AllowEarlyTransition;
             }
         }
 

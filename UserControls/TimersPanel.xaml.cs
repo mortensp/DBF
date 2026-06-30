@@ -1,11 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
-using DBF.Views;
+
+using DragDropEffects = System.Windows.DragDropEffects;
+using DragEventArgs = System.Windows.DragEventArgs;
 
 namespace DBF.UserControls;
 
@@ -98,6 +100,50 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
     #endregion
 
     #region Private Methods
+        private void Grid_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Move;
+            e.Handled = true;
+        }
+
+        private void Grid_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(typeof(BridgeTimerControl)))
+                return;
+
+            var dragged = (BridgeTimerControl)e.Data.GetData(typeof(BridgeTimerControl));
+
+            // Find target
+            var pos = e.GetPosition((UIElement)sender);
+            var hit = VisualTreeHelper.HitTest(this, pos)?.VisualHit;
+
+            while (hit != null && hit is not BridgeTimerControl)
+                hit = VisualTreeHelper.GetParent(hit);
+
+            var target = hit as BridgeTimerControl;
+
+            if (target == null || target == dragged)
+                return;
+
+            SwapTimers(dragged.BridgeTimer, target.BridgeTimer);
+        }
+
+        private void SwapTimers(BridgeTimer a, BridgeTimer b)
+        {
+            if (a == null || b == null)
+                return;
+
+            var props = GetType().GetProperties()
+                                 .Where(p => p.PropertyType == typeof(BridgeTimer))
+                                 .ToList();
+
+            PropertyInfo pa = props.First(p => p.GetValue(this) == a);
+            PropertyInfo pb = props.First(p => p.GetValue(this) == b);
+
+            pa.SetValue(this, b);
+            pb.SetValue(this, a);
+        }
+
         private static void onTimersCanBeAddedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TimersPanel ctl)

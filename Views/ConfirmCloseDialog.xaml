@@ -21,11 +21,10 @@
         <TextBlock
             x:Name="MessageText"
             Margin="0,0,0,12"
-            FontSize="14"
+            FontSize="{DynamicResource LargeFontSize}"
             TextWrapping="Wrap" />
 
-        <StackPanel
-            Grid.Row="1"
+        <StackPanel Grid.Row="1"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
             <Button

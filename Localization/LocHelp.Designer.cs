@@ -87,5 +87,42 @@ namespace DBF.Localization {
                 return ResourceManager.GetString("AppSettings_Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Timersettings_Image {
+            get {
+                object obj = ResourceManager.GetObject("Timersettings_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string TimerSettings_Text {
+            get {
+                return ResourceManager.GetString("TimerSettings_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timer Settings.
+        /// </summary>
+        internal static string TimerSettings_Title {
+            get {
+                return ResourceManager.GetString("TimerSettings_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help Image doesn&apos;t exist.
+        /// </summary>
+        internal static string Unknown_Help_Image {
+            get {
+                return ResourceManager.GetString("Unknown_Help_Image", resourceCulture);
+            }
+        }
     }
 }

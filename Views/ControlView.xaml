@@ -5,8 +5,9 @@
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:ctl="clr-namespace:DBF.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:DBF.Helpers"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    xmlns:local="clr-namespace:DBF.Helpers"
+    xmlns:local="clr-namespace:DBF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     x:Name="root"
@@ -33,7 +34,8 @@
         <WrapPanel Grid.Row="0" Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="0,0,0,8"
-            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}">
+            Background="White"
+            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
             <StackPanel
                 HorizontalAlignment="Left"
                 Orientation="Horizontal"
@@ -55,7 +57,7 @@
                     Padding="4,1"
                     HorizontalAlignment="Left"
                     cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
-                    local:ComboBoxAutoScrollBehavior.AutoScroll="True"
+                    helpers:ComboBoxAutoScrollBehavior.AutoScroll="True"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding MainClubs}"
                     SelectedItem="{Binding SelectedMainClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -83,7 +85,7 @@
                     Padding="4,1"
                     HorizontalAlignment="Left"
                     cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
-                    local:ComboBoxAutoScrollBehavior.AutoScroll="True"
+                    helpers:ComboBoxAutoScrollBehavior.AutoScroll="True"
                     ItemsSource="{Binding Clubs}"
                     SelectedItem="{Binding SelectedClub, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -111,7 +113,7 @@
                     Padding="4,1"
                     HorizontalAlignment="Left"
                     cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
-                    local:ComboBoxAutoScrollBehavior.AutoScroll="True"
+                    helpers:ComboBoxAutoScrollBehavior.AutoScroll="True"
                     ItemsSource="{Binding PlayingTimes}"
                     SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -179,7 +181,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Background="#E10000"
-                FontSize="16"
+                FontSize="{DynamicResource X-LargeFontSize}"
                 FontWeight="Bold"
                 Foreground="White"
                 Text="{Binding ErrorMessage}" />
@@ -187,7 +189,15 @@
 
         <TabControl Grid.Row="2"
             Grid.ColumnSpan="2"
-            MinHeight="400">
+            MinHeight="400"
+            SelectedIndex="1">
+
+
+            <TabItem Header="{lex:Loc Startlist}" Visibility="{Binding Configuration.ReadBC3, Converter={StaticResource BoolToVis}}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <ctl:StartListControl x:Name="startListControl" />
+                </ScrollViewer>
+            </TabItem>
 
             <TabItem Header="{lex:Loc BridgeTimers}">
                 <Grid>
@@ -200,14 +210,8 @@
                     <DockPanel Grid.Row="0"
                         Margin="5,4,5,0"
                         LastChildFill="False"
-                        Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}">
+                        Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
 
-                        <Button
-                            x:Name="AddTimer"
-                            Width="70"
-                            Content="{lex:Loc AddTimer}"
-                            DockPanel.Dock="Left"
-                            IsEnabled="{Binding Configuration.CanAndTimer}" />
 
                         <Button
                             Width="40"
@@ -229,6 +233,14 @@
                             </Button.Style>
                             <Image Source="/Images/VerticalWindows.PNG" />
                         </Button>
+
+
+                        <Button
+                            x:Name="AddTimer"
+                            Width="70"
+                            Content="{lex:Loc AddTimer}"
+                            DockPanel.Dock="Left"
+                            IsEnabled="{Binding Configuration.CanAndTimer}" />
 
                         <Button
                             Width="40"
@@ -256,6 +268,12 @@
 
                     <!--  main part: the TimersPanel  -->
                     <Viewbox Grid.Row="1">
+
+                        <!--<Viewbox Grid.Row="1"  local:ZoomBehavior.ZoomLevel="{Binding GlobalZoom}">
+                      <Viewbox.LayoutTransform>
+                          <ScaleTransform ScaleX="{Binding GlobalZoom}" ScaleY="{Binding GlobalZoom}" />
+                      </Viewbox.LayoutTransform>-->
+
                         <ctl:TimersPanel
                             BridgeTimers="{Binding Configuration.BridgeTimers}"
                             CanAndTimer="{Binding Configuration.CanAndTimer}"
@@ -265,13 +283,7 @@
             </TabItem>
 
 
-            <TabItem Header="{lex:Loc Startlist}">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <ctl:StartListControl x:Name="startListControl" />
-                </ScrollViewer>
-            </TabItem>
-
-            <TabItem Header="{lex:Loc Results}">
+            <TabItem Header="{lex:Loc Results}" Visibility="{Binding Configuration.ReadBC3, Converter={StaticResource BoolToVis}}">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                     <ctl:ResultsControl x:Name="resultsControl" />
                 </ScrollViewer>
@@ -281,17 +293,18 @@
         <Label Grid.Row="3" Grid.Column="0"
             Content="{lex:Loc Projector}"
             FontWeight="Bold"
-            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}" />
+            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}" />
 
         <WrapPanel Grid.Row="3" Grid.Column="1"
             Margin="10,0,10,0"
             HorizontalAlignment="Center"
-            Visibility="{Binding DataContext.Parent.FullScreenMode, ElementName=root}">
+            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
             <Button
                 Width="100"
                 Margin="5"
                 cal:Message.Attach="[Event Click] = [Action ShowStartListAsync]"
-                Content="{lex:Loc btnShowStartLists}" />
+                Content="{lex:Loc btnShowStartLists}"
+                Visibility="{Binding DataContext.Parent.ListsVisibility, ElementName=root}" />
             <Button
                 Width="100"
                 Margin="5"
@@ -301,7 +314,8 @@
                 Width="100"
                 Margin="5"
                 cal:Message.Attach="[Event Click] = [Action ShowResultsAsync]"
-                Content="{lex:Loc btnShowResults}" />
+                Content="{lex:Loc btnShowResults}"
+                Visibility="{Binding DataContext.Parent.ListsVisibility, ElementName=root}" />
 
             <Button
                 Width="100"

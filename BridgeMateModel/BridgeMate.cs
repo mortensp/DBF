@@ -242,7 +242,7 @@ public class BridgeMate : PropertyChangedBase
 
             using var db = new BridgeMateContext(bwsFile);
 
-            // Count bords played for each roundStatus. We do this by looking at the ReceivedData, which contains a record for
+            // Count boards played for each roundStatus. We do this by looking at the ReceivedData, which contains a record for
             // each board played. We count the number of records for each roundStatus, and update the BoardsPlayed property of
             // the BMRounds accordingly.
             // Note that BMRounds has on entry per table per roundStatus. ie 6 entries per Group when having two tables

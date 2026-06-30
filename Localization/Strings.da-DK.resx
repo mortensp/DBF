@@ -163,7 +163,7 @@
     <value>Generalt</value>
   </data>
   <data name="MaxRows" xml:space="preserve">
-    <value>Max linjer af gangen:</value>
+    <value>Max linjer på siden:</value>
   </data>
   <data name="Projector" xml:space="preserve">
     <value>Projektor</value>
@@ -282,7 +282,7 @@
   <data name="TimePerRound" xml:space="preserve">
     <value>Tid pr. Runde</value>
   </data>
-  <data name="WarningDoNotStartNewGames" xml:space="preserve">
+  <data name="WarningDoNotStartNewBoard" xml:space="preserve">
     <value>Start ikke nye spil advarsel</value>
   </data>
   <data name="Minutes" xml:space="preserve">
@@ -410,12 +410,6 @@
   </data>
   <data name="tipMoreTime" xml:space="preserve">
     <value>Give mere tid i runden. Hold shift nede for at give mere tid på alle urene</value>
-  </data>
-  <data name="tipMoveTimerUp" xml:space="preserve">
-    <value>Flyt uret op</value>
-  </data>
-  <data name="tipMoveTimerDown" xml:space="preserve">
-    <value>Flyt uret ned</value>
   </data>
   <data name="tipResetTimer" xml:space="preserve">
     <value>Indlæs valgte indstillinger. Hold Shift nede for at Indlæse indstillinger for alle urene</value>
@@ -707,5 +701,32 @@
   </data>
   <data name="guideTimer" xml:space="preserve">
     <value>Betjening af uret</value>
+  </data>
+  <data name="mnuFontSize" xml:space="preserve">
+    <value>Skrift Størrelse</value>
+  </data>
+  <data name="DragNDrop" xml:space="preserve">
+    <value>Træk for at flytte timeren</value>
+  </data>
+  <data name="FontSize" xml:space="preserve">
+    <value>Tekst størrelse</value>
+  </data>
+  <data name="tbHelp" xml:space="preserve">
+    <value>Hjælp</value>
+  </data>
+  <data name="tbMaximize" xml:space="preserve">
+    <value>Maksimer</value>
+  </data>
+  <data name="tbMinimize" xml:space="preserve">
+    <value>Minimer</value>
+  </data>
+  <data name="tbRestore" xml:space="preserve">
+    <value>Gendan</value>
+  </data>
+  <data name="tbClose" xml:space="preserve">
+    <value>Luk</value>
+  </data>
+  <data name="AllowEarlyTransition" xml:space="preserve">
+    <value>Tillad tidligt rundeskifte</value>
   </data>
 </root>

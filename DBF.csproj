@@ -35,14 +35,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Themes\**" />
-	  <EmbeddedResource Remove="Themes\**" />
-	  <None Remove="Themes\**" />
-	  <Page Remove="Themes\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Remove="AudioServices\SoundResource.cs" />
+		
 		<Compile Remove="BridgeMateModel\BiddingData.cs" />
 		<Compile Remove="BridgeMateModel\HandEvaluation.cs" />
 		<Compile Remove="BridgeMateModel\HandRecord.cs" />
@@ -52,50 +45,38 @@
 		<Compile Remove="BridgeMateModel\ReceivedDataGrouped.cs" />
 		<Compile Remove="BridgeMateModel\ScoreUpload.cs" />
 		<Compile Remove="BridgeMateModel\Setting.cs" />
-		<Compile Remove="Helpers\ToastService.cs" />
-		<Compile Remove="UserControls\TimersPanel2.xaml.cs" />
-		<Compile Remove="UserControls\Toast.xaml.cs" />
-		<Compile Remove="ViewModels\BadgeExtensions.cs" />
+		
+		<Compile Remove="HelpSystem\PDFViewerControl.xaml.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Images\about.png" />
-	  <None Remove="Images\DBF_Tools.png" />
-	  <None Remove="Images\json.png" />
-	  <None Remove="Images\logs-file.png" />
-	  <None Remove="Images\manual.png" />
-	  <None Remove="Images\open-book.png" />
-	  <None Remove="Images\projector.ico" />
-	  <None Remove="Images\Splash.org.png" />
-	  <None Remove="Images\stopwatch.png" />
-	  <None Remove="Images\update-app.png" />
-	  <None Remove="Images\VerticalWindows.PNG" />
-	  <None Remove="InstallerFiles\Inno Setup Script.old.iss" />
+		<None Remove="HelpSystem\Images\AppSettings.pdf" />
+		<None Remove="Images\about.png" />
+		<None Remove="Images\DBF_Tools.png" />
+		<None Remove="Images\json.png" />
+		<None Remove="Images\logs-file.png" />
+		<None Remove="Images\manual.png" />
+		<None Remove="Images\open-book.png" />
+		<None Remove="Images\projector.ico" />
+		<None Remove="Images\Splash.org.png" />
+		<None Remove="Images\stopwatch.png" />
+		<None Remove="Images\update-app.png" />
+		<None Remove="Images\VerticalWindows.PNG" />
+		<None Remove="InstallerFiles\Inno Setup Script.old.iss" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Page Remove="UserControls\TimersPanel2.xaml" />
-	  <Page Remove="UserControls\Toast.xaml" />
-	</ItemGroup>
-
-	<!--<ItemGroup>
-	  <COMReference Include="{215d64d2-031c-33c7-96e3-61794cd1ee61}">
-	    <WrapperTool>tlbimp</WrapperTool>
-	    <VersionMinor>4</VersionMinor>
-	    <VersionMajor>2</VersionMajor>
-	    <Guid>215d64d2-031c-33c7-96e3-61794cd1ee61</Guid>
-	  </COMReference>
-	</ItemGroup>-->
 
 	<ItemGroup>
 		<Resource Include="Images\about.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
+		
 		<Resource Include="Images\DBF_Tools.ico">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
+		
 		<Resource Include="Images\DBF_Tools.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
 		<Resource Include="Images\guideTilUr.jpg">
@@ -103,39 +84,41 @@
 		</Resource>
 
 		<Resource Include="Images\HorizontalWindows.PNG">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
+		<EmbeddedResource Include="HelpSystem\Images\AppSettings.pdf" />
+
 		<EmbeddedResource Include="Images\projector.ico">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 
 		<EmbeddedResource Include="Images\projector_48x48.ico" />
 
 		<Resource Include="Images\json.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
 		<Resource Include="Images\logs-file.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
 		<Resource Include="Images\open-book.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
 		<Resource Include="Images\Splash.org.png" />
 
 		<Resource Include="Images\stopwatch.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
 		<Resource Include="Images\update-app.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 
 		<Resource Include="Images\VerticalWindows.PNG">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 	</ItemGroup>
 
@@ -149,6 +132,7 @@
 		<!--<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />-->
 		<PackageReference Include="MahApps.Metro.IconPacks.BootstrapIcons" Version="6.2.1" />
 		<PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="6.2.1" />
+		<PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.2.1" />
 		<!--<PackageReference Include="MahApps.Metro.IconPacks.Modern" Version="6.2.1" />-->
 		<!--<PackageReference Include="MahApps.Metro.IconPacks.PhosphorIcons" Version="6.2.1" />-->
 		<!--<PackageReference Include="MahApps.Metro.IconPacks.SimpleIcons" Version="6.2.1" />-->
@@ -157,6 +141,7 @@
 	<ItemGroup>
 		<PackageReference Include="EntityFrameworkCore.Jet" Version="9.0.0" />
 		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="9.0.0" />
+		<PackageReference Include="MahApps.Metro.IconPacks.MaterialDesign" Version="6.2.1" />
 		<PackageReference Include="System.Data.Odbc" Version="9.0.5" />
 	</ItemGroup>
 
@@ -186,21 +171,23 @@
 		<PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.16" />
 		<PackageReference Include="WpfScreenHelper" Version="2.1.1" />
 		<PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
-      
+
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="syncfusion.ui.wpf.net" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Shared.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Shared.Base" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Grid.Wpf" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="31.1.19" />
-		<PackageReference Include="Syncfusion.Tools.WPF" Version="31.1.19" />
+		<PackageReference Include="syncfusion.ui.wpf.net" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Shared.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Shared.Base" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Grid.Wpf" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Tools.WPF" Version="33.2.13" />
+		<!--<PackageReference Include="Syncfusion.Pdf.Wpf" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.PdfViewer.WPF" Version="33.2.13" />-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -209,19 +196,19 @@
 
 	<!-- Designer generation for Resources.resx and Settings.settings -->
 	<ItemGroup>
-	
+
 		<Compile Update="Localization\LocHelp.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>LocHelp.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LocHelp.resx</DependentUpon>
 		</Compile>
-	
+
 		<Compile Update="Localization\Syncfusion.SfColorPalette.Wpf.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>Syncfusion.SfColorPalette.Wpf.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Syncfusion.SfColorPalette.Wpf.resx</DependentUpon>
 		</Compile>
-	
+
 		<Compile Update="Properties\Resources.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
@@ -234,11 +221,11 @@
 			<DependentUpon>Settings.settings</DependentUpon>
 		</Compile>
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<EmbeddedResource Update="Localization\LocHelp.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>LocHelp.Designer.cs</LastGenOutput>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>LocHelp.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Localization\Strings.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
@@ -271,8 +258,8 @@
 		</EmbeddedResource>
 
 		<EmbeddedResource Update="Localization\Syncfusion.Shared.Wpf.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>Syncfusion.Shared.Wpf.Designer.cs</LastGenOutput>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Syncfusion.Shared.Wpf.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 
 		<Compile Update="Localization\Syncfusion.Shared.Wpf.Designer.cs">
@@ -285,7 +272,7 @@
 			<Generator></Generator>
 		</EmbeddedResource>
 	</ItemGroup>
-	
+
 	<!-- Only Resources.resx needs explicit generator; Strings.resx and all culture files handled automatically -->
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">
@@ -312,14 +299,14 @@
 		<None Include="FodyWeavers.xsd" />
 
 		<None Include="Localization\Syncfusion.SfColorPalette.Wpf.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>Syncfusion.SfColorPalette.Wpf2.Designer.cs</LastGenOutput>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Syncfusion.SfColorPalette.Wpf2.Designer.cs</LastGenOutput>
 		</None>
 
 		<None Include="Localization\Syncfusion.Shared.Wpf.da-DK.resx" />
 
 		<None Include="Localization\Syncfusion.Shared.Wpf.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
+			<Generator>ResXFileCodeGenerator</Generator>
 		</None>
 
 		<ProjectReference Include="..\..\Common Libs\AppArguments\AppArguments.csproj" />

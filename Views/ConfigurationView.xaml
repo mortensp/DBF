@@ -15,11 +15,11 @@
     lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
+    FontSize="{DynamicResource MediumFontSize}"
     SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterScreen"
+    WindowStyle="SingleBorderWindow"
     mc:Ignorable="d">
-
-
 
     <Window.Resources>
         <Style TargetType="TextBox">
@@ -29,6 +29,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
         <Style TargetType="ComboBox">
             <Style.Triggers>
                 <Trigger Property="IsKeyboardFocused" Value="True">
@@ -67,6 +68,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
@@ -79,7 +81,7 @@
                         Grid.RowSpan="1"
                         Grid.ColumnSpan="2"
                         Margin="0,3,4,0"
-                        FontSize="16"
+                        FontSize="{DynamicResource X-LargeFontSize}"
                         FontWeight="Bold"
                         Text="{lex:Loc General}" />
 
@@ -120,13 +122,29 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-
+                    <!--  FontSize  -->
                     <TextBlock Grid.Row="2" Grid.Column="0"
+                        Margin="8,5,4,0"
+                        VerticalAlignment="Center"
+                        Text="{lex:Loc FontSize}" />
+
+                    <ComboBox Grid.Row="2" Grid.Column="1"
+                        Width="140"
+                        Margin="0,3,4,2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        IsEditable="False"
+                        IsSynchronizedWithCurrentItem="True"
+                        ItemsSource="{Binding FontSizes}"
+                        SelectedItem="{Binding FontSizeService.FontSize}" />
+
+                    <!--  Read BridgeMate  -->
+                    <TextBlock Grid.Row="3" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc ReadBM}" />
 
-                    <CheckBox Grid.Row="2" Grid.Column="1"
+                    <CheckBox Grid.Row="3" Grid.Column="1"
                         Width="Auto"
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
@@ -135,12 +153,12 @@
 
 
                     <!--  BC3:  -->
-                    <TextBlock Grid.Row="3" Grid.Column="0"
+                    <TextBlock Grid.Row="4" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc ReadBC3}" />
 
-                    <CheckBox Grid.Row="3" Grid.Column="1"
+                    <CheckBox Grid.Row="4" Grid.Column="1"
                         Width="Auto"
                         Margin="0,5,4,0"
                         HorizontalAlignment="Left"
@@ -148,14 +166,14 @@
                         IsChecked="{Binding ReadBC3, Mode=TwoWay}" />
 
                     <!--<TextBlock
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Grid.Column="0"
                         Margin="8,3,4,0"
                         VerticalAlignment="Center"
                         Text="BC3 mappe:" />
 
                     <TextBox
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Grid.Column="1"
                         Width="Auto"
                         MinWidth="150"
@@ -165,21 +183,21 @@
                         Text="{Binding BC3Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />-->
 
                     <!--  Projector  -->
-                    <TextBlock Grid.Row="5" Grid.Column="0"
+                    <TextBlock Grid.Row="6" Grid.Column="0"
                         Margin="0,7,4,0"
-                        FontSize="16"
+                        FontSize="{DynamicResource X-LargeFontSize}"
                         FontWeight="Bold"
                         Text="{lex:Loc Projector}"
                         Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
                     <!--  Projector Interval:  -->
-                    <TextBlock Grid.Row="6" Grid.Column="0"
+                    <TextBlock Grid.Row="7" Grid.Column="0"
                         Margin="8,5,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc ProjectorInterval}"
                         Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
-                    <StackPanel Grid.Row="6" Grid.Column="1"
+                    <StackPanel Grid.Row="7" Grid.Column="1"
                         Margin="0,5,4,0"
                         Orientation="Horizontal"
                         Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}">
@@ -196,13 +214,13 @@
 
                     <!--  Maximum rows  -->
 
-                    <TextBlock Grid.Row="7" Grid.Column="0"
+                    <TextBlock Grid.Row="8" Grid.Column="0"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
                         Text="{lex:Loc MaxRows}"
                         Visibility="{Binding ReadBC3, Converter={StaticResource BoolToVis}}" />
 
-                    <TextBox Grid.Row="7" Grid.Column="1"
+                    <TextBox Grid.Row="8" Grid.Column="1"
                         Width="50"
                         Margin="0,5,0,5"
                         HorizontalAlignment="Left"

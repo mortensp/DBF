@@ -22,3 +22,4 @@ global using Orientation = System.Windows.Controls.Orientation;
 global using Screen = Caliburn.Micro.Screen;
 global using UserControl = System.Windows.Controls.UserControl;
 global using Window = System.Windows.Window;
+global using Button = System.Windows.Controls.Button;

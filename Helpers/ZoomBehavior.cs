@@ -1,62 +1,121 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using Caliburn.Micro;
+using DBF.DataModel;
+using DBF.Helpers;
 
 namespace DBF;
 
 public static class ZoomBehavior
 {
-    public static readonly DependencyProperty EnableZoomProperty =
-        DependencyProperty.RegisterAttached(
-            "EnableZoom",
-            typeof(bool),
-            typeof(ZoomBehavior),
-            new PropertyMetadata(false, OnEnableZoomChanged));
+    //private static double        step = 0.05;
+    private static Configuration configuration;
+    private static FontSizeService fontSizeService;
+    private static double        minFontSize;
+    private static double        maxFontSize;
 
-    public static void SetEnableZoom(DependencyObject obj, bool value)
-        => obj.SetValue(EnableZoomProperty, value);
+    #region Attached Property : EnableZoom
+        public static readonly DependencyProperty EnableZoomProperty = 
+                               DependencyProperty.RegisterAttached( "EnableZoom"
+                                                                  , typeof(bool)
+                                                                  , typeof(ZoomBehavior)
+                                                                  , new PropertyMetadata(false, OnEnableZoomChanged));
 
-    public static bool GetEnableZoom(DependencyObject obj)
-        => (bool)obj.GetValue(EnableZoomProperty);
+        public static void SetEnableZoom(DependencyObject obj, bool value)
+                                                        => obj.SetValue(EnableZoomProperty, value);
 
-    private static void OnEnableZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is FrameworkElement fe)
+        public static bool GetEnableZoom(DependencyObject obj)
+                                                        => (bool)obj.GetValue(EnableZoomProperty);
+
+        private static void OnEnableZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            configuration = IoC.Get<Configuration>();
+            fontSizeService = IoC.Get<FontSizeService>();
+            minFontSize   = Configuration.FontSizes.Min();
+            maxFontSize   = Configuration.FontSizes.Max();
+
+            if (d is not FrameworkElement fe)
+                return;
+
             if ((bool)e.NewValue)
-                fe.PreviewMouseWheel += OnMouseWheel;
+                fe.PreviewKeyDown += OnKeyDown;
             else
-                fe.PreviewMouseWheel -= OnMouseWheel;
+                fe.PreviewKeyDown -= OnKeyDown;
         }
-    }
+    #endregion
 
-    private static void OnMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        if (sender is FrameworkElement fe)
+    #region Attached Property : ZoomLevel
+        public static readonly DependencyProperty ZoomLevelProperty = 
+                               DependencyProperty.RegisterAttached( "ZoomLevel"
+                                                                  , typeof(double)
+                                                                  , typeof(ZoomBehavior)
+                                                                  , new PropertyMetadata(1.0, OnZoomLevelChanged));
+
+        public static void SetZoomLevel(DependencyObject obj, double value)
+                                                        => obj.SetValue(ZoomLevelProperty, value);
+
+        public static double GetZoomLevel(DependencyObject obj)
+                                                        => (double)obj.GetValue(ZoomLevelProperty);
+
+        private static void OnZoomLevelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            if (d is not FrameworkElement fe)
+                return;
+
+            double zoom = (double)e.NewValue;
+
+            // If Window → zoom content instead
+            if (fe is Window w && w.Content is FrameworkElement content)
+                fe = content;
+
+            if (fe.LayoutTransform is not ScaleTransform st)
             {
-                // Find or create ScaleTransform
-                if (fe.LayoutTransform is not ScaleTransform st)
-                {
-                    st = new ScaleTransform(1.0, 1.0);
-                    fe.LayoutTransform = st;
-                }
-
-                double zoom = st.ScaleX;
-                zoom += e.Delta > 0 ? 0.1 : -0.1;
-                zoom = Math.Max(0.5, Math.Min(2.5, zoom));
-
-                st.ScaleX = zoom;
-                st.ScaleY = zoom;
-
-                e.Handled = true;
+                st                 = new ScaleTransform(1.0, 1.0);
+                fe.LayoutTransform = st;
             }
+
+            st.ScaleX = zoom;
+            st.ScaleY = zoom;
         }
+    #endregion
+
+    // -------------------------------
+    // Ctrl + +  /  Ctrl + -
+    // -------------------------------
+    private static void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
+            return;
+
+        if (sender is not FrameworkElement fe)
+            return;
+
+        // Window → zoom content
+        //if (fe is Window w && w.Content is FrameworkElement content)
+        //    fe = content;
+        //double zoom = GetZoomLevel(fe);
+        if (e.Key == Key.OemPlus || e.Key == Key.Add)
+        {
+            //zoom                  += step;
+            e.Handled              = true;
+            configuration.FontSize+= 2;
+        }
+        else
+            if (e.Key == Key.OemMinus || e.Key == Key.Subtract)
+            {
+                //zoom                  -= step;
+                e.Handled              = true;
+                configuration.FontSize-= 2;
+            }
+
+        configuration.FontSize = Math.Max(minFontSize, configuration.FontSize);
+        configuration.FontSize = Math.Min(maxFontSize, configuration.FontSize);
+        fontSizeService.FontSize = configuration.FontSize;
+
+        //zoom = Math.Max(0.3, Math.Min(3.0, zoom));
+
+        //SetZoomLevel(fe, zoom);
     }
 }
-
