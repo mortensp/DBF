@@ -14,7 +14,7 @@ namespace DBF.DataModel
         public override string ToString()
         {
             if (Players is null || Players.Count() == 0)
-                return "Oversidere"; // string.Empty;
+                return "Oversidere"; 
 
             if (Players.Count() == 1)
                 return $"{PairNo,2} {Players[0].Name} - ?";
@@ -51,7 +51,6 @@ namespace DBF.DataModel
 
         public override int GetHashCode()
         {
-            // Brug de samme properties som i Equals
             return HashCode.Combine(PairNo);
         }
     }

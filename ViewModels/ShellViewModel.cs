@@ -68,7 +68,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         Configuration.Save();
 
         // 2. Set culture first
-        // Lex.Culture = LanguageService.Instance.SetCulture(name);
         LanguageService.Instance.SetCulture(name);
 
         // 3. Update UI on all views
@@ -86,11 +85,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         var window = new TimersHelpWindow();
         window.Show();
     }
-
-    //public void Help()
-    //{
-    //    Debugger.Break();
-    //}
 
     public void OnKeyDown(KeyEventArgs e)
     {
@@ -131,7 +125,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             _previousBounds      = new Rect(window.Left, window.Top, window.Width, window.Height);
 
             // Fullscreen mode
-            //vindow.WindowStyle = WindowStyle.None;
             window.ResizeMode  = ResizeMode.NoResize;
             window.WindowState = WindowState.Normal; // Need to maximize correctly
             window.WindowState = WindowState.Maximized;
@@ -158,7 +151,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             GitHub _github = new GitHub("DBF");
             _github.Update(Arguments.DebugMode, "install");
         }
-
         catch (Exception ex)
         {
             MessageBox.Show($"Updater Error: {ex.Message}", "Updater Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -185,6 +177,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             {
                 exePath = Process.GetCurrentProcess().MainModule?.FileName;
             }
+
             catch { /* permission can fail in certain environments */ }
 
             if (string.IsNullOrEmpty(exePath))
@@ -214,6 +207,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
             var process =Process.Start(psi);
         }
+
         catch (Exception ex)
         {
             MessageBox.Show($"{Lex.ErrorRestart}: {ex.Message}", Lex.Error, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -242,6 +236,7 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
         {
             await TryCloseAsync();
         }
+
         catch (Exception ex)
         {
             Debug.WriteLine($"{ex.Message}", Lex.Error, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -249,20 +244,17 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     }
 
     public void TitleBarDrag(MouseButtonEventArgs e)
-{
-    var win = (Window)GetView();
-
-    if (e.ClickCount == 2)
     {
-        // Toggle maximize
-        win.WindowState = win.WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
-    }
-    else
-    {
-        win.DragMove();
-    }
-}
+        var win = (Window)GetView();
 
+        if (e.ClickCount == 2)
+        {
+            // Toggle maximize
+            win.WindowState = win.WindowState == WindowState.Maximized
+                            ? WindowState.Normal
+                            : WindowState.Maximized;
+        }
+        else
+            win.DragMove();
+    }
 }

@@ -12,7 +12,7 @@ using DBF.Helpers;
 using DBF.ViewModels;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
-using Syncfusion.Windows.Controls.PivotGrid;
+//using Syncfusion.Windows.Controls.PivotGrid;
 using Group = Syncfusion.Data.Group;
 
 namespace DBF.UserControls
@@ -53,12 +53,10 @@ namespace DBF.UserControls
                 dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = InProjectorView; };
                 dgTeams.ItemsSourceChanged             += onTeamsChanged;
 
-                // Initialiser timeren
+                // Initialize the timer
                 groupTimer             = new DispatcherTimer();
                 groupTimer.Tick       += (s, e) => showNextGroup();
                 config.PropertyChanged+= (s, e) => setupPaging();
-
-                //showBreak();
             }
         #endregion
 
@@ -100,6 +98,7 @@ namespace DBF.UserControls
                     if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
                         dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
                 }
+
                 catch (Exception ex)
                 {
                     Logger.Exception(ex);
@@ -111,10 +110,8 @@ namespace DBF.UserControls
                 dg.View.Filter = item =>  displayLines.Count == 0
                                       ||  item               is Pair pair
                                       &&  displayLines[displayLineIndex].Contains(pair.EntryNo);
-                // 
-                setupPaging();
 
-                //dg.Visibility = pairs.Any(p => p.ResultStr == null) ? Visibility.Collapsed : Visibility.Visible;
+                setupPaging();
             }
         }
 
@@ -134,10 +131,8 @@ namespace DBF.UserControls
                 dg.View.Filter = item =>  displayLines.Count == 0
                                       ||  item               is Team team
                                       &&  displayLines[displayLineIndex].Contains(team.EntryNo);
-                // 
-                setupPaging();
 
-                //dg.Visibility = teams.Any(p => p.ImpScoreStr == null) ? Visibility.Collapsed : Visibility.Visible;
+                setupPaging();
             }
         }
 
@@ -271,31 +266,19 @@ namespace DBF.UserControls
                     UpdateColumnVisibility();
 
                 if (e.PropertyName == nameof(ControlViewModel.ShowAsOneGroupVisibility))
-                    OnPropertyChanged(nameof(CollapsedInProjectorView));  // Notify binding
+                    OnPropertyChanged(nameof(CollapsedInProjectorView));
             }
 
             private void UpdateColumnVisibility()
             {
                 if (this.DataContext is ControlViewModel vm)
                 {
-                    // dgPairs.Columns[] bruger MappingName som key
-
                     // HideHacGrp
                     var hacGrpColumn = dgPairs.Columns.FirstOrDefault(c => c.MappingName == "HACRankSectionGroup");
 
                     if (hacGrpColumn != null)
                         hacGrpColumn.IsHidden = vm.HideHacGrp;
 
-                    // HideTournamentSummery
-                    //var tournamentColumns = dgPairs.Columns.Where(c =>  c.MappingName == "TournamentRank"
-                    //                                                ||  c.MappingName == "TournamentResult"
-                    //                                                ||  c.MappingName == "HACTotal");
-
-                    //foreach (var col in tournamentColumns)
-                    //    if (col.MappingName == "HACTotal")
-                    //        col.IsHidden = vm.HideTournamentSummery || vm.HideHac;
-                    //    else
-                    //        col.IsHidden = vm.HideTournamentSummery;
                     dgPairs.Columns["HACTotal"]?.IsHidden = vm.HideTournamentSummery || vm.HideHac;
                     dgPairs.Columns["TournamentRank"]?.IsHidden = vm.HideTournamentSummery;
                     dgPairs.Columns["TournamentResult"]?.IsHidden = vm.HideTournamentSummery;
@@ -303,23 +286,23 @@ namespace DBF.UserControls
             }
         #endregion
 
-        private void showBreak()
-        {
-            try
-            {
-                // Only show the test button when running under a debugger
-                if (Debugger.IsAttached)
-                {
-                    var btn = this.FindName("btnBreak") as UIElement;
+        //private void showBreak()
+        //{
+        //    try
+        //    {
+        //        // Only show the test button when running under a debugger
+        //        if (Debugger.IsAttached)
+        //        {
+        //            var btn = this.FindName("btnBreak") as UIElement;
 
-                    if (btn != null)
-                        btn.Visibility = Visibility.Visible;
-                }
-            }
-            catch
-            {
-                // ignore any lookup failures
-            }
-        }
+        //            if (btn != null)
+        //                btn.Visibility = Visibility.Visible;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        // ignore any lookup failures
+        //    }
+        //}
     }
 }

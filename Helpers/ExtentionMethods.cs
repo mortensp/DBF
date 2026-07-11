@@ -39,18 +39,18 @@ public static class ExtentionMethods
         if (string.IsNullOrWhiteSpace(path))
             return null;
 
-        // Normaliser stien
+        // Normalize path    
         path = Path.GetFullPath(path);
 
-        // Split i segmenter
+        // Split into segments
         var parts = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-        // Start med roden (fx "C:\")
+        // Begin at the root (fx "C:\")
         string current = parts[0].EndsWith(":") ? parts[0] + Path.DirectorySeparatorChar : parts[0];
 
         string deepest = Directory.Exists(current) ? current : null;
 
-        // Gå ned gennem stien
+        // Parse and go down the path
         for (int i = 1; i < parts.Length; i++)
         {
             current = Path.Combine(current, parts[i]);
@@ -74,18 +74,18 @@ public static class ExtentionMethods
 
         int i = 0;
 
-        // Find første forskel
+        // Find first difference
         while (i < a.Length && i < b.Length &&
                string.Equals(a[i], b[i], StringComparison.OrdinalIgnoreCase))
         {
             i++;
         }
 
-        // Hvis B er længere og der er en forskel → returnér første unikke segment
+        // If B is longer and there is a difference → return the first unique segment
         if (i < b.Length)
             return b[i];
 
-        return null; // B er ikke længere end A, eller de er identiske
+        return null; // B is not longer than A, or they are identical
     }
 
     public static string GetLeafDirectoryName(this string path)

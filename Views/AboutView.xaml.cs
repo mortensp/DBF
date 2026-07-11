@@ -23,7 +23,6 @@ namespace DBF.Views
     {
              public AboutView()
         {
-            //Title=Lex.AboutTitle;
             InitializeComponent();
         }
     }

@@ -282,9 +282,6 @@
   <data name="TimePerRound" xml:space="preserve">
     <value>Tid pr. Runde</value>
   </data>
-  <data name="WarningDoNotStartNewBoard" xml:space="preserve">
-    <value>Start ikke nye spil advarsel</value>
-  </data>
   <data name="Minutes" xml:space="preserve">
     <value>minutter</value>
   </data>
@@ -728,5 +725,11 @@
   </data>
   <data name="AllowEarlyTransition" xml:space="preserve">
     <value>Tillad tidligt rundeskifte</value>
+  </data>
+  <data name="WarningDoNotStartNewBoard" xml:space="preserve">
+    <value>Start ikke nye spil advarsel</value>
+  </data>
+  <data name="NoSecondScreen" xml:space="preserve">
+    <value>Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K</value>
   </data>
 </root>

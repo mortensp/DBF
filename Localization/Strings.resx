@@ -729,4 +729,7 @@
   <data name="WarningDoNotStartNewBoard" xml:space="preserve">
     <value>Do Not Start New Board Warning</value>
   </data>
+  <data name="NoSecondScreen" xml:space="preserve">
+    <value>No second screen connected. Hold down Win and press K. </value>
+  </data>
 </root>

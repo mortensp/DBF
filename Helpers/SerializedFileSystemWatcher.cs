@@ -90,27 +90,7 @@ namespace DBF.Helpers
         #endregion
 
         #region Public Methods
-            //public bool WatchForNewFolder(string dir, string fileFilter, bool enable = true)
-            //{
-            //    if (Directory.Exists(dir))
-            //    {
-            //        this.Path                  = dir;
-            //        this.Filter                = fileFilter;
-            //        this.IncludeSubdirectories = false;
-            //        this.EnableRaisingEvents   = enable;
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        this.Path                  = dir.FindDeepestExistingDirectory();
-            //        this.Filter                = dir.FirstNonSharedDirectory(this.Path) ?? fileFilter;
-            //        this.IncludeSubdirectories = true;
-            //        this.EnableRaisingEvents   = enable;
-            //        _waitFolderPath            = dir;
-            //        _waitFileFilter            = fileFilter;
-            //        return false;
-            //    }
-            //}
+           
         #endregion
 
         #region Private methods
@@ -133,7 +113,6 @@ namespace DBF.Helpers
                         var leaf = path.GetLeafDirectoryName();
 
                         if (!leaf.WildcardMatch(dirFilter))
-                            //if (!string.Equals(dirFilter, leaf, StringComparison.OrdinalIgnoreCase))
                             return;
                     }
 
@@ -175,9 +154,6 @@ namespace DBF.Helpers
                         if (_cts.IsCancellationRequested)
                             break;
 
-                        // if (!_eventQueue.TryDequeue(out var path))
-                        //     continue; // spurious signal
-                        //
                         // Wait a short grouping interval to allow additional events to be queued
                         try
                         {
@@ -200,16 +176,13 @@ namespace DBF.Helpers
                         }
 
                         if (pathsToProcess.Count == 0)
-                            continue; // nothing to do
+                            continue; 
 
                         foreach (var path in pathsToProcess)
                         {
-                            if (_cts.IsCancellationRequested)
-                                break;
-
-                            // Try to get and remove latest event for this path
-                            if (!_latestEvents.TryRemove(path, out var ev))
-                                continue; // nothing to process for this path
+                            if (_cts.IsCancellationRequested
+                            || !_latestEvents.TryRemove(path, out var ev))
+                                continue; 
 
                             // Wait a short time for the writer to finish and wait for size-stability
                             await Task.Delay(200, _cts.Token).ConfigureAwait(false);
@@ -307,11 +280,11 @@ namespace DBF.Helpers
             /// </summary>
             public new void Dispose()
             {
-                // unsubscribe base events
                 base.Changed-= HandleBaseEvent;
                 base.Created-= HandleBaseEvent;
                 base.Deleted-= HandleBaseEvent;
                 base.Renamed-= HandleBaseEvent;
+
                 // We never exit the loop in normal operation; ensure flag cleared if we do
                 // This ensures that a new processor will be started if new events arrive after we exit.
                 try

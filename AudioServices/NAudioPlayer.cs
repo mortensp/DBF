@@ -152,7 +152,7 @@ public sealed class NAudioPlayer : IDisposable
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
 
-            _mp3DecodeTask = Task.Run(() => Mp3DecodeLoopAsync(stream, token), token);  // ← INITIALISER HER
+            _mp3DecodeTask = Task.Run(() => Mp3DecodeLoopAsync(stream, token), token);  // ← Initialize the MP3 decode loop in a separate task
             IsPlaying = true;
         }
     }
@@ -214,7 +214,7 @@ public sealed class NAudioPlayer : IDisposable
         }
     }
 
-    // ****-----------------------------****
+    // -----------------------------
     // Format detection
     // -----------------------------
     private static bool IsWav(Stream stream)

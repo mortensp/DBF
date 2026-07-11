@@ -25,7 +25,7 @@ namespace DBF.Views
         {
             InitializeComponent();
 
-            // Sæt vinduets højde relativ til skærmens 
+            // Set window height relative to screen height
             var screenHeight = SystemParameters.PrimaryScreenHeight;
             var screenWidth  = SystemParameters.PrimaryScreenWidth;
 
@@ -34,12 +34,6 @@ namespace DBF.Views
             Width                 = screenWidth - 100;
 
             helpImage.Source = new BitmapImage(new Uri("pack://application:,,,/Images/guideTilUr.jpg"));
-
-            //var bytes        = HelpImages.AppSettings_Image;
-            //Height                = Math.Min(screenHeight - 100, bytes.Height-100);
-            //Width                 = Math.Min(screenWidth - 100, bytes.Width-100);
-
-            //helpImage.Source = ToBitmapImage(bytes);
         }
 
         public static BitmapImage ToBitmapImage(Bitmap bmp)

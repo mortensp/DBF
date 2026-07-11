@@ -9,8 +9,7 @@ namespace DBF.HelpSystem;
 public static class Help
 {
     public static readonly DependencyProperty KeyProperty =
-                           DependencyProperty.RegisterAttached(
-                                                                "Key"
+                           DependencyProperty.RegisterAttached( "Key"
                                                               , typeof(string)
                                                               , typeof(Help)
                                                               , new PropertyMetadata(null, OnHelpKeyChanged));

@@ -1231,6 +1231,15 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No second screen connected. Hold down Win and press K. .
+        /// </summary>
+        internal static string NoSecondScreen {
+            get {
+                return ResourceManager.GetString("NoSecondScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to is not uploaded.
         /// </summary>
         internal static string NotUploaded {

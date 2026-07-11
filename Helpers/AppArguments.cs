@@ -16,17 +16,18 @@ public static class AppArguments
 
     #region Argument handling
         private static ArgumentMap validArgs = 
-                                   new ArgumentMap{
-                                                        {"mode",  new ( "normal", "restart", "reset") }
-                                                      , {"debug", new ("false", "true","" ) }
-                                                  };
+                                   new ArgumentMap
+                                       {
+                                             {"mode",  new ( "normal", "restart", "reset") }
+                                           , {"debug", new ("false", "true","" ) }
+                                       };
 
         private static string[] requiredArgs = new string[0];
 
         private static void showHelp(string msg, bool exitProgram)
         {
             string helpText = @"
-                                                                🔧 DBF Tools Help
+                                                                    🔧 DBF Tools Help
         ====================
         Usages:
           DBF.exe [mode:MyMode]  

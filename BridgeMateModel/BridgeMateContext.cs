@@ -34,7 +34,6 @@ public class BridgeMateContext : DbContext
                        + $"Dbq={DatabasePath};";
 
         _ = options.UseJetOdbc(connStr);
-        //.LogTo(Console.WriteLine);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,6 +46,9 @@ public class BridgeMateContext : DbContext
         modelBuilder.Entity<ReceivedData>(entity => { });
             modelBuilder.Entity<BMRound>(entity =>
             {
+                // Define a C# only (not in the database) composite key 
+                entity.HasKey(b => new { b.Section, b.TableNo, b.Round });
+
                 entity.Property(e => e.TableNo).HasColumnType("smallint");
 
                 // Configure foreign key relationship to Section based on Section.Id

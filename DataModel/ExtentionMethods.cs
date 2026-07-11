@@ -68,7 +68,6 @@ namespace DBF.DataModel
                                 var tItem = targetList.Find(i => i.Equals(item));
 
                                 if (tItem is null)
-                                    //if (!targetList.Contains(item))
                                     addMethod.Invoke(targetCollection, new[] { item });
                                 else
                                 {
@@ -123,13 +122,13 @@ namespace DBF.DataModel
             if (names.Count == 1)
                 return names[0];
 
-            // Sæt sidste separator som " og "
+            // Set last separator as " and "
             return string.Join(separator, names.Take(names.Count - 1)) + lastSeparator + names.Last();
         }
 
         public static void RefreshSorting(this SfDataGrid sfDataGrid)
         {
-            // Ryd og genanvend sorteringen
+            // Clear and reapply sorting
             var sortDescriptions = sfDataGrid.SortColumnDescriptions.ToList();
             var desc = sfDataGrid.SortColumnDescriptions;
 

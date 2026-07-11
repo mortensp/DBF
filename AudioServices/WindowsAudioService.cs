@@ -43,8 +43,6 @@ namespace DBF.AudioServices
             }
         }
 
-        //public void Play(string sound) => Play(sound, 50);
-
         public void Play(SoundDefinition sound) => Play(sound, 60);
 
         public void Play(SoundDefinition sound, int volume)
@@ -81,66 +79,6 @@ namespace DBF.AudioServices
                 return;
             }
         }
-
-        //public void Play(string soundName, int volume)
-        //{
-        //    try
-        //    {
-        //        _        = _player.Stop();
-        //        filePath = "";
-
-        //        if (IsValidFilePath(soundName))
-        //            if (File.Exists(soundName))
-        //                filePath = soundName;
-        //            else
-        //            {
-        //                Logger.Error($"{Lex.MissingSoundFile}: '{soundName}'");
-        //                return;
-        //            }
-        //        else
-        //            lock (_sync)
-        //            {
-        //                var resourcesObject = Properties.Resources.ResourceManager.GetObject(soundName);
-
-        //                if (resourcesObject is byte[] filebytes)
-        //                {
-        //                    filePath = Path.Combine(Path.GetTempPath(), $"{soundName}.mp3");
-
-        //                    if (!_tempFilePaths.Contains(filePath))
-        //                    {
-        //                        File.WriteAllBytes(filePath, filebytes);
-        //                        _tempFilePaths.Add(filePath);
-        //                    }
-        //                }
-        //                else
-        //                    if (resourcesObject is Stream)
-        //                        using (System.IO.Stream stream = (System.IO.Stream)resourcesObject)
-        //                        {
-        //                            filePath = Path.Combine(Path.GetTempPath(), $"{soundName}.{stream.GetAudioFormat()}");
-
-        //                            if (!_tempFilePaths.Contains(filePath))
-        //                            {
-        //                                using (var memoryStream = new MemoryStream())
-        //                                {
-        //                                    stream.CopyTo(memoryStream);
-        //                                    File.WriteAllBytes(filePath, memoryStream.ToArray());
-        //                                }
-
-        //                                _tempFilePaths.Add(filePath);
-        //                            }
-        //                        }
-        //            }
-
-        //        _      = _player.Stop();
-        //        Volume = volume;
-        //        _      = _player.Play(filePath);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Exception(ex, $"{Lex.ErrorPlayingSound}:'{soundName}'");
-        //        return;
-        //    }
-        //}
 
         public void Pause()
         {

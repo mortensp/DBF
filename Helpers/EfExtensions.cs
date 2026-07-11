@@ -13,10 +13,10 @@ public static class EfExtensions
     {
         var set = db.Set<TEntity>();
 
-        // 1. Hent nye rækker (tilføjer kun nye entities)
+        // 1. Fetch new rows (adds only new entities)
         set.Load();
 
-        // 2. Refresh alle eksisterende entities + navigation properties
+        // 2. Refresh all existing entities + navigation properties
         var visited = new HashSet<object>();
 
         foreach (var entity in set.Local)
@@ -31,7 +31,7 @@ public static class EfExtensions
         {
             var clrType = type.ClrType;
 
-            // Kald RefreshAll<TEntity>() via reflection
+            // call RefreshAll<TEntity>() using reflection
             var method = typeof(EfExtensions)
             .GetMethod(nameof(EfExtensions.RefreshAll))
             .MakeGenericMethod(clrType);
@@ -48,7 +48,7 @@ public static class EfExtensions
 
             visited.Add(entity);
 
-            // Reload selve entity'en
+            // Reload the entity itself
             db.Entry(entity).Reload();
 
             var entry = db.Entry(entity);
@@ -76,10 +76,10 @@ public static class EfExtensions
             }
         }
 
-        // Helper: afgør om navigationen er konfigureret til eager loading
+        // Helper: determine if the navigation is configured for eager loading
         private static bool IsEagerLoaded(this INavigationBase navigation, DbContext db)
         {
-            // Hvis navigationen er inkluderet via modelkonfiguration (HasOne/WithMany + AutoInclude)
+            // If the navigation is included via model configuration (HasOne/WithMany + AutoInclude)
             return navigation is INavigation nav && nav.IsEagerLoaded;
         }
     #endregion

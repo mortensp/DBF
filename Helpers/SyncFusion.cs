@@ -17,25 +17,23 @@ namespace DBF.Helpers
             int levelsToCheck = 25;
 
             // Get Current Syncfusion version
-            var version            = Assembly.Load("Syncfusion.Licensing")?.GetName()?.Version;
-            var major = $"V{version?.Major}:";
+            var version = Assembly.Load("Syncfusion.Licensing")?.GetName()?.Version;
+            var major   = $"V{version?.Major}:";
 
             // Get paths to search
-            var filePath = @"SyncfusionLicense.txt";            
+            var filePath         = @"SyncfusionLicense.txt";
             var currentDirectory = Directory.GetParent(AppContext.BaseDirectory);
-            
+
             StringBuilder searched = new StringBuilder();
 
             // Append strings to the StringBuilder
             searched.Append($"Searching for Syncfusion License Key for {major} in file: '{filePath}' starting at folder: '{currentDirectory?.FullName}' and up");
 
-            if (version is not null
-            && currentDirectory is not null
+            if (version          is not null
+            &&  currentDirectory is not null
             && !string.IsNullOrEmpty(filePath))
-            {
-             
 
-                for (int n = 0; n < levelsToCheck; n++)
+                for (int n = 0; n <  levelsToCheck; n++)
                 {
                     string fileDataPath = Path.Combine(currentDirectory.FullName, filePath);
 
@@ -43,14 +41,12 @@ namespace DBF.Helpers
 
                     if (File.Exists(fileDataPath))
                     {
-                        //Debug.WriteLine($"Syncfusion License file: {fileDataPath}");
-
                         foreach (var line in File.ReadLines(fileDataPath, Encoding.UTF8))
                         {
                             if (line.StartsWith(major, StringComparison.OrdinalIgnoreCase))
                             {
                                 SyncfusionLicenseProvider.RegisterLicense(line.Replace(major, "", StringComparison.OrdinalIgnoreCase).Trim());
-                                
+
                                 return string.Empty;
                             }
                         }
@@ -60,14 +56,12 @@ namespace DBF.Helpers
 
                     if (currentDirectory.Parent is null)
                         break;
-                                    
-                    currentDirectory = currentDirectory.Parent; 
+
+                    currentDirectory = currentDirectory.Parent;
                 }
-            }
 
             searched.Append($"{Environment.NewLine}License file is missing!");
             return searched.ToString();
-            //return string.Empty;
         }
     }
 }

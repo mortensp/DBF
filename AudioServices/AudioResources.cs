@@ -5,7 +5,6 @@ namespace DBF.AudioServices;
 
 public static class AudioResources
 {
-    //public static List <string> Sounds = new();
     public static readonly SoundDefinition[] SoundDefinitions;
 
     public static readonly SoundDefinition Sound_Bowl           = new( Lex.Sound_Bowl);
@@ -33,7 +32,6 @@ public static class AudioResources
           , Sound_HandHeld
           , Sound_IonBell
           , Sound_MechanicalBell
-          //, Sound_Notify
           , Sound_School
           , Sound_School2
         };

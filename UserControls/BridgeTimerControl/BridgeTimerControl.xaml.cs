@@ -33,42 +33,42 @@ public partial class BridgeTimerControl : UserControl
     }
 
     #region Dependency Properties
-        #region Timer Dependency Property
-            public static readonly DependencyProperty BridgeTimerProperty = 
+    #region Timer Dependency Property
+    public static readonly DependencyProperty BridgeTimerProperty =
                                    DependencyProperty.Register( nameof(BridgeTimer)
                                                               , typeof(BridgeTimer)
-                                                              , typeof(BridgeTimerControl)
-                                                              , new FrameworkPropertyMetadata(null,onBridgeTimerPropertyChanged));
+                                                              , typeof(BridgeTimerControl));
+                                                              //, new FrameworkPropertyMetadata(null,onBridgeTimerPropertyChanged));
             public BridgeTimer BridgeTimer
             {
                 get => (BridgeTimer)GetValue(BridgeTimerProperty);
                 set => SetValue(BridgeTimerProperty, value);
             }
 
-            private static void onBridgeTimerPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-            {
-                if (d is BridgeTimerControl ctl)
-                {
-                    if (e.OldValue is BridgeTimer oldValue)
-                        oldValue.PropertyChanged -= ctl.Timer_PropertyChanged;
+            //private static void onBridgeTimerPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            //{
+            //    if (d is BridgeTimerControl ctl)
+            //    {
+            //        if (e.OldValue is BridgeTimer oldValue)
+            //            oldValue.PropertyChanged -= ctl.Timer_PropertyChanged;
 
-                    if (e.NewValue is BridgeTimer newValue)
-                        ctl.UpdateText(ctl.BridgeTimer);
-                }
-            }
+            //        //if (e.NewValue is BridgeTimer newValue)
+            //        //    ctl.UpdateText(ctl.BridgeTimer);
+            //    }
+            //}
 
-            private void Timer_PropertyChanged(object sender, PropertyChangedEventArgs e)
-            {
-                if (sender         is BridgeTimer timer
-                &&  e.PropertyName == nameof(BridgeTimer.ForegroundColor))
-                    UpdateText(timer);
-            }
+            //private void Timer_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            //{
+            //    if (sender         is BridgeTimer timer
+            //    &&  e.PropertyName == nameof(BridgeTimer.ForegroundColor))
+            //        UpdateText(timer);
+            //}
 
-            private void UpdateText(BridgeTimer timer)
-            {
-                //foreach (var elm in this.display.Children.OfType<TextBlock>())
-                //    elm.Foreground = timer.Foreground;
-            }
+            //private void UpdateText(BridgeTimer timer)
+            //{
+            //    //foreach (var elm in this.display.Children.OfType<TextBlock>())
+            //    //    elm.Foreground = timer.Foreground;
+            //}
         #endregion
 
         #region CanClose Dependency Property
@@ -183,9 +183,6 @@ public partial class BridgeTimerControl : UserControl
                 BridgeTimer.Start();
         }
 
-        //private void BtnUp_Click(object sender, RoutedEventArgs e)   => Configuration.TimerUp(BridgeTimer);
-
-        //private void BtnDown_Click(object sender, RoutedEventArgs e) => Configuration.TimerDown(BridgeTimer);
         private void ControlLoaded(object sender, RoutedEventArgs e)
         {
             if (this.IsInDesignMode())

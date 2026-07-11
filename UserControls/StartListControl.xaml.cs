@@ -75,7 +75,6 @@ namespace DBF.UserControls
 
             setupPaging();
 
-            //groupTimer             = new DispatcherTimer();
             groupTimer.Tick       += (s, e) => showNextGroup();
             config.PropertyChanged+= (s, e) => setupPaging();
         }
@@ -167,11 +166,11 @@ namespace DBF.UserControls
             if (dataGrid == null)
                 return;
 
-            // Hent visuel række
+            // Fetch visual row
             var rowGenerator = dataGrid.GetRowGenerator();
             var rowInfo      = rowGenerator.Items[e.RowIndex];
 
-            // Vi håndterer kun data-rækker
+            // We only handle data rows
             if (rowInfo?.RowData == null || rowInfo.RowData is Group)
                 return;
 

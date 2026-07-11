@@ -36,7 +36,7 @@ public static class ComboBoxAutoScrollBehavior
         if (sender is not ComboBox combo || combo.SelectedItem == null)
             return;
 
-        // Vent til layout er opdateret (især når dropdown lige er åbnet)
+        // Wait for the event to finish and layout is updated (especially when the dropdown is just opened)
         combo.Dispatcher.BeginInvoke( new Action(() =>
                                     {
                                         var container = combo.ItemContainerGenerator.ContainerFromItem(combo.SelectedItem) as FrameworkElement;

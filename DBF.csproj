@@ -40,6 +40,7 @@
 		<Compile Remove="BridgeMateModel\HandEvaluation.cs" />
 		<Compile Remove="BridgeMateModel\HandRecord.cs" />
 		<Compile Remove="BridgeMateModel\LastEntryId.cs" />
+		<Compile Remove="BridgeMateModel\NewFile.cs" />
 		<Compile Remove="BridgeMateModel\PlayData.cs" />
 		<Compile Remove="BridgeMateModel\ReceivedDataCount.cs" />
 		<Compile Remove="BridgeMateModel\ReceivedDataGrouped.cs" />
@@ -175,19 +176,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="syncfusion.ui.wpf.net" Version="33.2.13" />
-		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="33.2.13" />
-		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="33.2.13" />
-		<PackageReference Include="Syncfusion.Shared.WPF" Version="33.2.13" />
 		<PackageReference Include="Syncfusion.Shared.Base" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Shared.WPF" Version="33.2.13" />
 		<PackageReference Include="Syncfusion.Grid.Wpf" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.SfGrid.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.Tools.WPF" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="33.2.13" />
+		
+		<!--<PackageReference Include="syncfusion.ui.wpf.net" Version="33.2.13" />
+		<PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="33.2.13" />
+		
 		<PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="33.2.13" />
 		<PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="33.2.13" />
 		<PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="33.2.13" />
 		<PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="33.2.13" />
-		<PackageReference Include="Syncfusion.Tools.WPF" Version="33.2.13" />
-		<!--<PackageReference Include="Syncfusion.Pdf.Wpf" Version="33.2.13" />
-		<PackageReference Include="Syncfusion.PdfViewer.WPF" Version="33.2.13" />-->
+	 -->
 	</ItemGroup>
 
 	<ItemGroup>

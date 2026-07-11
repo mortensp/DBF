@@ -3,7 +3,6 @@
 namespace DBF.DataModel
 {
 
-    //[XmlRoot(ElementName = "North")]
     public class Cards
     {
         [XmlElement(ElementName = "Spades")]   public string Spades   { get; set; }

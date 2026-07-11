@@ -10,11 +10,10 @@ namespace DBF;
 
 public static class ZoomBehavior
 {
-    //private static double        step = 0.05;
-    private static Configuration configuration;
+    private static Configuration   configuration;
     private static FontSizeService fontSizeService;
-    private static double        minFontSize;
-    private static double        maxFontSize;
+    private static double          minFontSize;
+    private static double          maxFontSize;
 
     #region Attached Property : EnableZoom
         public static readonly DependencyProperty EnableZoomProperty = 
@@ -24,17 +23,17 @@ public static class ZoomBehavior
                                                                   , new PropertyMetadata(false, OnEnableZoomChanged));
 
         public static void SetEnableZoom(DependencyObject obj, bool value)
-                                                        => obj.SetValue(EnableZoomProperty, value);
+                                                            => obj.SetValue(EnableZoomProperty, value);
 
         public static bool GetEnableZoom(DependencyObject obj)
-                                                        => (bool)obj.GetValue(EnableZoomProperty);
+                                                            => (bool)obj.GetValue(EnableZoomProperty);
 
         private static void OnEnableZoomChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            configuration = IoC.Get<Configuration>();
+            configuration   = IoC.Get<Configuration>();
             fontSizeService = IoC.Get<FontSizeService>();
-            minFontSize   = Configuration.FontSizes.Min();
-            maxFontSize   = Configuration.FontSizes.Max();
+            minFontSize     = Configuration.FontSizes.Min();
+            maxFontSize     = Configuration.FontSizes.Max();
 
             if (d is not FrameworkElement fe)
                 return;
@@ -54,10 +53,10 @@ public static class ZoomBehavior
                                                                   , new PropertyMetadata(1.0, OnZoomLevelChanged));
 
         public static void SetZoomLevel(DependencyObject obj, double value)
-                                                        => obj.SetValue(ZoomLevelProperty, value);
+                                                            => obj.SetValue(ZoomLevelProperty, value);
 
         public static double GetZoomLevel(DependencyObject obj)
-                                                        => (double)obj.GetValue(ZoomLevelProperty);
+                                                            => (double)obj.GetValue(ZoomLevelProperty);
 
         private static void OnZoomLevelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -93,29 +92,21 @@ public static class ZoomBehavior
             return;
 
         // Window → zoom content
-        //if (fe is Window w && w.Content is FrameworkElement content)
-        //    fe = content;
-        //double zoom = GetZoomLevel(fe);
         if (e.Key == Key.OemPlus || e.Key == Key.Add)
         {
-            //zoom                  += step;
             e.Handled              = true;
             configuration.FontSize+= 2;
         }
         else
             if (e.Key == Key.OemMinus || e.Key == Key.Subtract)
             {
-                //zoom                  -= step;
                 e.Handled              = true;
                 configuration.FontSize-= 2;
             }
 
-        configuration.FontSize = Math.Max(minFontSize, configuration.FontSize);
-        configuration.FontSize = Math.Min(maxFontSize, configuration.FontSize);
+        configuration.FontSize   = Math.Max(minFontSize, configuration.FontSize);
+        configuration.FontSize   = Math.Min(maxFontSize, configuration.FontSize);
         fontSizeService.FontSize = configuration.FontSize;
 
-        //zoom = Math.Max(0.3, Math.Min(3.0, zoom));
-
-        //SetZoomLevel(fe, zoom);
     }
 }

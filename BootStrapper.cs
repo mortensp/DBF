@@ -24,18 +24,14 @@ public class Bootstrapper : BootstrapperBase
         {
             Logger.Info("Bootstrapper initializing");
 
-            // Load arguments and language settings
+            // Load arguments 
             AppArguments.Load();
             LanguageService.Instance.Initialize( typeof(Lex)
                                                , typeof(LocHelp)
                                                , typeof(Syncfusion_Shared_Wpf)
                                                , typeof(Syncfusion_SfColorPalette_Wpf));
-            //LanguageService.Instance.SetCulture("da-DK");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            //FrameworkElement.LanguageProperty
-            //                .OverrideMetadata( typeof(FrameworkElement)
-            //                                 , new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
             Initialize();
 
             // Load language setting first - before anything else
@@ -56,8 +52,8 @@ public class Bootstrapper : BootstrapperBase
 
         IoC.Get<ShellViewModel>().OpenControlView();
 #endif
-        // Restore Taskbar Icon.
-        //Application.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
+        // // Restore Taskbar Icon.
+        // Application.MainWindow.Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Images/DBF_Tools.ico", UriKind.Absolute));
     }
 
     protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -78,7 +74,6 @@ public class Bootstrapper : BootstrapperBase
         {
             SyncFusion.FindandRegisterLicenseKey();
 
-            //_container.Instance<IWindowManager>(new WindowManager());
             _container.Singleton<IWindowManager, ZoomWindowManager>();
             _container.Singleton<IEventAggregator, EventAggregator>();
             _container.Singleton<Configuration>();

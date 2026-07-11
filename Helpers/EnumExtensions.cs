@@ -40,7 +40,7 @@ namespace DBF.Helpers
             return result;
         }
 
-        // Returnerer enum-værdierne der er sat i flags (fx [GroupFlags.A, GroupFlags.C])
+        // Returns the enum values that are set in the flags (e.g., [GroupFlags.A, GroupFlags.C])
         public static List<T> GetFlagValues<T>(this T flags, bool includeZero = false) where T : Enum
         {
             var  type       = typeof(T);
@@ -74,7 +74,7 @@ namespace DBF.Helpers
             return result;
         }
 
-        // Returnerer de numeriske (underliggende) værdier som long (fx [1,4])
+        // Returns the numeric (underlying) values as long (e.g., [1,4])
         public static List<long> GetFlagNumericValues<T>(this T flags, bool includeZero = false) where T : Enum
         {
             return flags.GetFlagValues(includeZero).Select(v => Convert.ToInt64(v)).ToList();

@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore;
 namespace DBF.BridgeMateModel
 {
     /// <summary>
-    /// Hvem møder hvem ved hvilket bord og med hvilke spil
+    /// Who meets whom at which table and with which cards
     /// </summary>
     [PrimaryKey(nameof(Section), nameof(Round), nameof(TableNo))]
     [Table("RoundData")]
     public partial class BMRound
     {
-        public                                          short?  Section         { get; set; }
-        [Column("Table", TypeName = "smallint")] public short?  TableNo         { get; set; }
-        public                                          short?  Round           { get; set; }
+        public                                          short  Section         { get; set; }
+        [Column("Table", TypeName = "smallint")] public short  TableNo         { get; set; }
+        public                                          short  Round           { get; set; }
         public                                          short?  Nspair          { get; set; }
         public                                          short?  Ewpair          { get; set; }
         public                                          short?  LowBoard        { get; set; }
@@ -30,7 +30,6 @@ namespace DBF.BridgeMateModel
         // Navigation property to Section (1:n)
         [ForeignKey(nameof(Section))]
         public virtual                                  Section SectionEntity   { get; set; }
-             //public override string  ToString() => $"Section:{Section}, TableNo:{TableNo}, Round:{Round}, Nspair:{Nspair}, Ewpair:{Ewpair}, LowBoard:{LowBoard}, HighBoard:{HighBoard}, CustomBoards:{CustomBoards}, BoardsPlayed:{BoardsPlayed}";
    
         public override string  ToString() => Done
             ? $"Section: {Section}, TableNo: {TableNo}, Round: {Round}, Done"

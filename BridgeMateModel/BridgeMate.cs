@@ -1,13 +1,10 @@
 ﻿using System.IO;
-using System.Windows;
-using System.Windows.Markup;
-using AppArguments;
 using Caliburn.Micro;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
 using DBF.Helpers;
-using DBF.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Data.Extensions;
 
 namespace DBF;
 
@@ -15,16 +12,21 @@ namespace DBF;
 // Once the *.bws file is found a Timer is used to prope for changes
 public class BridgeMate : PropertyChangedBase
 {
-    private const    string                      SearchExt = "bws";
-    private          SerializedFileSystemWatcher watcher;
-    private readonly Configuration               Configuration;
-    private          string                      bwsFile;
-    private          int                         bmClubNo  = -1;
-    private          DateTime                    lastDate;
-
-    #region Public Properties
-        public BindableCollection<BMRound>        BMRounds    { get; private set; } = new();
-        public BindableCollectionExt<RoundStatus> RoundStatus { get; private set; } = new();
+    #region Private Properties and Fields
+        private          CancellationTokenSource     _cts     = new();
+        private          Task                        _pollingTask;
+        private          SerializedFileSystemWatcher watcher;
+        private readonly Configuration               Configuration;
+        private          string                      bwsFile;
+        private          int                         bmClubNo = -1;
+        private          DateTime                    lastDate;
+        //
+        // Cache the sections  and rounds grouped by (Section, Round) for efficient lookups
+        // These Collections are initiated along side BMRounds and doesn't change until a new file is opened.
+        // But properties on the items may change!
+        private Dictionary<(short Section, short Round), BMRound[]> Rounds;
+        private Dictionary<short, SectionInfo>                      Sections;
+        private Session                                             Session;
     #endregion
 
     #region Constructors
@@ -38,110 +40,97 @@ public class BridgeMate : PropertyChangedBase
         }
     #endregion
 
-    public void CheckOrOpen(DateTime? playingTime, int? clubNumber)
+    #region Public Properties
+        public BindableCollectionExt<RoundStatus> RoundStatus { get; private set; } = new();
+    #endregion
+
+    public void CheckOrOpen(DateTime playingTime, int clubNumber)
     {
         if (!Configuration.ReadBridgeMate
-        ||  playingTime is not DateTime date
-        ||  clubNumber  is not int clubNo
-        ||  clubNo      <= 0)
+        ||  clubNumber <= 0)
             return;
 
         Logger.Info($"");
         Logger.Info($"CheckOrOpen called playingTime={playingTime} clubNumber={clubNumber}");
 
-        lastDate = date;
+        lastDate = playingTime;
+        stopPolling();
 
-        var path  = $"{Configuration.BridgeMatePath}{clubNo}\\";
-        var after = DateTime.Now.AddDays(-14); //TODO: change to 14 days;
+        var path   = $"{Configuration.BridgeMatePath}{clubNumber}\\";
+        var after  = playingTime.AddDays(-14);
+        var before = playingTime.AddDays(+1);
 
         if (!Directory.Exists(path))
         {
-            //if (Arguments.Values.Lookup("mode") != "restart"
-            //&&  Configuration.BridgeMatePath.IsDirectoryLink())
-            //{
-            //    Logger.Info($"BridgeMate: Directory not found: {path}");
-
-            //    var ok =MessageBox.Show( $"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}"
-            //                           + Environment.NewLine
-            //                           + $"If this occurs when started from the installer it might be fixed by restarting."
-            //                           + "Do you want to restart"
-            //                           , Lex.Error
-            //                           , MessageBoxButton.YesNo
-            //                           , MessageBoxImage.Question);
-
-            //    if (ok == MessageBoxResult.Yes)
-            //    {
-            //        var shell = IoC.Get<ShellViewModel>();
-            //        shell.Restart();
-            //    }
-
-            //    return;
-            //}
-
-            //&& (Configuration.BridgeMatePath.IsDirectoryLink()
-            // || path.IsDirectoryLink()))
-            //{
-            //    var shell = IoC.Get<ShellViewModel>();
-            //    shell.Restart();
-            //}
-            //
             Logger.Info($"BridgeMate: Directory not found: {path}");
-            MessageBox.Show( $"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}"
-                           , Lex.Error);
+            MessageBox.Show($"{Lex.Folder}: '{path}' {Lex.DoNotExist}. {Lex.BridgeMateError}", Lex.Error);
+            return;
         }
-        else
-            foreach (var found in Directory.GetFiles(path, $"*.{SearchExt}")
-                                           .Where(f => File.GetLastWriteTime(f) >= after)
-                                           .OrderByDescending(f => File.GetLastWriteTime(f))) 
+
+        var fileInfos = Directory.GetFiles(path, "*.bws")
+                                 .Select(path => new FileInfo(path))
+                                 .Where(f =>  f.LastWriteTime >= after
+                                          &&  f.CreationTime  <= before)
+                                 .ToList();
+
+        if (!fileInfos.Any())
+        {
+            Logger.Info($"BridgeMate: file not found for date {lastDate} in path {path}");
+            Close();
+            initWatcher(path, Configuration.ReadBridgeMate);
+            return;
+        }
+
+        foreach (var fileInfo in fileInfos.Reverse<FileInfo>())
+            try
             {
-                var file = Path.ChangeExtension(found, ".bws");
+                using var db = new BridgeMateContext(fileInfo.FullName);
 
-                try
-                {
-                    using var db = new BridgeMateContext(file);
+                Session = db.Sessions.ToList()
+                                     .FirstOrDefault(s => s.Date == playingTime);
 
-                    foreach (var session in db.Sessions)
-                        if (session.Date == date)
-                        {
-                            // No events while we load rows and open the file
-                            stopPolling();
-                            bwsFile  = file;
-                            bmClubNo = clubNo;
-
-                            if (session.Status != 2)
-                            {
-                                BMRounds = new(db.BMRounds.Include(b => b.SectionEntity));
-
-                                updatePlayedBoards(true);
-
-                                foreach (var section in db.Sections)
-                                {
-                                    var cntRounds = BMRounds.Where(r=>r.Section==section.Id && r.TableNo==1).Count();
-                                    var cntBoards = BMRounds.First().BoardsPerRound;
-
-                                    foreach (var timer in Configuration.GetRelatedTimers(section.Letter))
-                                        timer.UpdateBMSettings(section.ScoringType == 4, cntRounds, cntBoards);
-                                }
-
-                                startPolling();
-                            }
-
-                            return;
-                        }
-                }
-
-                catch (Exception ex)
-                {
-                    Logger.Exception(ex, $"BridgeMate: error opening/handling the file {file}");
+                if (Session        == null
+                ||  Session.Status == 2)
                     continue;
-                }
+
+                this.bwsFile = fileInfo.FullName;
+                bmClubNo     = clubNumber;
+
+                Rounds = db.BMRounds
+                           .Include(b => b.SectionEntity) // used to get the missing pair for the section
+                           .ToList()
+                           .GroupBy(r => (r.Section, r.Round))
+#if DEBUG
+                           // For debugging purposes, we want to see the rounds in order of Section and Round
+                           .OrderBy(g => g.Key.Section)
+                           .ThenBy(g => g.Key.Round)
+#endif
+                           .ToDictionary(g => g.Key
+                                        , g => g.OrderBy(r => r.TableNo)
+                                                .ToArray());
+
+                Sections = db.Sections.ToDictionary(s => s.Id
+                                                   , s => new SectionInfo( s.Letter
+                                                                         , s.ScoringType == 4
+                                                                         , s.Tables ?? 0
+                                                                         , Rounds.Count(r => r.Key.Section == s.Id)
+                                                                         , Rounds[(s.Id, 1)][0].BoardsPerRound)
+                                                   );
+
+                initPlayedBoards();
+                MarkChangedSettingsOnTimers();
+                startPolling();
+                return;
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex, $"BridgeMate: error opening/handling the file {fileInfo.FullName}");
+                Debugger.Break();
+                continue;
             }
 
-        // BridgeMate file not found
         Logger.Info($"BridgeMate: file not found for date {lastDate} in path {path}");
         Close();
-
-        bmClubNo = clubNo;
         initWatcher(path, Configuration.ReadBridgeMate);
     }
 
@@ -158,9 +147,7 @@ public class BridgeMate : PropertyChangedBase
         foreach (var timer in Configuration.BridgeTimers)
             timer.UpdateBMSettings(null);
 
-        bwsFile  = null;
-        BMRounds = null;
-        BMRounds?.Clear();
+        bwsFile = null;
         RoundStatus.Clear();
 
         if (bmClubNo >  -1)
@@ -171,163 +158,163 @@ public class BridgeMate : PropertyChangedBase
     }
 
     #region Private Methods
-        void initWatcher(string path, bool enableRaisingEvents = true)
+        private void initPlayedBoards()
         {
-            if (File.Exists(path))
-            {
-                watcher.Path = Path.GetDirectoryName(path);
-                watcher.Filters.Clear();
-                watcher.Filters.Add(Path.GetFileName(path));
-            }
-            else
-            {
-                if (Directory.Exists(Path.GetDirectoryName(path)))
-                {
-                    watcher.Filters.Clear();
-                    watcher.Filters.Add("*." + SearchExt);
-                }
-                else
-                    watcher.Filter = path.FirstNonSharedDirectory(watcher.Path);
-
-                watcher.Path = path.FindDeepestExistingDirectory();
-            }
-
-            watcher.IncludeSubdirectories = false;
-            watcher.EnableRaisingEvents   = enableRaisingEvents;
-
-            if (watcher.EnableRaisingEvents)
-                Logger.Info($"BridgeMate watcher enabled on path: {watcher.Path} ");
-            else
-                Logger.Info($"BridgeMate watcher disabled");
-        }
-
-        private async Task handleFileEventAsync(FileSystemEventArgs ev)
-        {
-            try
-            {
-                if (!ev.FullPath.StartsWith(Configuration.BridgeMatePath))
-                {
-                    initWatcher(Configuration.BridgeMatePath, Configuration.ReadBridgeMate);
-                    return;
-                }
-
-                var now = DateTime.UtcNow;
-
-                //Todo: Here we need to check if a new bws file has been created
-                switch (ev.ChangeType)
-                {
-                    case WatcherChangeTypes.Changed:
-                    case WatcherChangeTypes.Created:
-                    case WatcherChangeTypes.Renamed:
-                        Execute.BeginOnUIThread(() => CheckOrOpen(lastDate, bmClubNo));
-
-                        break;
-
-                    default:
-                        Logger.Info($"BridgeMate: unhandled file event {ev.ChangeType} for file {ev.FullPath}");
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception(ex, "BridgeMate.handleFileEventAsync");
-                MessageBox.Show($"{Lex.ErrorReadingBrideMateFolder}: " + ex.Message, Lex.Error);
-            }
-        }
-
-        private void updatePlayedBoards(bool first = false)
-        {
-            if (BMRounds is null)
+            if (Rounds       is null
+            ||  Rounds.Count == 0)
                 return;
 
             using var db = new BridgeMateContext(bwsFile);
 
-            // Count boards played for each roundStatus. We do this by looking at the ReceivedData, which contains a record for
-            // each board played. We count the number of records for each roundStatus, and update the BoardsPlayed property of
-            // the BMRounds accordingly.
-            // Note that BMRounds has on entry per table per roundStatus. ie 6 entries per Group when having two tables
-            if (first)
+            foreach (var row in Rounds.Values.SelectMany(r => r))
+                row.BoardsPlayed = ( row.Nspair == row.SectionEntity.MissingPair
+                                 ||  row.Ewpair == row.SectionEntity.MissingPair)
+                                 ? row.BoardsPerRound
+                                 : 0;
+
+            var receivedData = db.ReceivedData
+                                 .Where(r => r.Erased != true)
+                                 .OrderBy(r => r.Id)
+                                 .ToList();
+
+            foreach (var row in receivedData)
             {
-                foreach (var row in BMRounds)
-                    if (row.Nspair == row.SectionEntity.MissingPair
-                    ||  row.Ewpair == row.SectionEntity.MissingPair)
-                        row.BoardsPlayed = row.BoardsPerRound;
-                    else
-                        row.BoardsPlayed = 0;
+                Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed++;
 
-                // build index once
-                var roundIndex = BMRounds.ToDictionary(r => (r.Section,r.TableNo, r.Round));
-
-                foreach (var row in db.ReceivedData.OrderBy(r => r.Id))
-                {
-                    row.Processed4 = true;
-
-                    if (row.Erased != true
-                    &&  roundIndex.TryGetValue((row.Section, row.TableNo, row.Round), out var round))
-                        round.BoardsPlayed++;
-                }
+                row.Processed4 = true;
             }
-            else
-                foreach (var data in db.ReceivedData.Where(r => r.Processed4 != true))
-                {
-                    data.Processed4 = true;
-
-                    var round = BMRounds.FirstOrDefault(r =>  r.TableNo == data.TableNo
-                                                          &&  r.Round   == data.Round);
-
-                    if (round != null)
-                        if (data?.Erased == true)
-                            round.BoardsPlayed--;
-                        else
-                            round.BoardsPlayed++;
-                }
 
             db.SaveChanges();
 
-            // Update the RoundStatus collection, which is used to display the status of each roundStatus in the UI. We group the
-            // BMRounds by section and roundStatus, and create a RoundStatus object for each group. We then update the existing
-            // RoundStatus objects or add new ones as needed.
-            // Note that RoundStatus has one entry per Round and does not have a table property 
-            short  section =-1;
-            string letter  ="";
-
-            foreach (var roundStatus in BMRounds
-                                       .GroupBy(o => (o.Section, o.Round))
-                                       .OrderBy(g => g.Key.Section)
-                                       .ThenBy(g => g.Key.Round)
-                                       .Select(g => new RoundStatus
-                                                    {
-                                                        Section         = (short)g.Key.Section
-                                                      , Round           = (short)g.Key.Round
-                                                      , Done            = g.Count(g => g.Done) == db.Tables.Count(t => t.Section == g.Key.Section)
-                                                      , RemainingBoards = g.Sum  (g => g.BoardsRemaining)
-                                                    }))
-
+            Execute.BeginOnUIThread(() =>
             {
-                if (section != roundStatus.Section)
-                {
-                    letter  = db.Sections.FirstOrDefault(s => s.Id == roundStatus.Section)?.Letter;
-                    section = roundStatus.Section;
-                }
+                RoundStatus.ReplaceRange(Rounds.Select(rounds => new RoundStatus
+                                                                 {
+                                                                     Section         = (short)rounds.Key.Section
+                                                                   , Round           = (short)rounds.Key.Round
+                                                                   , Letter          = Sections[rounds.Key.Section].Letter
+                                                                   , Done            = rounds.Value.All(g => g.Done)
+                                                                   , BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
+                                                                 }));
+            });
+        }
 
-                roundStatus.Letter = letter;
+        private void updatePlayedBoards()
+        {
+            if (Rounds       is null
+            ||  Rounds.Count == 0)
+                return;
 
-                var existing = RoundStatus.FirstOrDefault(r =>  r.Section == roundStatus.Section
-                                                            &&  r.Round   == roundStatus.Round);
+            using var db = new BridgeMateContext(bwsFile);
 
-                if (existing is null)
-                    RoundStatus.Add(roundStatus);
+            var unprocessedData = db.ReceivedData
+                                    .Where(r => r.Processed4 != true)
+                                    .ToList();
+
+            foreach (var row in unprocessedData)
+            {
+                if (row.Erased == true)
+                    Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed--;
                 else
+                    Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed++;
+
+                row.Processed4 = true;
+            }
+
+            db.SaveChanges();
+
+            Execute.BeginOnUIThread(() =>
+            {
+                foreach (var stat in RoundStatus)
                 {
-                    existing.Done            = roundStatus.Done;
-                    existing.RemainingBoards = roundStatus.RemainingBoards;
+                    var round            = Rounds[(stat.Section, stat.Round)];
+                    stat.Done            = round.All(g => g.Done);
+                    stat.BoardsRemaining = round.Sum(g => g.BoardsRemaining);
                 }
+
+            });
+        }
+
+        private void MarkChangedSettingsOnTimers()
+        {
+            // Mark all timers with the new settings, so that the user can see the correct
+            // values in the TimerSettings dialog.
+            foreach (var item in Sections)
+            {
+                var section = item.Value;
+
+                foreach (var timer in Configuration.GetRelatedTimers(section.Letter))
+                    timer.UpdateBMSettings(section.Teams, section.Rounds, section.BoardsPerRound);
             }
         }
 
         #region Polling
-            private CancellationTokenSource _cts = new();
-            private Task                    _pollingTask;
+            void initWatcher(string path, bool enableRaisingEvents = true)
+            {
+                if (File.Exists(path))
+                {
+                    // path is a full file path
+                    watcher.Path = Path.GetDirectoryName(path);
+                    watcher.Filters.Clear();
+                    watcher.Filters.Add(Path.GetFileName(path));
+                }
+                else
+                {
+                    if (Directory.Exists(Path.GetDirectoryName(path)))
+                    {
+                        // path is a directory path
+                        watcher.Filters.Clear();
+                        watcher.Filters.Add("*.bws");
+                    }
+                    else
+                        watcher.Filter = path.FirstNonSharedDirectory(watcher.Path);
+
+                    watcher.Path = path.FindDeepestExistingDirectory();
+                }
+
+                watcher.IncludeSubdirectories = false;
+                watcher.EnableRaisingEvents   = enableRaisingEvents;
+
+                if (watcher.EnableRaisingEvents)
+                    Logger.Info($"BridgeMate watcher enabled on path: {watcher.Path} ");
+                else
+                    Logger.Info($"BridgeMate watcher disabled");
+            }
+
+            private async Task handleFileEventAsync(FileSystemEventArgs ev)
+            {
+                try
+                {
+                    if (!ev.FullPath.StartsWith(Configuration.BridgeMatePath))
+                    {
+                        initWatcher(Configuration.BridgeMatePath, Configuration.ReadBridgeMate);
+                        return;
+                    }
+
+                    var now = DateTime.UtcNow;
+
+                    //Todo: Here we need to check if a new bws file has been created
+                    switch (ev.ChangeType)
+                    {
+                        case WatcherChangeTypes.Changed:
+                        case WatcherChangeTypes.Created:
+                        case WatcherChangeTypes.Renamed:
+                            Execute.BeginOnUIThread(() => CheckOrOpen(lastDate, bmClubNo));
+
+                            break;
+
+                        default:
+                            Logger.Info($"BridgeMate: unhandled file event {ev.ChangeType} for file {ev.FullPath}");
+                            break;
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Logger.Exception(ex, "BridgeMate.handleFileEventAsync");
+                    MessageBox.Show($"{Lex.ErrorReadingBrideMateFolder}: " + ex.Message, Lex.Error);
+                }
+            }
 
             private bool IsPollingActive => _pollingTask != null
                                          && !_pollingTask.IsCompleted
@@ -365,6 +352,7 @@ public class BridgeMate : PropertyChangedBase
                         updatePlayedBoards();
                     }
                 }
+
                 catch (OperationCanceledException)
                 {
                     // Normal shutdown

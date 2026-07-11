@@ -31,24 +31,15 @@ public partial class HelpView : Window
     {
         base.OnContentRendered(e);
 
-        // Nu er vinduet 100% tegnet og målt
+        // The window is now fully rendered and measured
         this.Height    = ((HelpViewModel)DataContext).WindowHeight;
         this.Top       = 10;
         this.MaxHeight = SystemParameters.PrimaryScreenHeight - 20;
-        //CenterWindowOnScreen();
     }
 
-    //public void CenterWindowOnScreen()
-    //{
-    //    var screenWidth  = SystemParameters.PrimaryScreenWidth;
-    //    var screenHeight = SystemParameters.PrimaryScreenHeight;
-
-    //    this.Left = (screenWidth - this.Width) / 2;
-    //    this.Top  = (screenHeight - this.Height) / 2;
-    //}
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        this.Focus(); // så vinduet fanger tastaturet
+        this.Focus(); // Make sure the window captures keyboard input
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -60,28 +51,10 @@ public partial class HelpView : Window
         if (!ctrl)
             return;
 
-        //const double step = 10;
-
         if (e.Key == Key.OemPlus || e.Key == Key.Add)
-        {
-            //if (DataContext is HelpViewModel vm)
-            //{
-            //    vm.WindowWidth+= step;
-            //    vm.NotifyOfPropertyChange(nameof(vm.WindowWidth));
-            //}
-
             e.Handled = true;
-        }
         else
             if (e.Key == Key.OemMinus || e.Key == Key.Subtract)
-            {
-                //if (DataContext is HelpViewModel vm)
-                //{
-                //    vm.WindowWidth = Math.Max(300, vm.WindowWidth - step);
-                //    vm.NotifyOfPropertyChange(nameof(vm.WindowWidth));
-                //}
-
                 e.Handled = true;
-            }
     }
 }

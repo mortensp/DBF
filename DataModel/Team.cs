@@ -32,19 +32,18 @@ namespace DBF.DataModel
         [XmlElement(ElementName = "SectionTiebreak")] public    string       SectionTiebreak    { get; set; }
         [XmlElement(ElementName = "TournamentTiebreak")] public string       TournamentTiebreak { get; set; }
 
-        // Håndtering af afvigende navne i XML
         [XmlElement(ElementName = "TeamName")]
         public string TeamName2
         {
             set
             {
                 if (TeamName == null)
-                    TeamName =  value; // For at undgå at slette det eksisterende navn, hvis det er sat
+                    TeamName =  value; // This is to avoid deleting the existing name, if it is set
             }
         }
 
         //-----
-        // Dan et felt med alle navnene
+        // Composit name
         public string Names
         {
             get
@@ -94,7 +93,6 @@ namespace DBF.DataModel
 
             public override int GetHashCode()
             {
-                // Brug de samme properties som i Equals
                 return HashCode.Combine(TeamNo);
             }
         #endregion

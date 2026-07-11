@@ -8,7 +8,6 @@ namespace DBF.BridgeMateModel
     [PrimaryKey(nameof(Id))]
     public partial class PlayerName
     {
-        //[Key]
         [Column("ID", TypeName = "int")] public           int    Id    { get; set; }
         [Column(TypeName = "varchar(9)")] public          string Name  { get; set; }
         [Column("strID", TypeName = "varchar(9)")] public string StrId { get; set; }

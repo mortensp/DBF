@@ -2,7 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Syncfusion.UI.Xaml.Grid;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DBF.Views
 {
@@ -14,21 +16,6 @@ namespace DBF.Views
         public ControlView()
         {
             InitializeComponent();
-            //try
-            //{
-            //       // Only show the test button when running under a debugger
-            //    if (Debugger.IsAttached)
-            //    {
-            //        var btn = this.FindName("btnTest") as UIElement;
-
-            //        if (btn != null)
-            //            btn.Visibility = Visibility.Visible;
-            //    }
-            //}
-            //catch
-            //{
-            //    // ignore any lookup failures
-            //}
         }
 
         /// <summary>
@@ -38,10 +25,10 @@ namespace DBF.Views
         /// is found.</remarks>
         /// <param name="sender">The control that raised the event.</param>
         /// <param name="e">The MouseButtonEventArgs that identifies the mouse button and event details.</param>
-       ///<usages>
-       ///   <UserControl ..
-       ///       MouseDown="UserControl_MouseDown"/>
-       ///</usages>
+        ///<usages>
+        ///   <UserControl ..
+        ///       MouseDown="UserControl_MouseDown"/>
+        ///</usages>
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Window.GetWindow(this)?.Activate();

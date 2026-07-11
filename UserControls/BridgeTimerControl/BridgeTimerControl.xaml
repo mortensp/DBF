@@ -10,8 +10,8 @@
     xmlns:sf="http://schemas.syncfusion.com/wpf"
     xmlns:userctls="clr-namespace:DBF.UserControls"
     x:Name="root"
+    help:Help.Key="AppSettings"
     d:Background="white"
-    help:Help.Key="BridgeTimers"
     lex:LocalizeDictionary.DesignCulture="en-US"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
@@ -110,21 +110,36 @@
                             Text="{Binding BridgeTimer.RoundText}"
                             TextAlignment="Center" />
 
-                        <!--  Close button  -->
-                        <Button Grid.Row="0" Grid.Column="2"
-                            x:Name="btnClose"
-                            Width="24"
-                            Height="24"
+                        <WrapPanel Grid.Row="0" Grid.Column="2"
                             Margin="0,-4,-4,0"
                             HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Click="btnClose_Click"
-                            Content="X"
-                            Cursor="Hand"
-                            ToolTip="{lex:Loc tipCloseTimer}"
-                            Visibility="{Binding BridgeTimer.CanClose, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            VerticalAlignment="Top">
+
+                            <!--  Help button  -->
+                            <!--
+                            <Button
+                                x:Name="btnHelp"
+                                Width="24"
+                                Height="24"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Content="?"
+                                Cursor="Hand"
+                                ToolTip="{lex:Loc tipHelp}" />-->
+
+                            <!--  Close button  -->
+                            <Button
+                                x:Name="btnClose"
+                                Width="24"
+                                Height="24"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Click="btnClose_Click"
+                                Content="X"
+                                Cursor="Hand"
+                                ToolTip="{lex:Loc tipCloseTimer}"
+                                Visibility="{Binding BridgeTimer.CanClose, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </WrapPanel>
 
                         <!--  Row - Time  -->
                         <TextBlock Grid.Row="1"

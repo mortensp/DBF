@@ -3,7 +3,7 @@ using String.Localization;
 
 namespace DBF.DataModel
 {
-    /// En Tournament svarer til en række - f.eks. B-Rækken
+    /// A Tournament corresponds to a section - e.g., the B-Section
     [XmlRoot(ElementName = "Tournament")]
     public class Tournament
     {

@@ -128,7 +128,6 @@ namespace DBF.DataModel
 
         public override int GetHashCode()
         {
-            // Use the same properties as in Equals
             return HashCode.Combine(PairNo);
         }
     }

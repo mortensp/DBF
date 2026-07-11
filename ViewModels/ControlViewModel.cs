@@ -55,6 +55,7 @@ public class ControlViewModel : Screen, IDisposable
         {
             try
             {
+                IsBusy      = true;
                 _lexStrings = new(this);
 
                 BridgeMate = bridgeMate;
@@ -68,12 +69,12 @@ public class ControlViewModel : Screen, IDisposable
                 _watcher       = new() { EventGroupingDelay = TimeSpan.FromMilliseconds(7000) };
 
                 _watcher.UpdatedAsync+= handleFileEventAsync;
-                //
+
                 Pairs.CollectionChanged+= pairsCollectionChanged;
                 Teams.CollectionChanged+= teamsCollectionChanged;
-                //
+
                 Configuration.PropertyChanged+= configurationPropertyChanged;
-                //
+
                 _timersPanel.SetBinding( TimersPanel.OrientationProperty
                                        , new Binding(nameof(Configuration.WindowOrientation))
                                          {
@@ -91,9 +92,10 @@ public class ControlViewModel : Screen, IDisposable
                                          }
 
                                        );
-                //
+
                 initWatcher();
                 loadMainClubs();
+                IsBusy = false;
             }
             catch (Exception ex)
             {
@@ -128,6 +130,7 @@ public class ControlViewModel : Screen, IDisposable
         public UserControl                                 CurrentView              { get; private set; }
 
         public bool                                        BC3Available             => SelectedPlayingTime != null;
+        public bool                                        IsBusy                   { get; set; }
 
         public ObservableCollection<SortColumnDescription> SharedSortDescriptions   { get; } = new();
 
@@ -148,7 +151,6 @@ public class ControlViewModel : Screen, IDisposable
             get => _showAsOneGroup;
             set
             {
-                //var old = _showAsOneGroup;
                 if (Set(ref _showAsOneGroup, value))
                     if (value == true)
                         foreach (var pair in Pairs)
@@ -159,7 +161,8 @@ public class ControlViewModel : Screen, IDisposable
                     else
                         initSubgroups();
 
-                Pairs = new(Pairs); // For at sikre at UI opdateres, da SubGroup og Position ændres for alle par
+                // To ensure UI is updated because SubGroup and Position change for all pairs
+                Pairs = new(Pairs);
             }
         }
 
@@ -212,6 +215,7 @@ public class ControlViewModel : Screen, IDisposable
                         else
                         {
                             Logger.Info($"SectedClub changed: {value?.ToString() ?? "Null"}");
+
                             fetchPlayingTimes();
                         }
                 }
@@ -247,56 +251,56 @@ public class ControlViewModel : Screen, IDisposable
                         {
                             fetchPlayingTime();
 
-                            //_watcher.EnableRaisingEvents = true;
                             if (_tournaments.Count >  0 && Configuration.ReadBridgeMate)
                             {
-                                BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, SelectedMainClub.No);
-
-                                if (File.Exists(Configuration.StatePath))
-                                    Configuration.DeleteState();
-                                else
-                                {
-                                    // List of RoundStatus entries that's Done and only with enties
-                                    // that have the highest Round Number for each Section
-                                    var highestDonePerSection = BridgeMate.RoundStatus
-                                                                          .Where(r => r.Done)
-                                                                          .GroupBy(r => r.Section)
-                                                                          .SelectMany(
-                                                                                                                                                                                                                                                                                                                                    g =>
-                                                                                                                                                                                                                                                                                                                                    {
-                                                                                                                                                                                                                                                                                                                                        var maxRound = g.Max(x => x.Round);
-                                                                                                                                                                                                                                                                                                                                        return g.Where(x => x.Round == maxRound);
-                                                                                                                                                                                                                                                                                                                                    })
-                                                                          .ToList();
-
-                                    foreach (var timer in Configuration.BridgeTimers
-                                                                       .Where(t => t.Visibility == Visibility.Visible))
-                                        timer.Reset(false);
-
-                                    foreach (var rs in highestDonePerSection.Where(rs => rs.RemainingBoards >  0))
-                                        foreach (var timer in Configuration.GetRelatedTimers(rs))//, _threshold))
-                                            timer.SetRound(rs.Round + 1);
-                                }
+                                // Call on background thread without blocking UI                  
+                                _ = Task.Run(() => HandlePlayingTimeSelected());
                             }
                         }
                     }
                 }
             }
-        #endregion
 
-        //public double GlobalZoom
-        //{
-        //    get => field;
-        //    set
-        //    {
-        //        field = value;
-        //        NotifyOfPropertyChange(() => GlobalZoom);
-        //    }
-        //} = 1;
+            private void HandlePlayingTimeSelected()
+            {
+                // This method runs on background thread
+                BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, (int)SelectedMainClub.No);
+
+                // When CheckOrOpen is done, switch back to UI thread for UI updates
+                Execute.BeginOnUIThread(() =>
+                {
+                    if (File.Exists(Configuration.StatePath))
+                        Configuration.DeleteState();
+                    else
+                    {
+                        var highestDonePerSection = BridgeMate.RoundStatus
+                                                              .Where(r => r.Done)
+                                                              .GroupBy(r => r.Section)
+                                                              .SelectMany(g =>
+                                                                          {
+                                                                              var maxRound = g.Max(x => x.Round);
+                                                                              return g.Where(x => x.Round == maxRound);
+                                                                          })
+                                                              .ToList();
+                        foreach (var timer in Configuration.BridgeTimers
+                                                           .Where(t => t.Visibility == Visibility.Visible))
+                            timer.Reset(false);
+                        foreach (var rs in highestDonePerSection.Where(rs => rs.BoardsRemaining >  0))
+                            foreach (var timer in Configuration.GetRelatedTimers(rs))
+                                timer.SetRound(rs.Round + 1);
+                    }
+
+                });
+            }
+        #endregion
     #endregion
 
     #region Public Methods
-        public void Test() { Debugger.Break(); }
+        public void Test()
+        {
+            Debugger.Break();
+            SelectedClub = Clubs.Last();
+        }
 
         public void LexRefresh()
         {
@@ -376,28 +380,24 @@ public class ControlViewModel : Screen, IDisposable
 
                         case ConfirmCloseChoice.Close:
                             Configuration.DeleteState();
-                            //return await Task.FromResult(true);
                             break;
 
                         case ConfirmCloseChoice.SaveState:
                             Configuration.StopAll();
                             Configuration.SaveState();
-                            //return await Task.FromResult(true);
                             break;
                     }
                 }
                 else
-                {
+                
                     Configuration.DeleteState();
-                    //return await Task.FromResult(true);
-                }
             }
             catch (Exception ex)
             {
                 Logger.Exception(ex, $"Error when closing the ControlViewModel");
             }
 
-            Dispose();  // DISPOSE HER
+            Dispose();  
 
             return await Task.FromResult(true).ConfigureAwait(false);
         }
@@ -489,8 +489,10 @@ public class ControlViewModel : Screen, IDisposable
             catch (Exception ex)
             {
                 Logger.Exception(ex);
+
                 PlayingTimes.Clear();
             }
+
         }
 
         /// <summary>
@@ -548,20 +550,7 @@ public class ControlViewModel : Screen, IDisposable
             initSubgroups(pairs);
             Pairs = pairs;
             Teams = teams;
-            //var pairsView = System.Windows.Data.CollectionViewSource.GetDefaultView(Pairs);
-            //using (pairsView.DeferRefresh())
-            //{
-            //    Pairs.Clear();
-            //    Pairs.AddRange(pairs);
-            //}
 
-            //var teamsView = System.Windows.Data.CollectionViewSource.GetDefaultView(Teams);
-
-            //using (teamsView.DeferRefresh())
-            //{
-            //    Teams.Clear();
-            //    Teams.AddRange(teams);
-            //}
             Logger.Info($"Loaded  Playing Section: {_playingTime}");
         }
 
@@ -588,7 +577,7 @@ public class ControlViewModel : Screen, IDisposable
                         var hac = rnd?.HACResult?.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
                         var but = rnd?.ButlerResult.Teams.FirstOrDefault(t => t.TeamNo == team.TeamNo);
                         var oth = rnd?.Resultlist.Teams.FirstOrDefault(t => t.TeamNo == res.OpponentTeamNo);
-                        //
+
                         team.Merge(res);
                         team.Merge(hac);
                         team.Merge(but);
@@ -794,6 +783,7 @@ public class ControlViewModel : Screen, IDisposable
                     if (mainClub is null)
                     {
                         Logger.Info($"New mainclub read: {mainNew.Name}");
+
                         // a new main club
                         Execute.OnUIThread(
                             () =>
@@ -932,12 +922,11 @@ public class ControlViewModel : Screen, IDisposable
                 {
                     if (PlayingTimes[i].Date <  pt.Date)
                     {
-                        //Execute.OnUIThread(() => PlayingTimes.Insert(i, pt));
                         PlayingTimes.Insert(i, pt);
 
                         showBadge(msg => DateBadge = msg, Lex.New);
 
-                        return; // break;
+                        return;
                     }
                 }
 
@@ -1006,8 +995,7 @@ public class ControlViewModel : Screen, IDisposable
                             if (ErrorMessage.Value.StartsWith(Lex.BC3Data))
                                 _lexStrings.Set(ErrorMessage, () => Lex.BC3NotUploaded);
                             else
-                                _lexStrings.Set(
-                                                 ErrorMessage
+                                _lexStrings.Set( ErrorMessage
                                                , () => $"{Lex.BC3Data} '{tournamentFile.GroupName}' {Lex.NotUploaded}");
 
                             continue;
@@ -1020,8 +1008,7 @@ public class ControlViewModel : Screen, IDisposable
 
                         if (tournament is null)
                             if (string.IsNullOrEmpty(ErrorMessage.Value))
-                                _lexStrings.Set(
-                                                 ErrorMessage
+                                _lexStrings.Set( ErrorMessage
                                                , () => $"{Lex.BC3DataFor} '{tournamentFile.GroupName}' {Lex.NotUploaded}");
                             else
                                 _lexStrings.Set(ErrorMessage, () => Lex.BC3NotUploaded);
@@ -1158,9 +1145,8 @@ public class ControlViewModel : Screen, IDisposable
 
             if (projectorScreen is null)
             {
-                //#if RELEASE
 #if RELEASE
-                MessageBox.Show("Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K", "Info");
+                MessageBox.Show(Lex.NoSecondScreen, "Info");
 #else
                 var primaryScreen = WpfScreenHelper.Screen.PrimaryScreen;
 
@@ -1262,8 +1248,8 @@ public class ControlViewModel : Screen, IDisposable
 
             internal void SetBridgeMateWatcher(bool enable)
             {
-                if (enable)
-                    BridgeMate.CheckOrOpen(SelectedPlayingTime?.Date, SelectedMainClub?.No);
+                if (enable && SelectedPlayingTime != null)
+                    BridgeMate.CheckOrOpen(SelectedPlayingTime.Date, (int)SelectedMainClub.No);
                 else
                     BridgeMate.Close();
             }
@@ -1309,7 +1295,6 @@ public class ControlViewModel : Screen, IDisposable
                 return base.OnActivateAsync(cancellationToken);
             }
 
-            // IDisposable pattern
             public void Dispose()
             {
                 Dispose(true);

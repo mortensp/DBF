@@ -155,18 +155,11 @@ public partial class TimersPanel : UserControl, INotifyPropertyChanged
         {
             UpdateBridgeTimers();
         }
-
-        //private void onItemChanged(object sender, ItemPropertyChangedEventArgs<BridgeTimer> e)
-        //{
-        //    if (e.PropertyName == nameof(Visibility))
-        //        UpdateBridgeTimers();
-        //}
         private static void onBridgeTimersChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TimersPanel ctl)
             {
                 ctl.BridgeTimers.CollectionChanged+= ctl.onCollectionChanged;
-                //ctl.BridgeTimers.ItemChanged      += ctl.onItemChanged;
                 ctl.UpdateBridgeTimers();
             }
         }

@@ -6,7 +6,6 @@ namespace DBF.DataModel
     [XmlRoot(ElementName = "PlayingTime")]
     public class PlayingTime : IEquatable<PlayingTime>
     {
-        //private static readonly CultureInfo DkCulture = new("da-DK");
 
         [XmlAttribute(AttributeName = "Date")] public string                DateStr         { get; set; }
         [XmlElement("GroupTournament")] public        List<GroupTournament> TournamentFiles { get; set; }
@@ -35,7 +34,6 @@ namespace DBF.DataModel
 
         public override int GetHashCode()
         {
-            // Brug de samme properties som i Equals
             return HashCode.Combine(DateStr);
         }
     }

@@ -72,7 +72,6 @@ namespace DBF.DataModel
             }
         }
 
-        // Display name — translated dynamically based on CurrentCulture
         [JsonIgnore]
         public string Name => Key.GetTranslation();
 

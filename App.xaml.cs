@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using AppArguments;
 using Caliburn.Micro;
 using DBF.Helpers;
 using GitHubTools;
