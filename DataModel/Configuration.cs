@@ -355,7 +355,7 @@ namespace DBF.DataModel
 
                 public void LoadLanguageSetting()
                 {
-                    Logger.Info("Loading language setting from Configuration file");
+                    //Logger.Info("Loading language setting from Configuration file");
 
                     if (!File.Exists(_path)
                     &&  File.Exists(_oldPath))

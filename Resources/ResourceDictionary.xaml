@@ -30,6 +30,8 @@
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
     <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
+    <conv:FontSizeToButtonSizeConverter x:Key="FontSizeToSizeConverter" />
+
     <sys:Double x:Key="SmallFontSize">10</sys:Double>
     <sys:Double x:Key="MediumFontSize">12</sys:Double>
     <sys:Double x:Key="LargeFontSize">14</sys:Double>
