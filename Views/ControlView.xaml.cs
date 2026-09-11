@@ -1,10 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Threading;
-using Syncfusion.UI.Xaml.Grid;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+﻿using System.Windows.Input;
 
 namespace DBF.Views
 {

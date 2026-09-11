@@ -72,7 +72,7 @@ public class Bootstrapper : BootstrapperBase
         [DebuggerStepThrough]
         protected override void Configure()
         {
-            SyncFusion.FindandRegisterLicenseKey();
+            SyncFusion.FindAndRegisterLicenseKey();
 
             _container.Singleton<IWindowManager, ZoomWindowManager>();
             _container.Singleton<IEventAggregator, EventAggregator>();
@@ -107,10 +107,15 @@ public class Bootstrapper : BootstrapperBase
         {
             return (Type modelType, DependencyObject displayLocation, object context) =>
                    {
-                       if (modelType == typeof(ControlViewModel))
-                           if (context  is string viewName
-                           &&  viewName == "ProjectorView")
+                       if (context is string viewName)
+                       {
+                           if (viewName == "StartListPrintControl")
+                               return typeof(ControlViewModel);
+
+                           if (modelType == typeof(ControlViewModel)
+                           &&  viewName  == "ProjectorView")
                                return typeof(ProjectorView);
+                       }
 
                        return defaultLocateTypeForModelType(modelType, displayLocation, context);
                    };

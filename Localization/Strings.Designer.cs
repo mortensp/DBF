@@ -1330,6 +1330,15 @@ namespace DBF.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Print.
+        /// </summary>
+        internal static string Print {
+            get {
+                return ResourceManager.GetString("Print", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Projector.
         /// </summary>
         internal static string Projector {

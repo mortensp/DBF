@@ -13,16 +13,18 @@
     xmlns:model="clr-namespace:DBF.DataModel"
     x:Name="root"
     Title="DBF Tools"
-    Style="{StaticResource HelpWindowStyle}"
-    help:Help.Key="AppSettings"
+    MinHeight="570"
     cal:Message.Attach="[Event KeyDown] = [OnKeyDown($eventArgs)]"
     d:Height="800"
     d:Width="1100"
+    help:Help.Key="AppSettings"
     lex:LocalizeDictionary.DesignCulture="da-DK"
     lex:ResxLocalizationProvider.DefaultAssembly="DBF"
     lex:ResxLocalizationProvider.DefaultDictionary="Strings"
     FontSize="{DynamicResource MediumFontSize}"
     Icon="/Images/DBF_Tools.ico"
+    StateChanged="OnStateChanged"
+    Style="{StaticResource HelpWindowStyle}"
     WindowState="Normal"
     mc:Ignorable="d">
 
@@ -34,23 +36,25 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="3,0">
+    <!--  Grid Margin="3,0"  -->
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0"
+        <DockPanel
+            Grid.Row="0"
             Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}"
             Visibility="{Binding FullScreenVisibility}">
             <MenuItem
                 Name="mnuTest"
-                Style="{StaticResource OrphanMenuItemStyle}"
                 cal:Message.Attach="[Event Click] = [Action Test]"
                 BorderBrush="#D0D0D0"
                 BorderThickness="0,0,0,1"
                 DockPanel.Dock="Right"
                 Header="Break"
+                Style="{StaticResource OrphanMenuItemStyle}"
                 Visibility="Collapsed" />
 
             <Menu

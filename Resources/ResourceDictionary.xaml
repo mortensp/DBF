@@ -30,6 +30,7 @@
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
     <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
+    <sys:Double x:Key="SmallFontSize">10</sys:Double>
     <sys:Double x:Key="MediumFontSize">12</sys:Double>
     <sys:Double x:Key="LargeFontSize">14</sys:Double>
     <sys:Double x:Key="X-LargeFontSize">16</sys:Double>
@@ -181,8 +182,11 @@
                             FontWeight="Bold"
                             Foreground="Black"
                             Text="{Binding Key, Converter={StaticResource FirstPartConverter}}" />
+                      
                         <TextBlock Foreground="{Binding Key, Converter={StaticResource GroupColorConverter}}" Text="{Binding Key, Converter={StaticResource SecondPartConverter}}" />
+                        
                         <TextBlock Foreground="Black" Text="{Binding Key, Converter={StaticResource ThirdPartConverter}}" />
+                        
                         <TextBlock
                             FontWeight="Normal"
                             Foreground="Black"

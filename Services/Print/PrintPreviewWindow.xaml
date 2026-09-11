@@ -1,0 +1,59 @@
+﻿<Window
+    x:Class="DBF.Services.Print.PrintPreviewWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Print Preview"
+    Width="1100"
+    Height="800"
+    WindowStartupLocation="CenterOwner">
+
+    <DockPanel>
+
+        <!--  Toolbar  -->
+        <ToolBar DockPanel.Dock="Top">
+
+            <Button
+                Margin="2"
+                Click="Printer_Click"
+                Content="Printer..." />
+
+            <Separator />
+
+            <Button
+                Margin="2"
+                Click="FitPage_Click"
+                Content="Fit page" />
+
+            <Button
+                Margin="2"
+                Click="ActualSize_Click"
+                Content="100%" />
+
+            <Separator />
+
+            <Button
+                Margin="2"
+                Click="Print_Click"
+                Content="Print" />
+
+            <Button
+                Margin="2"
+                Click="Cancel_Click"
+                Content="Cancel" />
+
+            <TextBlock
+                x:Name="PrinterText"
+                Margin="20,0,0,0"
+                VerticalAlignment="Center" />
+
+        </ToolBar>
+
+        <!--  Preview  -->
+        <DocumentViewer
+            x:Name="DocumentViewer"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch" />
+
+    </DockPanel>
+
+</Window>

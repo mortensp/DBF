@@ -57,10 +57,13 @@ namespace DBF.DataModel
                     {
                         FontSizeService = IoC.Get<FontSizeService>();
                     }
+
                     catch
                     {
                         FontSizeService = new FontSizeService();
                     }
+
+                InDebugMode = Debugger.IsAttached;
             }
 
             public Configuration()
@@ -106,7 +109,7 @@ namespace DBF.DataModel
                 public string BridgeMatePath    => BC3Path + @"BridgeMate\";
 
                 #region FontSize(s)
-                    public static List<double> FontSizes { get; } = new() { 6, 8, 10, 12, 14, 16 };
+                    public static List<double> FontSizes { get; } = new() { 10, 11, 12, 13, 14, 15, 16 };
 
                     public double FontSize
                     {
@@ -117,7 +120,7 @@ namespace DBF.DataModel
 
                 public Orientation WindowOrientation           { get; set; } = Orientation.Horizontal;
 
-                public Visibility  WindowOrientationVisibility => VisibleTimerCount ==  2
+                public Visibility  WindowOrientationVisibility => VisibleTimerCount == 2
                                                                 ? Visibility.Visible
                                                                 : Visibility.Collapsed;
                 public TimeOnly? StartTime
@@ -350,107 +353,109 @@ namespace DBF.DataModel
                     setEndTime();
                 }
 
-        public void LoadLanguageSetting()
-        {
-            Logger.Info("Loading language setting from Configuration file");
-
-            if (!File.Exists(_path)
-            && File.Exists(_oldPath))
-            {
-                // make sure that destination folder exists
-                Directory.CreateDirectory(Path.GetDirectoryName(_path));
-
-                // move old config file
-                File.Move(_oldPath, _path);
-
-                // Delete old folder if empty
-                string sourceFolder = Path.GetDirectoryName(_oldPath)!;
-
-                if (Directory.GetFiles(sourceFolder).Length == 0
-                && Directory.GetDirectories(sourceFolder).Length == 0)
-                    Directory.Delete(sourceFolder);
-            }
-
-            if (!File.Exists(_path)
-            || Arguments.Values.Lookup("mode") == "reset")
-                LanguageService.Instance.SetCulture("en-US");
-            else
-            {
-                var jsonData = File.ReadAllText(_path);
-
-                if (string.IsNullOrWhiteSpace(jsonData))
-                    LanguageService.Instance.SetCulture("en-US");
-                else
+                public void LoadLanguageSetting()
                 {
-                    Logger.Info("Reading Configuration file");
+                    Logger.Info("Loading language setting from Configuration file");
 
-                    //TODO: Can later be removed 
-                    if (jsonData.IndexOf("\"Color\":") > -1)
-                        jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
+                    if (!File.Exists(_path)
+                    &&  File.Exists(_oldPath))
+                    {
+                        // make sure that destination folder exists
+                        Directory.CreateDirectory(Path.GetDirectoryName(_path));
 
-                    _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
+                        // move old config file
+                        File.Move(_oldPath, _path);
 
-                    LanguageService.Instance.SetCulture(CultureName);
-                }
+                        // Delete old folder if empty
+                        string sourceFolder = Path.GetDirectoryName(_oldPath)!;
 
-                //FontSizeService.FontSize = _loadedConfig.FontSize;
-                Presets.AddRange([ new Preset(nameof(Lex.Pairs_7x4),  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
+                        if (Directory.GetFiles(sourceFolder).Length       == 0
+                        &&  Directory.GetDirectories(sourceFolder).Length == 0)
+                            Directory.Delete(sourceFolder);
+                    }
+
+                    if (!File.Exists(_path)
+                    ||  Arguments.Values.Lookup("mode") == "reset")
+                        LanguageService.Instance.SetCulture("en-US");
+                    else
+                    {
+                        var jsonData = File.ReadAllText(_path);
+
+                        if (string.IsNullOrWhiteSpace(jsonData))
+                            LanguageService.Instance.SetCulture("en-US");
+                        else
+                        {
+                            Logger.Info("Reading Configuration file");
+
+                            //TODO: Can later be removed 
+                            if (jsonData.IndexOf("\"Color\":") >  -1)
+                                jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
+
+                            _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
+
+                            LanguageService.Instance.SetCulture(_loadedConfig.CultureName);
+                        }
+
+                        //FontSizeService.FontSize = _loadedConfig.FontSize;
+                        Presets.AddRange([ new Preset(nameof(Lex.Pairs_7x4),  false, false, 7,  4,  4, 0, 27, 0, 1, 12, 5)
                                          , new Preset(nameof(Lex.Pairs_8x4),  false, false, 8,  4,  4, 0, 27, 0, 1, 10, 5)
                                          , new Preset(nameof(Lex.Pairs_9x3),  false, false, 9,  3,  5, 0, 21, 0, 1, 12, 5)
                                          , new Preset(nameof(Lex.Pairs_11x2), false, false, 11, 2,  6, 0, 14, 0, 1, 12, 5)
                                          , new Preset(nameof(Lex.Pairs_11x3), false, false, 11, 3,  6, 0, 21, 0, 1, 12, 5)
                                          , new Preset(nameof(Lex.Teams_2x16), false, true,  2,  16, 1, 1, 46, 0, 0, 15, 5)
-                                 ]);
+                                         ]);
 
-                Logger.Info("Loaded  language setting from Configuration file");
-            }
-        }
-        
-                        public async Task LoadAsync()
+                        Logger.Info("Loaded  language setting from Configuration file");
+                    }
+                }
+
+                public async Task LoadAsync()
+                {
+                    if (!File.Exists(_path)
+                    ||  Arguments.Values.Lookup("mode") == "reset")
+                    {
+                        AppVersion    = _currentversion;
+                        ConfigVersion = _configVersion;
+                        Save();
+                        await OpenSettingsAsync();
+                    }
+                    else
+                    {
+                        var jsonData = File.ReadAllText(_path);
+
+                        if (string.IsNullOrWhiteSpace(jsonData))
                         {
-                            if (!File.Exists(_path)
-                            ||  Arguments.Values.Lookup("mode") == "reset")
-                            {
-                                AppVersion    = _currentversion;
-                                ConfigVersion = _configVersion;
-                                Save();
-                                await OpenSettingsAsync();
-                            }
-                            else
-                            {
-                                var jsonData = File.ReadAllText(_path);
-
-                                if (string.IsNullOrWhiteSpace(jsonData))
-                                {
-                                    AppVersion = _currentversion;
-                                    await OpenSettingsAsync();
-                                    Save();
-                                }
-                                else
-                                {
-                                    if (_loadedConfig is null)
-                                    {
-                                        Logger.Info("Reading Configuration file");
-
-                                        //TODO: Can be removed when old config files are no longer in circulation
-                                        if (jsonData.IndexOf("\"Color\":") >  -1)
-                                            jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
-
-                                        _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
-                                    }
-
-                                    Update(_loadedConfig);
-                                    FontSizeService.FontSize = _loadedConfig.FontSize;
-
-                                    if (_loadedConfig.ConfigVersion                           is null
-                                    ||  _loadedConfig.ConfigVersion.CompareTo(_configVersion) <  0)
-                                        await OpenSettingsAsync();
-                                }
-                            }
-
-                            loadTimers();
-                            IsLoaded = true;
+                            AppVersion = _currentversion;
+                            await OpenSettingsAsync();
+                            Save();
                         }
+                        else
+                        {
+                            if (_loadedConfig is null)
+                            {
+                                Logger.Info("Reading Configuration file");
+
+                                //TODO: Can be removed when old config files are no longer in circulation
+                                if (jsonData.IndexOf("\"Color\":") >  -1)
+                                    jsonData = jsonData.Replace("\"Color\":", "\"BackgroundColor\":");
+
+                                _loadedConfig = JsonSerializer.Deserialize<Configuration>(jsonData, _serializerOptions);
+                            }
+
+                            Update(_loadedConfig);
+
+                            if (FontSizes.Contains(_loadedConfig.FontSize))
+                                FontSizeService.FontSize = _loadedConfig.FontSize;
+
+                            if (_loadedConfig.ConfigVersion                           is null
+                            ||  _loadedConfig.ConfigVersion.CompareTo(_configVersion) <  0)
+                                await OpenSettingsAsync();
+                        }
+                    }
+
+                    loadTimers();
+                    IsLoaded = true;
+                }
             #endregion
 
             #region State Serializing 
@@ -501,6 +506,7 @@ namespace DBF.DataModel
                                 if (state.TimerStates[i].IsStarted)
                                     BridgeTimers[i].Restore(state.TimerStates[i]);
                         }
+
                         catch (Exception ex)
                         {
                             Logger.Exception(ex, "Unable to restore state");
@@ -567,7 +573,6 @@ namespace DBF.DataModel
                 }
             }
 
-           
             internal void UpdateTimers()
             {
                 foreach (var bridgeTimer in BridgeTimers.Where(t => t.Visibility == Visibility.Visible))
@@ -716,7 +721,6 @@ namespace DBF.DataModel
 
             private void arrangeTimers()
             {
-
                 for (var i = BridgeTimers.Count - 1; i >= 0; i--)
                 {
                     var timer = BridgeTimers[i];
@@ -747,7 +751,6 @@ namespace DBF.DataModel
                         psi.FileName = "notepad++.exe";
                         Process.Start(psi);
                     }
-
                     catch
                     {
                         psi.FileName = "notepad.exe";
@@ -765,6 +768,8 @@ namespace DBF.DataModel
                         return false;
                 }
             }
+
+            public static bool InDebugMode { get; }
 
             private void setEndTime()
             {

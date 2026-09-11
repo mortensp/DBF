@@ -1,6 +1,6 @@
 ﻿//using Syncfusion.XlsIO.FormatParser;
 
-namespace DBF.UserControls
+namespace DBF.DataModel
 {
     public struct Interval
     {

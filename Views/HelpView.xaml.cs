@@ -1,18 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using DBF.HelpSystem;
 using DBF.ViewModels;
 
 namespace DBF.Views;
@@ -31,10 +18,17 @@ public partial class HelpView : Window
     {
         base.OnContentRendered(e);
 
-        // The window is now fully rendered and measured
-        this.Height    = ((HelpViewModel)DataContext).WindowHeight;
-        this.Top       = 10;
-        this.MaxHeight = SystemParameters.PrimaryScreenHeight - 20;
+        var workArea = SystemParameters.WorkArea;
+        var vm       = (HelpViewModel)DataContext;
+
+        this.MaxHeight = workArea.Height - 20;
+        this.MaxWidth  = workArea.Width - 20;
+        this.Height    = Math.Min(vm.WindowHeight ?? this.MaxHeight, this.MaxHeight);
+        this.Width     = Math.Min(vm.WindowWidth ?? this.MaxWidth, this.MaxWidth);
+
+        // Center vinduet med hensyn til titlebar
+        this.Left = (workArea.Width - this.Width) / 2 + workArea.Left;
+        this.Top  = (workArea.Height - this.Height + SystemParameters.CaptionHeight/2) / 2 + workArea.Top;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

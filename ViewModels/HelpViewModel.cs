@@ -17,9 +17,9 @@ public class HelpViewModel : PropertyChangedBase
 
     public BitmapImage Image        { get; private set; }
 
-    public double      WindowWidth  { get;  set; }
+    public double?      WindowWidth  { get;  set; }
 
-    public double      WindowHeight { get;  set; }
+    public double?      WindowHeight { get;  set; }
 
     public string Key
     {
@@ -33,10 +33,11 @@ public class HelpViewModel : PropertyChangedBase
                 Text        = content.Text;
                 Image       = ToBitmapImage(content.Image);
 
-                if (content.Image is null)
+                if (content.Image is null 
+                    || content.Width is not null)
                 {
-                    WindowWidth  = 600;
-                    WindowHeight = 400;
+                    WindowWidth  = content.Width ;
+                    WindowHeight = content.Height;
                 }
                 else
                 {

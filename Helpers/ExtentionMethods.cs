@@ -1,11 +1,21 @@
 ﻿using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using Group = Syncfusion.Data.Group;
 namespace DBF.Helpers;
 
 public static class ExtentionMethods
 {
+        [Conditional("DEBUG")]
+    public static void SaveDebugBitmap(this RenderTargetBitmap bmp, string filename="debug_render.png")
+    {
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+        using var fs = File.Create(filename);
+        encoder.Save(fs);
+    }
     public static bool WildcardMatch(this string input, string pattern)
     {
         string regex = "^" + Regex.Escape(pattern)

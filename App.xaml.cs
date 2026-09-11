@@ -1,8 +1,11 @@
-﻿using System.Windows;
+﻿using System.Configuration;
+using System.Windows;
 using AppArguments;
 using Caliburn.Micro;
 using DBF.Helpers;
 using GitHubTools;
+using String.Localization;
+using static PrintDialogX.InterfaceSettings;
 
 namespace DBF
 {
@@ -15,7 +18,7 @@ namespace DBF
 
         protected override void OnStartup(StartupEventArgs e)
         {
-#if RELEASE
+#if (RELEASE || PRODTEST)
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
 
@@ -27,7 +30,8 @@ namespace DBF
             else
             {
                 Logger.Info("Looking for new version online");
-                _github.UpdateAndMarkAppStarted(Arguments.DebugMode);
+                var cultureName = LanguageService.Instance.CurrentCulture;
+                _github.UpdateAndMarkAppStarted(Arguments.DebugMode, cultureName.Name);
             }
 #else
             _github.MarkAppStarted();
@@ -51,6 +55,6 @@ namespace DBF
         {
             _github.MarkAppExitedNormally();
             base.OnExit(e);
-        }     
+        }
     }
 }

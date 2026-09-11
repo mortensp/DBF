@@ -115,7 +115,8 @@
                                 </Grid.ColumnDefinitions>
 
                                 <!--  Left side of TilteBar  -->
-                                <WrapPanel Grid.Column="0"
+                                <WrapPanel
+                                    Grid.Column="0"
                                     Margin="8,0,8,3"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center">
@@ -149,8 +150,8 @@
 
                                     <!--  Help  -->
                                     <Button
-                                        Style="{StaticResource TitleBarButtonStyle}"
                                         help:HelpBehavior.Attach="True"
+                                        Style="{StaticResource TitleBarButtonStyle}"
                                         ToolTip="{lex:Loc tbHelp}">
                                         <!--<TextBlock Text="?" />-->
                                         <icons:MaterialDesign
@@ -162,24 +163,49 @@
 
                                     <!--  Minimize  -->
                                     <Button
+                                        help:HelpWindowCommandsBehavior.MinimizeCommand="True"
                                         Style="{StaticResource TitleBarButtonStyle}"
-                                        help:WindowCommandsBehavior.MinimizeCommand="True"
                                         ToolTip="{lex:Loc tbMinimize}">
                                         <TextBlock Text="−" />
                                     </Button>
 
                                     <!--  Maximize  -->
-                                    <Button
+                                    <!--<Button
+                                        help:HelpWindowCommandsBehavior.MaximizeCommand="True"
                                         Style="{StaticResource TitleBarButtonStyle}"
-                                        help:WindowCommandsBehavior.MaximizeCommand="True"
                                         ToolTip="{lex:Loc tbMaximize}">
                                         <TextBlock Text="☐" />
+                                    </Button>-->
+
+                                    <Button help:HelpWindowCommandsBehavior.MaximizeCommand="True"
+                                          Style="{StaticResource TitleBarButtonStyle}"
+                                            ToolTip="{lex:Loc tbMaximize}">
+                                        <TextBlock x:Name="MaxIcon" FontSize="16">
+
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+
+                                                        <DataTrigger Binding="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                                            <Setter Property="Text" Value="🗗" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}}" Value="False">
+                                                            <Setter Property="Text" Value="☐" />
+                                                        </DataTrigger>
+
+
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </Button>
+
 
                                     <!--  Close  -->
                                     <Button
+                                        help:HelpWindowCommandsBehavior.CloseCommand="True"
                                         Style="{StaticResource CloseButtonStyle}"
-                                        help:WindowCommandsBehavior.CloseCommand="True"
                                         ToolTip="{lex:Loc tbClose}">
                                         <TextBlock Text="✕" />
                                     </Button>

@@ -3,6 +3,9 @@
     "DBF": {
       "commandName": "Project",
       "commandLineArgs": "debug:true"
+    },
+    "DBF Prod": {
+      "commandName": "Project"
     }
   }
 }

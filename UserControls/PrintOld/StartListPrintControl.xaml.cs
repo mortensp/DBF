@@ -3,26 +3,24 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.ViewModels;
-using Syncfusion.Data;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Grid.Helpers;
 using Group = Syncfusion.Data.Group;
+
 namespace DBF.UserControls
 {
     /// <summary>
     /// Interaction logic for StartListControl.xaml
     /// </summary>
-    public partial class StartListControl : UserControl
+    public partial class StartListPrintControl : UserControl
     {
-        private Configuration config;// = IoC.Get<Configuration>();
-
+        private Configuration config;
         private bool              parentIsViewbox;
         private int               displayLineIndex = -1;
         private Interval          interval         = new(0, 0);
@@ -36,9 +34,10 @@ namespace DBF.UserControls
         private DispatcherTimer   groupTimer       =new();
 
         #region Constructors
-            public StartListControl()
+            public StartListPrintControl()
             {
                 InitializeComponent();
+
                 this.DataContextChanged+= StartlistControl_DataContextChanged;
                 this.Loaded            += UserControl_Loaded;
 
@@ -57,28 +56,26 @@ namespace DBF.UserControls
                 dgTeams.GroupCollapsing             += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.GroupExpanding              += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.ItemsSourceChanged          += onTeamsChanged;
-            
-                      config ??= IoC.Get<Configuration>();
-
             }
         #endregion
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-  
-            var parent = VisualTreeHelper.GetParent(this);
+            config ??= IoC.Get<Configuration>();
 
-            while (parent is not null
-               &&  parent is not Viewbox)
-                parent = VisualTreeHelper.GetParent(parent);
+            //var parent = VisualTreeHelper.GetParent(this);
 
-            if (parent is not null)
+            //while (parent is not null
+            //   &&  parent is not Viewbox)
+            //    parent = VisualTreeHelper.GetParent(parent);
+
+            //if (parent is not null)
                 parentIsViewbox = true;
 
-            setupPaging();
+            //setupPaging();
 
-            groupTimer.Tick       += (s, e) => showNextGroup();
-            config.PropertyChanged+= (s, e) => setupPaging();
+            //groupTimer.Tick       += (s, e) => showNextGroup();
+            //config.PropertyChanged+= (s, e) => setupPaging();
         }
 
         private void onPairsChanged(object s, GridItemsSourceChangedEventArgs e)
@@ -104,7 +101,7 @@ namespace DBF.UserControls
                                       &&  displayLines[displayLineIndex].Contains(pair.EntryNo);
                 dg.View.RefreshFilter();
 
-                setupPaging();
+                //setupPaging();
             }
         }
 
@@ -122,44 +119,44 @@ namespace DBF.UserControls
                                       &&  displayLines[displayLineIndex].Contains(team.EntryNo);
                 dg.View.RefreshFilter();
 
-                // 
-                setupPaging();
+                 
+                //setupPaging();
             }
         }
 
-        private void setupPaging()
-        {
-            if (parentIsViewbox)
-            {
-                groupTimer.Stop();
-                groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
+        //private void setupPaging()
+        //{
+        //    if (parentIsViewbox)
+        //    {
+        //        groupTimer.Stop();
+        //        groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
 
-                displayLines     = [];
-                displayLineIndex = -1;
-                linesAllocated   = 0;
-                linesNeeded      = 0;
-                interval         = new(0, 0);
-                pairRows         = pairs?.Count() ?? 0;
-                teamRows         = teams?.Count() ?? 0;
+        //        displayLines     = [];
+        //        displayLineIndex = -1;
+        //        linesAllocated   = 0;
+        //        linesNeeded      = 0;
+        //        interval         = new(0, 0);
+        //        pairRows         = pairs?.Count() ?? 0;
+        //        teamRows         = teams?.Count() ?? 0;
 
-                dgPairs.View?.RefreshFilter();
-                dgTeams.View?.RefreshFilter();
+        //        dgPairs.View?.RefreshFilter();
+        //        dgTeams.View?.RefreshFilter();
 
-                if (pairRows + teamRows >  0)
-                {
-                    splitDataGrid(dgPairs);
-                    splitDataGrid(dgTeams);
+        //        if (pairRows + teamRows >  0)
+        //        {
+        //            splitDataGrid(dgPairs);
+        //            splitDataGrid(dgTeams);
 
-                    if (linesNeeded >  config.ProjectorMaxRows)
-                    {
-                        showNextGroup();
-                        groupTimer.Start();
-                    }
-                    else
-                        displayLines = [new Interval(0, pairRows + teamRows)];
-                }
-            }
-        }
+        //            if (linesNeeded >  config.ProjectorMaxRows)
+        //            {
+        //                showNextGroup();
+        //                groupTimer.Start();
+        //            }
+        //            else
+        //                displayLines = [new Interval(0, pairRows + teamRows)];
+        //        }
+        //    }
+        //}
 
         private void SfDataGrid_QueryRowHeight(object sender, QueryRowHeightEventArgs e)
         {

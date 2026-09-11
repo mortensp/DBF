@@ -732,4 +732,7 @@
   <data name="NoSecondScreen" xml:space="preserve">
     <value>Der er ikke oprettet forbindelse til en sekundær skærm. Tast Win+K</value>
   </data>
+  <data name="Print" xml:space="preserve">
+    <value>Udskrift</value>
+  </data>
 </root>

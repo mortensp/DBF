@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -9,8 +8,8 @@ using DBF.DataModel;
 using DBF.Helpers;
 using DBF.Views;
 using GitHubTools;
-using DBF.Localization;
 using String.Localization;
+
 namespace DBF.ViewModels;
 
 public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductActiveItem
@@ -88,49 +87,22 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
 
     public void OnKeyDown(KeyEventArgs e)
     {
+        bool isUiThread = Application.Current.Dispatcher.CheckAccess();
+
         if (e.Key == Key.F11)
-            ToggleFullscreen();
+            ToggleFullScreen();
         else
             if (IsFullscreen
             &&  e.Key == Key.Escape)
-                ToggleFullscreen();
+                ToggleFullScreen();
     }
 
-    public void ToggleFullscreen()
+    public void ToggleFullScreen()
     {
         var window = Application.Current.MainWindow;
 
-        if (IsFullscreen)
-        {
-            // Restore previous state
-            window.WindowStyle = _previousWindowStyle;
-            window.ResizeMode  = _previousResizeMode;
-
-            window.WindowState = WindowState.Normal;
-
-            window.Left        = _previousBounds.Left;
-            window.Top         = _previousBounds.Top;
-            window.Width       = _previousBounds.Width;
-            window.Height      = _previousBounds.Height;
-            window.WindowState = _previousWindowState;
-
-            IsFullscreen = false;
-        }
-        else
-        {
-            // Save current state
-            _previousWindowState = window.WindowState;
-            _previousWindowStyle = window.WindowStyle;
-            _previousResizeMode  = window.ResizeMode;
-            _previousBounds      = new Rect(window.Left, window.Top, window.Width, window.Height);
-
-            // Fullscreen mode
-            window.ResizeMode  = ResizeMode.NoResize;
-            window.WindowState = WindowState.Normal; // Need to maximize correctly
-            window.WindowState = WindowState.Maximized;
-
-            IsFullscreen = true;
-        }
+        if (window is ShellView view)
+            view.ToggleMaximize(IsFullscreen = !IsFullscreen);
     }
 
     public void OpenSettingFiles()
@@ -147,9 +119,11 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     {
         try
         {
+            var cultureName = LanguageService.Instance.CurrentCulture.Name;
+
             Logger.Info("Running GitHup Updater");
             GitHub _github = new GitHub("DBF");
-            _github.Update(Arguments.DebugMode, "install");
+            _github.Update(Arguments.DebugMode, cultureName, "install");
         }
         catch (Exception ex)
         {
@@ -220,14 +194,6 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
     public void Minimize()
     {
         (GetView() as Window).WindowState = WindowState.Minimized;
-    }
-
-    public void ToggleMaximize()
-    {
-        var win         = GetView() as Window;
-        win.WindowState = win.WindowState == WindowState.Maximized
-                        ? WindowState.Normal
-                        : WindowState.Maximized;
     }
 
     public async Task CloseAsync()

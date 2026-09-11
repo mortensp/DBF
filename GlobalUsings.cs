@@ -2,7 +2,9 @@
 global using System.Text;
 global using System.Diagnostics;
 global using DBF.Localization;
+
 global using Lex = DBF.Localization.Strings;
+global using Size= System.Windows.Size;
 
 // the rest is to hide Windows.Forms which is only here for sfBadge and
 // as we uses Forms by <UseWindowsForms>true</UseWindowsForms> in the csproj file

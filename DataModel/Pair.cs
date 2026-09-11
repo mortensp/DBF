@@ -9,25 +9,25 @@ namespace DBF.DataModel
     {
         private string direction;
 
-        public int          PairNo            => PairNoStr.AsInt();
-        public int          PairTournamentRank=> PairTournamentRankStr.AsInt();
-        public int          SectionRank       => SectionRankStr.AsInt();
-        public int          TournamentRank    => TournamentRankStr.AsInt();
-        public int          HACRankSection    => HACRankSectionStr.AsInt();
-        public decimal      AvgHAC            => AvgHACStr.AsDecimal();
-        public decimal      ExpectedPct     => ExpectedScoreStr.AsDecimal();
-        
-        public decimal      ExpectedScore     => ExpectedScoreStr.AsDecimal();
-          public decimal      ActualPct       => ActualScoreStr.AsDecimal();
-        public decimal      ActualScore       => ActualScoreStr.AsDecimal();
-        public decimal      Result            => ResultStr.AsDecimal();
-        public int          Rank              => RankStr.AsInt();
-        public decimal      DeltaHAC          => DeltaHACStr.AsDecimal();
-        public decimal      TournamentScore   => TournamentScoreStr.AsDecimal();
-        public decimal      TournamentResult  => TournamentResultStr.AsDecimal();
-        public decimal      HACTotal          => HACTotalStr.AsDecimal();
-        public int          HACRankTotal      => HACRankTotalStr.AsInt();
-        [XmlIgnore] public                                        int       GroupNo                 { get; set; }
+        public int          PairNo                => PairNoStr.AsInt();
+        public int          PairTournamentRank    => PairTournamentRankStr.AsInt();
+        public int          SectionRank           => SectionRankStr.AsInt();
+        public int          TournamentRank        => TournamentRankStr.AsInt();
+        public int          HACRankSection        => HACRankSectionStr.AsInt();
+        public decimal      AvgHAC                => AvgHACStr.AsDecimal();
+        public decimal      ExpectedPct           => ExpectedScoreStr.AsDecimal();
+
+        public decimal      ExpectedScore         => ExpectedScoreStr.AsDecimal();
+        public decimal      ActualPct             => ActualScoreStr.AsDecimal();
+        public decimal      ActualScore           => ActualScoreStr.AsDecimal();
+        public decimal      Result                => ResultStr.AsDecimal();
+        public int          Rank                  => RankStr.AsInt();
+        public decimal      DeltaHAC              => DeltaHACStr.AsDecimal();
+        public decimal      TournamentScore       => TournamentScoreStr.AsDecimal();
+        public decimal      TournamentResult      => TournamentResultStr.AsDecimal();
+        public decimal      HACTotal              => HACTotalStr.AsDecimal();
+        public int          HACRankTotal          => HACRankTotalStr.AsInt();
+        [XmlIgnore] public                                        int          GroupNo               { get; set; }
         [XmlIgnore] public                                        string       Group                 { get; set; }
         ///-----
         [XmlAttribute(AttributeName = "No")] public               string       PairNoStr             { get; set; }
@@ -73,11 +73,11 @@ namespace DBF.DataModel
             }
         }
 
-        [XmlIgnore] public                                        int          Position             { get; set; }
+        [XmlIgnore] public int    Position            { get; set; }
 
-        [XmlIgnore] public                                        string       SubGroup              { get; set; } = "";
-        [XmlIgnore] public                                        int          HACRankSectionGroup    { get; set; }
-        [XmlIgnore] public int EntryNo { get; set; }
+        [XmlIgnore] public string SubGroup            { get; set; } = "";
+        [XmlIgnore] public int    HACRankSectionGroup { get; set; }
+        [XmlIgnore] public int    EntryNo             { get; set; }
 
         // ---
         public string PairName

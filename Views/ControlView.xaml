@@ -34,9 +34,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <WrapPanel Grid.Row="0" Grid.Column="0"
+        <!--  Row 0  -->
+
+        <WrapPanel
+            Grid.Row="0"
+            Grid.Column="0"
             Grid.ColumnSpan="2"
-            Margin="0,0,0,8"
+            Margin="0,0,0,2"
             Background="White"
             Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
             <StackPanel
@@ -45,16 +49,16 @@
                 Visibility="{Binding BC3Available, Converter={StaticResource BooleanToVisibilityConverter}}">
 
                 <!--  BridgeCenter ie. Mainclub  -->
-                <Label Content="{lex:Loc Club}" FontWeight="Bold" />
+                <Label Content="{lex:Loc Club}" FontWeight="SemiBold" />
 
                 <TextBlock
                     Margin="-4,4,5,0"
-                    FontWeight="Bold"
+                    FontWeight="SemiBold"
                     Text=":" />
 
                 <ComboBox
                     Name="cmbClubNo"
-                    Width="Auto"                    
+                    Width="Auto"
                     MinWidth="100"
                     MaxHeight="20"
                     Padding="4,1"
@@ -73,11 +77,11 @@
                     HorizontalAnchor="Inside" />
 
                 <!--  Subclub  -->
-                <Label Content="{lex:Loc Subclub}" FontWeight="Bold" />
+                <Label Content="{lex:Loc Subclub}" FontWeight="SemiBold" />
 
                 <TextBlock
                     Margin="-4,4,5,0"
-                    FontWeight="Bold"
+                    FontWeight="SemiBold"
                     Text=":" />
 
                 <ComboBox
@@ -107,25 +111,34 @@
 
                 <!--  Playing date and time  -->
                 <WrapPanel>
-                    <Label Content="{lex:Loc Date}" FontWeight="Bold" />
+                    <Label Content="{lex:Loc Date}" FontWeight="SemiBold" />
 
                     <TextBlock
                         Margin="-4,4,5,0"
-                        FontWeight="Bold"
+                        FontWeight="SemiBold"
                         Text=":" />
                 </WrapPanel>
 
                 <ComboBox
                     Name="cmbDate"
                     Width="Auto"
-                    MinWidth="100" 
+                    MinWidth="100"
                     MaxHeight="20"
-                    Padding="4,1"
+                    Padding="4,3,1,1"
                     HorizontalAlignment="Left"
                     cal:Message.Attach="[Event DropDownOpened] = [Action ResetBadges]"
                     helpers:ComboBoxAutoScrollBehavior.AutoScroll="True"
                     ItemsSource="{Binding PlayingTimes}"
-                    SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    SelectedItem="{Binding SelectedPlayingTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                FontFamily="Cascadia Code"
+                                FontSize="{DynamicResource MediumFontSize}"
+                                Text="{Binding Date, StringFormat='dd MMM yy  HH:mm'}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <sf:SfBadge
                     Width="25"
@@ -133,13 +146,7 @@
                     Content="{Binding DateBadge}"
                     Foreground="Black" />
 
-                <!--  Toast overlay  -->
-                <!--
-                <Grid
-                    x:Name="ToastHost"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    IsHitTestVisible="False" />-->
+
             </StackPanel>
 
             <StackPanel
@@ -151,11 +158,11 @@
                 <TextBlock
                     Margin="10,5,5,0"
                     HorizontalAlignment="Left"
-                    FontWeight="Bold"
+                    FontWeight="SemiBold"
                     Text="{lex:Loc StartTime}" />
                 <TextBlock
                     Margin="-4,4,5,0"
-                    FontWeight="Bold"
+                    FontWeight="SemiBold"
                     Text=":" />
 
                 <ctl:TimePicker SelectedTime="{Binding Configuration.StartTime, Mode=TwoWay}" />
@@ -166,22 +173,27 @@
             <TextBlock
                 Margin="10,5,5,0"
                 HorizontalAlignment="Left"
-                FontWeight="Bold"
+                FontWeight="SemiBold"
                 Text="{lex:Loc ExpectedEndTime}" />
 
             <TextBlock
                 Margin="-4,4,5,0"
-                FontWeight="Bold"
+                FontWeight="SemiBold"
                 Text=":" />
 
             <TextBlock
-                x:Name="Configuration_EndTime"
-                Margin="0,5"
+                Margin="0,7,0,0"
                 HorizontalAlignment="Left"
-                FontWeight="Bold" />
+                FontFamily="Cascadia Code"
+                FontSize="{DynamicResource MediumFontSize}"
+                FontWeight="SemiBold"
+                Text="{Binding Configuration.EndTime, StringFormat='HH:mm'}" />
         </WrapPanel>
 
-        <Border Grid.Row="1" Grid.Column="2"
+        <!--  Row 1  -->
+        <Border
+            Grid.Row="1"
+            Grid.Column="2"
             Height="28"
             Visibility="{Binding ErrorMessage.Value, Converter={StaticResource HideEmptyConverter}}">
             <TextBlock
@@ -194,7 +206,8 @@
                 Text="{Binding ErrorMessage}" />
         </Border>
 
-        <TabControl Grid.Row="2"
+        <TabControl
+            Grid.Row="2"
             Grid.ColumnSpan="2"
             MinHeight="400"
             SelectedIndex="1">
@@ -213,8 +226,9 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!--  Top: buttons  -->
-                    <DockPanel Grid.Row="0"
+                    <!--  Tab Item Top: buttons  -->
+                    <DockPanel
+                        Grid.Row="0"
                         Margin="5,4,5,0"
                         LastChildFill="False"
                         Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
@@ -227,11 +241,12 @@
 
                         <Button
                             x:Name="btnHelp"
-                            help:Help.Key="TimerSettings"
                             Width="40"
                             Height="25"
+                            help:Help.Key="AppSettings"
                             help:HelpBehavior.Attach="True"
-                            DockPanel.Dock="Right">
+                            DockPanel.Dock="Right"
+                            Visibility="Collapsed">
                             <icons:MaterialDesign
                                 Width="12"
                                 Height="12"
@@ -284,14 +299,8 @@
                         </Button>
                     </DockPanel>
 
-                    <!--  main part: the TimersPanel  -->
-                    <Viewbox Grid.Row="1">
-
-                        <!--<Viewbox Grid.Row="1"  local:ZoomBehavior.ZoomLevel="{Binding GlobalZoom}">
-                      <Viewbox.LayoutTransform>
-                          <ScaleTransform ScaleX="{Binding GlobalZoom}" ScaleY="{Binding GlobalZoom}" />
-                      </Viewbox.LayoutTransform>-->
-
+                    <!--  Tab Item Main part: the TimersPanel  -->
+                    <Viewbox Name="ControlViewbox" Grid.Row="1">
                         <ctl:TimersPanel
                             BridgeTimers="{Binding Configuration.BridgeTimers}"
                             CanAndTimer="{Binding Configuration.CanAndTimer}"
@@ -306,14 +315,24 @@
                     <ctl:ResultsControl x:Name="resultsControl" />
                 </ScrollViewer>
             </TabItem>
+
+            <TabItem Header="{lex:Loc Print}" Visibility="{Binding Configuration.InDebugMode, Converter={StaticResource BoolToVis}}">
+                <!--<ctl:StartListPrintControl x:Name="printControl" />-->
+                <ctl:PrintableGridView x:Name="printControl" />
+            </TabItem>
         </TabControl>
 
-        <Label Grid.Row="3" Grid.Column="0"
+        <!--  Row 3  -->
+        <Label
+            Grid.Row="3"
+            Grid.Column="0"
             Content="{lex:Loc Projector}"
             FontWeight="Bold"
             Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}" />
 
-        <WrapPanel Grid.Row="3" Grid.Column="1"
+        <WrapPanel
+            Grid.Row="3"
+            Grid.Column="1"
             Margin="10,0,10,0"
             HorizontalAlignment="Center"
             Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">

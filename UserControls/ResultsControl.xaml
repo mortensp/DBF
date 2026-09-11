@@ -59,18 +59,31 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0"
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
             Margin="5,5,0,0"
             HorizontalAlignment="Left"
             Orientation="Horizontal">
-            <TextBlock FontWeight="Bold" Text="{lex:Loc Results}" />
-            <TextBlock FontWeight="Bold" Text="  " />
-            <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
+            <TextBlock
+                FontSize="{DynamicResource X-LargeFontSize}"
+                FontWeight="Bold"
+                Text="{lex:Loc Results}" />
+            <TextBlock
+                FontSize="{DynamicResource X-LargeFontSize}"
+                FontWeight="Bold"
+                Text="  " />
+            <TextBlock
+                FontSize="{DynamicResource X-LargeFontSize}"
+                FontWeight="Bold"
+                Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
 
 
         </StackPanel>
 
-        <CheckBox Grid.Row="0" Grid.Column="1"
+        <CheckBox
+            Grid.Row="0"
+            Grid.Column="1"
             Margin="30,6,0,0"
             Content="{lex:Loc chkShowAsOneGroup}"
             IsChecked="{Binding ShowAsOneGroup, UpdateSourceTrigger=PropertyChanged}"
@@ -78,7 +91,9 @@
 
 
 
-        <icons:PackIconFontAwesome Grid.Row="0" Grid.Column="2"
+        <icons:PackIconFontAwesome
+            Grid.Row="0"
+            Grid.Column="2"
             Width="30"
             Height="30"
             HorizontalAlignment="Left"
@@ -115,8 +130,9 @@
             </icons:PackIconFontAwesome.Triggers>
         </icons:PackIconFontAwesome>
 
-        <syncfusion:SfDataGrid Grid.Row="1"
+        <syncfusion:SfDataGrid
             Name="dgTeams"
+            Grid.Row="1"
             Grid.ColumnSpan="2"
             Margin="0,0,0,10"
             Padding="5,0,5,0"
@@ -137,21 +153,25 @@
             Visibility="{Binding Teams, Converter={StaticResource HideCollectionEmptyConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdGroup}"
+                <syncfusion:GridTextColumn
+                    HeaderText="{lex:Loc hdGroup}"
                     IsHidden="True"
                     MappingName="Group" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdNo}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdNo}"
                     MappingName="TeamNo"
                     NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdTeam}"
+                <syncfusion:GridTextColumn
                     AllowSorting="False"
+                    HeaderText="{lex:Loc hdTeam}"
                     MappingName="TeamName"
                     MinimumWidth="350" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdOpponentTeam}"
+                <syncfusion:GridTextColumn
+                    HeaderText="{lex:Loc hdOpponentTeam}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="OpponentTeamNo"
                     TextAlignment="Center" />
@@ -159,14 +179,16 @@
                 <!--  Kamp Resultat  -->
 
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdKP}"
+                <syncfusion:GridTextColumn
                     Width="100"
                     CellStyle="{StaticResource CenteredCourierNew}"
+                    HeaderText="{lex:Loc hdKP}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="MatchResult"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdImps}"
+                <syncfusion:GridTextColumn
+                    HeaderText="{lex:Loc hdImps}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="ImpScore"
                     TextAlignment="Center" />
@@ -177,13 +199,15 @@
                     CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     MappingName="Separator" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdKPTotal}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdKPTotal}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="TotalKP"
                     NumberDecimalDigits="2"
                     TextAlignment="Center" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdTournamentPos}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdTournamentPos}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="TournamentRank"
                     NumberDecimalDigits="0"
@@ -201,8 +225,9 @@
 
         </syncfusion:SfDataGrid>
 
-        <syncfusion:SfDataGrid Grid.Row="2"
+        <syncfusion:SfDataGrid
             Name="dgPairs"
+            Grid.Row="2"
             Grid.ColumnSpan="2"
             Padding="5,0,5,0"
             AllowEditing="False"
@@ -222,59 +247,69 @@
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
             <syncfusion:SfDataGrid.Columns>
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdGroup}"
+                <syncfusion:GridTextColumn
+                    HeaderText="{lex:Loc hdGroup}"
                     IsHidden="True"
                     MappingName="Group" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdSubGroup}"
+                <syncfusion:GridTextColumn
+                    HeaderText="{lex:Loc hdSubGroup}"
                     IsHidden="True"
                     MappingName="SubGroup" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdNo}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdNo}"
                     MappingName="PairNo"
                     NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdNames}"
+                <syncfusion:GridTextColumn
                     AllowSorting="False"
+                    HeaderText="{lex:Loc hdNames}"
                     MappingName="PairName"
                     MinimumWidth="350" />
 
                 <!--  Section Score  -->
                 <!--  ViewModelProxyen is needed  -->
-                <syncfusion:GridPercentColumn HeaderText="{lex:Loc hdActualPct}"
+                <syncfusion:GridPercentColumn
+                    HeaderText="{lex:Loc hdActualPct}"
                     HorizontalHeaderContentAlignment="Center"
                     IsHidden="{Binding Data.ImpsPair, Source={StaticResource ViewModelProxy}}"
                     PercentDecimalDigits="1"
                     ValueBinding="{Binding ActualPct}" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdScore}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdScore}"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="Result"
                     NumberDecimalDigits="1"
                     TextAlignment="Right" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdDeltaHAC}"
+                <syncfusion:GridNumericColumn
                     Width="60"
+                    HeaderText="{lex:Loc hdDeltaHAC}"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="{Binding Data.HideHac, Source={StaticResource ViewModelProxy}}"
                     MappingName="DeltaHAC"
                     NumberDecimalDigits="2"
                     TextAlignment="Right" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdHACPos}"
+                <syncfusion:GridTextColumn
+                    HeaderText="{lex:Loc hdHACPos}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="HACRankSection"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn HeaderText="{lex:Loc hdMP}"
+                <syncfusion:GridTextColumn
                     Width="40"
                     AllowSorting="False"
+                    HeaderText="{lex:Loc hdMP}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="MP"
                     TextAlignment="Center" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdPos}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdPos}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="Position"
                     NumberDecimalDigits="0"
@@ -286,20 +321,23 @@
                     CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     MappingName="Separator2" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdTournamentScore}"
+                <syncfusion:GridNumericColumn
                     Width="60"
+                    HeaderText="{lex:Loc hdTournamentScore}"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="TournamentResult"
                     NumberDecimalDigits="1" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdDeltaHAC}"
+                <syncfusion:GridNumericColumn
                     Width="60"
+                    HeaderText="{lex:Loc hdDeltaHAC}"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="True"
                     MappingName="HACTotal"
                     NumberDecimalDigits="2" />
 
-                <syncfusion:GridNumericColumn HeaderText="{lex:Loc hdPos}"
+                <syncfusion:GridNumericColumn
+                    HeaderText="{lex:Loc hdPos}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="TournamentRank"
                     NumberDecimalDigits="0"

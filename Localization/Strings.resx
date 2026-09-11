@@ -732,4 +732,7 @@
   <data name="NoSecondScreen" xml:space="preserve">
     <value>No second screen connected. Hold down Win and press K. </value>
   </data>
+  <data name="Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
 </root>

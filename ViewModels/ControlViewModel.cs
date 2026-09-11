@@ -1,18 +1,4 @@
-﻿using Caliburn.Micro;
-
-using DBF.AudioServices;
-using DBF.Converters;
-using DBF.DataModel;
-using DBF.Helpers;
-using DBF.UserControls;
-using DBF.Views;
-
-using String.Localization;
-
-using Syncfusion.Data.Extensions;
-using Syncfusion.UI.Xaml.Grid;
-
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
@@ -20,7 +6,21 @@ using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Xml.Serialization;
+using Caliburn.Micro;
+using DBF.AudioServices;
+using DBF.Converters;
+using DBF.DataModel;
+using DBF.Helpers;
+using DBF.Services;
+using DBF.UserControls;
+using DBF.Views;
+using PrintDialog2;
+using String.Localization;
+using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.Grid;
+using PrintSettings = DBF.Services.PrintSettings;
 
 namespace DBF.ViewModels;
 
@@ -36,18 +36,23 @@ public class ControlViewModel : Screen, IDisposable
                                                                                Converters = { new DecimalCommaConverter() }
                                                                            };
 
-        private          LexStrings                      _lexStrings       ;
-        private          BindableCollection<PlayingTime> _playingDates     = [];
+        private          LexStrings                      _lexStrings;
+        private          BindableCollection<PlayingTime> _playingDates   = [];
         private          PlayingTime                     _playingTime;
-        private          UserControl                     _resultsControl   = new ResultsControl();
         private          int                             _sectionNo;
         private          Club                            _selectedClub;
         private          MainClub                        _selectedMainClub;
-        private          bool                            _showAsOneGroup   = true;
-        private          UserControl                     _startListControl = new StartListControl();
-        private          TimersPanel                     _timersPanel      =new();
+        private          bool                            _showAsOneGroup = true;
+        private          TimersPanel                     _timersPanel    =new();
         private          List<Tournament>                _tournaments;
         private readonly IWindowManager                  _windowManager;
+        private          ShellViewModel                  shellVm;
+
+        private ControlView controlView;
+
+        //
+        private UserControl _resultsControl   = new ResultsControl();   // dummy control
+        private UserControl _startListControl = new StartListControl(); // dummy control
     #endregion
 
     #region Constructors
@@ -95,8 +100,10 @@ public class ControlViewModel : Screen, IDisposable
 
                 initWatcher();
                 loadMainClubs();
-                IsBusy = false;
+                IsBusy  = false;
+                shellVm = IoC.Get<ShellViewModel>();
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -298,8 +305,45 @@ public class ControlViewModel : Screen, IDisposable
     #region Public Methods
         public void Test()
         {
-            Debugger.Break();
-            SelectedClub = Clubs.Last();
+            //Debugger.Break();
+            //SelectedClub = Clubs.Last();
+            var view = controlView.startListControl;
+
+            populate(50);
+
+            //var dlg = new PrintPreviewWindow2(null, view,null,81);
+            //var x   = dlg.ShowDialog();
+
+            //PrintService.Preview(view, "StartListe", 81);
+            //PrintService.Print(view, "StartListe", 81);
+            //PrintServiceX.Print(view, "StartListe", 81);
+            var settings = new PrintSettings()
+                           {
+                               PageSize = new Size(595, 842) // A4 size in points
+                           };
+
+            //PrintService2.Preview(view, settings);
+            //PrintService2.Print(view, settings);
+            var dlg   = new PrintDialog2Window(view);
+            dlg.Owner = Application.Current.MainWindow;
+            dlg.ShowDialog();
+        }
+
+        private void populate(int goal)
+        {
+            var len   = Pairs.Count;
+            var pairs = Pairs.ToArray();
+
+            while (true)
+            {
+                var cnt = Math.Min(len, goal - Pairs.Count);
+
+                if (cnt <= 0)
+                    return;
+
+                var cloned = Pairs.Take(cnt);
+                Pairs.AddRange(cloned);
+            }
         }
 
         public void LexRefresh()
@@ -325,15 +369,26 @@ public class ControlViewModel : Screen, IDisposable
             public async Task ShowStartListAsync()
             {
                 if (CurrentView is not StartListControl)
+                {
                     CurrentView = _startListControl;
 
+                    //if (_startListControl.FindName("MyScrollViewer") is ScrollViewer sv)
+                    //    sv.ScrollToTop();
+                }
+
                 await showProjector().ConfigureAwait(false);
+                // Scroll til toppen
             }
 
             public async Task ShowBridgeTimersAsync()
             {
                 if (CurrentView is not TimersPanel)
+                {
                     CurrentView = _timersPanel;
+
+                    //if (_resultsControl.FindName("MyScrollViewer") is ScrollViewer sv)
+                    //    sv.ScrollToTop();
+                }
 
                 await showProjector().ConfigureAwait(false);
             }
@@ -389,15 +444,16 @@ public class ControlViewModel : Screen, IDisposable
                     }
                 }
                 else
-                
+
                     Configuration.DeleteState();
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex, $"Error when closing the ControlViewModel");
             }
 
-            Dispose();  
+            Dispose();
 
             return await Task.FromResult(true).ConfigureAwait(false);
         }
@@ -486,13 +542,13 @@ public class ControlViewModel : Screen, IDisposable
                                                        })
                                             .OrderByDescending(pt => pt.Date));
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex);
 
                 PlayingTimes.Clear();
             }
-
         }
 
         /// <summary>
@@ -533,6 +589,7 @@ public class ControlViewModel : Screen, IDisposable
                         buildTeams(teams, grpNo, grp);
                 }
             }
+
             catch (Exception)
             {
                 _lexStrings.Set(ErrorMessage, () => Lex.BC3ReadError);
@@ -766,6 +823,7 @@ public class ControlViewModel : Screen, IDisposable
 
                     return mainclub;
                 }
+
                 catch (Exception)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -905,6 +963,7 @@ public class ControlViewModel : Screen, IDisposable
                                 }
                         }
                 }
+
                 catch (Exception ex)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -1093,6 +1152,7 @@ public class ControlViewModel : Screen, IDisposable
                         return (T)serializer.Deserialize(reader);
                     }
                 }
+
                 catch (Exception)
                 {
                     Logger.Info($"{Lex.ErrorDeserializing}: {fullPath}");
@@ -1117,11 +1177,13 @@ public class ControlViewModel : Screen, IDisposable
                         using var sr = new StreamReader(fs, encoding);
                         return sr.ReadToEnd();
                     }
+
                     catch (IOException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
                         delay = Math.Min(1000, delay * 2); // exponential backoff, cap at 1s
                     }
+
                     catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
@@ -1166,6 +1228,7 @@ public class ControlViewModel : Screen, IDisposable
                     projectorView.Top  = primaryScreen.WorkingArea.Top;
                     projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                 }
+
 #endif
             }
             else
@@ -1193,7 +1256,6 @@ public class ControlViewModel : Screen, IDisposable
                 Logger.Info($"ProjectorView shown on {(projectorScreen != null ? $"screen: {projectorScreen.DeviceName}" : "primary screen")}");
 
             // Move ShellView activation out here, so that it ALWAS get focus in the end.
-            var shellVm   = IoC.Get<ShellViewModel>();
             var shellView = shellVm.GetView() as Window;
 
             if (shellView != null)
@@ -1228,6 +1290,7 @@ public class ControlViewModel : Screen, IDisposable
                         else
                             initWatcher();
                     }
+
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");
@@ -1289,6 +1352,12 @@ public class ControlViewModel : Screen, IDisposable
         #endregion
 
         #region Overrides
+            protected override void OnViewLoaded(object view)
+            {
+                if (view is ControlView cv)
+                    controlView = cv;
+            }
+
             protected override Task OnActivateAsync(CancellationToken cancellationToken)
             {
                 Logger.Info("Activating ControlViewModel");
