@@ -18,7 +18,7 @@ namespace DBF
 
         protected override void OnStartup(StartupEventArgs e)
         {
-#if (RELEASE || PRODTEST)
+#if (RELEASE )
             // How to run the app
             var mode = Arguments.Values.Lookup("mode");
 
