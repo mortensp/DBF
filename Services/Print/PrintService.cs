@@ -71,16 +71,17 @@ public static class PrintService
                                       , string title = null
                                       , double contentHeaderHeight = 120)
             {
+                //Report: En meget simpel Bitmap løsning, der virker
                 var fds = CreateFixedDocumentSequence(header, content, footer, contentHeaderHeight);
 
 #if true
-        string s = _previewWindowXaml.Replace("@@TITLE", title ?? "");
+                string s = _previewWindowXaml.Replace("@@TITLE", title ?? "");
 
-        using var    reader = new System.Xml.XmlTextReader(new StringReader(s));
-        Window       window = System.Windows.Markup.XamlReader.Load(reader) as Window;
+                using var    reader = new System.Xml.XmlTextReader(new StringReader(s));
+                Window       window = System.Windows.Markup.XamlReader.Load(reader) as Window;
 
-        DocumentViewer dv1 = LogicalTreeHelper.FindLogicalNode(window, "dv1") as DocumentViewer;
-        dv1.Document = fds;
+                DocumentViewer dv1 = LogicalTreeHelper.FindLogicalNode(window, "dv1") as DocumentViewer;
+                dv1.Document       = fds;
 #else
                 var window = new Window
                              {
@@ -98,7 +99,7 @@ public static class PrintService
 
                 window.Content = dv;
 #endif
-        window.Owner = Application.Current.MainWindow;
+                window.Owner = Application.Current.MainWindow;
                 window.ShowDialog();
             }
         #endregion
@@ -221,11 +222,10 @@ public static class PrintService
     // ------------------------------------------------------------
     // FIXEDDOCUMENT (NO XPS)
     // ------------------------------------------------------------
-  
     private static FixedDocumentSequence CreateFixedDocumentSequence( FrameworkElement headerElement
-                                                                       , FrameworkElement centralElement
-                                                                       , FrameworkElement footerElement
-                                                                       , double contentHeaderHeight)
+                                                                    , FrameworkElement centralElement
+                                                                    , FrameworkElement footerElement
+                                                                    , double contentHeaderHeight)
     {
         var headerClone  = PrepareClone(headerElement);
         var contentClone = PrepareClone(centralElement);

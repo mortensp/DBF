@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reflection;
 using Caliburn.Micro;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
@@ -17,9 +18,11 @@ public class BridgeMate : PropertyChangedBase
         private          Task                        _pollingTask;
         private          SerializedFileSystemWatcher watcher;
         private readonly Configuration               Configuration;
-        private          string                      bwsFile;
+        private          string                      bwsFile ;
         private          int                         bmClubNo = -1;
         private          DateTime                    lastDate;
+    private readonly object _sync = new();
+
         //
         // Cache the sections  and rounds grouped by (Section, Round) for efficient lookups
         // These Collections are initiated along side BMRounds and doesn't change until a new file is opened.
@@ -81,55 +84,58 @@ public class BridgeMate : PropertyChangedBase
             return;
         }
 
-        foreach (var fileInfo in fileInfos.Reverse<FileInfo>())
-            try
-            {
-                using var db = new BridgeMateContext(fileInfo.FullName);
+        lock (_sync)
+        {
 
-                Session = db.Sessions.ToList()
-                                     .FirstOrDefault(s => s.Date == playingTime);
+            foreach (FileInfo fileInfo in fileInfos.Reverse<FileInfo>())
+                try
+                {
+                    using var db = new BridgeMateContext(fileInfo.FullName);
 
-                if (Session        == null
-                ||  Session.Status == 2)
-                    continue;
+                    Session = db.Sessions.ToList()
+                                         .FirstOrDefault(s => s.Date == playingTime);
 
-                this.bwsFile = fileInfo.FullName;
-                bmClubNo     = clubNumber;
+                    if (Session == null
+                    || Session.Status == 2)
+                        continue;
 
-                Rounds = db.BMRounds
-                           .Include(b => b.SectionEntity) // used to get the missing pair for the section
-                           .ToList()
-                           .GroupBy(r => (r.Section, r.Round))
+                    bmClubNo = clubNumber;
+
+                    Rounds = db.BMRounds
+                               .Include(b => b.SectionEntity) // used to get the missing pair for the section
+                               .ToList()
+                               .GroupBy(r => (r.Section, r.Round))
 #if DEBUG
-                           // For debugging purposes, we want to see the rounds in order of Section and Round
-                           .OrderBy(g => g.Key.Section)
-                           .ThenBy(g => g.Key.Round)
+                               // For debugging purposes, we want to see the rounds in order of Section and Round
+                               .OrderBy(g => g.Key.Section)
+                               .ThenBy(g => g.Key.Round)
 #endif
-                           .ToDictionary(g => g.Key
-                                        , g => g.OrderBy(r => r.TableNo)
-                                                .ToArray());
+                               .ToDictionary(g => g.Key
+                                            , g => g.OrderBy(r => r.TableNo)
+                                                    .ToArray());
 
-                Sections = db.Sections.ToDictionary(s => s.Id
-                                                   , s => new SectionInfo( s.Letter
-                                                                         , s.ScoringType == 4
-                                                                         , s.Tables ?? 0
-                                                                         , Rounds.Count(r => r.Key.Section == s.Id)
-                                                                         , Rounds[(s.Id, 1)][0].BoardsPerRound)
-                                                   );
+                    Sections = db.Sections.ToDictionary(s => s.Id
+                                                       , s => new SectionInfo(s.Letter
+                                                                             , s.ScoringType == 4
+                                                                             , s.Tables ?? 0
+                                                                             , Rounds.Count(r => r.Key.Section == s.Id)
+                                                                             , Rounds[(s.Id, 1)][0].BoardsPerRound)
+                                                       );
 
-                initPlayedBoards();
-                MarkChangedSettingsOnTimers();
-                startPolling();
-                return;
-            }
-            catch (Exception ex)
-            {
-                Logger.Exception(ex, $"BridgeMate: error opening/handling the file {fileInfo.FullName}");
-                Debugger.Break();
-                continue;
-            }
+                    initPlayedBoards(fileInfo.FullName);
+                    MarkChangedSettingsOnTimers();
+                    startPolling();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception(ex, $"BridgeMate: error opening/handling the file {fileInfo.FullName}");
 
-        Logger.Info($"BridgeMate: file not found for date {lastDate} in path {path}");
+                    Debugger.Break();
+                    continue;
+                }
+        }
+        Logger.Info($"BridgeMate: No file found for date: {lastDate} in path: {path}");
         Close();
         initWatcher(path, Configuration.ReadBridgeMate);
     }
@@ -158,17 +164,20 @@ public class BridgeMate : PropertyChangedBase
     }
 
     #region Private Methods
-        private void initPlayedBoards()
+        private void initPlayedBoards(string path)
         {
             if (Rounds       is null
             ||  Rounds.Count == 0)
                 return;
 
-            using var db = new BridgeMateContext(bwsFile);
+            this.bwsFile = path;
 
+            using var db = new BridgeMateContext(path);
+        lock (_sync)
+        {
             foreach (var row in Rounds.Values.SelectMany(r => r))
-                row.BoardsPlayed = ( row.Nspair == row.SectionEntity.MissingPair
-                                 ||  row.Ewpair == row.SectionEntity.MissingPair)
+                row.BoardsPlayed = (row.Nspair == row.SectionEntity.MissingPair
+                                 || row.Ewpair == row.SectionEntity.MissingPair)
                                  ? row.BoardsPerRound
                                  : 0;
 
@@ -183,20 +192,27 @@ public class BridgeMate : PropertyChangedBase
 
                 row.Processed4 = true;
             }
-
+        }
             db.SaveChanges();
 
             Execute.BeginOnUIThread(() =>
             {
-                RoundStatus.ReplaceRange(Rounds.Select(rounds => new RoundStatus
-                                                                 {
-                                                                     Section         = (short)rounds.Key.Section
-                                                                   , Round           = (short)rounds.Key.Round
-                                                                   , Letter          = Sections[rounds.Key.Section].Letter
-                                                                   , Done            = rounds.Value.All(g => g.Done)
-                                                                   , BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
-                                                                 }));
-            });
+                lock (_sync)
+                {
+                    RoundStatus.ReplaceRange(Rounds.Select(rounds => new RoundStatus
+                    {
+                        Section = (short)rounds.Key.Section
+                                                                       ,
+                        Round = (short)rounds.Key.Round
+                                                                       ,
+                        Letter = Sections[rounds.Key.Section]?.Letter
+                                                                       ,
+                        Done = rounds.Value.All(g => g.Done)
+                                                                       ,
+                        BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
+                    }));
+                }
+                    });
         }
 
         private void updatePlayedBoards()
@@ -210,7 +226,8 @@ public class BridgeMate : PropertyChangedBase
             var unprocessedData = db.ReceivedData
                                     .Where(r => r.Processed4 != true)
                                     .ToList();
-
+        lock (_sync)
+        {
             foreach (var row in unprocessedData)
             {
                 if (row.Erased == true)
@@ -220,18 +237,21 @@ public class BridgeMate : PropertyChangedBase
 
                 row.Processed4 = true;
             }
+        }
 
             db.SaveChanges();
 
             Execute.BeginOnUIThread(() =>
             {
-                foreach (var stat in RoundStatus)
+                lock (_sync)
                 {
-                    var round            = Rounds[(stat.Section, stat.Round)];
-                    stat.Done            = round.All(g => g.Done);
-                    stat.BoardsRemaining = round.Sum(g => g.BoardsRemaining);
+                    foreach (var stat in RoundStatus)
+                    {
+                        var round            = Rounds[(stat.Section, stat.Round)];
+                        stat.Done = round.All(g => g.Done);
+                        stat.BoardsRemaining = round.Sum(g => g.BoardsRemaining);
+                    }
                 }
-
             });
         }
 

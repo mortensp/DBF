@@ -13,10 +13,10 @@ public static class CloneHelper
 
         var type = original.GetType();
 
-        // Ny instans af samme UserControl-type
+        // New instance of the same UserControl type
         var clone = (FrameworkElement)Activator.CreateInstance(type);
 
-        // Samme DataContext (samme ViewModel)
+        // Same DataContext (same ViewModel)
         clone.DataContext = original.DataContext;
 
         return clone;

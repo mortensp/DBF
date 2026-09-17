@@ -61,6 +61,8 @@
 		
 		<Compile Remove="Services\Print\MemoryXpsDocument.cs" />
 		
+		<Compile Remove="Services\Print\PrintServiceWpf.cs" />
+		
 		<Compile Remove="Services\Print\VisualPaginatorOld.cs" />
 		
 		<Compile Remove="Services\Print\WPF_Print.cs" />		
@@ -82,9 +84,6 @@
 		<None Remove="Images\VerticalWindows.PNG" />
 		<None Remove="InstallerFiles\Inno Setup Script.old.iss" />
 	</ItemGroup>
-
-
-
 
 	<ItemGroup>
 		<Resource Include="Images\about.png">
@@ -153,6 +152,7 @@
 		<PackageReference Include="MahApps.Metro.IconPacks.BootstrapIcons" Version="6.2.1" />
 		<PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="6.2.1" />
 		<PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.2.1" />
+		<PackageReference Include="MahApps.Metro.IconPacks.MaterialDesign" Version="6.2.1" />
 		<!--<PackageReference Include="MahApps.Metro.IconPacks.Modern" Version="6.2.1" />-->
 		<!--<PackageReference Include="MahApps.Metro.IconPacks.PhosphorIcons" Version="6.2.1" />-->
 		<!--<PackageReference Include="MahApps.Metro.IconPacks.SimpleIcons" Version="6.2.1" />-->
@@ -161,7 +161,6 @@
 	<ItemGroup>
 		<PackageReference Include="EntityFrameworkCore.Jet" Version="9.0.0" />
 		<PackageReference Include="EntityFrameworkCore.Jet.Odbc" Version="9.0.0" />
-		<PackageReference Include="MahApps.Metro.IconPacks.MaterialDesign" Version="6.2.1" />
 		<PackageReference Include="System.Data.Odbc" Version="9.0.5" />
 	</ItemGroup>
 
@@ -318,6 +317,8 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 
+		<None Include=".github\copilot-instructions.md" />
+
 		<None Include="FodyWeavers.xsd" />
 
 		<None Include="Localization\Syncfusion.SfColorPalette.Wpf.resx">
@@ -335,7 +336,9 @@
 		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
 		<ProjectReference Include="..\..\Common Libs\Localization\Localization.csproj" />
 		<ProjectReference Include="..\..\Common Libs\PrintDialog2\PrintDialog2.csproj" />
+		<ProjectReference Include="..\..\Common Libs\PrintDialogXY\PrintDialogXY\PrintDialogXY.csproj" />
 		<ProjectReference Include="..\..\Common Libs\PrintDialogX\PrintDialogX\PrintDialogX.csproj" />
+		<ProjectReference Include="..\..\Common Libs\PrintWPF\PrintWPF.csproj" />
 	</ItemGroup>
 
 </Project>

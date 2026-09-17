@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
+using System.Printing;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -14,6 +15,7 @@ using DBF.Converters;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.Services;
+using DBF.Services.Print;
 using DBF.UserControls;
 using DBF.Views;
 using PrintDialog2;
@@ -47,9 +49,7 @@ public class ControlViewModel : Screen, IDisposable
         private          List<Tournament>                _tournaments;
         private readonly IWindowManager                  _windowManager;
         private          ShellViewModel                  shellVm;
-
-        private ControlView controlView;
-
+        private          ControlView                     controlView;
         //
         private UserControl _resultsControl   = new ResultsControl();   // dummy control
         private UserControl _startListControl = new StartListControl(); // dummy control
@@ -305,28 +305,78 @@ public class ControlViewModel : Screen, IDisposable
     #region Public Methods
         public void Test()
         {
-            //Debugger.Break();
-            //SelectedClub = Clubs.Last();
-            var view = controlView.startListControl;
+            Debugger.Break();
+            SelectedClub = Clubs.Last();
+
+            var view   = controlView.startListControl;
+            var report = new TestReport1View();
 
             populate(50);
 
-            //var dlg = new PrintPreviewWindow2(null, view,null,81);
-            //var x   = dlg.ShowDialog();
+            //var settings = new PrintSettings()
+            //               {
+            //                   PageSize = new Size(595, 842) // A4 size in points
+            //               };
 
+            //var settings2 = new PrintDialog2.PrintSettings()
+            //                {
+            //                    PageSize     = new Size(595, 842) // A4 size in points
+            //                  , HeaderHeight = 81
+            //                };
+
+            //var settings3 = new PrintWPF.PrintSettings()
+            //                {
+            //                    PageSize = new Size(595, 842) // A4 size in points
+            //                };
+
+            // ------------------------
+            // - No dynamic paginator -
+            // - But it's acurate     -
+            // ------------------------
             //PrintService.Preview(view, "StartListe", 81);
             //PrintService.Print(view, "StartListe", 81);
-            //PrintServiceX.Print(view, "StartListe", 81);
-            var settings = new PrintSettings()
-                           {
-                               PageSize = new Size(595, 842) // A4 size in points
-                           };
 
-            //PrintService2.Preview(view, settings);
-            //PrintService2.Print(view, settings);
-            var dlg   = new PrintDialog2Window(view);
-            dlg.Owner = Application.Current.MainWindow;
-            dlg.ShowDialog();
+            // ----------------------------------
+            // - Uses a Visual Pagiator         -
+            // - Trying to use std PrintDialog  -
+            // - with a VisualPaginator amd FDS -
+            // - Paginator is fine              -
+            // ----------------------------------
+            //PrintService3.Preview(view, settings);
+            //PrintService3.Print(view, settings);
+
+            // -----------------------
+            // - y new PrindDialogEx -
+            // -----------------------
+            PrintWPF.PrintVisual.PrintDialog( report
+                                            , new PrintWPF.PrintSettings()
+                                              {
+                                            //  PageSize     = new Size(595, 842) // In points
+                                            //, HeaderHeight = 74
+                                                  Margin      = new Thickness(10, 16, 10, 16)
+                                                , Orientation = PageOrientation.Landscape
+                                              });
+            //PrintWPF.PrintVisual.PrintDialog(view,74);
+            // -----------------------------------------------
+            // - Interface to PrintDialogX                   -
+            // - Paginator is not precis unless              -
+            // - model.PrintDocument.DocumentMargin is None  -
+            // -----------------------------------------------
+            //PrintServiceX.Print(view, "StartListe", 81);
+
+            // ---------------------------------
+            // - Interface to PrintDialog2     -
+            // - My own class library          -
+            // - Trying to use std PrintDialog -
+            // - with a VisualPaginator       -
+            // ---------------------------------
+            //PrintService2.Preview(view, settings2);
+            //PrintService2.Print(view, settings2);
+
+            //min egen PrintDialog2
+            //var dlg   = new PrintDialog2Window(view);
+            //dlg.Owner = Application.Current.MainWindow;
+            //dlg.ShowDialog();
         }
 
         private void populate(int goal)

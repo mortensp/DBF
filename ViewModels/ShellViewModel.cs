@@ -224,3 +224,4 @@ public class ShellViewModel : Conductor<Screen>.Collection.OneActive, IConductAc
             win.DragMove();
     }
 }
+

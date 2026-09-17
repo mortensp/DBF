@@ -36,8 +36,8 @@ public class PaginatorDocument : IDocumentPaginatorSource
                               , Height = paginator.PageSize.Height
                             };
 
-            // DocumentPage.Visual er et Visual → vi skal tilføje det til FixedPage
-            fixedPage.Children.Add((UIElement)dp.Visual);
+            // DocumentPage.Visual is a Visual → we add it as background
+            fixedPage.Background = new System.Windows.Media.VisualBrush(dp.Visual);
 
             var pc = new PageContent();
             ((IAddChild)pc).AddChild(fixedPage);
@@ -45,7 +45,7 @@ public class PaginatorDocument : IDocumentPaginatorSource
             fixedDoc.Pages.Add(pc);
         }
 
-        // Pak FixedDocument ind i en FixedDocumentSequence
+        // Wrap FixedDocument in a FixedDocumentSequence
         var fds    = new FixedDocumentSequence();
         var docRef = new DocumentReference();
         docRef.SetDocument(fixedDoc);

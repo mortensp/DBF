@@ -45,12 +45,12 @@ public class VisualPaginator : DocumentPaginator
                        , Height = _pageSize.Height
                      };
 
-        // Clone header (øverste del af UserControl)
+        // Clone header (top part of UserControl)
         var header = CloneElement(_visual, new Rect(0, 0, _pageSize.Width, HeaderHeight));
         Canvas.SetTop(header, _margin.Top);
         canvas.Children.Add(header);
 
-        // Clone content (kun den del der hører til denne side)
+        // Clone content (only the part belonging to this page)
         double yOffset = HeaderHeight + pageNumber * ContentHeight;
         var    content = CloneElement(_visual, new Rect(0, yOffset, _pageSize.Width, ContentHeight));
         Canvas.SetTop(content, HeaderHeight + _margin.Top);

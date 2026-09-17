@@ -10,7 +10,7 @@ namespace DBF.Services.Print;
 
 public partial class PrintPreviewWindow2 : Window
 {
-    // Gem referencer til de originale UI elementer, så vi kan rendere dem igen
+    // Save references to the original UI elements so we can render them again
     private FrameworkElement _headerEl;
     private FrameworkElement _centralEl;
     private FrameworkElement _footerEl;
@@ -25,7 +25,7 @@ public partial class PrintPreviewWindow2 : Window
         _footerEl            = footer;
         _contentHeaderHeight = headerHeight;
 
-        // Kør første preview generering
+        // Run first preview generation  
         UpdatePreview();
 
         this.Loaded+= (s, e) => HidePrintButton();
@@ -33,7 +33,7 @@ public partial class PrintPreviewWindow2 : Window
 
     private void HidePrintButton()
     {
-        // Find alle buttons i documentvieweren
+        // Find all buttons in the document viewer
         var buttons = FindVisualChildren<Button>(MyDocumentViewer);
 
         foreach (var button in buttons)
@@ -46,19 +46,19 @@ public partial class PrintPreviewWindow2 : Window
     {
         var printDlg = new System.Windows.Controls.PrintDialog();
 
-        // 1. Forbered printerens PrintTicket baseret på dine ComboBox-valg
+        // 1. Prepare printer's PrintTicket based on your ComboBox choices
         try
         {
-            // Hent printerens standardopsætning (eller lav en ny hvis den er null)
+            // Fetch printer's default settings (or create a new one if it is null)
             PrintTicket ticket = printDlg.PrintTicket ?? new PrintTicket();
 
             // Synkroniser orientering [1]
             if (ComboOrientation.SelectedItem is ComboBoxItem orientItem)
-                ticket.PageOrientation = orientItem.Content.ToString() == "Liggende"
+                ticket.PageOrientation = orientItem.Content.ToString() == "Landscape"
                                        ? PageOrientation.Landscape
                                        : PageOrientation.Portrait;
 
-            // Synkroniser papirstørrelse [1]
+            // Sync paper size [1]
             if (ComboPaperSize.SelectedItem is ComboBoxItem sizeItem)
                 switch (sizeItem.Content.ToString())
                 {
@@ -75,7 +75,7 @@ public partial class PrintPreviewWindow2 : Window
                         break;
                 }
 
-            // Tildel den opdaterede billet til printdialogen inden den åbnes [1]
+            // Assign the updated ticket to the print dialog before it opens [1]
             printDlg.PrintTicket = ticket;
 
             // 2. Vis dialogen (Nu vil den have valgt det rigtige format derinde!) [2]
@@ -90,8 +90,8 @@ public partial class PrintPreviewWindow2 : Window
         }
         catch (Exception ex)
         {
-            // Enkelte virtuelle printerdrivere kan fejle i validering – håndter det yndefuldt
-            System.Diagnostics.Debug.WriteLine($"Kunne ikke konfigurere PrintTicket: {ex.Message}");
+            // Some virtual printer drivers may fail validation - handle it gracefully
+            System.Diagnostics.Debug.WriteLine($"Could not configure PrintTicket: {ex.Message}");
         }
 
         e.Handled = true;
@@ -118,10 +118,10 @@ public partial class PrintPreviewWindow2 : Window
 
     private void UpdatePreview()
     {
-        // 1. Beregn størrelse ud fra UI valg (96 enheder = 1 tomme)
+        // 1. Calculate size from UI choices (96 units = 1 inch)
         double    width  = 8.27 * 96;  // Standard A4
         double    height = 11.69 * 96;
-        Thickness margin = new Thickness(40); // Kan også gøres dynamisk hvis ønsket
+        Thickness margin = new Thickness(40); // Can also be made dynamic if desired
 
         if (ComboPaperSize.SelectedItem is ComboBoxItem sizeItem)
             switch (sizeItem.Content.ToString())
@@ -138,7 +138,7 @@ public partial class PrintPreviewWindow2 : Window
             }
 
         if (ComboOrientation.SelectedItem is ComboBoxItem orientItem && 
-            orientItem.Content.ToString() == "Liggende")
+            orientItem.Content.ToString() == "Landscape")
         {
             double temp = width;
             width       = height;
@@ -147,7 +147,7 @@ public partial class PrintPreviewWindow2 : Window
 
         Size targetSize = new Size(width, height);
 
-        // 2. Gen-generer hele din FixedDocumentSequence med de nye mål
+        // 2. Regenerate entire FixedDocumentSequence with new dimensions
         FixedDocumentSequence updatedSequence = CreateFixedDocumentSequence( _headerEl
                                                                            , _centralEl
                                                                            , _footerEl
@@ -155,7 +155,7 @@ public partial class PrintPreviewWindow2 : Window
                                                                            , targetSize
                                                                            , margin);
 
-        // 3. Skub det nye dokument over i vieweren – den opdaterer øjeblikkeligt på skærmen
+        // 3. Push the new document into the viewer - it updates immediately on screen
         MyDocumentViewer.Document = updatedSequence;
     }
 
@@ -163,24 +163,24 @@ public partial class PrintPreviewWindow2 : Window
                                                                     , FrameworkElement centralElement
                                                                     , FrameworkElement footerElement
                                                                     , double contentHeaderHeight
-                                                                    , Size pageSize       // Modtag størrelsen dynamisk
-                                                                    , Thickness margin)    // Modtag margener dynamisk
+                                                                    , Size pageSize       // Receive size dynamically
+                                                                    , Thickness margin)    // Receive margins dynamically
     {
-        // 1. Klun og render elementerne baseret på den NYE tilgængelige bredde
+        // 1. Clone and render elements based on the NEW available width
         var headerClone  = PrepareClone(headerElement);
         var contentClone = PrepareClone(centralElement);
         var footerClone  = PrepareClone(footerElement);
 
-        // Tip: Sørg for at dine PrepareClone/RenderElement metoder måler (Measure/Arrange) 
-        // elementerne efter den nye 'pageSize.Width - margin.Left - margin.Right', 
-        // så indholdet rent faktisk strækker eller sammentrækker sig til det nye papir.
+        // Tip: Make sure your PrepareClone/RenderElement methods measure (Measure/Arrange)
+        // elements according to the new 'pageSize.Width - margin.Left - margin.Right', 
+        // so the content actually stretches or shrinks to the new paper size.
         var headerBmp  = RenderElement(headerClone);
         var contentBmp = RenderElement(contentClone);
         var footerBmp  = RenderElement(footerClone);
 
         double headerHeight = FindHeaderHeight(centralElement, contentHeaderHeight);
 
-        // 2. Opret din paginator med de nye dynamiske mål
+        // 2. Create your paginator with the new dynamic dimensions
         var paginator = new BitmapPaginator(
                                              headerBmp
                                            , contentBmp

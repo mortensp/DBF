@@ -9,17 +9,20 @@ using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.ViewModels;
+using PrintWPF;
 using Syncfusion.Data;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Grid.Helpers;
+using Syncfusion.Windows.Shared;
+using Wpf.Ui.Controls;
 using Group = Syncfusion.Data.Group;
 namespace DBF.UserControls
 {
     /// <summary>
     /// Interaction logic for StartListControl.xaml
     /// </summary>
-    public partial class StartListControl : UserControl
+    public partial class StartListControl : UserControl, IWpfReport
     {
         private Configuration config;// = IoC.Get<Configuration>();
 
@@ -57,15 +60,15 @@ namespace DBF.UserControls
                 dgTeams.GroupCollapsing             += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.GroupExpanding              += (s, e) => { e.Cancel = parentIsViewbox; };
                 dgTeams.ItemsSourceChanged          += onTeamsChanged;
-            
-                      config ??= IoC.Get<Configuration>();
 
+                config ??= IoC.Get<Configuration>();
             }
         #endregion
 
+        public double HeaderHeight { get; set; } = 82;
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-  
             var parent = VisualTreeHelper.GetParent(this);
 
             while (parent is not null
@@ -79,6 +82,18 @@ namespace DBF.UserControls
 
             groupTimer.Tick       += (s, e) => showNextGroup();
             config.PropertyChanged+= (s, e) => setupPaging();
+
+            //
+            //            if (((ListCollectionView)dgPairs.ItemsSource).Count > 0)
+            //            {
+            //                var row = (DataGridRow)VisualTreeHelper.GetChild(dgPairs, 1);
+
+            //                var    orgin           = new System.Windows.Point(0, 0);
+            //                var    pos             = row.TranslatePoint(orgin, this);
+            //                double yOffset         = pos.Y;
+
+            //                HeaderHeight = pos.Y;
+            //            }
         }
 
         private void onPairsChanged(object s, GridItemsSourceChangedEventArgs e)

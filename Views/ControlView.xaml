@@ -24,7 +24,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="343*" />
+            <ColumnDefinition Width="369*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -39,7 +40,7 @@
         <WrapPanel
             Grid.Row="0"
             Grid.Column="0"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="3"
             Margin="0,0,0,2"
             Background="White"
             Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
@@ -193,9 +194,9 @@
         <!--  Row 1  -->
         <Border
             Grid.Row="1"
-            Grid.Column="2"
+            Grid.Column="1"
             Height="28"
-            Visibility="{Binding ErrorMessage.Value, Converter={StaticResource HideEmptyConverter}}">
+            Visibility="{Binding ErrorMessage.Value, Converter={StaticResource HideEmptyConverter}}" Grid.ColumnSpan="2" Margin="0,0,0,527" Grid.RowSpan="2">
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -208,7 +209,7 @@
 
         <TabControl
             Grid.Row="2"
-            Grid.ColumnSpan="2"
+            Grid.ColumnSpan="3"
             MinHeight="400"
             SelectedIndex="1">
 
@@ -324,18 +325,18 @@
 
         <!--  Row 3  -->
         <Label
-            Grid.Row="3"
+            Grid.Row="2"
             Grid.Column="0"
             Content="{lex:Loc Projector}"
             FontWeight="Bold"
-            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}" />
+            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}" Grid.ColumnSpan="2" Margin="0,527,343,0" Grid.RowSpan="2" />
 
         <WrapPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Grid.Column="1"
-            Margin="10,0,10,0"
-            HorizontalAlignment="Center"
-            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}">
+            Margin="136,527,0,0"
+            HorizontalAlignment="Left"
+            Visibility="{Binding DataContext.Parent.FullScreenVisibility, ElementName=root}" Grid.ColumnSpan="2" Grid.RowSpan="2">
             <Button
                 Width="100"
                 Margin="5"

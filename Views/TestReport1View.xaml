@@ -1,0 +1,91 @@
+﻿<UserControl
+    x:Class="DBF.Views.TestReport1View"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lib="clr-namespace:PrintWPF;assembly=PrintWPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    d:DesignHeight="410"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Header that appears on first page only  -->
+        <StackPanel
+            Grid.Row="0"
+            Margin="0,0,0,20"
+            lib:Document.VisibleOnFirstPageOnly="True">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="24"
+                FontWeight="Bold"
+                Text="Report Header1" />
+
+            <TextBlock Text="This header is only visible on the first page." TextAlignment="Center" />
+        </StackPanel>
+
+        <!--  DataGrid with paginization support  -->
+        <DataGrid
+            Width="500"
+            x:Name="ReportDgList"
+            Grid.Row="1"
+            VerticalAlignment="Stretch"
+            d:ItemsSource="{Binding Items}"
+            lib:Document.Paginate="True"
+            AutoGenerateColumns="False"
+            Background="Transparent"
+            BorderBrush="Black"
+            BorderThickness="1"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            CanUserReorderColumns="False"
+            CanUserResizeColumns="True"
+            CanUserResizeRows="False"
+            CanUserSortColumns="False"
+            HeadersVisibility="Column"
+            IsReadOnly="True"
+            ItemsSource="{Binding ReportList}"
+           >
+
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Width="0.2*"
+                    Binding="{Binding Id}"
+                    Header="ID"
+                    IsReadOnly="True" />
+
+                <DataGridTextColumn
+                    Width="0.6*"
+                    Binding="{Binding Name}"
+                    Header="Name"
+                    IsReadOnly="True" />
+
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Description}"
+                    Header="Description"
+                    IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!--  Footer  -->
+        <Grid Grid.Row="2" Margin="0,10,0,00">
+            <TextBlock HorizontalAlignment="Left">
+                <Run Text="Date:" /> <Run Text="{Binding Source={x:Static sys:DateTime.Now}, Mode=OneWay, StringFormat=d}" />
+            </TextBlock>
+
+            <TextBlock HorizontalAlignment="Right">
+                <Run Text="Page:" />
+                <Run lib:Document.SetCurrentPageNumberAttachedProperty="True" Text="{Binding (lib:Document.CurrentPageNumber), Mode=OneWay, RelativeSource={RelativeSource Self}}" />
+                <Run Text="(" /><Run lib:Document.SetLastPageNumberAttachedProperty="True" Text="{Binding (lib:Document.LastPageNumber), Mode=OneWay, RelativeSource={RelativeSource Self}}" /><Run Text=")" />
+            </TextBlock>
+        </Grid>
+    </Grid>
+</UserControl>

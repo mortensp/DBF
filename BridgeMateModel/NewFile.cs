@@ -7,14 +7,14 @@
 
     if (first)
     {
-        // ✅ Optimization 1: Initialiser BoardsPlayed baseret på SectionEntity
+        // ✅ Optimization 1: Initialize BoardsPlayed based on SectionEntity
         foreach (var row in BMRounds)
             row.BoardsPlayed = (row.Nspair == row.SectionEntity.MissingPair || 
                                 row.Ewpair == row.SectionEntity.MissingPair) 
                                     ? row.BoardsPerRound 
                                     : 0;
 
-        // ✅ Optimization 2: Hent alle ReceivedData på én gang (ikke iterativt)
+        // ✅ Optimization 2: Fetch all ReceivedData at once (not iteratively)
         var receivedData = db.ReceivedData
                             .Where(r => r.Erased != true)
                             .OrderBy(r => r.Id)
@@ -23,7 +23,7 @@
         // ✅ Optimization 3: Byg index for O(1) lookups
         var roundIndex = BMRounds.ToDictionary(r => (r.Section, r.TableNo, r.Round));
 
-        // ✅ Optimization 4: Ret op i memory før DB save
+        // ✅ Optimization 4: Fix in memory before DB save
         foreach (var row in receivedData)
         {
             if (roundIndex.TryGetValue((row.Section, row.TableNo, row.Round), out var round))
@@ -34,12 +34,12 @@
     }
     else
     {
-        // ✅ Optimization 5: Samme tilgang i else-blok - brug index i stedet for FirstOrDefault()
+        // ✅ Optimization 5: Same approach in else-block - use index instead of FirstOrDefault()
         var unprocessedData = db.ReceivedData
                                .Where(r => r.Processed4 != true)
                                .ToList();
 
-        var roundIndex = BMRounds.ToDictionary(r => (r.TableNo, r.Round)); // Kun TableNo + Round nødvendig her
+        var roundIndex = BMRounds.ToDictionary(r => (r.TableNo, r.Round)); // Only TableNo + Round needed here
 
         foreach (var data in unprocessedData)
         {
@@ -55,7 +55,7 @@
         }
     }
 
-    // ✅ Optimization 6: Gem kun én gang
+    // ✅ Optimization 6: Save only once
     db.SaveChanges();
 
     updateRoundStatus();

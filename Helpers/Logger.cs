@@ -49,11 +49,37 @@ namespace DBF.Helpers
         {
             try
             {
-                var msg = (context ?? "").Trim() + " " + ex.ToString();
+                var msg = (context ?? "").Trim() + " " + FormatException(ex);
                 Log("EXC", msg);
             }
 
             catch { }
+        }
+
+        private static string FormatException(Exception ex)
+        {
+            if (ex == null)
+                return "";
+
+            var sb = new System.Text.StringBuilder();
+            var current = ex;
+            int depth = 0;
+
+            while (current != null)
+            {
+                if (depth > 0)
+                    sb.AppendLine();
+
+                sb.Append($"{new string(' ', depth * 2)}[{current.GetType().Name}] {current.Message}");
+
+                if (!string.IsNullOrEmpty(current.StackTrace))
+                    sb.AppendLine().Append($"{new string(' ', depth * 2)}StackTrace: {current.StackTrace}");
+
+                current = current.InnerException;
+                depth++;
+            }
+
+            return sb.ToString();
         }
 
         private static void Log(string level, string message)

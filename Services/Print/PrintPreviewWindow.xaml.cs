@@ -59,8 +59,7 @@ public partial class PrintPreviewWindow : Window
         CreatePrintPaginator();
 
         // Show the printer-adjusted paginator in the preview.
-        DocumentViewer.Document = 
-        new PaginatorDocument(_printPaginator!);
+        DocumentViewer.Document = new PaginatorDocument(_printPaginator!);
 
         FitPage();
     }

@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Printing;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 using global::DBF.Helpers;
-using PrintDialogX;
+using PrintDialogXY;
 using Syncfusion.UI.Xaml.Grid;
-using PrintDialog = PrintDialogX.PrintDialog;
-using PrintDocument = PrintDialogX.PrintDocument;
+using PrintDialog = PrintDialogXY.PrintDialog;
+using PrintDocument = PrintDialogXY.PrintDocument;
 
 namespace DBF.Services;
 
-public static class PrintServiceX
+public static class PrintServiceXY
 {
     #region  PUBLIC API
         /// <summary>
@@ -66,8 +58,6 @@ public static class PrintServiceX
                                 , string title = null
                                 , double contentHeaderHeight = 120)
         {
-        //Report: Bitmap løsning
-
             // 1. Prepare clones 
             var headerClone  = PrepareClone(header);
             var contentClone = PrepareClone(content);
@@ -94,17 +84,17 @@ public static class PrintServiceX
             // Create the initial document 
             dlg.Document = new();
 
-            // Capture PrintSettingsChanged Events - is't here the magic happens
+            // Is't here the magic happens
             dlg.Document.PrintSettingsChanged+= (s, e) =>
             {
-                if (s is not PrintDialogX.PrintDocument document)
+                if (s is not PrintDialogXY.PrintDocument document)
                     return;
 
                 // Delay the preview generation until the document is updated.
                 e.IsUpdating = null;
 
-                // Convert Layout to PageOrientation
-                var orientation = e.CurrentSettings.Layout == PrintDialogX.Enums.Layout.Portrait
+                // Convert Layout to PageOrientationY
+                var orientation = e.CurrentSettings.Layout == PrintDialogXY.Enums.Layout.Portrait
                                 ? PageOrientation.Portrait
                                 : PageOrientation.Landscape;
 
@@ -115,10 +105,10 @@ public static class PrintServiceX
 
                 var margin = e.CurrentSettings.Margin switch
                 {
-                    PrintDialogX.Enums.Margin.Default => new Thickness(20),
-                    PrintDialogX.Enums.Margin.None    => new Thickness(0),
-                    PrintDialogX.Enums.Margin.Minimum => new Thickness(10),
-                    PrintDialogX.Enums.Margin.Custom  => new Thickness(30),
+                    PrintDialogXY.Enums.Margin.Default => new Thickness(20),
+                    PrintDialogXY.Enums.Margin.None    => new Thickness(0),
+                    PrintDialogXY.Enums.Margin.Minimum => new Thickness(10),
+                    PrintDialogXY.Enums.Margin.Custom  => new Thickness(30),
                     _                                 => new Thickness(0)
                 };
 

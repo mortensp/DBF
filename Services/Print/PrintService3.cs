@@ -1,11 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Syncfusion.UI.Xaml.Grid;
 using PrintDialog = System.Windows.Controls.PrintDialog;
 
 namespace DBF.Services;
 
-public static class PrintService2
+public static class PrintService3
 {
     public static void Print(FrameworkElement element, PrintSettings settings)
     {
@@ -23,6 +22,7 @@ public static class PrintService2
     {
         try
         {
+            //Report: Cropped rectangle løsning
             var paginator = new VisualPaginator(element, settings);
 
             var window = new Window

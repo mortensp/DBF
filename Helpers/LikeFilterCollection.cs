@@ -9,20 +9,20 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 /// <summary>
-/// *         Matcher 0+ tegn (som i VB)
-/// ?         Matcher 1 tegn (som i VB)
-/// **        Matcher rekursivt på tværs af path‑segmenter
-///           Eksempel:
+/// *         Matches 0+ characters (as in VB)
+/// ?         Matches 1 character (as in VB)
+/// **        Matches recursively across path segments
+///           Example:
 ///             src/**/test/*.cs
-/// {a,b,c}   Alternativer
-///           Eksempel:
+/// {a,b,c}   Alternatives
+///           Example:
 ///             *.{jpg,png,gif}
-/// [abc] og 
-/// [a-z]    Tegnklasser
-///          Eksempel:
+/// [abc] and 
+/// [a-z]    Character classes
+///          Example:
 ///            file[0-9].txt
-/// !pattern Matcher alt undtagen mønsteret
-///          Eksempel:
+/// !pattern Matches everything except the pattern
+///          Example:
 ///            !*.tmp
 /// </summary>
 public sealed class LikeFilterCollection : IEnumerable<string>

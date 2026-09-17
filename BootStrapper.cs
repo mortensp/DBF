@@ -84,7 +84,8 @@ public class Bootstrapper : BootstrapperBase
             foreach (var viewModel in SelectViewModels())
                 if (_container.HasHandler(viewModel, null) == false)
                     if (viewModel.Name == "ShellViewModel"
-                    ||  viewModel.Name == "ControlViewModel")
+                    ||  viewModel.Name == "ControlViewModel"
+                    ||  viewModel.Name == "TestReport1ViewModel")
                     {
                         _container.RegisterSingleton(viewModel, null, viewModel);
                         Logger.Debug($"Registered {viewModel.Name} as Singleton");
