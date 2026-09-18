@@ -36,9 +36,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Services\Print\**" />
 	  <Compile Remove="UserControls\PrintOld\**" />
+	  <EmbeddedResource Remove="Services\Print\**" />
 	  <EmbeddedResource Remove="UserControls\PrintOld\**" />
+	  <None Remove="Services\Print\**" />
 	  <None Remove="UserControls\PrintOld\**" />
+	  <Page Remove="Services\Print\**" />
 	  <Page Remove="UserControls\PrintOld\**" />
 	</ItemGroup>
 
@@ -55,17 +59,7 @@
 		<Compile Remove="BridgeMateModel\ScoreUpload.cs" />
 		<Compile Remove="BridgeMateModel\Setting.cs" />
 		
-		<Compile Remove="HelpSystem\PDFViewerControl.xaml.cs" />
-		
-		<Compile Remove="Services\Print\BitmapPaginatorOld.cs" />
-		
-		<Compile Remove="Services\Print\MemoryXpsDocument.cs" />
-		
-		<Compile Remove="Services\Print\PrintServiceWpf.cs" />
-		
-		<Compile Remove="Services\Print\VisualPaginatorOld.cs" />
-		
-		<Compile Remove="Services\Print\WPF_Print.cs" />		
+		<Compile Remove="HelpSystem\PDFViewerControl.xaml.cs" />		
 		<Compile Remove="ViewModels\StartListPrintViewModel.cs" />
 	</ItemGroup>
 

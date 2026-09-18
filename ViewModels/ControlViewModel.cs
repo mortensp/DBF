@@ -7,22 +7,17 @@ using System.Printing;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Xml.Serialization;
 using Caliburn.Micro;
 using DBF.AudioServices;
 using DBF.Converters;
 using DBF.DataModel;
 using DBF.Helpers;
-using DBF.Services;
-using DBF.Services.Print;
 using DBF.UserControls;
 using DBF.Views;
-using PrintDialog2;
 using String.Localization;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
-using PrintSettings = DBF.Services.PrintSettings;
 
 namespace DBF.ViewModels;
 
@@ -309,74 +304,31 @@ public class ControlViewModel : Screen, IDisposable
             SelectedClub = Clubs.Last();
 
             var view   = controlView.startListControl;
-            var report = new TestReport1View();
+            var report = new TestReport1bView();
 
             populate(50);
-
-            //var settings = new PrintSettings()
-            //               {
-            //                   PageSize = new Size(595, 842) // A4 size in points
-            //               };
-
-            //var settings2 = new PrintDialog2.PrintSettings()
-            //                {
-            //                    PageSize     = new Size(595, 842) // A4 size in points
-            //                  , HeaderHeight = 81
-            //                };
-
-            //var settings3 = new PrintWPF.PrintSettings()
-            //                {
-            //                    PageSize = new Size(595, 842) // A4 size in points
-            //                };
-
-            // ------------------------
-            // - No dynamic paginator -
-            // - But it's acurate     -
-            // ------------------------
-            //PrintService.Preview(view, "StartListe", 81);
-            //PrintService.Print(view, "StartListe", 81);
-
-            // ----------------------------------
-            // - Uses a Visual Pagiator         -
-            // - Trying to use std PrintDialog  -
-            // - with a VisualPaginator amd FDS -
-            // - Paginator is fine              -
-            // ----------------------------------
-            //PrintService3.Preview(view, settings);
-            //PrintService3.Print(view, settings);
 
             // -----------------------
             // - y new PrindDialogEx -
             // -----------------------
+            var pageBreakSelectors = 
+                new Dictionary<string, Func<object, object>>
+                {
+                    ["ReportDgList"] = item => ((ReportDataRow)item).Group
+                };
+
             PrintWPF.PrintVisual.PrintDialog( report
                                             , new PrintWPF.PrintSettings()
                                               {
                                             //  PageSize     = new Size(595, 842) // In points
                                             //, HeaderHeight = 74
-                                                  Margin      = new Thickness(10, 16, 10, 16)
-                                                , Orientation = PageOrientation.Landscape
-                                              });
+                                                  Margin             = new Thickness(0, 10, 0, 10)
+                                                , Orientation        = PageOrientation.Landscape
+                                                , PageBreakSelectors = pageBreakSelectors
+                                              }
+
+                                            );
             //PrintWPF.PrintVisual.PrintDialog(view,74);
-            // -----------------------------------------------
-            // - Interface to PrintDialogX                   -
-            // - Paginator is not precis unless              -
-            // - model.PrintDocument.DocumentMargin is None  -
-            // -----------------------------------------------
-            //PrintServiceX.Print(view, "StartListe", 81);
-
-            // ---------------------------------
-            // - Interface to PrintDialog2     -
-            // - My own class library          -
-            // - Trying to use std PrintDialog -
-            // - with a VisualPaginator       -
-            // ---------------------------------
-            //PrintService2.Preview(view, settings2);
-            //PrintService2.Print(view, settings2);
-
-            //min egen PrintDialog2
-            //var dlg   = new PrintDialog2Window(view);
-            //dlg.Owner = Application.Current.MainWindow;
-            //dlg.ShowDialog();
         }
 
         private void populate(int goal)

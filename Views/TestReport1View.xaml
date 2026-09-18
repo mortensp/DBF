@@ -20,7 +20,7 @@
         <StackPanel
             Grid.Row="0"
             Margin="0,0,0,20"
-            lib:Document.VisibleOnFirstPageOnly="True">
+            lib:Reporting.VisibleOnFirstPageOnly="True">
             <TextBlock
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -33,12 +33,12 @@
 
         <!--  DataGrid with paginization support  -->
         <DataGrid
-            Width="500"
             x:Name="ReportDgList"
             Grid.Row="1"
+            Width="400"
             VerticalAlignment="Stretch"
             d:ItemsSource="{Binding Items}"
-            lib:Document.Paginate="True"
+            lib:Reporting.Paginate="True"
             AutoGenerateColumns="False"
             Background="Transparent"
             BorderBrush="Black"
@@ -51,8 +51,7 @@
             CanUserSortColumns="False"
             HeadersVisibility="Column"
             IsReadOnly="True"
-            ItemsSource="{Binding ReportList}"
-           >
+            ItemsSource="{Binding ReportList}">
 
             <DataGrid.Columns>
                 <DataGridTextColumn
@@ -83,8 +82,8 @@
 
             <TextBlock HorizontalAlignment="Right">
                 <Run Text="Page:" />
-                <Run lib:Document.SetCurrentPageNumberAttachedProperty="True" Text="{Binding (lib:Document.CurrentPageNumber), Mode=OneWay, RelativeSource={RelativeSource Self}}" />
-                <Run Text="(" /><Run lib:Document.SetLastPageNumberAttachedProperty="True" Text="{Binding (lib:Document.LastPageNumber), Mode=OneWay, RelativeSource={RelativeSource Self}}" /><Run Text=")" />
+                <Run lib:Reporting.SetCurrentPageNumberAttachedProperty="True" Text="{Binding (lib:Reporting.CurrentPageNumber), Mode=OneWay, RelativeSource={RelativeSource Self}}" />
+                <Run Text="(" /><Run lib:Reporting.SetLastPageNumberAttachedProperty="True" Text="{Binding (lib:Reporting.LastPageNumber), Mode=OneWay, RelativeSource={RelativeSource Self}}" /><Run Text=")" />
             </TextBlock>
         </Grid>
     </Grid>
