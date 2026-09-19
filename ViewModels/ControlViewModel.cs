@@ -303,10 +303,10 @@ public class ControlViewModel : Screen, IDisposable
             Debugger.Break();
             SelectedClub = Clubs.Last();
 
-            var view   = controlView.startListControl;
-            var report = new TestReport1bView();
+            //var view   = controlView.startListControl;
+            var view     = new TestReport3View();
 
-            populate(50);
+        populate(50);
 
             // -----------------------
             // - y new PrindDialogEx -
@@ -317,14 +317,15 @@ public class ControlViewModel : Screen, IDisposable
                     ["ReportDgList"] = item => ((ReportDataRow)item).Group
                 };
 
-            PrintWPF.PrintVisual.PrintDialog( report
+            PrintWPF.PrintVisual.PrintDialog( view
                                             , new PrintWPF.PrintSettings()
                                               {
-                                            //  PageSize     = new Size(595, 842) // In points
-                                            //, HeaderHeight = 74
-                                                  Margin             = new Thickness(0, 10, 0, 10)
-                                                , Orientation        = PageOrientation.Landscape
+                                                  PageSize           = new Size(816, 1056) // In points
+                                                //, Margin             = new Thickness(15, 15, 15, 15)
+                                                , Margin             = new Thickness(0)
+                                                , Orientation        = PageOrientation.Portrait
                                                 , PageBreakSelectors = pageBreakSelectors
+                                            //, HeaderHeight = 74
                                               }
 
                                             );

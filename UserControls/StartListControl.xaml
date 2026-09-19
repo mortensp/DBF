@@ -55,8 +55,8 @@
                 FontWeight="Bold"
                 Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
         </StackPanel>
-
-        <syncfusion:SfDataGrid
+        <Grid x:Name="DetailsRegion" Grid.Row="1">
+            <syncfusion:SfDataGrid
             Name="dgTeams"
             Grid.Row="1"
             Margin="0,0,0,10"
@@ -76,19 +76,19 @@
             ScrollViewer.CanContentScroll="True"
             Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
-            <syncfusion:SfDataGrid.Columns>
-                <syncfusion:GridTextColumn
+                <syncfusion:SfDataGrid.Columns>
+                    <syncfusion:GridTextColumn
                     HeaderText="{lex:Loc hdGroup}"
                     IsHidden="True"
                     MappingName="Group" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     Padding="5,0"
                     HeaderText="{lex:Loc hdNo}"
                     MappingName="TeamNo"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     x:Name="TeamName"
                     Width="250"
                     Padding="5,0"
@@ -96,7 +96,7 @@
                     HeaderText="{lex:Loc hdTeam}"
                     MappingName="TeamName" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     Padding="5,0"
                     HeaderText="{lex:Loc hdStartPos}"
                     HorizontalHeaderContentAlignment="Center"
@@ -104,14 +104,14 @@
                     MinimumWidth="80"
                     TextAlignment="Center" />
 
-                <syncfusion:GridNumericColumn
+                    <syncfusion:GridNumericColumn
                     Padding="5,0"
                     HeaderText="{lex:Loc hdHAC}"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="AvgHAC"
                     NumberDecimalDigits="2" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     Padding="5,0"
                     HeaderText="{lex:Loc hdPlayers}"
                     HorizontalHeaderContentAlignment="Left"
@@ -120,20 +120,20 @@
                     MinimumWidth="600"
                     TextAlignment="Left"
                     TextWrapping="Wrap" />
-            </syncfusion:SfDataGrid.Columns>
+                </syncfusion:SfDataGrid.Columns>
 
-            <syncfusion:SfDataGrid.SortColumnDescriptions>
-                <syncfusion:SortColumnDescription ColumnName="Group" SortDirection="Ascending" />
-                <syncfusion:SortColumnDescription ColumnName="TeamNo" SortDirection="Ascending" />
-            </syncfusion:SfDataGrid.SortColumnDescriptions>
+                <syncfusion:SfDataGrid.SortColumnDescriptions>
+                    <syncfusion:SortColumnDescription ColumnName="Group" SortDirection="Ascending" />
+                    <syncfusion:SortColumnDescription ColumnName="TeamNo" SortDirection="Ascending" />
+                </syncfusion:SfDataGrid.SortColumnDescriptions>
 
-            <syncfusion:SfDataGrid.GroupColumnDescriptions>
-                <syncfusion:GroupColumnDescription ColumnName="Group" />
-            </syncfusion:SfDataGrid.GroupColumnDescriptions>
+                <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                    <syncfusion:GroupColumnDescription ColumnName="Group" />
+                </syncfusion:SfDataGrid.GroupColumnDescriptions>
 
-        </syncfusion:SfDataGrid>
+            </syncfusion:SfDataGrid>
 
-        <syncfusion:SfDataGrid
+            <syncfusion:SfDataGrid
             Name="dgPairs"
             Grid.Row="2"
             Padding="5,0,5,0"
@@ -155,105 +155,106 @@
             ShowColumnWhenGrouped="True"
             Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
-            <syncfusion:SfDataGrid.Columns>
-                <syncfusion:GridTextColumn
+                <syncfusion:SfDataGrid.Columns>
+                    <syncfusion:GridTextColumn
                     HeaderText="{lex:Loc hdGroup}"
                     IsHidden="True"
                     MappingName="Group" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     HeaderText="{lex:Loc hdSubGroup}"
                     IsHidden="True"
                     MappingName="SubGroup" />
 
-                <syncfusion:GridNumericColumn
+                    <syncfusion:GridNumericColumn
                     HeaderText="{lex:Loc hdNo}"
                     MappingName="PairNo"
                     NumberDecimalDigits="0"
                     TextAlignment="Center" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     AllowSorting="False"
                     HeaderText="{lex:Loc hdNames}"
                     MappingName="PairName"
                     MinimumWidth="350" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     HeaderText="{lex:Loc hdStartPos}"
                     HorizontalHeaderContentAlignment="Center"
                     MappingName="StartPos"
                     TextAlignment="Center" />
 
-                <!--    -->
-                <syncfusion:GridNumericColumn
+                    <!--    -->
+                    <syncfusion:GridNumericColumn
                     HeaderText="{lex:Loc hdHAC}"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="{Binding Data.HideHac, Source={StaticResource ViewModelProxy}}"
                     MappingName="AvgHAC"
                     NumberDecimalDigits="1" />
 
-                <!--  ViewModelProxyen er nødvendig  -->
-                <syncfusion:GridPercentColumn
+                    <!--  ViewModelProxyen er nødvendig  -->
+                    <syncfusion:GridPercentColumn
                     HeaderText="{lex:Loc hdExpectedScore}"
                     HorizontalHeaderContentAlignment="Center"
                     IsHidden="True"
                     MappingName="ExpectedPct"
                     PercentDecimalDigits="2" />
 
-                <syncfusion:GridNumericColumn
+                    <syncfusion:GridNumericColumn
                     HeaderText="{lex:Loc hdExpectedScore}"
                     HorizontalHeaderContentAlignment="Center"
                     IsHidden="{Binding Data.ImpsPair, Source={StaticResource ViewModelProxy}, Converter={StaticResource BooleanInvertConverter}}"
                     MappingName="ExpectedScore"
                     NumberDecimalDigits="2" />
 
-                <!--  Tourneringens Score  -->
-                <syncfusion:GridTemplateColumn
+                    <!--  Tourneringens Score  -->
+                    <syncfusion:GridTemplateColumn
                     Width="2"
                     CellTemplate="{StaticResource ColumnSeparatorTemplate}"
                     MappingName="Separator2" />
 
-                <syncfusion:GridNumericColumn
+                    <syncfusion:GridNumericColumn
                     HeaderText="{lex:Loc hdScore}"
                     HorizontalHeaderContentAlignment="Right"
                     IsHidden="{Binding Data.HideTournamentSummery, Source={StaticResource ViewModelProxy}}"
                     MappingName="TournamentResult"
                     NumberDecimalDigits="1" />
 
-                <syncfusion:GridNumericColumn
+                    <syncfusion:GridNumericColumn
                     HeaderText="{lex:Loc hdDeltaHAC}"
                     HorizontalHeaderContentAlignment="Right"
                     MappingName="HACTotal"
                     NumberDecimalDigits="2" />
 
-                <syncfusion:GridTextColumn
+                    <syncfusion:GridTextColumn
                     HeaderText="{lex:Loc hdPos}"
                     HorizontalHeaderContentAlignment="Center"
                     IsHidden="{Binding Data.HideTournamentSummery, Source={StaticResource ViewModelProxy}}"
                     MappingName="TournamentRank"
                     TextAlignment="Center" />
 
-            </syncfusion:SfDataGrid.Columns>
+                </syncfusion:SfDataGrid.Columns>
 
-            <syncfusion:SfDataGrid.StackedHeaderRows>
-                <syncfusion:StackedHeaderRow>
-                    <syncfusion:StackedHeaderRow.StackedColumns>
-                        <syncfusion:StackedColumn ChildColumns="ExpectedPct,ExpectedScore" HeaderText="{lex:Loc hdSection}" />
-                        <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="{lex:Loc hdTournament}" />
-                    </syncfusion:StackedHeaderRow.StackedColumns>
-                </syncfusion:StackedHeaderRow>
-            </syncfusion:SfDataGrid.StackedHeaderRows>
+                <syncfusion:SfDataGrid.StackedHeaderRows>
+                    <syncfusion:StackedHeaderRow>
+                        <syncfusion:StackedHeaderRow.StackedColumns>
+                            <syncfusion:StackedColumn ChildColumns="ExpectedPct,ExpectedScore" HeaderText="{lex:Loc hdSection}" />
+                            <syncfusion:StackedColumn ChildColumns="TournamentRank,TournamentResult,HACTotal" HeaderText="{lex:Loc hdTournament}" />
+                        </syncfusion:StackedHeaderRow.StackedColumns>
+                    </syncfusion:StackedHeaderRow>
+                </syncfusion:SfDataGrid.StackedHeaderRows>
 
-            <syncfusion:SfDataGrid.SortColumnDescriptions>
-                <syncfusion:SortColumnDescription ColumnName="Group" SortDirection="Ascending" />
-                <syncfusion:SortColumnDescription ColumnName="SubGroup" SortDirection="Ascending" />
-                <syncfusion:SortColumnDescription ColumnName="PairNo" SortDirection="Ascending" />
-            </syncfusion:SfDataGrid.SortColumnDescriptions>
+                <syncfusion:SfDataGrid.SortColumnDescriptions>
+                    <syncfusion:SortColumnDescription ColumnName="Group" SortDirection="Ascending" />
+                    <syncfusion:SortColumnDescription ColumnName="SubGroup" SortDirection="Ascending" />
+                    <syncfusion:SortColumnDescription ColumnName="PairNo" SortDirection="Ascending" />
+                </syncfusion:SfDataGrid.SortColumnDescriptions>
 
-            <syncfusion:SfDataGrid.GroupColumnDescriptions>
-                <syncfusion:GroupColumnDescription ColumnName="Group" />
-                <syncfusion:GroupColumnDescription ColumnName="SubGroup" />
-            </syncfusion:SfDataGrid.GroupColumnDescriptions>
-        </syncfusion:SfDataGrid>
+                <syncfusion:SfDataGrid.GroupColumnDescriptions>
+                    <syncfusion:GroupColumnDescription ColumnName="Group" />
+                    <syncfusion:GroupColumnDescription ColumnName="SubGroup" />
+                </syncfusion:SfDataGrid.GroupColumnDescriptions>
+            </syncfusion:SfDataGrid>
+        </Grid>
     </Grid>
 </UserControl>

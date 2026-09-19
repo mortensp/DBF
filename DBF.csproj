@@ -60,7 +60,10 @@
 		<Compile Remove="BridgeMateModel\Setting.cs" />
 		
 		<Compile Remove="HelpSystem\PDFViewerControl.xaml.cs" />		
-		<Compile Remove="ViewModels\StartListPrintViewModel.cs" />
+		<Compile Remove="ViewModels\StartListPrintViewModel.cs" />		
+		<Compile Remove="ViewModels\TestReport2ViewModel.cs" />		
+		<Compile Remove="ViewModels\TestReport3ViewModel.cs" />		
+		<Compile Remove="ViewModels\TestReport4ViewModel.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

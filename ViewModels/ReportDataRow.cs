@@ -2,12 +2,12 @@
 
 public class ReportDataRow
 {
-    public ReportDataRow(int id, string name, string description,int group)
+    public ReportDataRow(int id, string name, string description,int? group=null)
     {
         Id          = id;
         Name        = name;
         Description = description;
-        Group       = group;
+        Group       = group??0;
 
     }
 
