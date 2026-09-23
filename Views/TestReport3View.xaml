@@ -31,33 +31,6 @@
         </TextBlock>
 
 
-
-        <ItemsControl
-            x:Name="ItemsControl1"
-            Grid.Row="1"
-            
-            lib:Reporting.Paginate="True"
-            Margin="0,0,0,15"
-            ItemsSource="{Binding VerticalReportList}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type local:ReportDataRow}">
-                    <Border BorderBrush="Black" BorderThickness="2">
-                        <StackPanel Margin="3">
-                            <TextBlock Text="{Binding Id}" />
-                            <TextBlock Text="{Binding Name}" />
-                            <TextBlock Text="{Binding Description}" />
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
-
         <Grid x:Name="DetailsRegion" Grid.Row="2">
             <ItemsControl
                 x:Name="ItemsControl2"
@@ -104,6 +77,31 @@
             </ItemsControl>
 
         </Grid>
+
+        <ItemsControl
+            x:Name="ItemsControl1"
+            Grid.Row="1"
+            Margin="0,0,0,15"
+            lib:Reporting.Paginate="True"
+            ItemsSource="{Binding VerticalReportList}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:ReportDataRow}">
+                    <Border BorderBrush="Black" BorderThickness="2">
+                        <StackPanel Margin="3">
+                            <TextBlock Text="{Binding Id}" />
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="{Binding Description}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
 
         <TextBlock
             Grid.Row="3"

@@ -32,12 +32,12 @@
         </StackPanel>
 
         <!--  DataGrid with paginization support  -->
-        <Grid x:Name="DetailsRegion" Grid.Row="1">
+        <!--<Grid x:Name="DetailsRegion" Grid.Row="1" VerticalAlignment="Top" >-->
             <DataGrid
                 x:Name="ReportDgList"
                 Grid.Row="1"
                 Width="400"
-                VerticalAlignment="Stretch"
+                VerticalAlignment="Top"
                 lib:Reporting.Paginate="True"
                 AutoGenerateColumns="False"
                 Background="Transparent"
@@ -73,7 +73,7 @@
                         IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
-        </Grid>
+        <!--</Grid>-->
 
         <!--  Footer  -->
         <Grid Grid.Row="2" Margin="0,10,0,00">

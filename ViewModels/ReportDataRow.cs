@@ -8,7 +8,6 @@ public class ReportDataRow
         Name        = name;
         Description = description;
         Group       = group??0;
-
     }
 
     public int    Id          { get; }

@@ -3,20 +3,17 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.ViewModels;
 using PrintWPF;
-using Syncfusion.Data;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Grid.Helpers;
-using Syncfusion.Windows.Shared;
-using Wpf.Ui.Controls;
 using Group = Syncfusion.Data.Group;
+
 namespace DBF.UserControls
 {
     /// <summary>

@@ -332,9 +332,6 @@
 		<ProjectReference Include="..\..\Common Libs\AppArguments\AppArguments.csproj" />
 		<ProjectReference Include="..\..\Common Libs\GithubTools\GithubTools.csproj" />
 		<ProjectReference Include="..\..\Common Libs\Localization\Localization.csproj" />
-		<ProjectReference Include="..\..\Common Libs\PrintDialog2\PrintDialog2.csproj" />
-		<ProjectReference Include="..\..\Common Libs\PrintDialogXY\PrintDialogXY\PrintDialogXY.csproj" />
-		<ProjectReference Include="..\..\Common Libs\PrintDialogX\PrintDialogX\PrintDialogX.csproj" />
 		<ProjectReference Include="..\..\Common Libs\PrintWPF\PrintWPF.csproj" />
 	</ItemGroup>
 

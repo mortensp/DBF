@@ -5,7 +5,6 @@ using Caliburn.Micro;
 using DBF.Helpers;
 using GitHubTools;
 using String.Localization;
-using static PrintDialogX.InterfaceSettings;
 
 namespace DBF
 {

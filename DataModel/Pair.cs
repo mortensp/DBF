@@ -1,7 +1,6 @@
-﻿//using Azure.Core.Pipeline;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using PropertyChanged;
-//using DeepCopy;
+
 namespace DBF.DataModel
 {
     [AddINotifyPropertyChangedInterface]
