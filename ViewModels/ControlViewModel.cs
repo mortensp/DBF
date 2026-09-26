@@ -99,6 +99,7 @@ public class ControlViewModel : Screen, IDisposable
                 IsBusy  = false;
                 shellVm = IoC.Get<ShellViewModel>();
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -302,11 +303,10 @@ public class ControlViewModel : Screen, IDisposable
         {
             Debugger.Break();
             //SelectedClub = Clubs.Last();
-
             var view = controlView.startListControl;
-        //var view = new TestReport1View();
-            //populate(50);
+            //var view = new TestReport3View();
 
+            //populate(50);
             var grid =new SfDataGrid();
             var row  = grid.ResolveToRecordIndex(0);
 
@@ -316,15 +316,17 @@ public class ControlViewModel : Screen, IDisposable
             var pageBreakSelectors = 
                 new Dictionary<string, Func<object, object>>
                 {
-                    ["ReportDgList"] = item => ((ReportDataRow)item).Group
+                    ["ItemsControl1"] = item => ((ReportDataRow)item).Group
+                  , ["ItemsControl2"] = item => ((ReportDataRow)item).Group
+                  , ["dgPairs"]       = item => ((Pair)item).Group
                 };
 
             PrintWPF.PrintVisual.PrintDialog( view
                                             , new PrintWPF.PrintSettings()
                                               {
-                                                  PageSize           = new Size(816, 400) // In points
-                                                //, Margin             = new Thickness(15, 15, 15, 15)
-                                            , Margin             = new Thickness(0)
+                                            //PageSize           = new Size(816, 400) // In points
+                                            //, Margin             = new Thickness(15, 15, 15, 15)
+                                                  Margin             = new Thickness(0)
                                                 , Orientation        = PageOrientation.Portrait
                                                 , PageBreakSelectors = pageBreakSelectors
                                             //, HeaderHeight = 74
@@ -483,6 +485,7 @@ public class ControlViewModel : Screen, IDisposable
 
                     Configuration.DeleteState();
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex, $"Error when closing the ControlViewModel");
@@ -577,6 +580,7 @@ public class ControlViewModel : Screen, IDisposable
                                                        })
                                             .OrderByDescending(pt => pt.Date));
             }
+
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -623,6 +627,7 @@ public class ControlViewModel : Screen, IDisposable
                         buildTeams(teams, grpNo, grp);
                 }
             }
+
             catch (Exception)
             {
                 _lexStrings.Set(ErrorMessage, () => Lex.BC3ReadError);
@@ -856,6 +861,7 @@ public class ControlViewModel : Screen, IDisposable
 
                     return mainclub;
                 }
+
                 catch (Exception)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -995,6 +1001,7 @@ public class ControlViewModel : Screen, IDisposable
                                 }
                         }
                 }
+
                 catch (Exception ex)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -1183,6 +1190,7 @@ public class ControlViewModel : Screen, IDisposable
                         return (T)serializer.Deserialize(reader);
                     }
                 }
+
                 catch (Exception)
                 {
                     Logger.Info($"{Lex.ErrorDeserializing}: {fullPath}");
@@ -1207,11 +1215,13 @@ public class ControlViewModel : Screen, IDisposable
                         using var sr = new StreamReader(fs, encoding);
                         return sr.ReadToEnd();
                     }
+
                     catch (IOException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
                         delay = Math.Min(1000, delay * 2); // exponential backoff, cap at 1s
                     }
+
                     catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
@@ -1256,6 +1266,7 @@ public class ControlViewModel : Screen, IDisposable
                     projectorView.Top  = primaryScreen.WorkingArea.Top;
                     projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                 }
+
 #endif
             }
             else
@@ -1317,6 +1328,7 @@ public class ControlViewModel : Screen, IDisposable
                         else
                             initWatcher();
                     }
+
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");

@@ -29,6 +29,7 @@
             <ListView
                 x:Name="ListView"
                 Grid.Row="1"
+                
         ItemsSource="{Binding ReportList}"                lib:Reporting.Paginate="True"
                 AlternationCount="2"
                 SizeChanged="ListView_OnSizeChanged">

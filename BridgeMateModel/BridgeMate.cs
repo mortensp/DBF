@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using Caliburn.Micro;
+using System.Threading;
 using DBF.BridgeMateModel;
 using DBF.DataModel;
 using DBF.Helpers;
@@ -21,7 +22,7 @@ public class BridgeMate : PropertyChangedBase
         private          string                      bwsFile ;
         private          int                         bmClubNo = -1;
         private          DateTime                    lastDate;
-    private readonly object _sync = new();
+        private readonly object                      _sync    = new();
 
         //
         // Cache the sections  and rounds grouped by (Section, Round) for efficient lookups
@@ -86,7 +87,6 @@ public class BridgeMate : PropertyChangedBase
 
         lock (_sync)
         {
-
             foreach (FileInfo fileInfo in fileInfos.Reverse<FileInfo>())
                 try
                 {
@@ -95,8 +95,8 @@ public class BridgeMate : PropertyChangedBase
                     Session = db.Sessions.ToList()
                                          .FirstOrDefault(s => s.Date == playingTime);
 
-                    if (Session == null
-                    || Session.Status == 2)
+                    if (Session        == null
+                    ||  Session.Status == 2)
                         continue;
 
                     bmClubNo = clubNumber;
@@ -115,7 +115,7 @@ public class BridgeMate : PropertyChangedBase
                                                     .ToArray());
 
                     Sections = db.Sections.ToDictionary(s => s.Id
-                                                       , s => new SectionInfo(s.Letter
+                                                       , s => new SectionInfo( s.Letter
                                                                              , s.ScoringType == 4
                                                                              , s.Tables ?? 0
                                                                              , Rounds.Count(r => r.Key.Section == s.Id)
@@ -127,6 +127,7 @@ public class BridgeMate : PropertyChangedBase
                     startPolling();
                     return;
                 }
+
                 catch (Exception ex)
                 {
                     Logger.Exception(ex, $"BridgeMate: error opening/handling the file {fileInfo.FullName}");
@@ -135,6 +136,7 @@ public class BridgeMate : PropertyChangedBase
                     continue;
                 }
         }
+
         Logger.Info($"BridgeMate: No file found for date: {lastDate} in path: {path}");
         Close();
         initWatcher(path, Configuration.ReadBridgeMate);
@@ -173,46 +175,60 @@ public class BridgeMate : PropertyChangedBase
             this.bwsFile = path;
 
             using var db = new BridgeMateContext(path);
-        lock (_sync)
-        {
-            foreach (var row in Rounds.Values.SelectMany(r => r))
-                row.BoardsPlayed = (row.Nspair == row.SectionEntity.MissingPair
-                                 || row.Ewpair == row.SectionEntity.MissingPair)
-                                 ? row.BoardsPerRound
-                                 : 0;
-
-            var receivedData = db.ReceivedData
-                                 .Where(r => r.Erased != true)
-                                 .OrderBy(r => r.Id)
-                                 .ToList();
-
-            foreach (var row in receivedData)
+            lock (_sync)
             {
-                Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed++;
+                foreach (var row in Rounds.Values.SelectMany(r => r))
+                    row.BoardsPlayed = ( row.Nspair == row.SectionEntity.MissingPair
+                                     ||  row.Ewpair == row.SectionEntity.MissingPair)
+                                     ? row.BoardsPerRound
+                                     : 0;
 
-                row.Processed4 = true;
+                var receivedData = db.ReceivedData
+                                     .Where(r => r.Erased != true)
+                                     .OrderBy(r => r.Id)
+                                     .ToList();
+
+                foreach (var row in receivedData)
+                {
+                    Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed++;
+
+                    row.Processed4 = true;
+                }
             }
-        }
+
             db.SaveChanges();
 
             Execute.BeginOnUIThread(() =>
             {
-                lock (_sync)
+                // Try to acquire the lock with a timeout to avoid blocking indefinitely.
+                var lockTaken = false;
+                try
                 {
-                    RoundStatus.ReplaceRange(Rounds.Select(rounds => new RoundStatus
+                    // Wait up to 2 seconds to acquire the lock. Adjust duration if needed.
+                    lockTaken = Monitor.TryEnter(_sync, TimeSpan.FromSeconds(2));
+
+                    if (lockTaken)
                     {
-                        Section = (short)rounds.Key.Section
-                                                                       ,
-                        Round = (short)rounds.Key.Round
-                                                                       ,
-                        Letter = Sections[rounds.Key.Section]?.Letter
-                                                                       ,
-                        Done = rounds.Value.All(g => g.Done)
-                                                                       ,
-                        BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
-                    }));
+                        RoundStatus.ReplaceRange(Rounds.Select(rounds => new RoundStatus
+                                                                     {
+                                                                         Section         = (short)rounds.Key.Section
+                                                                       , Round           = (short)rounds.Key.Round
+                                                                       , Letter          = Sections[rounds.Key.Section]?.Letter
+                                                                       , Done            = rounds.Value.All(g => g.Done)
+                                                                       , BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
+                                                                     }));
+                    }
+                    else
+                    {
+                        Logger.Info("BridgeMate: timeout acquiring _sync lock while updating RoundStatus on UI thread");
+                    }
                 }
-                    });
+                finally
+                {
+                    if (lockTaken)
+                        Monitor.Exit(_sync);
+                }
+            });
         }
 
         private void updatePlayedBoards()
@@ -226,18 +242,18 @@ public class BridgeMate : PropertyChangedBase
             var unprocessedData = db.ReceivedData
                                     .Where(r => r.Processed4 != true)
                                     .ToList();
-        lock (_sync)
-        {
-            foreach (var row in unprocessedData)
+            lock (_sync)
             {
-                if (row.Erased == true)
-                    Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed--;
-                else
-                    Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed++;
+                foreach (var row in unprocessedData)
+                {
+                    if (row.Erased == true)
+                        Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed--;
+                    else
+                        Rounds[(row.Section, row.Round)][row.TableNo - 1].BoardsPlayed++;
 
-                row.Processed4 = true;
+                    row.Processed4 = true;
+                }
             }
-        }
 
             db.SaveChanges();
 
@@ -248,10 +264,11 @@ public class BridgeMate : PropertyChangedBase
                     foreach (var stat in RoundStatus)
                     {
                         var round            = Rounds[(stat.Section, stat.Round)];
-                        stat.Done = round.All(g => g.Done);
+                        stat.Done            = round.All(g => g.Done);
                         stat.BoardsRemaining = round.Sum(g => g.BoardsRemaining);
                     }
                 }
+
             });
         }
 
@@ -328,7 +345,6 @@ public class BridgeMate : PropertyChangedBase
                             break;
                     }
                 }
-
                 catch (Exception ex)
                 {
                     Logger.Exception(ex, "BridgeMate.handleFileEventAsync");
@@ -372,7 +388,6 @@ public class BridgeMate : PropertyChangedBase
                         updatePlayedBoards();
                     }
                 }
-
                 catch (OperationCanceledException)
                 {
                     // Normal shutdown

@@ -6,9 +6,12 @@
     xmlns:lib="clr-namespace:PrintWPF;assembly=PrintWPF"
     xmlns:local="clr-namespace:DBF.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DataContext="{d:DesignInstance Type=local:TestReport3ViewModel,
+                                     IsDesignTimeCreatable=True}"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -31,28 +34,35 @@
         </TextBlock>
 
 
-        <Grid x:Name="DetailsRegion" Grid.Row="2">
+        <!--<Grid x:Name="DetailsRegion" Grid.Row="2">-->
             <ItemsControl
                 x:Name="ItemsControl2"
                 Grid.Row="2"
                 Margin="0,0,0,10"
+                            VerticalAlignment="Top"
+                HorizontalAlignment="Center"
                 lib:Reporting.Paginate="True"
                 ItemsSource="{Binding ReportList}">
+                
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:ReportDataRow}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                             <Border Grid.Column="0" BorderThickness="1,0,0,1">
                                 <TextBlock Text="{Binding Id}" />
                             </Border>
                             <Border Grid.Column="1" BorderThickness="1,0,0,1">
                                 <TextBlock Text="{Binding Name}" />
                             </Border>
-                            <Border Grid.Column="2" BorderThickness="1,0,1,1">
+                        <Border Grid.Column="3" BorderThickness="1,0,0,1">
+                            <TextBlock Text="{Binding Group}" />
+                        </Border>
+                        <Border Grid.Column="2" BorderThickness="1,0,1,1" Margin="10,0">
                                 <TextBlock Text="{Binding Description}" />
                             </Border>
                         </Grid>
@@ -66,30 +76,49 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
+                            <!-- Table Header -->
                             <TextBlock
                                 Grid.Row="0"
                                 Text="Header for List 2"
                                 TextAlignment="Center" />
+                            <!-- Table rows -->
                             <ItemsPresenter Grid.Row="1" Margin="20" />
                         </Grid>
                     </ControlTemplate>
                 </ItemsControl.Template>
             </ItemsControl>
 
-        </Grid>
-
+        <!--</Grid>-->
+        
         <ItemsControl
             x:Name="ItemsControl1"
             Grid.Row="1"
+            MaxHeight="87"
             Margin="0,0,0,15"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
             lib:Reporting.Paginate="True"
-            ItemsSource="{Binding VerticalReportList}">
+            ItemsSource="{Binding HorizontalReportList}">
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,0,10"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Text="Min Header" />
+                        <ItemsPresenter />
+                    </StackPanel>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:ReportDataRow}">
                     <Border BorderBrush="Black" BorderThickness="2">
-                        <StackPanel Margin="3">
+                        <StackPanel Margin="3" x:Name="itemStackPanel" >
                             <TextBlock Text="{Binding Id}" />
                             <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="{Binding Group}" />
                             <TextBlock Text="{Binding Description}" />
                         </StackPanel>
                     </Border>
@@ -98,7 +127,7 @@
 
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Orientation="Horizontal" />
+                    <VirtualizingStackPanel Orientation="Horizontal" x:Name="VirtualizingStackPanel"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>

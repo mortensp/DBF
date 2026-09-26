@@ -7,13 +7,13 @@ public class ReportsViewModel:Screen
     public ReportsViewModel()
     {
         for (var i = 1; i <= 8; i++)
-            VerticalReportList.Add(new ReportDataRow(i, $"Row {i}", $"This is the description of column number {i}", 0));
+            HorizontalReportList.Add(new ReportDataRow(i, $"Row {i}", $"This is the description of column number {i}", $"Group: {i/3}"));
 
         for (var i = 1; i <= 63; i++)
-            ReportList.Add(new ReportDataRow(i, $"Row {i}", $"This is the description of row number {i}", 0));
+            ReportList.Add(new ReportDataRow(i, $"Row {i}", $"This is the description of row number {i}", $"Group: {i/4}"));
     }
 
-    public ObservableCollection<ReportDataRow> VerticalReportList { get; set; } = new();
+    public ObservableCollection<ReportDataRow> HorizontalReportList { get; set; } = new();
 
     public ObservableCollection<ReportDataRow> ReportList         { get; set; } = new();
 }
