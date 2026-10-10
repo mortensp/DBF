@@ -26,7 +26,9 @@ public static class ExtentionMethods
     }
     public static int LineCount(this Group group)
     {
-        return (group.Records?.Count() ?? 0) + 1 + (group.Groups?.Count ?? 0);
+        //return (group.Records?.Count() ?? 0) + 1 + (group.Groups?.Count ?? 0);
+        return 1+ (group.Records?.Count() ?? 0) + 1 + (group.Count());
+
     }
 
     public static DataGridBoundColumn FindColumn(this DataGrid grid, string name)

@@ -1,36 +1,43 @@
 ﻿using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using DBF.DataModel;
 using DBF.Helpers;
 using DBF.ViewModels;
+using PrintWPF;
 using Syncfusion.Data.Extensions;
 using Syncfusion.UI.Xaml.Grid;
-//using Syncfusion.Windows.Controls.PivotGrid;
+using Syncfusion.UI.Xaml.Grid.Helpers;
 using Group = Syncfusion.Data.Group;
 
 namespace DBF.UserControls
 {
-    public partial class ResultsControl : UserControl, INotifyPropertyChanged
+    /// <summary>
+    /// Interaction logic for StartListControl.xaml
+    /// </summary>    
+    public partial class ResultsControl : UserControl, IWpfReport, INotifyPropertyChanged
     {
-        private Configuration config = IoC.Get<Configuration>();
-
-        private int               displayLineIndex = -1;
-        private Interval          interval         = new(0, 0);
+        private Configuration     config;
+        private bool              inProjectorView;
         private int               linesAllocated;
-        private int               linesNeeded;
         private IEnumerable<Pair> pairs;
         private IEnumerable<Team> teams;
         private int               pairRows;
         private int               teamRows;
-        private List<Interval>    displayLines     = [];
-        private DispatcherTimer   groupTimer;
+        private DispatcherTimer   groupTimer =new();
+
+        #region Pagination
+            private DataModel.PageRange currentPageRange = new(0, 0);
+
+            private int pageIndex = -1;
+
+            private List<DataModel.PageRange> pageRanges = [];
+        #endregion
 
         #region Constructors
             public ResultsControl()
@@ -39,36 +46,34 @@ namespace DBF.UserControls
                 this.DataContextChanged+= ResultsControl_DataContextChanged;
                 this.Loaded            += UserControl_Loaded;
 
+                // Pairs
                 dgPairs.Columns["PairName"].ColumnSizer = GridLengthUnitType.SizeToCells;
                 dgPairs.GroupCollapsed                 += (s, e) => dgPairs.RefreshSorting();
                 dgPairs.GroupExpanded                  += (s, e) => dgPairs.RefreshSorting();
-                dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = InProjectorView; };
-                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = InProjectorView; };
+                dgPairs.GroupCollapsing                += (s, e) => { e.Cancel = inProjectorView; };
+                dgPairs.GroupExpanding                 += (s, e) => { e.Cancel = inProjectorView; };
                 dgPairs.ItemsSourceChanged             += onPairsChanged;
 
+                // Teams       
                 dgTeams.Columns["TeamName"].ColumnSizer = GridLengthUnitType.SizeToCells;
                 dgTeams.GroupCollapsed                 += (s, e) => dgTeams.RefreshSorting();
                 dgTeams.GroupExpanded                  += (s, e) => dgTeams.RefreshSorting();
-                dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = InProjectorView; };
-                dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = InProjectorView; };
+                dgTeams.GroupCollapsing                += (s, e) => { e.Cancel = inProjectorView; };
+                dgTeams.GroupExpanding                 += (s, e) => { e.Cancel = inProjectorView; };
                 dgTeams.ItemsSourceChanged             += onTeamsChanged;
 
-                // Initialize the timer
-                groupTimer             = new DispatcherTimer();
-                groupTimer.Tick       += (s, e) => showNextGroup();
-                config.PropertyChanged+= (s, e) => setupPaging();
+                config ??= IoC.Get<Configuration>();
             }
         #endregion
 
         #region Public Properties
-            public Visibility CollapsedInProjectorView => InProjectorView
+            public Visibility CollapsedInProjectorView => inProjectorView
                                                       ||  DataContext is not ControlViewModel vm
                                                         ? Visibility.Collapsed
                                                         : vm.ShowAsOneGroupVisibility;
-
-            public bool       InProjectorView          { get; private set; }
         #endregion
 
+        #region Event handling
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             var parent = VisualTreeHelper.GetParent(this);
@@ -77,8 +82,15 @@ namespace DBF.UserControls
                &&  parent is not Window)
                 parent = VisualTreeHelper.GetParent(parent);
 
-            InProjectorView = parent?.GetType().Name == "ProjectorView";
+            inProjectorView = parent?.GetType().Name == "ProjectorView";
             setupPaging();
+
+            groupTimer.Tick       += (s, e) => showNextGroup();
+            config.PropertyChanged+= (s, e) =>
+            {
+                if (e.PropertyName == nameof(Configuration.ProjectorMaxRows))
+                    setupPaging();
+            };
         }
 
         private void onPairsChanged(object s, GridItemsSourceChangedEventArgs e)
@@ -86,32 +98,29 @@ namespace DBF.UserControls
             if (s              is SfDataGrid dg
             &&  dg.ItemsSource is not null)
             {
-                try
-                {
-                    dg.ClearFilters();
-                    dg.GroupColumnDescriptions.Clear();
-                    dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
+                dg.ClearFilters();
 
-                    pairs = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Pair>;
+                dg.GroupColumnDescriptions.Clear();
+                dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "Group" });
 
-                    // SubGroups?                
-                    if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
-                        dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
-                }
+                pairs = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Pair>;
 
-                catch (Exception ex)
-                {
-                    Logger.Exception(ex);
-                    throw;
-                }
+                // SubGroups?                
+                if (pairs.Any(p => !string.IsNullOrEmpty(p.SubGroup)))
+                    dg.GroupColumnDescriptions.Add(new GroupColumnDescription() { ColumnName = "SubGroup" });
 
                 dg.RefreshSorting();
+
+                dg.View.Filter = item =>  pageRanges.Count == 0
+                                      ||  pageIndex        <  0
+                                      ||  item             is Pair pair
+                                      &&  pageRanges[pageIndex].Contains(pair.EntryNo);
                 dg.View.RefreshFilter();
-                dg.View.Filter = item =>  displayLines.Count == 0
-                                      ||  item               is Pair pair
-                                      &&  displayLines[displayLineIndex].Contains(pair.EntryNo);
 
                 setupPaging();
+
+                // Auto-size non-wrapping columns to fit their largest cell (run after record is present)
+                AutoSizeColumnsToContent(dg);
             }
         }
 
@@ -127,27 +136,31 @@ namespace DBF.UserControls
 
                 teams = ((ListCollectionView)dg.ItemsSource).SourceCollection as IEnumerable<Team>;
 
+                dg.View.Filter = item =>  pageRanges.Count == 0
+                                      ||  pageIndex        <  0
+                                      ||  item             is Team team
+                                      &&  pageRanges[pageIndex].Contains(team.EntryNo);
                 dg.View.RefreshFilter();
-                dg.View.Filter = item =>  displayLines.Count == 0
-                                      ||  item               is Team team
-                                      &&  displayLines[displayLineIndex].Contains(team.EntryNo);
 
                 setupPaging();
+
+                // Auto-size non-wrapping columns to fit their largest cell (run after record is present)
+                AutoSizeColumnsToContent(dg);
             }
         }
+        #endregion
 
         private void setupPaging()
         {
-            if (InProjectorView)
+            if (inProjectorView)
             {
                 groupTimer.Stop();
                 groupTimer.Interval = TimeSpan.FromSeconds(config.ProjectorInterval);
 
-                displayLines     = [];
-                displayLineIndex = -1;
+                pageRanges       = [];
+                pageIndex        = -1;
                 linesAllocated   = 0;
-                linesNeeded      = 0;
-                interval         = new(0, 0);
+                currentPageRange = new(0, 0);
                 pairRows         = pairs?.Count() ?? 0;
                 teamRows         = teams?.Count() ?? 0;
 
@@ -156,94 +169,260 @@ namespace DBF.UserControls
 
                 if (pairRows + teamRows >  0)
                 {
-                    splitDataGrid(dgPairs);
-                    splitDataGrid(dgTeams);
+                    parse(dgPairs);
+                    parse(dgTeams);
 
-                    if (linesNeeded >  config.ProjectorMaxRows)
+                    if (pageRanges.Count == 0)
+                        pageRanges = [new DataModel.PageRange(0, pairRows + teamRows)];
+                    else
                     {
                         showNextGroup();
                         groupTimer.Start();
                     }
-                    else
-                        displayLines = [new Interval(0, pairRows + teamRows)];
                 }
             }
         }
 
-        #region Display Line Groups
-            private void splitDataGrid(SfDataGrid dataGrid)
+        #region Column and Row Sizing
+            private void SfDataGrid_QueryRowHeight(object sender, QueryRowHeightEventArgs e)
             {
-                if (dataGrid?.View is null)
+                var dataGrid = sender as SfDataGrid;
+
+                if (dataGrid == null)
                     return;
 
-                foreach (Group group in dataGrid.View.Groups.OrderBy(g => ((Group)g).Key))
+                // Fetch visual row
+                var recordEntry = dataGrid.GetNodeEntry(e.RowIndex);
+
+                if (recordEntry is null
+                ||  recordEntry.IsGroups)
+                    return;
+
+                var record = dataGrid.GetRecordAtRowIndex(e.RowIndex);
+
+                if (record == null)
+                    return;
+
+                double maxHeight = dataGrid.RowHeight;
+
+                // Get device DPI -> pixelsPerDip
+                var    dpi          = VisualTreeHelper.GetDpi(dataGrid);
+                double pixelsPerDip = dpi.PixelsPerDip;
+
+                foreach (var col in dataGrid.Columns.OfType<GridTextColumn>().Where(c => c.TextWrapping == TextWrapping.Wrap))
                 {
-                    linesNeeded+= group.LineCount();
+                    var value = record.GetType().GetProperty(col.MappingName)?.GetValue(record)?.ToString();
 
-                    if (group.LineCount() <= config.ProjectorMaxRows - linesAllocated)
-                        addGroup(group);
-                    else
+                    if (string.IsNullOrEmpty(value))
+                        continue;
+
+                    var fontFamily = dataGrid.FontFamily;
+                    var fontSize   = dataGrid.FontSize;
+                    var typeface   = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+
+                    // Use overload that accepts pixelsPerDip (DPI aware measurement)
+                    var formattedText = new FormattedText( value
+                                                         , CultureInfo.CurrentCulture
+                                                         , FlowDirection.LeftToRight
+                                                         , typeface
+                                                         , fontSize
+                                                         , Brushes.Black
+                                                         , new NumberSubstitution()
+                                                         , TextFormattingMode.Display
+                                                         , pixelsPerDip);
+
+                    // Consider column padding when measuring. Use horizontal padding to compute available
+                    // text width, and vertical padding when adding to the required row height.
+                    var horizontalPadding = col.Padding.Left + col.Padding.Right;
+                    var verticalPadding   = col.Padding.Top + col.Padding.Bottom + 4; // small extra gap
+
+                    // If this control is placed inside a Viewbox it will be scaled. In that case we must
+                    // measure the text as it will appear visually (scaled) and then convert the measured
+                    // visible height back to the unscaled row height that SfDataGrid expects.
+                    double scaleX = 1.0, scaleY = 1.0;
+                    try
                     {
-                        if (!interval.IsEmpty)
-                            endInterval();
+                        var wnd = Window.GetWindow(dataGrid);
 
-                        if (group.Groups is null || group.Groups.Count == 0)
-                            splitGroup(group);
-                        else
-                            foreach (Group subgroup in group.Groups)
-                                if (subgroup.LineCount() <= config.ProjectorMaxRows - linesAllocated)
-                                    addGroup(subgroup);
-                                else
-                                    splitGroup(subgroup);
+                        if (wnd is not null)
+                        {
+                            var gt = dataGrid.TransformToVisual(wnd);
+                            var p0 = gt.Transform(new Point(0, 0));
+                            var pX = gt.Transform(new Point(1, 0));
+                            var pY = gt.Transform(new Point(0, 1));
+                            scaleX = Math.Abs(pX.X - p0.X);
+                            scaleY = Math.Abs(pY.Y - p0.Y);
+
+                            if (scaleX <= 0)
+                                scaleX =  1.0;
+
+                            if (scaleY <= 0)
+                                scaleY =  1.0;
+                        }
                     }
+
+                    catch
+                    {
+                        // fall back to 1.0 if transform not available
+                        scaleX = scaleY = 1.0;
+                    }
+
+                    var availableTextWidth = Math.Max(1.0, (col.ActualWidth - horizontalPadding) * scaleX);
+
+                    // Measure text at the scaled font size so FormattedText.Height represents visible height
+                    var scaledTypeface = typeface;
+                    var scaledFontSize = fontSize * scaleY;
+
+                    var visFormatted = new FormattedText(formattedText.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, scaledTypeface, scaledFontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, pixelsPerDip)
+                                       {
+                                           MaxTextWidth = availableTextWidth
+                                       };
+
+                    // convert visible height back to unscaled height used by SfDataGrid
+                    var requiredUnscaledHeight = (visFormatted.Height / scaleY);
+
+                    if (requiredUnscaledHeight + verticalPadding >  maxHeight)
+                        maxHeight = Math.Max(maxHeight, requiredUnscaledHeight + verticalPadding);
                 }
 
-                if (!interval.IsEmpty)
+                e.Height  = maxHeight;
+                e.Handled = true;
+            }
+
+            private void AutoSizeColumnsToContent(SfDataGrid dg)
+            {
+                var    dpi          = VisualTreeHelper.GetDpi(dg);
+                double pixelsPerDip = dpi.PixelsPerDip;
+                var    typeface     = new Typeface(dg.FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+                var    items        = ((ListCollectionView)dg.ItemsSource).SourceCollection;
+
+                foreach (var col in dg.Columns.OfType<GridTextColumn>().Where(c => c.TextWrapping != TextWrapping.Wrap))
+                {
+                    double max = 0;
+
+                    // header
+                    var header   = (col.HeaderText ?? string.Empty);
+                    var ftHeader = new FormattedText(header, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, dg.FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, pixelsPerDip);
+                    max          = ftHeader.Width;
+
+                    // cells
+                    foreach (var item in items)
+                    {
+                        var v = item?.GetType().GetProperty(col.MappingName)?.GetValue(item)?.ToString();
+
+                        if (string.IsNullOrEmpty(v))
+                            continue;
+
+                        var ft = new FormattedText(v, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, dg.FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Display, pixelsPerDip);
+                        max    = Math.Max(max, ft.Width);
+                    }
+
+                    var horizPadding = col.Padding.Left + col.Padding.Right + 8;
+
+                    // gap for sorting icon etc.
+                    col.Width = max + horizPadding;
+                }
+
+                dg.UpdateLayout();
+            }
+        #endregion
+
+        #region Display Line Groups
+            private void parse(SfDataGrid dataGrid)
+            {
+                if (dataGrid?.View              is null
+                ||  dataGrid.View.Records.Count == 0)
+                    return;
+
+                if (dataGrid.View.Groups       is null
+                ||  dataGrid.View.Groups.Count == 0)
+                    parse(dataGrid.View.Records);
+                else
+                    foreach (Group group in dataGrid.View.Groups)
+                        parse(group);
+
+                if (!currentPageRange.IsEmpty)
                     endInterval();
             }
 
-            private void addGroup(Group group)
+            private void parse(Group group)
             {
-                interval.To   += group.Records?.Count() ?? 0;
-                linesAllocated+= group.LineCount();
-            }
+                linesAllocated++;  // allocate one line for the group header
 
-            private void splitGroup(Group group)
-            {
-                for (int rows = group.Records.Count; rows >  0;)
+                if (group.Groups is null)
                 {
-                    var cnt     = Math.Min(rows, config.ProjectorMaxRows - linesAllocated - 1);
-                    interval.To+= cnt;
-                    displayLines.Add(interval);
-                    interval       = new Interval(interval.To, interval.To);
-                    linesAllocated = 0;
-                    rows          -= cnt;
+                    parse(group.Records);
+                    return;
+                }
+
+                // Foreach will not work here
+                for (int i = 0; i <  group.Groups.Count(); i++)
+                {
+                    var subGroup =group.Groups[i];
+
+                    if (subGroup.Count() == 0)
+                    {
+                        linesAllocated++;  // allocate one line for the group header
+                        parse(subGroup.Records);
+                    }
+                    else
+                        parse(subGroup);
                 }
             }
 
-            public void endInterval()
+            private void parse(ICollection<Syncfusion.Data.RecordEntry> records)
             {
-                if (interval.To >  interval.From)
-                    displayLines.Add(interval);
+                var linesNeeded = records.Count;
 
-                interval       = new Interval(interval.To, interval.To);
-                linesAllocated = 0;
+                if (!currentPageRange.IsEmpty
+                &&  records.Count >  config.ProjectorMaxRows - linesAllocated)
+                    endInterval();
+
+                if (records.Count <= config.ProjectorMaxRows - linesAllocated)
+                {
+                    currentPageRange.To+= records.Count;
+                    linesAllocated     += records.Count;
+                }
+                else
+                    while (linesNeeded >  0)
+                    {
+                        var cnt             = Math.Min(linesNeeded, config.ProjectorMaxRows - linesAllocated);
+                        currentPageRange.To+= cnt;
+                        linesAllocated     += cnt;
+                        linesNeeded        -= cnt;
+
+                        if (linesAllocated >= config.ProjectorMaxRows)
+                        {
+                            endInterval();
+                            currentPageRange = new DataModel.PageRange(currentPageRange.To, currentPageRange.To);
+                            linesAllocated   = 0;
+                        }
+                    }
+            }
+
+            void endInterval()
+            {
+                if (!currentPageRange.IsEmpty)
+                    pageRanges.Add(currentPageRange);
+
+                currentPageRange = new DataModel.PageRange(currentPageRange.To, currentPageRange.To);
+                linesAllocated   = 0;
             }
 
             private void showNextGroup()
             {
-                if (++displayLineIndex >= displayLines.Count)
-                    displayLineIndex = 0;
+                if (++pageIndex >= pageRanges.Count)
+                    pageIndex = 0;
 
                 dgPairs.View?.RefreshFilter();
                 dgTeams.View?.RefreshFilter();
             }
         #endregion
 
-        public void btnBreak_Click(object sender, RoutedEventArgs e)
-        {
-            Debugger.Break();
-        }
+        //public void btnBreak_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Debugger.Break();
+        //}
 
         #region OnDatacontextChanged
             private void ResultsControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -259,10 +438,10 @@ namespace DBF.UserControls
 
             private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(ControlViewModel.HideHac)
-                ||  e.PropertyName == nameof(ControlViewModel.HideHacGrp)
-                ||  e.PropertyName == nameof(ControlViewModel.ShowAsOneGroup)
-                ||  e.PropertyName == nameof(ControlViewModel.HideTournamentSummery))
+                if (e.PropertyName is  nameof(ControlViewModel.HideHac)
+                                   or  nameof(ControlViewModel.HideHacGrp)
+                                   or  nameof(ControlViewModel.ShowAsOneGroup)
+                                   or  nameof(ControlViewModel.HideTournamentSummery))
                     UpdateColumnVisibility();
 
                 if (e.PropertyName == nameof(ControlViewModel.ShowAsOneGroupVisibility))
@@ -285,24 +464,5 @@ namespace DBF.UserControls
                 }
             }
         #endregion
-
-        //private void showBreak()
-        //{
-        //    try
-        //    {
-        //        // Only show the test button when running under a debugger
-        //        if (Debugger.IsAttached)
-        //        {
-        //            var btn = this.FindName("btnBreak") as UIElement;
-
-        //            if (btn != null)
-        //                btn.Visibility = Visibility.Visible;
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        // ignore any lookup failures
-        //    }
-        //}
     }
 }

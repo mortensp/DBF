@@ -10,6 +10,8 @@ global using Size= System.Windows.Size;
 // as we uses Forms by <UseWindowsForms>true</UseWindowsForms> in the csproj file
 global using System.Windows.Media;
 global using Application = System.Windows.Application;
+
+global using Point = System.Windows.Point;
 global using Binding= System.Windows.Data.Binding;
 global using Brush = System.Windows.Media.Brush;
 global using Brushes = System.Windows.Media.Brushes;

@@ -25,14 +25,14 @@ namespace DBF.ViewModels;
 public class ControlViewModel : Screen, IDisposable
 {
     #region Private Fields
-        private                 SerializedFileSystemWatcher _watcher;
-        private static readonly TimeSpan                    _threshold   = new TimeSpan(0, 0, 10);
-        private                 bool                        _disposed;
-        private                 Encoding                    _iso_8859_1  = Encoding.GetEncoding("iso-8859-1");
-        private                 JsonSerializerOptions       _jsonOptions = new()
-                                                                           {
-                                                                               Converters = { new DecimalCommaConverter() }
-                                                                           };
+    private SerializedFileSystemWatcher _watcher;
+        private static readonly TimeSpan              _threshold   = new TimeSpan(0, 0, 10);
+        private                 bool                  _disposed;
+        private                 Encoding              _iso_8859_1  = Encoding.GetEncoding("iso-8859-1");
+        private                 JsonSerializerOptions _jsonOptions = new()
+                                                                     {
+                                                                         Converters = { new DecimalCommaConverter() }
+                                                                     };
 
         private          LexStrings                      _lexStrings;
         private          BindableCollection<PlayingTime> _playingDates   = [];
@@ -99,7 +99,6 @@ public class ControlViewModel : Screen, IDisposable
                 IsBusy  = false;
                 shellVm = IoC.Get<ShellViewModel>();
             }
-
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -302,7 +301,8 @@ public class ControlViewModel : Screen, IDisposable
         public void Test()
         {
             Debugger.Break();
-            //SelectedClub = Clubs.Last();
+            SelectedClub = Clubs.Last();
+
             var view = controlView.startListControl;
             //var view = new TestReport3View();
 
@@ -333,34 +333,8 @@ public class ControlViewModel : Screen, IDisposable
                                               }
 
                                             );
-            //PrintWPF.PrintVisual.PrintDialog(view,74);
         }
 
-        //public Rect GetRowBoundsInWindow(SfDataGrid dataGrid, Window window, int rowIndex)
-        //{
-        //    // 1. Hent den interne VisualContainer fra datagridet
-        //    var visualContainer = dataGrid.GetVisualContainer();
-
-        //    if (visualContainer == null)
-        //        return Rect.Empty;
-
-        //    // 2. Hent rækkens visuelle rektangel i forhold til selve VisualContaineren
-        //    // (Beregner automatisk højde og Y-forskydning inkl. scrolling)
-        //    Rect rowRectInContainer = visualContainer..rect.GetRowRect(rowIndex);
-
-        //    // Hvis rækken ikke findes eller ikke er synlig, returneres en tom Rect
-        //    if (rowRectInContainer.IsEmpty)
-        //        return Rect.Empty;
-
-        //    // 3. Transformer koordinaterne fra VisualContaineren til Window-koordinater
-        //    GeneralTransform transform = visualContainer.TransformToVisual(window);
-
-        //    // Top-venstre hjørne af rækken projiceret over i vinduet
-        //    Point topLeftInWindow = transform.Transform(new Point(rowRectInContainer.Left, rowRectInContainer.Top));
-
-        //    // Returner den samlede placering og størrelse i forhold til vinduet
-        //    return new Rect(topLeftInWindow, rowRectInContainer.Size);
-        //}
         private void populate(int goal)
         {
             var len   = Pairs.Count;
@@ -407,26 +381,15 @@ public class ControlViewModel : Screen, IDisposable
             public async Task ShowStartListAsync()
             {
                 if (CurrentView is not StartListControl)
-                {
                     CurrentView = _startListControl;
 
-                    //if (_startListControl.FindName("MyScrollViewer") is ScrollViewer sv)
-                    //    sv.ScrollToTop();
-                }
-
                 await showProjector().ConfigureAwait(false);
-                // Scroll til toppen
             }
 
             public async Task ShowBridgeTimersAsync()
             {
                 if (CurrentView is not TimersPanel)
-                {
                     CurrentView = _timersPanel;
-
-                    //if (_resultsControl.FindName("MyScrollViewer") is ScrollViewer sv)
-                    //    sv.ScrollToTop();
-                }
 
                 await showProjector().ConfigureAwait(false);
             }
@@ -453,13 +416,15 @@ public class ControlViewModel : Screen, IDisposable
 
         public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                var owner = CurrentView is not null
-                          ? Window.GetWindow(CurrentView) ?? Application.Current.MainWindow
-                          : Application.Current.MainWindow;
+            var owner = CurrentView is not null
+                      ? Window.GetWindow(CurrentView) ?? Application.Current.MainWindow
+                      : Application.Current.MainWindow;
 
-                if (Configuration.TimersActive && (owner.GetType().Name != "ProjectorView"))
+            if (owner.GetType().Name != "ProjectorView")
+            {
+                if (!Configuration.TimersActive)
+                    Configuration.DeleteState();
+                else
                 {
                     // show custom dialog with three choices
                     var dlg   = new ConfirmCloseDialog($"{Lex.ClosingTheWindow} {Lex.ContinueQuestion}");
@@ -481,17 +446,9 @@ public class ControlViewModel : Screen, IDisposable
                             break;
                     }
                 }
-                else
 
-                    Configuration.DeleteState();
+                Dispose();
             }
-
-            catch (Exception ex)
-            {
-                Logger.Exception(ex, $"Error when closing the ControlViewModel");
-            }
-
-            Dispose();
 
             return await Task.FromResult(true).ConfigureAwait(false);
         }
@@ -580,7 +537,6 @@ public class ControlViewModel : Screen, IDisposable
                                                        })
                                             .OrderByDescending(pt => pt.Date));
             }
-
             catch (Exception ex)
             {
                 Logger.Exception(ex);
@@ -627,7 +583,6 @@ public class ControlViewModel : Screen, IDisposable
                         buildTeams(teams, grpNo, grp);
                 }
             }
-
             catch (Exception)
             {
                 _lexStrings.Set(ErrorMessage, () => Lex.BC3ReadError);
@@ -861,7 +816,6 @@ public class ControlViewModel : Screen, IDisposable
 
                     return mainclub;
                 }
-
                 catch (Exception)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -1001,7 +955,6 @@ public class ControlViewModel : Screen, IDisposable
                                 }
                         }
                 }
-
                 catch (Exception ex)
                 {
                     _lexStrings.Set(ErrorMessage, () => Lex.ErrorMainXml);
@@ -1190,7 +1143,6 @@ public class ControlViewModel : Screen, IDisposable
                         return (T)serializer.Deserialize(reader);
                     }
                 }
-
                 catch (Exception)
                 {
                     Logger.Info($"{Lex.ErrorDeserializing}: {fullPath}");
@@ -1215,13 +1167,11 @@ public class ControlViewModel : Screen, IDisposable
                         using var sr = new StreamReader(fs, encoding);
                         return sr.ReadToEnd();
                     }
-
                     catch (IOException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
                         delay = Math.Min(1000, delay * 2); // exponential backoff, cap at 1s
                     }
-
                     catch (UnauthorizedAccessException) when (attempt <  maxAttempts)
                     {
                         Thread.Sleep(delay);
@@ -1266,7 +1216,6 @@ public class ControlViewModel : Screen, IDisposable
                     projectorView.Top  = primaryScreen.WorkingArea.Top;
                     projectorView.Left = primaryScreen.WpfBounds.Left + primaryScreen.WpfBounds.Width - projectorView.Width;
                 }
-
 #endif
             }
             else
@@ -1328,7 +1277,6 @@ public class ControlViewModel : Screen, IDisposable
                         else
                             initWatcher();
                     }
-
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Error handling event on UI thread: {ex.Message}");

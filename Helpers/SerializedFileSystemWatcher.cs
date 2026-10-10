@@ -154,7 +154,7 @@ namespace DBF.Helpers
                         if (_cts.IsCancellationRequested)
                             break;
 
-                        // Wait a short grouping interval to allow additional events to be queued
+                        // Wait a short grouping currentPageRange to allow additional events to be queued
                         try
                         {
                             await Task.Delay(EventGroupingDelay, _cts.Token).ConfigureAwait(false);
