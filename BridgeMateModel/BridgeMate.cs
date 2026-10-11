@@ -127,7 +127,6 @@ public class BridgeMate : PropertyChangedBase
                     startPolling();
                     return;
                 }
-
                 catch (Exception ex)
                 {
                     Logger.Exception(ex, $"BridgeMate: error opening/handling the file {fileInfo.FullName}");
@@ -208,26 +207,23 @@ public class BridgeMate : PropertyChangedBase
                     lockTaken = Monitor.TryEnter(_sync, TimeSpan.FromSeconds(2));
 
                     if (lockTaken)
-                    {
                         RoundStatus.ReplaceRange(Rounds.Select(rounds => new RoundStatus
-                                                                     {
-                                                                         Section         = (short)rounds.Key.Section
-                                                                       , Round           = (short)rounds.Key.Round
-                                                                       , Letter          = Sections[rounds.Key.Section]?.Letter
-                                                                       , Done            = rounds.Value.All(g => g.Done)
-                                                                       , BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
-                                                                     }));
-                    }
+                                                                         {
+                                                                             Section         = (short)rounds.Key.Section
+                                                                           , Round           = (short)rounds.Key.Round
+                                                                           , Letter          = Sections[rounds.Key.Section]?.Letter
+                                                                           , Done            = rounds.Value.All(g => g.Done)
+                                                                           , BoardsRemaining = rounds.Value.Sum(g => g.BoardsRemaining)
+                                                                         }));
                     else
-                    {
                         Logger.Info("BridgeMate: timeout acquiring _sync lock while updating RoundStatus on UI thread");
-                    }
                 }
                 finally
                 {
                     if (lockTaken)
                         Monitor.Exit(_sync);
                 }
+
             });
         }
 
@@ -345,6 +341,7 @@ public class BridgeMate : PropertyChangedBase
                             break;
                     }
                 }
+
                 catch (Exception ex)
                 {
                     Logger.Exception(ex, "BridgeMate.handleFileEventAsync");
@@ -392,6 +389,12 @@ public class BridgeMate : PropertyChangedBase
                 {
                     // Normal shutdown
                     Logger.Debug("Stop polling");
+                }
+
+                catch (Exception ex)
+                {
+                    // Normal shutdown
+                    Logger.Debug($"Stop polling: {ex.Message}");
                 }
             }
         #endregion

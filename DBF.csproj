@@ -59,7 +59,7 @@
 		<Compile Remove="BridgeMateModel\ScoreUpload.cs" />
 		<Compile Remove="BridgeMateModel\Setting.cs" />
 		
-		<Compile Remove="HelpSystem\PDFViewerControl.xaml.cs" />		
+		<!--<Compile Remove="HelpSystem\PDFViewerControl.xaml.cs" />-->
 		<Compile Remove="ViewModels\StartListPrintViewModel.cs" />		
 		<Compile Remove="ViewModels\TestReport2ViewModel.cs" />		
 		<Compile Remove="ViewModels\TestReport3ViewModel.cs" />		
@@ -79,7 +79,7 @@
 		<None Remove="Images\stopwatch.png" />
 		<None Remove="Images\update-app.png" />
 		<None Remove="Images\VerticalWindows.PNG" />
-		<None Remove="InstallerFiles\Inno Setup Script.old.iss" />
+		<!--<None Remove="InstallerFiles\Inno Setup Script.old.iss" />-->
 	</ItemGroup>
 
 	<ItemGroup>

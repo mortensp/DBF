@@ -57,7 +57,8 @@ public class ControlViewModel : Screen, IDisposable
             try
             {
                 IsBusy      = true;
-                _lexStrings = new(this);
+            ShowAsOneGroup = true; 
+            _lexStrings = new(this);
 
                 BridgeMate = bridgeMate;
 

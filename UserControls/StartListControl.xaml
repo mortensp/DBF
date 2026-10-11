@@ -34,8 +34,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
-            Grid.Row="0"
+        <StackPanel Grid.Row="0"
             Margin="5,5,0,0"
             HorizontalAlignment="Left"
             Orientation="Horizontal">
@@ -55,10 +54,9 @@
                 Text="{Binding Date, StringFormat='{}{0:d. MMM yyyy kl. HH:mm}'}" />
         </StackPanel>
 
-        <Grid x:Name="DetailsRegion" Grid.Row="1">
-            <syncfusion:SfDataGrid
+        <Grid  Grid.Row="1">
+            <syncfusion:SfDataGrid Grid.Row="1"
                 Name="dgTeams"
-                Grid.Row="1"
                 Margin="0,0,0,10"
                 lib:Reporting.Paginate="True"
                 AllowEditing="False"
@@ -73,7 +71,7 @@
                 FilterRowPosition="None"
                 FontSize="{DynamicResource LargeFontSize}"
                 ItemsSource="{Binding Source={StaticResource TeamsViewSource}}"
-                QueryRowHeight="SfDataGrid_QueryRowHeight"
+                QueryRowHeight="QueryRowHeight"
                 ScrollViewer.CanContentScroll="True"
                 Visibility="{Binding Teams, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
 
@@ -91,7 +89,6 @@
 
                     <syncfusion:GridTextColumn
                         x:Name="TeamName"
-                        Width="250"
                         Padding="5,0"
                         AllowSorting="False"
                         HeaderText="{lex:Loc hdTeam}"
@@ -107,7 +104,7 @@
                     <syncfusion:GridNumericColumn
                         Padding="5,0"
                         HeaderText="{lex:Loc hdHAC}"
-                        HorizontalHeaderContentAlignment="Right"
+                        HorizontalHeaderContentAlignment="Center"
                         MappingName="AvgHAC"
                         NumberDecimalDigits="2" />
 
@@ -120,6 +117,7 @@
                         MinimumWidth="600"
                         TextAlignment="Left"
                         TextWrapping="Wrap" />
+                    
                 </syncfusion:SfDataGrid.Columns>
 
                 <syncfusion:SfDataGrid.SortColumnDescriptions>
@@ -133,9 +131,8 @@
 
             </syncfusion:SfDataGrid>
 
-            <syncfusion:SfDataGrid
+            <syncfusion:SfDataGrid Grid.Row="2"
                 Name="dgPairs"
-                Grid.Row="2"
                 Padding="5,0,5,0"
                 lib:Reporting.Paginate="True"
                 AllowEditing="False"
@@ -152,6 +149,7 @@
                 FontSize="{DynamicResource LargeFontSize}"
                 ItemsSource="{Binding Source={StaticResource PairsViewSource}}"
                 NavigationMode="Row"
+                QueryRowHeight="QueryRowHeight"
                 ScrollViewer.CanContentScroll="True"
                 ShowColumnWhenGrouped="True"
                 Visibility="{Binding Pairs, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource HideCollectionEmptyConverter}}">
@@ -177,9 +175,10 @@
                         AllowSorting="False"
                         HeaderText="{lex:Loc hdNames}"
                         MappingName="PairName"
-                        MinimumWidth="350" />
+                        MinimumWidth="280" />
 
                     <syncfusion:GridTextColumn
+                        Padding="5,0"
                         HeaderText="{lex:Loc hdStartPos}"
                         HorizontalHeaderContentAlignment="Center"
                         MappingName="StartPos"
@@ -187,8 +186,9 @@
 
                     <!--    -->
                     <syncfusion:GridNumericColumn
+                        Padding="0,0,5,0"
                         HeaderText="{lex:Loc hdHAC}"
-                        HorizontalHeaderContentAlignment="Right"
+                        HorizontalHeaderContentAlignment="Center"
                         IsHidden="{Binding Data.HideHac, Source={StaticResource ViewModelProxy}}"
                         MappingName="AvgHAC"
                         NumberDecimalDigits="1" />
@@ -222,8 +222,9 @@
                         NumberDecimalDigits="1" />
 
                     <syncfusion:GridNumericColumn
+                        Padding="5,0"
                         HeaderText="{lex:Loc hdDeltaHAC}"
-                        HorizontalHeaderContentAlignment="Right"
+                        HorizontalHeaderContentAlignment="Center"
                         MappingName="HACTotal"
                         NumberDecimalDigits="2" />
 

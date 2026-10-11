@@ -93,7 +93,6 @@
     <Style TargetType="sfgrid:GridHeaderCellControl">
         <Setter Property="Background" Value="{StaticResource HeaderBrush}" />
         <Setter Property="Foreground" Value="Black" />
-        <!--<Setter Property="HorizontalContentAlignment" Value="Left" />-->
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 

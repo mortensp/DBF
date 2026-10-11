@@ -71,7 +71,7 @@ namespace DBF.DataModel
 
                 var oppKP = 20 - KP;
 
-                return $"{KP.Value,5:0.00}-{oppKP.Value,5:0.00}";
+                return $"{KP.Value,5:0.00} - {oppKP.Value,5:0.00}";
             }
         }
 
