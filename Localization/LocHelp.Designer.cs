@@ -71,20 +71,30 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to App Settings comes here.
-        /// </summary>
-        internal static string AppSettings_Text {
-            get {
-                return ResourceManager.GetString("AppSettings_Text", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to App Settings title.
         /// </summary>
         internal static string AppSettings_Title {
             get {
                 return ResourceManager.GetString("AppSettings_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap BridgeTimer_Image {
+            get {
+                object obj = ResourceManager.GetObject("BridgeTimer_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BridgeTimer.
+        /// </summary>
+        internal static string BridgeTimer_Title {
+            get {
+                return ResourceManager.GetString("BridgeTimer_Title", resourceCulture);
             }
         }
         
@@ -99,15 +109,6 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string TimerSettings_Text {
-            get {
-                return ResourceManager.GetString("TimerSettings_Text", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Timer Settings.
         /// </summary>
         internal static string TimerSettings_Title {
@@ -117,11 +118,21 @@ namespace DBF.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Help Image doesn&apos;t exist.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static string Unknown_Help_Image {
+        internal static System.Drawing.Bitmap Unknown_Help_Image {
             get {
-                return ResourceManager.GetString("Unknown_Help_Image", resourceCulture);
+                object obj = ResourceManager.GetObject("Unknown_Help_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing Help Image.
+        /// </summary>
+        internal static string Unknown_Help_Title {
+            get {
+                return ResourceManager.GetString("Unknown_Help_Title", resourceCulture);
             }
         }
     }

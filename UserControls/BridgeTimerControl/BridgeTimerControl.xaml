@@ -76,8 +76,7 @@
                 </Grid.RowDefinitions>
 
                 <!--  BridgeTimer Display in row 0  -->
-                <Border
-                    Grid.Row="0"
+                <Border Grid.Row="0"
                     Padding="0"
                     CornerRadius="6">
                     <Grid
@@ -109,32 +108,29 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
+                        <TextBlock Grid.Row="0" Grid.Column="1"
                             Margin="0,0,0,4"
                             FontWeight="Bold"
                             Text="{Binding BridgeTimer.RoundText}"
                             TextAlignment="Center" />
 
-                        <WrapPanel
-                            Grid.Row="0"
-                            Grid.Column="2"
+                        <WrapPanel Grid.Row="0" Grid.Column="2"
                             Margin="0,-4,-4,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top">
 
                             <!--  Help button  -->
-                            <!--
                             <Button
                                 x:Name="btnHelp"
                                 Width="24"
                                 Height="24"
+                                help:Help.Key="BridgeTimer"
+                                help:HelpBehavior.Attach="True"
                                 Background="Transparent"
                                 BorderBrush="Transparent"
                                 Content="?"
                                 Cursor="Hand"
-                                ToolTip="{lex:Loc tipHelp}" />-->
+                                ToolTip="{lex:Loc tipHelp}" />
 
                             <!--  Close button  -->
                             <Button
@@ -151,19 +147,15 @@
                         </WrapPanel>
 
                         <!--  Row - Time  -->
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.ColumnSpan="3"
+                        <TextBlock Grid.Row="1" Grid.ColumnSpan="3"
                             Margin="0,0,8,0"
                             HorizontalAlignment="Center"
                             FontSize="44"
                             FontWeight="Bold"
                             Text="{Binding BridgeTimer.Time}" />
 
-                        <TextBlock
+                        <TextBlock Grid.Row="1" Grid.Column="2"
                             x:Name="warning"
-                            Grid.Row="1"
-                            Grid.Column="2"
                             Visibility="{Binding BridgeTimer.WarningVisibility}">
                             <Canvas
                                 Width="31"
@@ -185,10 +177,8 @@
                         </TextBlock>
 
                         <!--  Row - Info  -->
-                        <TextBlock
+                        <TextBlock Grid.Row="3" Grid.Column="1"
                             x:Name="info"
-                            Grid.Row="3"
-                            Grid.Column="1"
                             MaxWidth="400"
                             MaxHeight="150"
                             Margin="0,0,0,4"
@@ -198,10 +188,8 @@
                             TextAlignment="Center"
                             TextWrapping="Wrap" />
 
-                        <TextBlock
+                        <TextBlock Grid.Row="5" Grid.Column="1"
                             x:Name="group"
-                            Grid.Row="5"
-                            Grid.Column="1"
                             Margin="0,8,0,0"
                             HorizontalAlignment="Center"
                             FontWeight="Bold"
@@ -211,8 +199,7 @@
                 </Border>
 
                 <!--  BridgeTimer Control Buttons i row 1  -->
-                <StackPanel
-                    Grid.Row="1"
+                <StackPanel Grid.Row="1"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     Orientation="Horizontal"

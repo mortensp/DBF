@@ -15,20 +15,29 @@ public static class HelpProvider
             "AppSettings"   => new HelpContent( Title: LocHelp.AppSettings_Title
                                               , Text: null
                                               , Image: LocHelp.AppSettings_Image
-                                              , Width: 850
-                                              , Height: null
+                                              , Width: 760
+                                              , Height: 1083
                                               ),
 
             "TimerSettings" => new HelpContent( Title: LocHelp.TimerSettings_Title
                                               , Text: null
                                               , Image: LocHelp.Timersettings_Image
-                                              , Width: 909
-                                              , Height: null
+                                              , Width: 760
+                                              , Height: 1083
+                                              ),
+            "BridgeTimer"   => new HelpContent( Title: LocHelp.BridgeTimer_Title
+                                              , Text: null
+                                              , Image: LocHelp.BridgeTimer_Image
+                                              , Width: 532
+                                              , Height: 675
                                               ),
 
-            _               => new HelpContent( Title: LocHelp.Unknown_Help_Image
+            _               => new HelpContent( Title: LocHelp.Unknown_Help_Title
                                               , Text: null
-                                              , Image: null
+                                              , Image: LocHelp.Unknown_Help_Image
+                                              , Width: 600
+                                              , Height: 300
+                                              , IsMissing: true
                                               )
         };//
     }

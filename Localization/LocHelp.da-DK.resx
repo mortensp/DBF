@@ -121,16 +121,25 @@
   <data name="AppSettings_Image" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\HelpSystem\Images\AppSettings.da-DK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AppSettings_Text" xml:space="preserve">
-    <value>Program Indstillinger kommer her</value>
-  </data>
   <data name="AppSettings_Title" xml:space="preserve">
     <value>Program Indstillinger Titel</value>
+  </data>
+  <data name="Timersettings_Image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\HelpSystem\Images\TimerSettings.da-DK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TimerSettings_Title" xml:space="preserve">
     <value>Ur indstillinger</value>
   </data>
-  <data name="Unknown_Help_Image" xml:space="preserve">
-    <value>Hjælpe billedet findes ikke</value>
+  <data name="Unknown_Help_Title" xml:space="preserve">
+    <value>Hjælpen mangler</value>
+  </data>
+  <data name="Unknown_Help_Image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\HelpSystem\Images\Unknown_Help_Image.da-DK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BridgeTimer_Image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\HelpSystem\Images\BridgeTimer.da-DK.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BridgeTimer_Title" xml:space="preserve">
+    <value>Bridge Ur</value>
   </data>
 </root>
